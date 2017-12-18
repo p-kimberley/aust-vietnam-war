@@ -1,0 +1,272 @@
+@import 'vendor/icheck';
+@import 'vendor/jquery-ui';
+@import 'vendor/select2';
+@import 'vendor/openlayers';
+@import 'vendor/tooltipster';
+@import 'vendor/dropzone';
+@import 'vendor/videojs';
+@import 'vendor/fontawesome';
+@import 'dialogs/casualty-info';
+@import 'dialogs/casualty-submit-info';
+@import 'directives/incident-note';
+@import 'directives/poppy-tooltip';
+@import 'right-sidebar/right-sidebar';
+@import 'chart';
+@import 'globals';
+@import 'incident-note';
+@import 'main-toolbox';
+@import 'marker-tooltips';
+@import 'media';
+@import 'quick-start-guide';
+@import 'search';
+@import 'timeline';
+@import 'responsive-rules';
+
+html {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	position: fixed;
+	padding: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	font-family: $fontFamily;
+	font-size: $normalFontSize;
+	overflow: hidden;
+
+	* {
+		text-rendering: auto;
+	}
+
+	div, p {
+		line-height: normal;
+	}
+
+	p {
+		margin: .3em 0 .6em 0;
+	}
+
+	ul {
+		list-style: none;
+		margin: inherit;
+	}
+
+	table {
+		font-size: $normalFontSize;
+	}
+
+	blockquote {
+		margin: 15px 10px;
+		padding: 10px 15px 5px 15px;
+		border-top: none;
+		border-bottom: none;
+		border-left: solid 3px #999;
+		font-style: italic;
+	}
+
+	button, .clickable {
+		cursor: pointer;
+	}
+
+	input[type="text"] {
+		border: solid 1px #D1D1D1;
+		font-size: $normalFontSize;
+		padding: 5px 6px;
+		font-family: $fontFamily;
+		border-radius: 3px;
+	}
+
+	textarea {
+		font-family: $fontFamily;
+		font-size: .95em;
+	}
+}
+
+/* Images contained within this DIV are loaded to reduce lag when applying CSS styles */
+#preload {
+	display: none;
+}
+
+/* Progress indicator */
+
+.loading-container {
+	position: absolute;
+	vertical-align: middle;
+	z-index: 10;
+	top: 50%;
+	text-align: center;
+	width: 100%;
+
+	.loading-container-inner {
+		margin: auto;
+		text-align: left;
+		background-color: #FFF;
+		box-sizing: border-box;
+		padding: 8px 18px 15px 26px;
+		border-radius: 5px;
+		display: inline-block;
+		border: solid 1px rgba(0, 0, 0, 0.8);
+		box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.6);
+
+		.loading-spinner {
+			display: inline-block;
+			position: relative;
+		}
+
+		.loading-text {
+			display: inline-block;
+			vertical-align: middle;
+			text-align: center;
+			color: #000;
+			padding-top: 5px;
+			padding-left: 20px;
+		}
+	}
+}
+
+/* Page layout */
+
+#main-container {
+	display: table;
+	width: 100%;
+	height: 100%;
+
+	#top-container {
+		display: table-row;
+		height: 100%;
+	}
+
+	#left-container {
+		position: fixed;
+
+		#map {
+			position: fixed;
+			clear: both;
+			width: 100%;
+			height: 100%;
+			top: 0;
+			box-sizing: border-box;
+		}
+
+		#map-watermark {
+			position: fixed;
+			opacity: 0.8;
+			left: 52px;
+			width: 200px;
+			height: 130px;
+			background: url(/images/Map-Watermark-Logo.png) no-repeat;
+			background-size: contain;
+			pointer-events: none;
+		}
+
+		#left-sidebar-container {
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #333;
+			width: 45px;
+			height: 100%;
+			border-right: solid 1px #111;
+			box-sizing: border-box;
+			box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.6);
+
+			#left-sidebar {
+				display: table;
+				height: 100%;
+				width: 100%;
+			}
+		}
+
+		#map-drop-target-overlay {
+			position: absolute;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			box-sizing: border-box;
+			padding: 2px;
+			z-index: 1;
+
+			.target-overlay-inner {
+				background-color: rgba(0, 135, 247, 0.18);
+				border: dashed 3px rgba(0, 135, 247, 0.8);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				border-radius: 10px;
+				opacity: 0;
+				transition: opacity .4s;
+			}
+
+			&.dragging {
+				.target-overlay-inner {
+					opacity: 1;
+				}
+			}
+		}
+	}
+}
+
+canvas.effects-canvas {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	box-sizing: border-box;
+	pointer-events: none;
+}
+
+#modal-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	opacity: 0.8;
+	z-index: 10000;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+
+#loading-progress-container {
+	display: none;
+	position: fixed;
+	width: 350px;
+	max-width: 100%;
+	border: solid 1px #000;
+	background-color: #000;
+	background: url('/images/Incident-Popup-Background.jpg') no-repeat;
+	background-size: cover;
+	box-shadow: 0 0 25px 0 rgba(0,0,0,1);
+	z-index: 100001;
+	overflow: hidden;
+	padding: 15px 25px 20px 20px;
+	border-radius: 3px;
+
+	.heading {
+		display: block;
+		font-weight: bold;
+		text-align: left;
+		color: #000;
+	}
+
+	.message {
+		display: block;
+		padding-bottom: 1em;
+		text-align: left;
+		color: #000;
+	}
+
+	.progress {
+		display: block;
+		width: 100%;
+		height: 1em;
+		border: solid 1px #111;
+	}
+}

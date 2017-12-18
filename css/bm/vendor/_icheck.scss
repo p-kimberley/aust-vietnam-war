@@ -1,0 +1,11 @@
+.icheckbox_square-blue, .iradio_square-blue {
+	background-color: #f5f5f5;
+
+	&.hover {
+		background-color: #FFF;
+	}
+}
+
+.iradio_square-blue {
+	border-radius: 50px;
+}

@@ -1,0 +1,226 @@
+@import '../globals';
+
+/* Incident casualty honour roll */
+
+#right-sidebar-panel-honour-roll {
+	.honour-roll-options {
+		display: table;
+		width: 100%;
+
+		.option {
+			display: table-cell;
+			vertical-align: middle;
+			padding: 5px 3px 0 3px;
+			width: 100%;
+
+			input {
+				width: 100%;
+			}
+
+			.ui-selectmenu-button {
+				width: auto;
+			}
+		}
+	}
+}
+
+.cas-contribute-container {
+	color: #333;
+	cursor: pointer;
+	line-height: 1.7em;
+	transition: all .2s;
+
+	&:hover {
+		color: #0b93d5;
+	}
+}
+
+ul.casualty-list {
+	padding-top: 5px;
+
+	li {
+		cursor: pointer;
+		border-radius: 5px;
+		padding: 5px;
+		border: solid 1px transparent;
+
+		.casualty-item-container {
+			padding: 8px;
+			display: table-row;
+
+			.portrait-container {
+				display: table-cell;
+				text-align: center;
+
+				.portrait {
+					min-width: 50px;
+					background-color: #333;
+					border-radius: 50px;
+
+					img {
+						max-width: 50px;
+						border-radius: 50px;
+						height: 50px;
+					}
+				}
+			}
+
+			.details {
+				display: table-cell;
+				width: 100%;
+				vertical-align: middle;
+				padding-left: 10px;
+
+				.name {
+					font-weight: 500;
+					padding-bottom: 0.2em;
+				}
+
+				.tribute-container {
+					float: right;
+					text-align: right;
+					position: relative;
+
+					.tribute-add-button {
+						opacity: 0;
+						cursor: pointer;
+						padding: 5px 23px 4px 4px;
+						color: #333;
+						position: absolute;
+						top: 3px;
+						right: 0;
+						border: solid 1px #555;
+						border-radius: 3px;
+						box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.3);
+						background: #e4e4e4 url(/images/Poppy.png) no-repeat;
+						background-size: 17px;
+						background-position: 16px 2px;
+						transition: background-color .2s, border-color .2s, color .2s, box-shadow .2s;
+						font-size: 10px;
+
+						&:hover {
+							background-color: #FFF;
+							border-color: #333;
+							color: #000;
+							box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+						}
+					}
+
+					.tributes {
+						display: block;
+						text-align: right;
+						vertical-align: bottom;
+						position: relative;
+						top: 28px;
+						right: 0;
+						padding-left: 10px;
+
+						.count {
+							font-size: 12px;
+							color: #444;
+							padding-right: 9px;
+							position: absolute;
+							top: 2px;
+							font-family: monospace;
+							right: 57px;
+						}
+
+						.poppy {
+							background: url(/images/Poppy.png) no-repeat;
+							background-size: contain;
+							display: inline-block;
+							margin-left: -9px;
+							width: 20px;
+							height: 20px;
+
+							&.ng-enter {
+								opacity: 0;
+								transition: all 2s;
+							}
+
+							&.ng-enter-active {
+								opacity: 1;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		&:hover {
+			background-color: #FFF;
+			border-color: rgba(0, 0, 0, 0.3);
+
+			.details .tribute-container .tribute-add-button {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.tooltip-input-tribute {
+	background: rgba(0, 0, 0, 0.5) url(/images/Poppy.png) no-repeat;
+	background-size: cover;
+	background-position-x: 50px;
+
+	form {
+		margin: 0;
+
+		.header {
+			padding: 1px 8px 5px 7px;
+			background-color: rgba(255, 255, 255, 0.1);
+			font-weight: 500;
+			color: #FFF;
+			border-bottom: solid 1px rgba(0, 0, 0, 0.5);
+		}
+
+		textarea {
+			display: block;
+			height: 80px;
+			width: 250px;
+			border: none;
+			resize: none;
+			border-bottom: solid 1px #555;
+			background-color: rgba(255, 255, 255, 0.95);
+			padding: 2px 4px;
+			outline: none;
+		}
+
+		.button-container {
+			display: table;
+			width: 100%;
+
+			button {
+				display: table-cell;
+				width: 50%;
+				border: solid 1px;
+				padding: 4px 10px;
+
+				&.submit {
+					background-color: #58baea;
+					border-color: #a9e3ff;
+					transition: all .2s;
+
+					&:hover {
+						background-color: #2489c5;
+						border-color: #58baea;
+						color: #FFF;
+					}
+				}
+
+				&.cancel {
+					background-color: #d0d0d0;
+					border-color: #f7f7f7;
+					border-right: 0;
+					transition: all .2s;
+
+					&:hover {
+						background-color: #9d9d9d;
+						border-color: #d0d0d0;
+						color: #FFF;
+					}
+				}
+			}
+		}
+	}
+}

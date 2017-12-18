@@ -1,0 +1,40 @@
+$fontFamily: "Segoe UI",Arial,sans-serif;
+
+$largerFontSize: 1.2em;
+$normalFontSize: .95em;
+$smallerFontSize: 0.85em;
+
+$highlightChangeAmount: 20%;
+
+$highlightBackgroundColor: #2489c5;
+$highlightBackgroundColorHover: darken($highlightBackgroundColor, $highlightChangeAmount);
+
+$highlightBorderColor: darken($highlightBackgroundColor, $highlightChangeAmount);
+$highlightBorderColorHover: darken($highlightBorderColor, $highlightChangeAmount);
+
+@mixin font-awesome-icon($icon, $color) {
+	position: relative;
+	color: $color;
+
+	* {
+		background-image: none!important;
+	}
+
+	&:before {
+		content: $icon;
+		font-family: FontAwesome;
+		position: absolute;
+		top: 0;
+		right: 6px;
+		text-indent: 0;
+	}
+}
+
+/* Homepage common styles */
+
+$widgetContentPadding: 0;
+
+.widget-content-container {
+	padding: $widgetContentPadding;
+	color: #FFF;
+}

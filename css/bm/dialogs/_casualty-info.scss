@@ -1,0 +1,119 @@
+@import '../globals';
+
+/* Casualty info dialog */
+
+#casualty-info-dialog {
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	margin-left: auto;
+	margin-right: auto;
+	border: solid 1px #333;
+	background-color: #FFF;
+	box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.5);
+	display: block;
+	border-radius: 3px;
+	z-index: 10;
+
+	.cas-background {
+		width: 100%;
+		height: 100%;
+		opacity: 0.2;
+		overflow: hidden;
+		position: absolute;
+		pointer-events: none;
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position-y: 50%;
+		z-index: -1;
+	}
+
+	.heading {
+		padding: 3px 5px;
+		cursor: all-scroll;
+
+		.title {
+			font-size: 1.1em;
+			padding: 5px 5px 5px 8px;
+			color: #000;
+			font-weight: 500;
+		}
+
+		.close-button {
+			font-size: 1.5em;
+			cursor: pointer;
+			padding: 5px;
+			float: right;
+			transition: all .2s;
+
+			&:hover {
+				color: #888;
+			}
+		}
+	}
+
+	.body {
+		padding: 0 10px 10px 10px;
+		display: table;
+
+		.left {
+			padding: 0 5px 5px 5px;
+			display: table-cell;
+
+			.portrait img {
+				border: solid 1px rgba(0, 0, 0, 0.8);
+				border-radius: 3px;
+				width: 100px;
+				margin-top: 5px;
+			}
+		}
+
+		.right {
+			padding: 0 5px 5px 10px;
+			display: table-cell;
+			vertical-align: top;
+			height: 100%;
+
+			#cas-info-tabs {
+				.ui-tabs-nav.ui-widget-header {
+					display: flex;
+				}
+			}
+
+			.field {
+				display: table-row;
+
+				.name {
+					display: table-cell;
+					font-weight: 500;
+					color: #111;
+					padding: 2px;
+				}
+
+				.value {
+					color: #111;
+					padding-left: 30px;
+				}
+			}
+
+			p {
+				color: #111;
+				margin-top: 5px;
+				margin-bottom: 10px;
+			}
+		}
+	}
+
+	.cas-info-tab.ui-tabs-panel.ui-widget-content {
+		background-color: rgba(255, 255, 255, 0.8);
+	}
+
+	#cas-info-tab-service-history ul {
+		padding: 0;
+	}
+
+	#cas-info-tab-service-history li {
+		margin-bottom: 15px;
+		color: #111;
+	}
+}

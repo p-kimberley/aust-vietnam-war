@@ -1,0 +1,47 @@
+@import '../bm/globals';
+
+.avw-homepage-widget.news {
+	.news-container {
+		padding: 7% 10%;
+
+		h2 {
+			color: #FFF;
+			margin-top: 0;
+			margin-bottom: 10px;
+			border-bottom: solid 2px $highlightBackgroundColor;
+			padding-bottom: 5px;
+		}
+
+		a {
+			color: rgb(122, 190, 255);
+
+			&:hover {
+				color: rgb(83, 221, 255);
+			}
+		}
+
+		ul {
+			padding-left: 5px;
+			margin: 0;
+
+			li {
+				padding-top: 10px;
+
+				&:first-of-type {
+					padding-top: inherit;
+				}
+
+				.date {
+					font-size: .9em;
+				}
+
+				.title {
+					font-size: 1em;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					overflow: hidden;
+				}
+			}
+		}
+	}
+}

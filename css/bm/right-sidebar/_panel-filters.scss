@@ -1,0 +1,140 @@
+
+#right-sidebar-panel-filters {
+	form {
+		margin-bottom: 0;
+
+		.filter-selector-container {
+			display: block;
+			padding-bottom: 5px;
+			width: 100%;
+			height: auto !important;
+
+			label.filter-selector-control {
+				display: inline-block;
+				padding-left: 5px;
+				cursor: pointer;
+				margin-bottom: 7px;
+				position: relative;
+				top: 2px;
+			}
+
+			input.filter-selector-control {
+				display: inline-block;
+			}
+		}
+
+		.filter-control-container {
+			display: none;
+			padding-bottom: 10px;
+			width: 100%;
+			height: auto !important;
+
+			.select2-search__field {
+				line-height: 22px;
+			}
+		}
+
+		input.map-filter-textbox {
+			box-sizing: border-box;
+			width: 100%;
+		}
+
+		.map-filter-treeview {
+			background-color: rgba(255, 255, 255, 0.5);
+			margin-top: 5px;
+			padding: 3px 0;
+			border-radius: 3px;
+			border: solid 1px rgba(0, 0, 0, 0.2);
+
+			.jstree-search {
+				font-weight: 500;
+				color: #1e6b98;
+				font-style: normal;
+			}
+
+			.item-count {
+				font-size: 0.8em;
+				color: #1f7ead;
+				position: relative;
+				top: -1px;
+			}
+		}
+
+		.map-filter-dropdown {
+			width: 100%;
+			font-size: 12px;
+			padding: 2px;
+			margin-left: -2px;
+			max-height: 300px;
+		}
+
+		.map-filter-range-slider {
+			margin: 0 10px;
+		}
+
+		.map-filter-range-slider-label-container {
+			height: 26px;
+			padding: 0 5px;
+
+			input[type="text"] {
+				height: 100%;
+				border: none;
+				background: none;
+				color: #333;
+				box-shadow: none !important;
+				width: 40%;
+
+				&.left {
+					float: left;
+				}
+
+				&.right {
+					float: right;
+					text-align: right !important;
+				}
+			}
+		}
+
+		.filter-button-container {
+			padding-top: 15px;
+			padding-bottom: 15px;
+
+			.clear {
+				font-weight: normal;
+				float: right;
+			}
+		}
+
+		.result-count {
+			padding: 10px 0;
+			font-size: 15px;
+			text-align: center;
+			color: #333;
+			background: #DDD;
+			border-radius: 5px;
+			border: solid 1px #AAA;
+		}
+	}
+}
+
+#map-unit-filter-search-matches {
+	display: none;
+	position: absolute;
+	min-width: 150px;
+	max-width: 400px;
+	max-height: 500px;
+	border-radius: 3px;
+	border: solid 1px #111;
+	background: #444;
+	padding: 5px;
+	overflow: auto;
+	box-shadow: 2px 3px 5px 0 rgba(0, 0, 0, 0.6);
+	z-index: 100;
+
+	span.map-unit-filter-match-highlight {
+		padding: 0 2px;
+		background: rgba(255, 255, 0, 0.3);
+		color: #111;
+		border-radius: 3px;
+	}
+}

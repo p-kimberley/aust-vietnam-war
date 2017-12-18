@@ -1,0 +1,78 @@
+@media (max-width: 500px), (max-height: 500px) {
+	#incident-note-comments-panel, #comments-panel-show-hide-button {
+		display: none;
+	}
+
+	#media-upload-dialog {
+		max-width: 220px;
+	}
+
+	#media-upload-properties {
+		min-width: inherit;
+	}
+}
+
+@media (max-width: 650px) {
+	#incident-note-container {
+		.indicator {
+			display: none;
+		}
+
+		.moderation-panel {
+			display: none;
+		}
+	}
+}
+
+@media (min-height: 800px) {
+	#media-upload-dialog {
+		height: 500px;
+	}
+
+	#media-dropzone-container,
+	#media-upload-meta-entry-container {
+		max-height: 500px;
+	}
+}
+
+@media (min-width: 1200px) {
+	#media-upload-dialog {
+		width: 350px;
+	}
+}
+
+@media (max-width: 800px), (max-height: 350px) {
+	.ol-overviewmap {
+		display: none;
+	}
+
+	.ol-scale-line {
+		display: none;
+	}
+
+	#timeline-date-selector-container {
+		display: none!important;
+	}
+
+	#timeline-chart .highcharts-range-selector-buttons {
+		display: none!important;
+	}
+}
+
+@media (max-width: 900px), (max-height: 350px) {
+	#map-watermark {
+		display: none;
+	}
+}
+
+@media (max-width: 950px) {
+	#chart-container .highcharts-range-selector-buttons {
+		display: none;
+	}
+}
+
+@media (min-width: 800px) and (max-width: 1000px) {
+	#timeline-chart .highcharts-title {
+		display: none;
+	}
+}

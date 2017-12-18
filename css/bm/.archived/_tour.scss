@@ -1,0 +1,85 @@
+/* Battle Map tour styles */
+
+div.tour-step-container {
+	cursor: move;
+}
+
+div.tour-step-container, div.tour-step-container p {
+	color: #333;
+}
+
+div.tour-step-button-close {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	background: url('/images/Controlbox-Icon-Close-White.png') no-repeat;
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+	transition: background .2s;
+}
+
+div.tour-step-button-close:hover {
+	background: url('/images/Controlbox-Icon-Close-White-Hover.png') no-repeat;
+}
+
+div.tour-step-title {
+	color: #111;
+	font-size: 16px!important;
+	font-weight: bold;
+	padding: 5px 10px 5px 0;
+	border-bottom: solid 2px rgba(0, 0, 0, 0.3);
+}
+
+div.tour-step-body {
+	padding: 10px 0;
+}
+
+div.tour-step-body a {
+	text-decoration: underline;
+}
+
+div.tour-step-body img {
+	max-width: inherit;
+	max-height: inherit;
+}
+
+div.tour-step-body table {
+	margin-bottom: 10px;
+}
+
+div.tour-step-body tr {
+	border: none;
+}
+
+div.tour-step-body td {
+	color: #333;
+	padding: 5px 8px;
+	border: none;
+}
+
+div.tour-step-body p {
+	margin: 8px 0;
+}
+
+div.tour-step-body ol {
+	margin-bottom: 10px;
+}
+
+div.tour-step-body li {
+	color: #333;
+	line-height: normal;
+}
+
+div.tour-step-body p.tour-action-step {
+	border-left: solid 3px #cf0000;
+	background: rgba(255, 0, 0, 0.16);
+	margin-top: 5px;
+	padding: 7px 10px 8px 10px;
+	border-bottom-right-radius: 3px;
+	border-top-right-radius: 3px;
+}
+
+#dialog-about p {
+	padding-left: 10px;
+}

@@ -1,0 +1,94 @@
+@import '../globals';
+
+#right-sidebar-panel-marker {
+	#incident-context-panel {
+		$infoItemMargin: .4em 0;
+		display: inline-block;
+		width: 100%;
+		box-sizing: border-box;
+
+		.info-item {
+			margin: .4em 0;
+			max-width: 100%;
+			display: table;
+
+			& > .icon {
+				width: 1em;
+				display: table-cell;
+				text-align: center;
+			}
+
+			& > div {
+				color: #222;
+				display: table-cell;
+				padding-left: 7px;
+			}
+
+			li {
+				a.follow-unit {
+					visibility: hidden;
+					color: #888;
+					transition: color .2s;
+					margin-left: 3px;
+
+					&:hover {
+						color: #000;
+					}
+				}
+
+				&:hover a.follow-unit {
+					visibility: visible;
+				}
+			}
+
+			&:first-of-type {
+				margin-top: 0;
+			}
+		}
+
+		.stat-container {
+			display: table;
+			width: 100%;
+			margin-top: 10px;
+			padding-left: 10px;
+			box-sizing: border-box;
+
+			.stat-group {
+				width: 32%;
+				padding-left: 43px;
+				height: 40px;
+				display: table-cell;
+				box-sizing: border-box;
+				background-repeat: no-repeat;
+				background-size: contain;
+				vertical-align: middle;
+
+				&.strength {
+					background-image: url('/images/Incident-Popup-Icon-Strength.png');
+				}
+
+				&.kia {
+					background-image: url('/images/Incident-Popup-Icon-KIA.png');
+				}
+
+				&.wia {
+					background-image: url('/images/Incident-Popup-Icon-WIA.png');
+				}
+
+				.friendly {
+					color: #06F !important;
+					font-weight: bold;
+					padding-left: 5px;
+					font-size: 15px;
+				}
+
+				.enemy {
+					color: #D00 !important;
+					font-weight: bold;
+					padding-left: 5px;
+					font-size: 15px;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,158 @@
+/* Unified search */
+
+#search-container {
+	position: absolute;
+	top: 8px;
+	right: 9px;
+	z-index: 100;
+
+	#search-form {
+		margin: 0;
+
+		#search-input {
+			width: 300px;
+			padding: .45em .7em;
+			box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.5);
+			border: solid 1px rgba(0, 0, 0, 0.6);
+			border-radius: 5px;
+			outline: none;
+
+			&.active {
+				box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.8);
+				border-color: rgba(0, 0, 0, 0.8);
+			}
+		}
+
+		#search-clear-button {
+			color: rgba(0, 0, 0, 0.5);
+			transition: all .2s;
+			position: absolute;
+			top: 7px;
+			right: 9px;
+			font-size: 21px;
+			font-family: sans-serif;
+			cursor: pointer;
+
+			&:hover {
+				color: rgba(0, 0, 0, 0.7);
+			}
+
+			&:hover:active {
+				color: #000;
+			}
+		}
+	}
+
+	#search-results-container {
+		background-color: #F5F5F5;
+		box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+		border: solid 1px rgba(0, 0, 0, 0.6);
+		border-radius: 5px;
+		position: relative;
+		top: 5px;
+		overflow-x: hidden;
+		text-overflow: clip;
+		max-width: 298px;
+		max-height: 600px;
+		overflow-y: auto;
+
+		.mCSB_inside > .mCSB_container {
+			margin-right: 0;
+		}
+
+		.mCSB_scrollTools {
+			margin-top: 5px;
+			margin-bottom: 5px;
+			margin-right: -1px;
+		}
+
+		.no-results {
+			padding: 10px;
+			text-align: center;
+			font-style: italic;
+		}
+
+		#search-similar-terms {
+			padding: 6px 10px 9px 10px;
+			width: 100%;
+			text-align: center;
+			box-sizing: border-box;
+
+			.term {
+				display: inline-block;
+				padding: 0 6px 3px 6px;
+				border-radius: 10px;
+				color: #333;
+				cursor: pointer;
+				transition: all .2s;
+
+				em {
+					text-decoration: underline;
+				}
+
+				.term-freq {
+					color: #666;
+					font-size: 10px;
+				}
+
+				&:hover {
+					color: #000;
+					background-color: rgba(0, 0, 0, 0.1);
+				}
+			}
+		}
+
+		#search-categories {
+			.result-category {
+				& > .header {
+					background-color: #AAA;
+					padding: 5px 10px;
+					font-weight: 500;
+					cursor: default;
+					border-top: solid 1px rgba(0, 0, 0, 0.5);
+					border-bottom: solid 1px rgba(0, 0, 0, 0.5);
+				}
+
+				ul {
+					padding: 0;
+
+					li {
+						padding: 5px 14px 5px 10px;
+						cursor: pointer;
+						border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+						min-height: 40px;
+
+						.header {
+							font-weight: 500;
+							display: block;
+							color: #333;
+						}
+
+						.subtext {
+							color: #333;
+
+							.highlight {
+								background-color: rgba(0, 150, 222, 0.39);
+								border-radius: 6px;
+								padding: 0 3px;
+							}
+						}
+
+						img.thumbnail {
+							max-width: 50px;
+							max-height: 40px;
+							float: right;
+							border-radius: 5px;
+							margin-top: 2px;
+							margin-left: 5px;
+						}
+
+						&:hover {
+							background-color: #DDD;
+						}
+					}
+				}
+			}
+		}
+	}
+}

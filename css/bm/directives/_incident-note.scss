@@ -1,0 +1,104 @@
+/* List of user-contributed incident notes */
+
+ul.incident-note-list {
+	padding: 0;
+
+	li.notes-item {
+		width: 100%;
+		cursor: pointer;
+		overflow: hidden;
+		padding: 5px 8px;
+		box-sizing: border-box;
+		border: solid 1px transparent;
+		border-bottom-color: rgba(0, 0, 0, 0.2);
+		transition: all .2s;
+
+		.notes-title {
+			display: block;
+			height: 20px;
+			color: #000 !important;
+			font-size: 15px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+
+			& > pre {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				background-color: transparent;
+			}
+
+			& > * {
+				color: #000 !important;
+				font-size: 14px;
+			}
+		}
+
+		.notes-body-preview {
+			display: block;
+			color: #333 !important;
+			font-size: 14px;
+			height: 20px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
+		.notes-author {
+			color: #555;
+			display: block;
+			text-align: right;
+			font-size: 14px;
+			padding-right: 2px;
+			margin-top: 5px;
+			overflow: hidden;
+		}
+
+		.notes-comment-count {
+			float: left;
+			margin-top: 5px;
+
+			span.fa {
+				margin-right: 5px;
+			}
+		}
+
+		.notes-status {
+			display: inline-block;
+			float: left;
+			font-family: "FontAwesome";
+			padding: .5em .1em 0 .6em;
+
+			&.rejected {
+				color: red;
+
+				&:after {
+					content: '\f00d';
+				}
+			}
+
+			&.pending {
+				color: #333;
+
+				&:after {
+					content: '\f017';
+				}
+			}
+		}
+
+		&:hover {
+			background-color: #dadadb;
+			border-bottom-color: rgba(0, 0, 0, 0.4);
+		}
+
+		&.active {
+			background-color: #963;
+		}
+
+		&.selected {
+			background-color: #999;
+			cursor: default;
+		}
+	}
+}

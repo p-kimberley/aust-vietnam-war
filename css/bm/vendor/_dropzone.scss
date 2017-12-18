@@ -1,0 +1,217 @@
+#media-dropzone.dropzone {
+	height: 100%;
+	background: rgba(0, 0, 0, 0.1);
+	border: 2px dashed #666;
+	border-radius: 5px;
+	vertical-align: middle;
+	padding: 5px 10px;
+
+	.dz-message {
+		text-align: center;
+		font-size: 18px;
+		color: #666;
+		width: 100%;
+		position: absolute;
+		top: 50%;
+		left: 0;
+		margin-top: -9px;
+	}
+
+	.dz-drag-hover {
+		border: 2px dashed #0087F7;
+		background: rgba(0, 135, 247, 0.18);
+
+		.dz-message {
+			color: #0072D0;
+			opacity: 1;
+		}
+	}
+
+	.dz-preview {
+		display: table;
+		vertical-align: top;
+		overflow: hidden;
+		white-space: nowrap;
+		margin: 5px 0;
+		min-height: 0;
+
+		.dz-image {
+			border-radius: 0;
+			overflow: hidden;
+			width: 45px;
+			height: 45px;
+			top: 0;
+			position: relative;
+			display: inline-block;
+
+			img {
+				border-radius: 25px;
+				width: 45px;
+			}
+		}
+
+		.dz-details {
+			display: table-cell;
+			position: relative;
+			vertical-align: top;
+			top: auto;
+			left: auto;
+			opacity: 1;
+			font-size: 14px;
+			width: 100%;
+			max-width: 100%;
+			text-align: left;
+			color: rgba(0, 0, 0, 0.9);
+			line-height: normal;
+			padding: 0 0 0 5px;
+
+			.dz-size-container {
+				display: block;
+				width: 100%;
+				padding: 5px;
+
+				.loading-spinner {
+					position: relative;
+					top: -5px;
+					left: -4px;
+				}
+
+				.dz-size {
+					margin-bottom: 0;
+					font-size: inherit;
+					padding: 0;
+					float: right;
+					text-align: right;
+
+					span {
+						padding: 0;
+					}
+				}
+			}
+
+			.dz-filename {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 160px;
+				padding: 0 5px 0 5px;
+				display: block;
+
+				span {
+					border: 0;
+					padding: 0;
+				}
+
+				&:hover span {
+					background-color: transparent;
+					border: 0;
+					padding: 0;
+				}
+
+				&:not(:hover) span {
+					border: 0;
+					padding: 0;
+				}
+			}
+		}
+
+		.dz-progress {
+			opacity: 1;
+			z-index: 1000;
+			pointer-events: none;
+			position: static;
+			display: table-cell;
+			height: 12px;
+			width: 100%;
+			bottom: 0;
+			top: 0;
+			left: 0;
+			margin: 0;
+			background: rgba(0, 0, 0, 0.1);
+			-webkit-transform: scale(1);
+			border-radius: 8px;
+			overflow: hidden;
+		}
+
+		.dz-remove {
+			display: block;
+			border: none;
+			position: absolute;
+			color: transparent;
+			top: 2px;
+			right: 4px;
+			font-size: 1.2em;
+			z-index: 1;
+			text-decoration: none;
+
+			span {
+				color: #b40000;
+				cursor: pointer;
+				transition: all .2s;
+
+				&:hover {
+					color: red;
+				}
+			}
+		}
+
+		.dz-ready-message {
+			display: inline-block;
+			position: static;
+			background: none;
+			color: #00a816;
+			opacity: 1;
+			padding: 0 10px 0 0;
+			white-space: normal;
+			width: 100%;
+		}
+
+		.dz-error-mark {
+			pointer-events: none;
+			background: url(/images/Incident-Button-Reject.png) no-repeat;
+			background-size: contain;
+			width: 30px;
+			height: 30px;
+			opacity: 0;
+			z-index: 500;
+			position: absolute;
+			display: block;
+			top: 7px;
+			left: 7px;
+			margin-left: 0;
+			margin-top: 0;
+		}
+
+		&.dz-error .dz-error-message {
+			position: static;
+			display: inline-block;
+			background: none;
+			color: #FF0000;
+			opacity: 1;
+			padding: 0 10px 0 0;
+			white-space: normal;
+			width: 100%;
+		}
+
+		&:hover {
+			.dz-image img {
+				-webkit-transform: inherit;
+				-moz-transform: inherit;
+				-ms-transform: inherit;
+				-o-transform: inherit;
+				transform: scale(1);
+				-webkit-filter: blur(0);
+				filter: blur(0);
+			}
+		}
+
+		&:not(.dz-processing) {
+			.dz-progress {
+				animation: pulse 0s;
+			}
+		}
+	}
+
+	&.dz-started {
+		background-color: transparent;
+	}
+}

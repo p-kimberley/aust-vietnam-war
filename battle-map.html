@@ -1,0 +1,1333 @@
+﻿<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">-->
+    <title>Battle Map</title>
+    <link rel="stylesheet" href="/css/vendor/fontawesome/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/css/vendor/icheck/flat/blue.css"/>
+    <link rel="stylesheet" href="/js/vendor/select2/css/select2.min.css"/>
+    <link rel="stylesheet" href="/js/vendor/jquery-ui/jquery-ui.css?revision=34"/>
+    <link rel="stylesheet" href="/js/vendor/mcustom-scrollbar/jquery.mCustomScrollbar.min.css"/>
+    <link rel="stylesheet" href="/js/vendor/tooltipster/css/tooltipster.bundle.min.css"/>
+    <link rel="stylesheet" href="/js/vendor/tooltipster/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-light.min.css"/>
+    <link rel="stylesheet" href="/js/vendor/jstree/themes/default/style.min.css"/>
+    <link rel="stylesheet" href="/js/vendor/dropzone/min/dropzone.min.css"/>
+    <link rel="stylesheet" href="/js/vendor/videojs/video-js.min.css"/>
+    <link rel="stylesheet" href="/js/vendor/lightgallery/css/lightgallery.min.css">
+    <!--<link rel="stylesheet" href="/js/vendor/ol3-cesium/ol.css"/>-->
+    <link rel="stylesheet" href="/js/vendor/openlayers/ol.css"/>
+
+    <!-- Usernoise styles -->
+    <!--<link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/js/vendor/font/css/usernoise-embedded.css"/>-->
+    <link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/css/button.css"/>
+    <link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/js/popup/dist/popup.css"/>
+    <link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/js/discussion/dist/discussion.css"/>
+    <link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/vendor/icons/css/embedded.css"/>
+
+    <link rel="stylesheet" href="/css/bm/battle-map.css?revision=42"/>
+</head>
+
+<body>
+
+<div id="preload">
+    <img src="/images/Right-Sidebar-Button-Chart-Hover.png"/>
+    <img src="/images/Right-Sidebar-Button-Chart-Active.png"/>
+    <img src="/images/Right-Sidebar-Button-Filter-Hover.png"/>
+    <img src="/images/Right-Sidebar-Button-Filter-Active.png"/>
+    <img src="/images/Right-Sidebar-Button-Layers-Hover.png"/>
+    <img src="/images/Right-Sidebar-Button-Layers-Active.png"/>
+    <img src="/images/Right-Sidebar-Button-Marker-Hover.png"/>
+    <img src="/images/Right-Sidebar-Button-Marker-Active.png"/>
+    <img src="/images/Right-Sidebar-Button-Media-Hover.png"/>
+    <img src="/images/Right-Sidebar-Button-Media-Active.png"/>
+    <img src="/images/Right-Sidebar-Button-Notes-Hover.png"/>
+    <img src="/images/Right-Sidebar-Button-Notes-Active.png"/>
+    <img src="/images/Right-Sidebar-Button-Slouch-Hat-Hover.png"/>
+    <img src="/images/Right-Sidebar-Button-Slouch-Hat-Active.png"/>
+    <img src="/images/Media-Upload-Hover.png"/>
+    <img src="/images/Back-Icon-Hover.png"/>
+    <img src="/images/Help-Icon-Hover.png"/>
+    <img src="/images/User-Icon-Hover.png"/>
+</div>
+
+<div id="main-container">
+    <div id="top-container">
+        <div id="left-container">
+            <!-- Marker tooltip templates -->
+            <div id="marker-tooltip-incident" class="ol-popup">
+                <div class="ol-popup-heading"></div>
+                <div class="ol-popup-content">
+                    <table>
+                        <tr class="operation">
+                            <th>Operation</th>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr class="unit-task">
+                            <th>Unit Task</th>
+                            <td id="marker-tooltip-unit-task">&nbsp</td>
+                        </tr>
+                        <tr class="friendly-units">
+                            <th>Units</th>
+                            <td><ul></ul></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="marker-tooltip-air-sortie" class="ol-popup">
+                <div class="ol-popup-heading"></div>
+                <div class="ol-popup-content">
+                    <table>
+                        <tr class="aircraft-type">
+                            <th>Aircraft type</th>
+                            <td></td>
+                        </tr>
+                        <tr class="mission-type">
+                            <th>Mission type</th>
+                            <td></td>
+                        </tr>
+                        <tr class="service-supported">
+                            <th>Service supported</th>
+                            <td></td>
+                        </tr>
+                        <tr class="operation">
+                            <th>Operation</th>
+                            <td></td>
+                        </tr>
+                        <tr class="launch-base">
+                            <th>Launch base</th>
+                            <td></td>
+                        </tr>
+                        <tr class="target-objective">
+                            <th>Target objective</th>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="marker-tooltip-sea-operation" class="ol-popup">
+                <div class="ol-popup-heading"></div>
+                <div class="ol-popup-content">
+                    <table>
+                        <tr class="ship-type">
+                            <th>Ship type</th>
+                            <td></td>
+                        </tr>
+                        <tr class="ship-name">
+                            <th>Ship name</th>
+                            <td></td>
+                        </tr>
+                        <tr class="operation">
+                            <th>Operation name</th>
+                            <td></td>
+                        </tr>
+                        <tr class="operation-type">
+                            <th>Operation type</th>
+                            <td></td>
+                        </tr>
+                        <tr class="force-supported">
+                            <th>Force supported</th>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="marker-tooltip-media" class="ol-popup">
+                <div class="ol-popup-content">
+                    <span class="item-count"></span>
+                </div>
+            </div>
+            <div id="marker-tooltip-poi" class="ol-popup">
+                <div class="ol-popup-heading">Point of Interest</div>
+                <div class="ol-popup-content">
+                    <table>
+                        <tr class="type">
+                            <th>Type</th>
+                            <td></td>
+                        </tr>
+                        <tr class="name">
+                            <th>Name</th>
+                            <td></td>
+                        </tr>
+                        <tr class="established">
+                            <th>Established</th>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="chart-container">
+                <div id="chart-control-box">
+                    <div id="chart-controlbox-help-tooltip" class='button help'>
+                        <span class="fa fa-question"></span>
+                    </div>
+                    <div id="chart-controlbox-button-close" class='button close' title='Close'>
+                        <span class="fa fa-times"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full-screen incident note display interface -->
+            <div id="incident-note-fullscreen-window-container">
+                <div id="incident-note-fullscreen-window">
+                    <div id="incident-note-container" ng-controller="incidentNoteController">
+                        <div class="header-block-container">
+                            <div class="header-block">
+                                <div class="moderation-panel" ng-show="utilityServices.isPrivilegedUser()">
+                                    <div class="status-spinner"></div>
+                                    <div class="status-button approve" title="Approve this note, publishing it for all users to see" ng-show="noteData.Approval_Status !== 1 && utilityServices.isPrivilegedUser()" ng-click="setNoteApprovalStatus(1)">
+                                        <span class="fa fa-check icon"></span>
+                                        <span class="caption">Approve</span>
+                                    </div>
+                                    <div class="status-button reject" title="Reject this note, hiding it from everyone except the moderation team" ng-show="noteData.Approval_Status && utilityServices.isPrivilegedUser()" ng-click="setNoteApprovalStatus(0)">
+                                        <span class="fa fa-times icon"></span>
+                                        <span class="caption">Reject</span>
+                                    </div>
+                                    <div class="moderation-status" ng-class="moderationStatusClass">{{ moderationStatusText }}</div>
+                                </div>
+                                <a class="avatar"
+                                   ng-href="{{ utilityServices.decodeURIComponent(userMeta.Profile_Page) }}"
+                                   title="View the author's profile page" target="blank"
+                                   ng-bind-html="userMeta.Avatar"></a>
+                                <div class="title-block">
+                                    <div class="date">{{ formatDate(noteData.Created) }}</div>
+                                    <div class="title"
+                                         title="{{ noteData.Title ? noteData.Title : '(Untitled Note)' }}">{{
+                                        noteData.Title }}
+                                    </div>
+                                    <div class="author-block">
+                                        <div class="author">
+                                            <a ng-href="{{ utilityServices.decodeURIComponent(userMeta.Profile_Page) }}"
+                                               target="_blank" title="View the author's profile page">{{
+                                                noteData.Author_Display_Name }}</a>
+                                        </div>
+                                        <div class="indicator user-posts" ng-show="userMeta.User_Note_Count > 0">{{
+                                            userMeta.User_Note_Count }} notes posted
+                                        </div>
+                                        <div class="indicator veteran" ng-show="userMeta.Vietnam_Veteran">
+                                            Vietnam Veteran
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="incident-note-controlbox">
+                                    <a href="#" class="controlbox-button edit" title="Edit this note" ng-show="userHasNoteEditPermission()" onClick="BM.IncidentNote.updateNote()">
+                                        <span class="fa fa-pencil"></span>
+                                    </a>
+                                    <a href="#" class="controlbox-button delete" title="Delete this note" ng-show="utilityServices.isPrivilegedUser()" onClick="BM.IncidentNote.deleteNote()">
+                                        <span class="fa fa-trash"></span>
+                                    </a>
+                                    <a href="#" class="controlbox-button open-incident" title="Open the note's related incident" onClick="BM.IncidentNote.openIncident()">
+                                        <span class="fa fa-map-marker"></span>
+                                    </a>
+                                    <div class="controlbox-divider" ng-show="utilityServices.isPrivilegedUser()"></div>
+                                    <a href="#" class="controlbox-button close" title="Close" onClick="BM.IncidentNote.close()">
+                                        <span class="fa fa-times"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="body-container">
+                            <div id="incident-note-comments-panel">
+                                <div class="comments-header">Comments ({{ noteComments.length }})</div>
+                                <div id="comments-entry-container">
+                                    <span ng-show="!utilityServices.isUserLoggedIn()"><a href="#" onClick="RedirectToLoginPage()">Login</a> to post a comment</span>
+                                    <form ng-show="utilityServices.isUserLoggedIn()">
+                                    <textarea id="incident-note-comment-entry" ng-model="comment" rows="5"
+                                              maxlength="5000"
+                                              placeholder="Comment on this incident note"></textarea>
+                                        <button type="button" class="default" id="incident-note-comments-submit" ng-disabled="!comment"
+                                                ng-click="addComment(noteData.ID, comment)">Submit
+                                        </button>
+                                        <div id="incident-note-comments-submit-status">
+                                            <div class="status-icon"></div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="incident-note-comments-container">
+                                    <div id="incident-note-comments">
+                                        <ul>
+                                            <li ng-repeat="noteComment in noteComments">
+                                                <div class="note-comments-list-item">
+                                                    <div class="comments-heading-container">
+                                                        <div class="comment-controlbox"
+                                                             ng-show="userHasCommentEditPermission(noteComment.Author.Name)">
+                                                            <a href="#" class="controlbox-button delete"
+                                                               ng-click="deleteComment(noteComment.ID, $event)"
+                                                               title="Delete comment"></a>
+                                                        </div>
+                                                        <a class="comment-avatar"
+                                                           ng-href="{{ utilityServices.decodeURIComponent(getCommentAuthorMeta($index).Profile_Page) }}"
+                                                           target="_blank" title="More about this user"
+                                                           ng-bind-html="getCommentAuthorMeta($index).Avatar">
+                                                        </a>
+                                                        <div class="comment-heading">
+                                                            <span class="date">{{ formatDate(noteComment.Created) }}</span>
+                                                            <a class="author-link"
+                                                               ng-href="{{utilityServices.decodeURIComponent(getCommentAuthorMeta($index).Profile_Page)}}"
+                                                               target="_blank" title="More about this user">{{noteComment.Author.Name}}</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="comment">{{ noteComment.Comment }}</div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="incident-note-content-container">
+                                <div ng-bind-html="noteData.Body"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OpenLayers 3 render target -->
+            <div id="map"></div>
+
+            <!-- Fullscreen control -->
+            <div class="ol-full-screen ol-unselectable ol-control">
+                <button id="map-toggle-fullscreen" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="button" title="Toggle full-screen" role="button">
+                    <span class="go-fullscreen fa fa-arrows-alt"></span>
+                    <span class="restore fa fa-compress" style="display: none"></span>
+                </button>
+            </div>
+
+            <!-- Unified search -->
+            <div id="search-container" style="display: none">
+                <form id="search-form">
+                    <input type="text" id="search-input" placeholder="Search...">
+                    <div id="search-clear-button"><span class="fa fa-times-circle"></span></div>
+                </form>
+                <div id="search-results-container" style="display: none">
+                    <div id="search-similar-terms"></div>
+                    <div id="search-categories"></div>
+                </div>
+            </div>
+
+            <!-- Toolbox showing login/logout and help buttons -->
+            <div id="map-watermark"></div>
+
+            <div id="map-drop-target-overlay">
+                <div class="target-overlay-inner"></div>
+            </div>
+
+            <div id="media-dropzone-template" class="dropzone" style="display: none">
+                <div class="dz-preview dz-image-preview">
+                    <div class="dz-image">
+                        <img data-dz-thumbnail>
+                        <div class="dz-error-mark"></div>
+                    </div>
+                    <div class="dz-details">
+                        <div class="dz-filename">
+                            <span data-dz-name></span>
+                        </div>
+                        <div class="dz-size-container">
+                            <div class="dz-size"><span data-dz-size=""></span></div>
+                            <div class="loading-spinner"></div>
+                            <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                            <div class="dz-ready-message" style="display: none"><span>Ready to upload</span></div>
+                        </div>
+                        <a class="dz-remove" href="#" title="Remove file from the upload queue" data-dz-remove>
+                            <span class="fa fa-minus-circle"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="left-sidebar-container">
+                <div id="left-sidebar">
+                    <div id="media-reel-container" ng-controller="mediaController">
+                        <div id="media-upload-button" title="Upload photos or videos"></div>
+                        <div id="media-upload-dialog" style="display: none">
+                            <div class="heading">
+                                <a href="#" class="button-cancel" title="Cancel upload" ng-click="confirmCancelUpload()" ng-show="currentUploadStep < 4">
+                                    <span class="fa fa-times"></span>
+                                </a>
+                                <span ng-show="currentUploadStep == 1">Step 1: Choose Files</span>
+                                <span ng-show="currentUploadStep == 2">Step 2: Choose Location</span>
+                                <span ng-show="currentUploadStep == 3">Step 3: Set Metadata</span>
+                                <span ng-show="currentUploadStep == 4">Upload Status</span>
+                            </div>
+                            <div class="content">
+                                <div class="step" ng-show="currentUploadStep == 1">
+                                    <div id="media-dropzone-container">
+                                        <div id="media-dropzone" class="dropzone"></div>
+                                    </div>
+                                </div>
+                                <div class="step location" ng-show="currentUploadStep == 2">
+                                    <p>Associating a location with your uploaded media will help others find your content</p>
+                                    <h1>Choose a location type</h1>
+                                    <div id="media-location-options">
+                                        <div class="location-option">
+                                            <div class="selectable" ng-class="locationOption == 1 ? 'active' : ''" ng-click="locationOption = 1"
+                                                 title="The photos/videos are directly associated with a particular incident">
+                                                <div class="title">Incident Marker</div>
+                                                <div class="icon marker"></div>
+                                            </div>
+                                        </div>
+                                        <div class="location-option">
+                                            <div class="selectable" ng-class="locationOption == 2 ? 'active' : ''" ng-click="locationOption = 2"
+                                                 title="The photos/videos are non-combat related or are not attributed to a particular incident">
+                                                <div class="title">Point on Map</div>
+                                                <div class="icon point-on-map"></div>
+                                            </div>
+                                        </div>
+                                        <div class="location-option">
+                                            <div class="selectable" ng-class="locationOption == 3 ? 'active' : ''" ng-click="locationOption = 3"
+                                                 title="The location for the uploaded photos/videos is either uncertain or unknown">
+                                                <div class="title">Unknown</div>
+                                                <div class="icon unknown fa fa-3x fa-question-circle"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="location-pick-prompt" id="location-pick-marker" ng-show="locationOption == 1">
+                                        <h1>Select a marker</h1>
+                                        <p ng-show="!selectedMarker">Select a marker from the map then click <em>Next</em>.</p>
+                                        <p ng-show="selectedMarker">You have selected an incident marker.</p>
+                                        <p ng-show="selectedMarker">Click <em>Next</em> to continue.</p>
+                                    </div>
+                                    <div class="location-pick-prompt" id="location-pick-point-on-map" ng-show="locationOption == 2">
+                                        <h1>Pick a point on the map</h1>
+                                        <div class="marker-container" title="Drag this marker onto the map. You can move it after placing it.">
+                                            <div class="marker-box">
+                                                <div id="map-location-selection-marker" class="map-selection-marker"></div>
+                                            </div>
+                                        </div>
+                                        <div class="prompt">
+                                            <p ng-show="!selectedPoint">Drag and drop the marker onto the location of the map relating to your media</p>
+                                            <p ng-show="selectedPoint">Selected location:<br/>[{{selectedPoint[0] | number : 5}}, {{selectedPoint[1] | number : 5}}]</p>
+                                            <p ng-show="selectedPoint">Click <em>Next</em> to continue, or fine-tune the location of the marker on the map.</p>
+                                        </div>
+                                    </div>
+                                    <div class="location-pick-prompt" ng-show="locationOption == 3">
+                                        <h1>No location set</h1>
+                                        <p>You have indicated that the location of the media you are uploading is unknown or uncertain.</p>
+                                        <p>While your files will be searchable by tag, description and other metadata, they won't automatically appear in the image reel as users pan around the map.</p>
+                                        <p>If you know approximately where the images/videos were taken, please <a href="#" ng-click="locationOption = 2">click here</a>.
+                                            Otherwise, click <em>Next</em> to continue.</p>
+                                    </div>
+                                </div>
+                                <div class="step meta" id="media-upload-step-3" ng-show="currentUploadStep == 3">
+                                    <div id="media-upload-meta-entry-container">
+                                        <form id="media-upload-properties" name="mediaUploadProperties" ng-submit="nextUploadStep()">
+                                            <h1 style="margin-top: 0; padding-top: 0">Apply to all items</h1>
+                                            <table class="media-properties">
+                                                <tr><td><input type="checkbox" id="media-upload-date-taken-enabled" ng-model="commonProperties.dateTaken.enabled"></td>
+                                                    <td><label for="media-upload-date-taken-enabled">Date Taken</label></td>
+                                                    <td style="width: 100%">
+                                                        <input type="text" date-picker class="date" id="media-upload-date-taken" ng-model="commonProperties.dateTaken.value" placeholder="dd/mm/yyyy"
+                                                            ng-disabled="!commonProperties.dateTaken.enabled" ng-change="" autocomplete="off">
+                                                    </td></tr>
+                                                <tr><td><input type="checkbox" id="media-upload-attribution-enabled" ng-model="commonProperties.attribution.enabled"></td>
+                                                    <td><label for="media-upload-attribution-enabled">Attribution</label></td>
+                                                    <td>
+                                                        <input type="text" id="media-upload-attribution" ng-model="commonProperties.attribution.value" placeholder="Originator or copyright holder"
+                                                               ng-disabled="!commonProperties.attribution.enabled">
+                                                    </td></tr>
+                                                <tr><td><input type="checkbox" id="media-upload-tags-enabled" ng-model="commonProperties.tags.enabled"></td>
+                                                    <td><label for="media-upload-tags-enabled">Tags</label></td>
+                                                    <td>
+                                                        <select meta-tag-input multiple id="media-upload-tags" ng-model="commonProperties.tags.value" style="width: 100%"
+                                                                ng-disabled="!commonProperties.tags.enabled" data-placeholder="e.g. FSB Coral, casevac, wounded"></select>
+                                                    </td></tr>
+                                                <tr><td><input type="checkbox" id="media-upload-description-enabled" ng-model="commonProperties.description.enabled"></td>
+                                                    <td><label for="media-upload-description-enabled">Description</label></td>
+                                                    <td>
+                                                    <textarea id="media-upload-description" ng-model="commonProperties.description.value" rows="3" placeholder="e.g. 2 Pl A Coy conducting a clearing patrol"
+                                                              ng-disabled="!commonProperties.description.enabled" ng-required="commonProperties.description.enabled"></textarea>
+                                                    </td></tr>
+                                            </table>
+                                            <h1>Individual item properties</h1>
+                                            <ul id="media-upload-meta-list">
+                                                <li class="media-upload-item" ng-repeat="mediaItem in mediaUploadItems">
+                                                    <div class="thumbnail-preview">
+                                                        <div ng-bind-html="mediaItem.previewImage" title="{{mediaItem.name}}"></div>
+                                                    </div>
+                                                    <div class="media-upload-item-meta media-properties">
+                                                        <ng-form name="mediaUploadItemProperties">
+                                                            <input type="text" date-picker class="date item-meta-date" placeholder="Date Taken" ng-hide="commonProperties.dateTaken.enabled" ng-model="mediaItem.dateTaken"
+                                                                name="dateTaken" autocomplete="off">
+                                                            <input type="text" placeholder="Attribution" ng-hide="commonProperties.attribution.enabled" ng-model="mediaItem.attribution">
+                                                            <select meta-tag-input multiple class="item-meta-tags" ng-hide="commonProperties.tags.enabled" ng-model="mediaItem.tags" style="width: 100%"
+                                                                    name="tags" data-placeholder="Tags"></select>
+                                                            <textarea placeholder="Description" ng-hide="commonProperties.description.enabled" ng-model="mediaItem.description" rows="2" name="description"></textarea>
+                                                            <div class="no-fields" ng-hide="!commonProperties.dateTaken.enabled || !commonProperties.attribution.enabled ||
+                                                                !commonProperties.tags.enabled || !commonProperties.description.enabled">
+                                                                <span>All fields set by common values</span>
+                                                            </div>
+                                                        </ng-form>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="step progress" id="media-upload-step-4" ng-show="currentUploadStep == 4">
+                                    <p>Your files are being uploaded. Do not close this window until the operation completes.</p>
+                                    <div id="media-upload-progress-file" class="media-upload-progress-container">
+                                        <div class="progress-label-container">
+                                            <div class="progress-label"></div>
+                                            <div class="percentage"></div>
+                                        </div>
+                                        <div class="progress-bar"></div>
+                                        <div class="data-sent"></div>
+                                    </div>
+                                    <div id="media-upload-progress-total" class="media-upload-progress-container">
+                                        <div class="progress-label-container">
+                                            <div class="progress-label">Total progress</div>
+                                            <div class="percentage"></div>
+                                        </div>
+                                        <div class="progress-bar"></div>
+                                        <div class="data-sent"></div>
+                                    </div>
+                                    <button id="media-upload-error-log-copy" data-clipboard-action="copy" data-clipboard-target="#media-upload-error-list"
+                                            ng-show="uploadErrors.length > 0" title="Copy contents of the error log to the clipboard">
+                                        <span class="fa fa-clipboard"></span>
+                                    </button>
+                                    <h1>Error Log{{ uploadErrors.length > 0 ? ' (' + uploadErrors.length + ')' : '' }}</h1>
+                                    <div id="media-upload-errors">
+                                        <div class="no-errors" ng-hide="uploadErrors.length > 0"><em>No errors have occurred</em></div>
+                                        <ul id="media-upload-error-list">
+                                            <li ng-repeat="uploadError in uploadErrors">
+                                                <div class="title">{{ uploadError.title }}</div>
+                                                <div class="body">{{ uploadError.body }}</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="navigation">
+                                <div id="media-upload-button-back" class="button back" ng-class="backButtonEnabled() ? '' : 'disabled'">
+                                    <a href="#" ng-click="prevUploadStep()" ng-class="currentUploadStep <= 1 ? 'hidden' : ''">
+                                        <span class="fa fa-arrow-circle-left fa-lg"></span> Back
+                                    </a>
+                                </div>
+                                <div id="media-upload-button-next" class="button next" ng-class="nextButtonEnabled() ? '' : 'disabled'">
+                                    <a href="#" ng-click="nextUploadStep()">{{ currentUploadStep >= 4 ? "Close" : "Next " }}
+                                        <span class="fa fa-arrow-circle-right fa-lg" ng-hide="currentUploadStep == 4"></span></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="media-reel">
+                            <ul class="images"></ul>
+                        </div>
+                    </div>
+
+                    <div id="map-main-toolbox" ng-controller="mainToolboxController">
+                        <div class="shade"></div>
+                        <div class="toolbox-item-menu" id="toolbox-menu-account"></div>
+                        <div class="toolbox-item" id="user-toolbox-item">
+                            <div class="toolbox-icon user" ng-bind-html="userMeta.Avatar ? userMeta.Avatar : ''"></div>
+                            <div class="flyout">
+                                <div class="caption">{{ utilityServices.getUserName() || "Account Settings" }}</div>
+                                <div class="flyout-panel">
+                                    <div class="avatar-container">
+                                        <a class="avatar" ng-show="userIsLoggedIn"
+                                           ng-href="{{ utilityServices.decodeURIComponent(userMeta.Profile_Page) }}"
+                                           target="_blank" ng-bind-html="userMeta.Avatar"></a>
+                                    </div>
+                                    <div class="profile-links" ng-show="userIsLoggedIn">
+                                        <div>
+                                            <a ng-href="{{ utilityServices.decodeURIComponent(userMeta.Profile_Page) }}"
+                                               target="_blank">My Profile</a></div>
+                                        <div><a ng-href="{{ logoutUrl }}">Sign Out</a></div>
+                                    </div>
+                                    <div class="user-sign-in-prompt" ng-show="!userIsLoggedIn">
+                                        <p><a href="#" onClick="RedirectToLoginPage()">Sign in</a> with an existing account
+                                        </p>
+                                        <p style="color: #888"><em>- or -</em></p>
+                                        <p><a href="/register">Register</a> as a new user</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="toolbox-item">
+                            <div class="toolbox-icon help"></div>
+                            <div class="flyout">
+                                <div class="caption">Help and About</div>
+                                <div class="flyout-panel">
+                                    <div class="help-about-menu">
+                                        <p><a href="#" onClick="BM.QuickStartGuide.open()">Quick Start Guide</a></p>
+                                        <!--TODO: Implement guided tour-->
+                                        <!--<p><a href="#">Start a Tour</a></p>-->
+                                        <p><a href="#" target="_blank" onClick="usernoise.window.show()">Provide Feedback</a></p>
+                                        <p><a href="#" onClick="BM.MainToolbox.showAboutDialog()">About, Credits and Version
+                                            Information</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="toolbox-item">
+                            <div class="toolbox-icon back" onClick="window.location='/'"></div>
+                            <div class="flyout">
+                                <div class="caption">Return to Homepage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-sidebar-container">
+            <div id="search-show-button" title="Search"><span class="fa fa-2x fa-search"></span></div>
+            <div id="right-sidebar">
+                <div id="right-sidebar-panels">
+                    <div id="right-sidebar-panel-layers" class="right-sidebar-panel">
+                        <div class="panel-title">
+                            <span>Map Options</span>
+                            <div class="sidebar-close-button"><span class="fa fa-times-thin"></span></div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="panel-section-heading world-view collapsible">World View</div>
+                            <div class="panel-section world-view">
+                                <div class="panel-section-content">
+                                    <div id="map-world-view-selector">
+                                        <form id="world-view-selector-form">
+                                            <input type="radio" id="world-view-2d" name="basemap-selector"
+                                                   checked="checked">
+                                            <label for="world-view-2d" role="button">2D</label>
+                                            <input type="radio" id="world-view-3d" name="basemap-selector">
+                                            <label for="world-view-3d" role="button">3D</label>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-section-heading collapsible">Basemap</div>
+                            <div class="panel-section">
+                                <div class="panel-section-content">
+                                    <div id="map-basemap-selector">
+                                        <!-- Basemap controls will be generated and placed here by BM.BasemapController -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-section-heading collapsible">Overlays</div>
+                            <div class="panel-section">
+                                <div class="panel-section-content">
+                                    <div id="map-layer-selector">
+                                        <!-- Layer controls will be generated and placed here by BM.LayerController -->
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="right-sidebar-panel-filters" class="right-sidebar-panel">
+                        <div class="panel-title">
+                            <span>Filters</span>
+                            <div class="sidebar-close-button"><span class="fa fa-times-thin"></span></div>
+                        </div>
+                        <div class="panel-body">
+                            <!-- Contact filters -->
+                            <div class="panel-section-heading hidden">Ground incidents</div>
+                            <div class="panel-section hidden">
+                                <div class="panel-section-content">
+                                    <form>
+                                        <div id="contact-filter-container"></div>
+                                        <!-- Buttons to apply or clear the filter panel controls -->
+                                        <div class="filter-button-container">
+                                            <button class="apply default" onClick="BM.FilterPanel.applyContactFilter()">Apply Filter</button>
+                                            <button class="clear" onClick="BM.FilterPanel.clearContactFilter()">Clear</button>
+                                        </div>
+                                        <!-- Result count -->
+                                        <div class="result-count"></div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- Air sortie filters -->
+                            <div class="panel-section-heading hidden">Air sorties</div>
+                            <div class="panel-section hidden">
+                                <div class="panel-section-content">
+                                    <form>
+                                        <div id="sortie-filter-container"></div>
+                                        <!-- Buttons to apply or clear the filter panel controls -->
+                                        <div class="filter-button-container">
+                                            <button class="apply default" onClick="BM.FilterPanel.applySortieFilter()">Apply Filter</button>
+                                            <button class="clear" onClick="BM.FilterPanel.clearSortieFilter()">Clear</button>
+                                        </div>
+                                        <!-- Result count -->
+                                        <div class="result-count"></div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- Naval gunfire filters -->
+                            <div class="panel-section-heading hidden">Naval gunfire missions</div>
+                            <div class="panel-section hidden">
+                                <div class="panel-section-content">
+                                    <form>
+                                        <div id="naval-gunfire-filter-container"></div>
+                                        <!-- Buttons to apply or clear the filter panel controls -->
+                                        <div class="filter-button-container">
+                                            <button class="apply default" onClick="BM.FilterPanel.applyNavalGunfireFilter()">Apply Filter</button>
+                                            <button class="clear" onClick="BM.FilterPanel.clearNavalGunfireFilter()">Clear</button>
+                                        </div>
+                                        <!-- Result count -->
+                                        <div class="result-count"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="right-sidebar-panel-analytics" class="right-sidebar-panel">
+                        <div class="panel-title">
+                            <span>Analytics</span>
+                            <div class="sidebar-close-button"><span class="fa fa-times-thin"></span></div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="panel-section-heading">Charts</div>
+                            <div class="panel-section">
+                                <div class="panel-section-content">
+                                    <div id="map-chart-control-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="right-sidebar-panel-notes" class="right-sidebar-panel">
+                        <div class="panel-title">
+                            <span>Community Notes</span>
+                            <div class="sidebar-close-button"><span class="fa fa-times-thin"></span></div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="panel-section-heading collapsible">Recent</div>
+                            <div class="panel-section">
+                                <div class="panel-section" ng-controller="recentIncidentNoteController">
+                                    <div incident-note-list></div>
+                                </div>
+                            </div>
+                            <div class="panel-section-heading collapsible" id="note-list-pending-approval-heading">Pending Approval</div>
+                            <div class="panel-section" id="note-list-pending-approval">
+                                <div class="panel-section" ng-controller="pendingIncidentNoteController">
+                                    <div incident-note-list></div>
+                                </div>
+                            </div>
+                            <div class="panel-section-heading collapsible">My Notes</div>
+                            <div class="panel-section">
+                                <div class="panel-section" ng-controller="userIncidentNoteController">
+                                    <div incident-note-list></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="right-sidebar-panel-honour-roll" class="right-sidebar-panel" ng-controller="honourRollController">
+                        <div class="panel-title">
+                            <span>Honour Roll</span>
+                            <div class="sidebar-close-button"><span class="fa fa-times-thin"></span></div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="panel-section">
+                                <div class="panel-section-content">
+                                    <div class="honour-roll-options">
+                                        <div class="option">
+                                            <input type="text" class="search" placeholder="Search by name" ng-model="searchTerm" ng-change="updateHonourRoll()"/>
+                                        </div>
+                                        <div class="option">
+                                            <select select-menu class="category-selector" ng-model="selectedCategory" ng-change="updateHonourRoll()">
+                                                <option value="Service" selected>Service</option>
+                                                <option value="Rank">Rank</option>
+                                                <option value="Service_Category_1">Corps</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <ul>
+                                <li ng-repeat="category in categories">
+                                    <div class="panel-section-heading collapsible collapsed" ng-click="togglePanelHeader($event)">{{category.key + " (" + category.doc_count + ")"}}</div>
+                                    <div class="panel-section">
+                                        <div class="panel-section-content">
+                                            <ul class="casualty-list">
+                                                <li ng-repeat="person in category.people.hits.hits | orderBy: ['_source.Last_Name', '_source.First_Name', '_source.Second_Name'] track by $index" casualty-list-item ng-click="honourRollServices.showCasDialog(person._source)">
+                                                    <div class="casualty-item-container">
+                                                        <div class="details">
+                                                            <div class="name">{{person._source.Last_Name + ',' + (person._source.First_Name ? ' ' + person._source.First_Name : '') + (person._source.Second_Name ? ' ' + person._source.Second_Name : '')}}</div>
+                                                            <div class="description">{{person._source.Rank}}</div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="right-sidebar-panel-media-moderation" class="right-sidebar-panel" ng-controller="mediaModerationController">
+                        <div class="panel-title">
+                            <span>Media Awaiting Moderation</span>
+                            <div class="sidebar-close-button"><span class="fa fa-times-thin"></span></div>
+                        </div>
+                        <div class="panel-body">
+                            <ul id="media-moderation-list">
+                                <li ng-repeat="dateGroup in dateGroups" media-date-group>
+                                    <div class="panel-section-heading collapsible">
+                                        <div class="button-container bulk-approval">
+                                            <div class="spinner"></div>
+                                            <div class="button approve" title="Approve all" ng-click="bulkApproveMediaItems(dateGroup, true)" ng-class="dateGroup.statusChanging ? 'disabled' : ''">
+                                                <span class="icon fa fa-check"></span>
+                                            </div>
+                                            <div class="button reject" title="Reject all" ng-click="bulkApproveMediaItems(dateGroup, false)" ng-class="dateGroup.statusChanging ? 'disabled' : ''">
+                                                <span class="icon fa fa-times"></span>
+                                            </div>
+                                        </div>
+                                        <span>{{dateGroup.date | date : 'dd MMMM yyyy'}}</span>
+                                    </div>
+                                    <div class="panel-section media-thumbnail-container">
+                                        <div class="item-thumbnail" ng-repeat="mediaItem in dateGroup.items">
+                                            <div class="item-container">
+                                                <img media-thumbnail-image ng-src="{{thumbnailImageUrl(mediaItem)}}" alt="{{mediaItem.FileName + '.' + mediaItem.FileExt}}"/>
+                                                <div class="info">
+                                                    <div class="button-container approval">
+                                                        <div class="spinner"></div>
+                                                        <div class="button approve" title="Approve media item" ng-click="approveMediaItem(dateGroup, mediaItem, true)"
+                                                             ng-class="mediaItem.statusChanging ? 'disabled' : ''">
+                                                            <span class="fa fa-check"></span>
+                                                        </div>
+                                                        <div class="button reject" title="Reject media item" ng-click="approveMediaItem(dateGroup, mediaItem, false)"
+                                                             ng-class="mediaItem.statusChanging ? 'disabled' : ''">
+                                                            <span class="fa fa-times"></span>
+                                                        </div>
+                                                    </div>
+                                                    <p class="filename">{{mediaItem.FileName + '.' + mediaItem.FileExt}}</p>
+                                                    <p><a ng-href="{{utilityServices.getUserProfileUrl(mediaItem.Author_User_Name)}}" target="_blank">{{mediaItem.Author_Display_Name}}</a></p>
+                                                    <p>{{mediaItem.Description ? mediaItem.Description : ''}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <p class="media-moderation-empty-message" ng-show="dateGroups.length == 0"><em>No media items are awaiting moderation.</em></p>
+                        </div>
+                    </div>
+
+                    <div id="right-sidebar-panel-marker" class="right-sidebar-panel">
+                        <div id="incident-context-panel" ng-controller="incidentDetailsController">
+                            <div class="panel-title">
+                                <span>About this Incident</span>
+                                <div class="sidebar-close-button"><span class="fa fa-times-thin"></span></div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="panel-section-heading collapsible">Details</div>
+                                <div class="panel-section" id="incident-stats">
+                                    <div class="panel-section-content">
+                                        <p class="info-item"><strong>Operation: </strong>{{incidentData._source.Operation ? incidentData._source.Operation : "Unknown"}}</p>
+                                        <p class="info-item" ng-show="incidentData._source.Unit_Task"><strong>Unit Task: </strong>{{incidentData._source.Unit_Task}}</p>
+
+                                        <div class="info-item" title="Date and time of the incident">
+                                            <span class="icon fa fa-clock-o"></span>
+                                            <div>{{getDateTime(incidentData._source)}}</div>
+                                        </div>
+                                        <div class="info-item location" title="Reported location in MGRS coordinates">
+                                            <span class="icon fa fa-map-marker"></span>
+                                            <div>{{incidentData._source.Grid_Ref}}</div>
+                                        </div>
+                                        <div class="info-item" title="Friendly units involved in the incident">
+                                            <span class="icon fa fa-flag"></span>
+                                            <div>
+                                                <ul class="friendly-units">
+                                                    <li ng-repeat="unit in incidentData._source.Fr_Units | orderBy : 'unit.ShortDisplayName'" title="{{unit.LongDisplayName}}">
+                                                        <span>{{unit.ShortDisplayName}}</span>
+                                                        <a class="follow-unit" href="#" ng-click="followUnit(unit, incidentData._id)" title="Follow this unit"><span class="fa fa-eye"></span></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <!--<div>{{incidentData._source.Fr_Units_Involved}}</div>-->
+                                        </div>
+
+                                        <div class="stat-container">
+                                            <div class="stat-group strength"
+                                                 title="Number of friendly and enemy personnel present">
+                                                <div class="friendly">{{incidentData._source.Fr_Force_Present || 0}}</div>
+                                                <div class="enemy">{{incidentData._source.En_Force || 0}}</div>
+                                            </div>
+                                            <div class="stat-group kia"
+                                                 title="Number of friendly and enemy forces killed in action">
+                                                <div class="friendly">{{incidentData._source.Fr_KIA || 0}}</div>
+                                                <div class="enemy">{{incidentData._source.En_KIA || 0}}</div>
+                                            </div>
+                                            <div class="stat-group wia"
+                                                 title="Number of friendly and enemy forces wounded in action">
+                                                <div class="friendly">{{incidentData._source.Fr_WIA || 0}}</div>
+                                                <div class="enemy">{{incidentData._source.En_WIA || 0}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-section-heading collapsible collapsed" ng-show="hasCasualties()">
+                                    {{'Casualty Honour Roll' + (casualties.length > 0 ? ' (' + casualties.length + ')' : '')}}
+                                </div>
+                                <div class="panel-section" id="incident-cas-honour-roll" ng-show="hasCasualties()">
+                                    <div class="panel-section-content">
+                                    <span class="cas-contribute-container" ng-hover="userAddCas.hover = true" ng-click="userAddCas.active = true">
+                                        <span class="fa fa-user-plus"></span>
+                                        <span class="user-add-cas-prompt" ng-click="promptKIAContribution(incidentData._id)">{{userAddCas.hover ? "Assign another casualty to this contact" : "Know someone else who was killed in action?"}}</span>
+                                    </span>
+                                        <ul class="casualty-list">
+                                            <li casualty-list-item ng-repeat="person in casualties | orderBy: ['Last_Name', 'First_Name'] track by $index" ng-click="honourRollServices.showCasDialog(person._source)">
+                                                <div class="casualty-item-container">
+                                                    <div class="portrait-container">
+                                                        <div class="portrait"><img ng-src="{{honourRollServices.getCasImageUrl(person._source)}}" alt="person._source.Service_Number"/></div>
+                                                    </div>
+                                                    <div class="details">
+                                                        <div class="tribute-container">
+                                                            <div tooltipped data-side="left" class="tribute-add-button" ng-attr-title="Place a poppy" ng-click="honourRollServices.showAddTributePopup(person, $event)" ng-show="honourRollServices.addPoppyButtonEnabled(person._source)">
+                                                                <span class="fa fa-plus"></span>
+                                                            </div>
+                                                            <div poppy-tooltip class="tributes">
+                                                                <span class="count" ng-show="person._source.Tributes.length > 5">(+{{person._source.Tributes.length - 5}})</span>
+                                                                <span class="poppy" ng-repeat="tribute in person._source.Tributes | limitTo:5"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="name">{{person._source.Last_Name + ',' + (person._source.First_Name ? ' ' + person._source.First_Name : '') + (person._source.Second_Name ? ' ' + person._source.Second_Name : '')}}</div>
+                                                        <div class="description">{{person._source.Rank}}</div>
+                                                    </div>
+                                                </div>
+                                                <div style="display: none">
+                                                    <div class="tooltip-input-tribute">
+                                                        <form>
+                                                            <div class="header">Place a Poppy</div>
+                                                            <textarea ng-attr-placeholder="{{honourRollServices.getTributeInputPlaceholderText()}}" maxlength="500" ng-disabled="!honourRollServices.isTributeInputEnabled()" ng-model="tributeInput"></textarea>
+                                                            <div class="button-container">
+                                                                <button class="cancel" ng-click="cancelAddTribute()">Cancel</button>
+                                                                <button class="submit" ng-click="addTribute(person._source)">Place Poppy</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="panel-section-heading collapsible">Reports</div>
+                                <div class="panel-section">
+                                    <div class="panel-section-subheading">Original Incident Report</div>
+                                    <div class="panel-section-content">{{incidentData._source.Description_of_Incident}}</div>
+                                    <div class="panel-section-subheading">Archival Sources</div>
+                                    <div class="panel-section-content">{{incidentData._source.Archival_Source_Data}}</div>
+                                    <div class="panel-section-subheading" ng-show="incidentData._source.Source_Hyperlink != null">Internet Sources</div>
+                                    <div class="panel-section-content" ng-show="incidentData._source.Source_Hyperlink != null"><a ng-href="{{incidentData._source.Source_Hyperlink}}" target="_blank">Australian War Memorial (AWM) digital collection</a></div>
+                                </div>
+                                <div class="panel-section-heading collapsible">
+                                    <div class="button-container">
+                                        <div class="button new-note" title="Attach a note to this incident" ng-click="addIncidentNote(incidentData._id)">
+                                            <span class="icon fa fa-plus-circle"></span>
+                                            <div class="label">Add a Note</div>
+                                        </div>
+                                    </div>
+                                    <span>Community Notes</span>
+                                </div>
+                                <div class="panel-section" ng-controller="noteByIncidentController">
+                                    <div incident-note-list></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="right-sidebar-buttons">
+                <div id="right-sidebar-button-layers" class="right-sidebar-button" title="Map Options"></div>
+                <div id="right-sidebar-button-filters" class="right-sidebar-button" title="Filters"></div>
+                <div id="right-sidebar-button-analytics" class="right-sidebar-button" title="Analytics"></div>
+                <div id="right-sidebar-button-notes" class="right-sidebar-button" title="Community Notes"></div>
+                <div id="right-sidebar-button-honour-roll" class="right-sidebar-button" title="Honour Roll"></div>
+                <div id="right-sidebar-button-media-moderation" class="right-sidebar-button" title="Media Moderation"></div>
+                <div id="right-sidebar-button-marker" class="right-sidebar-button"
+                     title="Information about this Incident"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map-timeline">
+        <div id="timeline-tracker-container">
+            <div id="timeline-tracker">
+                <div class="controlbox">
+                    <span class="button minimise fa fa-window-minimize" title="Minimise"></span>
+                    <span class="button search fa fa-search" title="Choose a different unit"></span>
+                    <span class="button close fa fa-times" title="Close"></span>
+                </div>
+                <div class="options">
+                    <div class="track-type-container">
+                        <div class="cell">
+                            <label for="timeline-track-types">Follow a </label>
+                        </div>
+                        <div class="cell">
+                            <select id="timeline-track-types"></select>
+                        </div>
+                    </div>
+                    <div class="selector-container"></div>
+                </div>
+                <div class="navigator-container">
+                    <div class="heading"><span>Currently tracking</span></div>
+                    <div class="navigator">
+                        <span class="arrow left fa fa-chevron-circle-left"></span>
+                        <span class="description"><span>(Date)</span></span>
+                        <span class="arrow right fa fa-chevron-circle-right"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="timeline-chart-container">
+            <div id="timeline-chart"></div>
+            <div id="timeline-date-selector-container">
+                <label for="timeline-date-start">Start Date:</label>
+                <input type="text" id="timeline-date-start" class="timeline-date-picker">
+                <label for="timeline-date-end">End Date:</label>
+                <input type="text" id="timeline-date-end" class="timeline-date-picker">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Media lightbox sidebar containing metadata and comments -->
+<div id="media-lightbox-sidebar" ng-controller="mediaLightboxController">
+    <div class="filename">{{mediaInfo._source.File_Name + '.' + mediaInfo._source.File_Ext}}</div>
+    <div class="description">{{description()}}</div>
+    <div class="spacer"></div>
+    <div class="tags">
+        <div class="tag" ng-repeat="tag in tags">
+            <span class="tag-icon fa fa-tag"></span><span class="tag-name">{{tag.Name}}</span>
+        </div>
+    </div>
+    <div class="spacer"></div>
+    <table border="0" class="info">
+        <tr ng-show="mediaInfo._source.Date_Taken != ''"><th><span class="fa fa-calendar" title="Date taken" ng-show="mediaInfo._source.Date_Taken != null && mediaInfo._source.Date_Taken != ''"></span></th>
+            <td>{{mediaInfo._source.Date_Taken | date : 'dd MMMM yyyy' }}</td>
+        </tr>
+        <tr ng-show="mediaInfo._source.Attribution != ''"><th><span class="fa fa-copyright" title="Attribution / copyright" ng-show="mediaInfo._source.Attribution != null && mediaInfo._source.Attribution != ''"></span></th>
+            <td>{{mediaInfo._source.Attribution}}</td>
+        </tr>
+        <tr><th><span class="fa fa-user" title="Submitted by {{mediaInfo._source.Author.Name}}"></span></th>
+            <td><a ng-href="{{utilityServices.getUserProfileUrl(mediaInfo._source.Author.Name)}}" target="_blank">{{mediaInfo._source.Author.Name}}</a>, {{creationDate()}}</td>
+        </tr>
+    </table>
+    <div class="spacer"></div>
+    <table border="0" class="social">
+        <tr>
+            <th><span class="fa fa-eye" title="Number of views"></span></th>
+            <td colspan="2">{{mediaInfo._source.Views}} {{mediaInfo._source.Views == 1 ? "view" : "views"}}</td>
+        </tr>
+        <tr>
+            <th><span class="fa fa-thumbs-up" title="Number of likes"></span></th>
+            <td>{{userLikesCaption()}}</td>
+            <td><button id="media-like-button" ng-click="likeMediaItem()" ng-show="mediaInfo._source.Likes.length < 1 && utilityServices.isUserLoggedIn()"><span class="fa fa-thumbs-up"></span> Like</button></td>
+        </tr>
+    </table>
+</div>
+
+<!-- Draggable helper that the user places on the map to select a location -->
+<div id="map-location-selection-marker-clone" class="map-selection-marker"></div>
+
+<div id="casualty-info-dialog" ng-controller="casualtyInfoController">
+    <div class="cas-background" ng-style="{'background-image': 'url(' + casPortraitUrl() + ')'}"></div>
+    <div class="heading">
+        <div class="close-button fa fa-close" title="Close" onClick="BM.CasualtyInfoDialog.hide()"></div>
+        <div class="title">{{casDisplayName()}}</div>
+    </div>
+    <div class="body">
+        <div class="left">
+            <div class="portrait">
+                <img ng-src="{{casPortraitUrl()}}"/>
+            </div>
+        </div>
+        <div class="right">
+            <div id="cas-info-tabs">
+                <ul>
+                    <li><a href="#cas-info-tab-personal-details">Personal Information</a></li>
+                    <li><a href="#cas-info-tab-service-history">Service History</a></li>
+                </ul>
+                <div id="cas-info-tab-personal-details" class="cas-info-tab">
+                    <div class="field"><div class="name">Service Number</div><div class="value">{{cas.Service_Number}}</div></div>
+                    <div class="field"><div class="name">Rank</div><div class="value">{{cas.Rank}}</div></div>
+                    <div class="field"><div class="name">Service</div><div class="value">{{cas.Service}}</div></div>
+                    <div class="field"><div class="name">{{cas.Service == 'Army' ? 'Corps' : 'Service Category'}}</div><div class="value">{{cas.Service_Category_1}}</div></div>
+                    <div class="field"><div class="name">Date of Birth</div><div class="value">{{cas.Birth.Date | date : 'dd MMM yyyy'}} ({{casAge()}} years)</div></div>
+                    <div class="field"><div class="name">Place of Birth</div><div class="value">{{cas.Birth.Place + (cas.Birth.State ? ', ' + cas.Birth.State : '')}}</div></div>
+                    <div class="field"><div class="name">Country of Birth</div><div class="value">{{cas.Birth.Country}}</div></div>
+                    <div class="field"><div class="name">Date of Death</div><div class="value">{{cas.Death.Date | date : 'dd MMM yyyy'}}</div></div>
+                    <div class="field"><div class="name">Cause of Death</div><div class="value">Killed in action</div></div>
+                </div>
+                <div id="cas-info-tab-service-history" class="cas-info-tab">
+                    <ul>
+                        <li ng-repeat="tour in tours">
+                            <div class="field"><div class="name">Unit</div><div class="value">{{tour.Unit}}</div></div>
+                            <div class="field"><div class="name">Dates</div><div class="value">{{tour.Start_Date | date : 'dd MMM yyyy'}} - {{tour.End_Date | date : 'dd MMMM yyyy'}}</div></div>
+                            <div class="field"><div class="name">Duration</div><div class="value">{{tourDuration(tour)}}</div></div>
+                        </li>
+                    </ul>
+                    <p>Total days in Vietnam: {{totalDaysInVietnam() || 'Unknown'}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm whether the user wants to abort media upload -->
+<div id="dialog-confirm-media-upload-cancellation">
+    <p>You have media items ready to upload. Are you sure you want to cancel?</p>
+</div>
+
+<!-- Provide KIA information -->
+<div id="dialog-casualty-submit-info" style="display: none">
+    <p>If you are certain of the name of a service person who was killed during or as a result of this incident, please complete the details below and click <em>Submit</em>.</p>
+    <form>
+        <table>
+            <tr>
+                <th nowrap>Incident ID</th>
+                <td class="incident-id"></td>
+            </tr>
+            <tr>
+                <th nowrap>Casualty type</th>
+                <td>
+                    <select class="cas-type">
+                        <option value="KIA" selected>Killed in Action</option>
+                        <option value="DOW">Died of Wounds</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th nowrap>Casualty names</th>
+                <td>
+                    <select class="kia-personnel" multiple="multiple"></select>
+                </td>
+            </tr>
+        </table>
+        <textarea class="additional-notes" placeholder="Additional notes (optional)" maxlength="1000"></textarea>
+    </form>
+</div>
+
+<!-- Incident note input dialog -->
+<div id="dialog-incident-note-input" style="display: none">
+    <div id="incident-note-input-message">
+        <span>Provide your personal account or opinion of this incident below. Your note will be viewable to visitors of this site, along with your registered name.<br/>
+        All submitted content must comply with the <a href="/terms" target="_blank">Terms of Use</a>.</span>
+    </div>
+    <div id="incident-note-input-title-block">
+        <label for="incident-note-input-title" id="incident-note-input-label">Title:</label>
+        <input type="text" id="incident-note-input-title" maxlength="100"/>
+    </div>
+    <div id="incident-note-input-container">
+        <form style="margin: 0">
+            <textarea name="text-note-input" id="incident-note-input-textarea"></textarea>
+        </form>
+    </div>
+</div>
+
+<div id="dialog-login" style="display: none">
+    <p>Use of this feature requires you to be signed in.</p>
+    <p>You will now be redirected to the login page, where you can sign in using an existing account, or register.</p>
+</div>
+
+<div id="dialog-about" style="display: none">
+    <h1>Australia's Vietnam War Interactive Website</h1>
+    <h2>Credits</h2>
+    <p>See <a href="https://vietnam.unsw.adfa.edu.au/team/" target="_blank" title="About the Team"><em>About the
+        Team</em></a>.</p>
+    <h2>Version Information</h2>
+    <p>Version 2.2.13, 05 Dec 2016</p>
+</div>
+
+<div id="quick-start-guide-container" ng-controller="quickStartGuideController" ng-show="showing">
+    <div class="modal-background" ng-click="close()"></div>
+    <div id="quick-start-guide">
+        <div class="title-bar">
+            <div class="close-button"><a href="#" title="Close" ng-click="close()"><span class="fa fa-close"></span></a></div>
+            <div class="title">Quick Start Guide - {{currentStep.title}}</div>
+        </div>
+        <div class="guide-step-container">
+            <div class="guide-step" ng-repeat="step in steps" ng-show="step === currentStep">
+                <img ng-src="{{step.imageUrl}}" alt="step.title"/>
+                <div class="guide-caption-container">
+                    <div class="guide-caption">{{step.caption}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress">
+                <div class="button-container"></div>
+                <div class="progress-bullets">
+                    <div class="bullet" ng-repeat="step in steps" ng-class="step === currentStep ? 'active' : ''"><span class="fa fa-circle" ng-click="goStep($index)"></span></div>
+                </div>
+                <div class="button-container">
+                    <div class="button next" ng-click="nextStep()">
+                        <span class="label">{{getNextButtonText()}}</span>
+                        <span class="fa fa-arrow-circle-right"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-background"></div>
+<div id="loading-progress-container">
+    <div class="heading"></div>
+    <div class="message"></div>
+    <div class="progress"></div>
+</div>
+
+<!-- Error dialog -->
+<div id="dialog-error" style="display: none"></div>
+
+<!-- Incident media abort confirmation -->
+<div id="dialog-abort-incident-media-upload-dialog" style="display: none">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:5px 7px 20px 0;"></span>
+        Do you wish to abort the upload of your selected images and videos?
+    </p>
+</div>
+
+<script src="/js/vendor/jquery-3.2.1.min.js"></script>
+<script src="/js/bm/utils.js?revision=31"></script>
+<script>
+    // Black out the screen while page elements are being initialised and positioned
+    SetModalBackgroundOpacity(1.0);
+</script>
+
+<script src="/js/vendor/bowser/bowser.js"></script>
+<script src="/js/vendor/angular/angular.js"></script>
+<script src="/js/vendor/angular/angular-animate.js"></script>
+<script src="/js/vendor/angular/angular-sanitize.js"></script>
+<script src="/js/vendor/ckeditor/ckeditor.js"></script>
+<script src="/js/vendor/ckeditor/adapters/jquery.js"></script>
+<script src="/js/vendor/momentjs/moment-with-locales.js"></script>
+<script src="/js/vendor/dropzone/dropzone.js"></script>
+<script src="/js/vendor/videojs/video.js"></script>
+<script src="/js/vendor/lightgallery/js/lightgallery.js"></script>
+<script src="/js/vendor/lightgallery/modules/lg-autoplay.js"></script>
+<script src="/js/vendor/lightgallery/modules/lg-fullscreen.js"></script>
+<script src="/js/vendor/lightgallery/modules/lg-pager.js"></script>
+<script src="/js/vendor/lightgallery/modules/lg-thumbnail.js"></script>
+<script src="/js/vendor/lightgallery/modules/lg-video.js"></script>
+<script src="/js/vendor/lightgallery/modules/lg-zoom.js"></script>
+<script src="/js/vendor/clipboard/clipboard.min.js"></script>
+<script src="/js/vendor/spin/spin.js"></script>
+<script src="/js/vendor/spin/jquery.spin.js"></script>
+<script src="/js/vendor/select2/js/select2.full.js"></script>
+<script src="/js/vendor/jquery-ui/jquery-ui.js"></script>
+<script src="/js/vendor/jquery-touchpunch/jquery.ui.touch-punch.js"></script>
+<script src="/js/vendor/velocity/velocity.js"></script>
+<script src="/js/vendor/icheck/icheck.js"></script>
+<script src="/js/vendor/jstree/jstree.js"></script>
+<script src="/js/vendor/mcustom-scrollbar/jquery.mCustomScrollbar.js"></script>
+<script src="/js/vendor/historyjs/jquery.history.js"></script>
+<script src="/js/vendor/tooltipster/js/tooltipster.bundle.js"></script>
+<script src="/js/vendor/tooltipster/js/plugins/tooltipster/tooltipster-discovery.js"></script>
+<!--<script src="/js/vendor/ol3-cesium/Cesium/Cesium.js"></script>
+<script src="/js/vendor/ol3-cesium/ol3cesium.js"></script>-->
+<script src="/js/vendor/openlayers/ol-debug.js"></script>
+<script src="/js/vendor/chroma/chroma.js"></script>
+<!--<script src="/js/vendor/turf/turf.js"></script>-->
+<script src="/js/vendor/highstock/highstock.js"></script>
+<script src="/js/vendor/highstock/themes/dark-unica.js"></script>
+<script src="/js/vendor/highstock/highcharts-legend-highlighter.src.js"></script>
+<script src="/js/bm/globals.js"></script>
+<script src="/js/bm/window-manager/window-manager.js"></script>
+<script src="/js/bm/services/utility.js"></script>
+<script src="/js/bm/services/incident-note.js"></script>
+<script src="/js/bm/services/honour-roll.js"></script>
+<script src="/js/bm/services/media.js"></script>
+<script src="/js/bm/directives/incident-note.js"></script>
+<script src="/js/bm/directives/select-menu.js"></script>
+<script src="/js/bm/directives/date-picker.js"></script>
+<script src="/js/bm/directives/meta-tag-input.js"></script>
+<script src="/js/bm/directives/tooltipped.js"></script>
+<script src="/js/bm/directives/poppy-tooltip.js"></script>
+<script src="/js/bm/directives/casualty-list-item.js"></script>
+<script src="/js/bm/activity-logging.js"></script>
+<script src="/js/bm/progress.js"></script>
+<script src="/js/bm/quick-start-guide.js"></script>
+<script src="/js/bm/timeline/timeline-series.js"></script>
+<script src="/js/bm/timeline/timeline.js"></script>
+<script src="/js/bm/timeline/timeline-track-type.js"></script>
+<script src="/js/bm/timeline/timeline-track-type-unit.js"></script>
+<script src="/js/bm/timeline/timeline-tracker.js"></script>
+<script src="/js/bm/filter/filter.js"></script>
+<script src="/js/bm/filter/filter-unit-tree.js"></script>
+<script src="/js/bm/filter/filter-range-slider.js"></script>
+<script src="/js/bm/filter/filter-text-box.js"></script>
+<script src="/js/bm/filter/filter-single-select-list.js"></script>
+<script src="/js/bm/filter/filter-multi-select-list.js"></script>
+<script src="/js/bm/filter/filter-distinct-field-multi-select.js"></script>
+<script src="/js/bm/filter/filter-distinct-field-single-select.js"></script>
+<script src="/js/bm/filter/filter-incident-notes.js"></script>
+<script src="/js/bm/chart/chart-options.js"></script>
+<script src="/js/bm/chart/chart.js"></script>
+<script src="/js/bm/chart/chart-incident-freq-date.js"></script>
+<script src="/js/bm/chart/chart-incident-freq-time.js"></script>
+<script src="/js/bm/chart/chart-battle-damage-date.js"></script>
+<script src="/js/bm/chart/chart-battle-damage-time.js"></script>
+<script src="/js/bm/chart/chart-loss-ratio-by-fired-first-by-date.js"></script>
+<script src="/js/bm/chart/chart-loss-ratio-by-fired-first-by-time.js"></script>
+<script src="/js/bm/chart/chart-weapon-rds-fired.js"></script>
+<script src="/js/bm/chart/chart-weapon-rds-fired-by-unit-task.js"></script>
+<script src="/js/bm/chart/chart-weapon-cas-ranges.js"></script>
+<script src="/js/bm/chart/chart-weapon-rds-fired-per-en-cas.js"></script>
+<script src="/js/bm/chart/chart-pers-tour-ages.js"></script>
+<script src="/js/bm/chart/chart-pers-age-by-service.js"></script>
+<script src="/js/bm/chart/chart-pers-age-of-death-by-service.js"></script>
+<script src="/js/bm/marker-tooltip/marker-tooltip.js"></script>
+<script src="/js/bm/marker-tooltip/marker-tooltip-incident.js"></script>
+<script src="/js/bm/marker-tooltip/marker-tooltip-poi.js"></script>
+<script src="/js/bm/marker-tooltip/marker-tooltip-air-sortie.js"></script>
+<script src="/js/bm/marker-tooltip/marker-tooltip-sea-operation.js"></script>
+<script src="/js/bm/layer/option/layer-option.js"></script>
+<script src="/js/bm/layer/option/layer-option-slider.js"></script>
+<script src="/js/bm/layer/option/layer-option-selectmenu.js"></script>
+<script src="/js/bm/layer/layer.js"></script>
+<script src="/js/bm/layer/layer-basemap.js"></script>
+<script src="/js/bm/layer/layer-tile.js"></script>
+<script src="/js/bm/layer/layer-icon.js"></script>
+<script src="/js/bm/layer/layer-marker.js"></script>
+<script src="/js/bm/layer/layer-marker-incident.js"></script>
+<script src="/js/bm/layer/layer-marker-incident-circles.js"></script>
+<script src="/js/bm/layer/layer-marker-media.js"></script>
+<script src="/js/bm/layer/layer-marker-poi.js"></script>
+<script src="/js/bm/layer/layer-air-operations.js"></script>
+<script src="/js/bm/layer/layer-sea-operations.js"></script>
+<script src="/js/bm/layer/layer-heatmap.js"></script>
+<script src="/js/bm/layer/layer-heatmap-contact.js"></script>
+<script src="/js/bm/layer/layers.js"></script>
+<script src="/js/bm/guidance-line.js"></script>
+<script src="/js/bm/incident-note/incident-note.js"></script>
+<script src="/js/bm/casualty-info-dialog.js"></script>
+<script src="/js/bm/search/search-source.js"></script>
+<script src="/js/bm/search/search-source-es.js"></script>
+<script src="/js/bm/search/search-source-es-operation.js"></script>
+<script src="/js/bm/search/search-source-es-incident.js"></script>
+<script src="/js/bm/search/search-source-es-incident-note.js"></script>
+<script src="/js/bm/search/search-source-es-media.js"></script>
+<script src="/js/bm/search/search-source-es-person.js"></script>
+<script src="/js/bm/search/search.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel-layers.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel-filters.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel-analytics.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel-notes.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel-honour-roll.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel-marker.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar-panel-media-moderation.js"></script>
+<script src="/js/bm/right-sidebar/right-sidebar.js"></script>
+<script src="/js/bm/media/media.js"></script>
+<script src="/js/bm/state-management.js"></script>
+<script src="/js/bm/main-toolbox.js"></script>
+<script src="/js/bm/battle-map.js"></script>
+
+<!--<script src="/js/vendor/velocity/velocity.min.js?revision=218"></script>
+<script src="/js/vendor/openlayers/ol.js?revision=218"></script>
+<script src="/js/vendor/ckeditor/ckeditor.js?revision=218"></script>
+<script src="/js/vendor/ckeditor/adapters/jquery.js?revision=218"></script>
+<script src="/js/bm/minified/battle-map.min.js?revision=218"></script>-->
+
+<!-- Manually include Usernoise as the WordPress footer code is not loaded -->
+<script src="/js/bm/usernoise-config.js?revision=2"></script>
+<script type='text/javascript' src='/wp-content/plugins/usernoise/js/usernoise.js?ver=4.1.5'></script>
+<script type='text/javascript' src='/wp-content/plugins/usernoise/js/button.js?ver=4.1.5'></script>
+
+</body>
+
+</html>

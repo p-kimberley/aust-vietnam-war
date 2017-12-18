@@ -1,0 +1,29 @@
+@import '../globals';
+
+#dialog-casualty-submit-info {
+	$controlPadding: 3px;
+	form {
+		margin: 0;
+	}
+
+	table, select, textarea {
+		width: 100%;
+	}
+
+	table {
+		th {
+			text-align: left;
+			padding-right: 5px;
+		}
+
+		td {
+			padding: $controlPadding;
+			width: 100%;
+		}
+	}
+
+	textarea {
+		margin-top: $controlPadding;
+		height: 100px;
+	}
+}

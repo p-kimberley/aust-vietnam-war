@@ -1,0 +1,196 @@
+@import '../globals';
+
+/* Tooltip theme customisations */
+
+.tooltipster-sidetip {
+	$arrowSize: 9px;
+
+	&.battlemap-tooltip-light, &.battlemap-tooltip-dark {
+		&.no-padding {
+			.tooltipster-content {
+				padding: 0;
+			}
+		}
+
+		&.minimal-padding {
+			.tooltipster-content {
+				padding: 3px;
+			}
+		}
+
+		.tooltipster-box {
+			box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
+			font-size: $normalFontSize;
+			border-width: 1px;
+		}
+
+		.tooltipster-content {
+			padding: 8px 15px 10px 15px;
+		}
+	}
+
+	/* Light theme */
+
+	&.battlemap-tooltip-light {
+		$arrowBorderColor: #555;
+		
+		&.tooltipster-bottom .tooltipster-arrow-border {
+			border-bottom-color: $arrowBorderColor;
+		}
+
+		&.tooltipster-left .tooltipster-arrow-border {
+			border-left-color: $arrowBorderColor;
+		}
+
+		&.tooltipster-right .tooltipster-arrow-border {
+			border-right-color: $arrowBorderColor;
+		}
+
+		&.tooltipster-top .tooltipster-arrow-border {
+			border-top-color: $arrowBorderColor;
+		}
+
+		.tooltipster-box {
+			border-color: $arrowBorderColor;
+		}
+
+		.tooltipster-content {
+			color: #111;
+		}
+
+		.tooltip-heading {
+			color: #000;
+			border-bottom: solid 1px rgba(0, 0, 0, 0.2);
+		}
+
+		.tooltip-body {
+			color: #333;
+		}
+	}
+
+	/* Dark theme */
+
+	&.battlemap-tooltip-dark {
+		$arrowBorder: rgba(255, 255, 255, 0.6);
+		$arrowBackground: #222;
+
+		&.tooltipster-top {
+			.tooltipster-arrow-border {
+				border-top-color: $arrowBorder;
+			}
+
+			.tooltipster-arrow-background {
+				border-top-color: $arrowBackground;
+			}
+		}
+
+		&.tooltipster-bottom {
+			.tooltipster-arrow-border {
+				border-bottom-color: $arrowBorder;
+			}
+
+			.tooltipster-arrow-background {
+				border-bottom-color: $arrowBackground;
+			}
+		}
+
+		&.tooltipster-left {
+			.tooltipster-arrow-border {
+				border-left-color: $arrowBorder;
+			}
+
+			.tooltipster-arrow-background {
+				border-left-color: $arrowBackground;
+			}
+		}
+
+		&.tooltipster-right {
+			.tooltipster-arrow-border {
+				border-right-color: $arrowBorder;
+			}
+
+			.tooltipster-arrow-background {
+				border-right-color: $arrowBackground;
+			}
+		}
+
+		.tooltipster-box {
+			border-color: rgba(255, 255, 255, 0.6);
+		}
+
+		.tooltipster-content {
+			color: #DDD;
+			background-color: #222;
+			border-radius: 3px;
+		}
+
+		.tooltip-heading {
+			color: #FFF;
+			border-bottom: solid 1px rgba(255, 255, 255, 0.2);
+		}
+
+		.tooltip-body {
+			color: #EEE;
+		}
+	}
+
+	&.tooltipster-top {
+		.tooltipster-arrow-border {
+			top: 1px;
+		}
+
+		.tooltipster-arrow-background {
+			top: -1px;
+		}
+	}
+
+	&.tooltipster-bottom {
+		.tooltipster-arrow-border {
+			top: -1px;
+		}
+
+		.tooltipster-arrow-background {
+			top: 0;
+		}
+	}
+
+	&.tooltipster-left {
+		.tooltipster-arrow-border {
+			left: 1px;
+		}
+
+		.tooltipster-arrow-background {
+			left: 0;
+		}
+	}
+
+	&.tooltipster-right {
+		.tooltipster-arrow-border {
+			left: -1px;
+		}
+
+		.tooltipster-arrow-background {
+			left: 0;
+		}
+	}
+
+	&.tooltipster-arrow {
+		.tooltipster-arrow-border {
+			border: $arrowSize solid transparent;
+		}
+	}
+
+	.tooltip-heading {
+		padding: .4em .6em .3em .6em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.tooltip-body {
+		padding: .3em .6em;
+		font-size: 0.9em;
+		overflow: auto;
+		display: block;
+	}
+}

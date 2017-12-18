@@ -1,0 +1,41 @@
+
+.avw-homepage-widget {
+	.post-meta {
+		display: table-row;
+
+		.thumbnail {
+			display: table-cell;
+		}
+
+		.info {
+			display: table-cell;
+			width: 100%;
+		}
+
+		.title {
+			display: block;
+			font-size: 22px;
+		}
+
+		.date {
+			display: inline-block;
+		}
+
+		.tags {
+			display: inline-block;
+			padding-left: 15px;
+
+			ul {
+				display: inline-block;
+
+				li {
+					display: inline-block;
+				}
+			}
+		}
+	}
+
+	.post-excerpt {
+		padding: 5px 0 15px 0;
+	}
+}

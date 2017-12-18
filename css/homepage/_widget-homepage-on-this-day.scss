@@ -1,0 +1,215 @@
+@import '../bm/globals';
+
+/* On this period in history */
+
+#no-incidents {
+	display: none;
+}
+
+/* Map */
+
+#map-container {
+	@extend .widget-content-container;
+	width: 100%;
+	height: 100%;
+	position: relative;
+
+	#map {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+#on-this-day-column {
+	position: relative;
+	min-height: 300px;
+}
+
+#incidents-section {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+
+	button {
+		position: absolute;
+		opacity: 0.6;
+		background-color: #333;
+		border: solid 1px #000;
+		color: #FFF;
+		border-radius: 3px;
+		padding: 5px 7px;
+		line-height: normal;
+		transition: all .2s;
+
+		.label {
+			padding-right: 5px;
+			transition: all .5s;
+		}
+
+		&.autohide-label {
+			top: 5px;
+			right: 5px;
+
+			.label {
+				display: none;
+				opacity: 0;
+			}
+
+			&:hover {
+				.label {
+					opacity: 1;
+					display: inline-block;
+				}
+			}
+		}
+
+		&:hover {
+			opacity: 1;
+		}
+
+		&:active {
+			opacity: 1;
+			background-color: #444;
+			border: solid 1px #FFF;
+			outline: none;
+		}
+	}
+}
+
+#launch-battlemap {
+	right: 5px;
+	top: 5px;
+}
+
+#incident-navigator-container {
+	$incidentDetailsCollapsedHeight: 50px;
+	$navigatorShowDelay: .2s;
+	position: absolute;
+	display: flex;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	vertical-align: bottom;
+	pointer-events: none;
+
+	#incident-navigator {
+		max-height: $incidentDetailsCollapsedHeight;
+		width: 100%;
+		overflow-y: hidden;
+		background: rgba(0,0,0,0.7);
+		color: #EEE;
+		vertical-align: bottom;
+		margin-top: auto;
+		padding: 0;
+		transition: all .2s;
+		transition-delay: $navigatorShowDelay;
+		pointer-events: auto;
+
+		.details-container {
+			height: $incidentDetailsCollapsedHeight;
+
+			.inner {
+				display: flex;
+				height: 100%;
+
+				.arrow-container {
+					display: inline-flex;
+					align-items: center;
+					vertical-align: middle;
+					height: auto;
+					position: relative;
+
+					.arrow {
+						padding: 10px;
+						cursor: pointer;
+						transition: all .2s;
+						border: solid 1px transparent;
+						display: flex;
+						align-items: center;
+						height: 100%;
+
+						&:hover {
+							color: #FFF;
+							background-color: #000;
+							border-color: rgba(255, 255, 255, 0.5);
+							text-shadow: 0 0 3px #FFF;
+						}
+					}
+				}
+
+				.incident-details {
+					display: inline-block;
+					padding: 5px 10px;
+					vertical-align: top;
+					cursor: default;
+					width: 100%;
+					overflow: hidden;
+
+					.date {
+						font-weight: bold;
+					}
+
+					.description {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						word-break: break-all;
+					}
+				}
+			}
+		}
+
+		#load-incident-in-battlemap {
+			width: 100%;
+			display: table-cell;
+			text-align: center;
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			opacity: 0;
+			transition-delay: $navigatorShowDelay;
+			transition: all .2s;
+
+			button {
+				border-color: rgba(255,255,255,0.8);
+				opacity: 0.8;
+				position: relative;
+				transition: opacity .2s, border-color .2s;
+
+				&:hover {
+					opacity: 1;
+					border-color: #FFF;
+				}
+			}
+		}
+
+		&:hover {
+			max-height: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.9);
+
+			.details-container {
+				height: 100%;
+
+				.inner {
+					.incident-details {
+						.description {
+							white-space: normal;
+							word-break: normal;
+							overflow: auto;
+						}
+					}
+				}
+			}
+
+			#load-incident-in-battlemap {
+				opacity: 1;
+				padding: 10px;
+				background-color: rgba(0, 0, 0, 0.5);
+				border-bottom-right-radius: 5px;
+				border-bottom-left-radius: 5px;
+			}
+		}
+	}
+}
