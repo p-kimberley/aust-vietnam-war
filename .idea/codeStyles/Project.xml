@@ -1,0 +1,21 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <JSCodeStyleSettings>
+      <option name="FUNCTION_EXPRESSION_BRACE_STYLE" value="2" />
+    </JSCodeStyleSettings>
+    <codeStyleSettings language="JavaScript">
+      <option name="BRACE_STYLE" value="2" />
+      <option name="CLASS_BRACE_STYLE" value="2" />
+      <option name="METHOD_BRACE_STYLE" value="2" />
+      <indentOptions>
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="SCSS">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+  </code_scheme>
+</component>

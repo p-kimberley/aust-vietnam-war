@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/wp-content/plugins/postman-smtp/Postman/Postman-Mail/sendgrid-php-3.2.0/vendor/guzzle/guzzle/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/wp-content/plugins/postman-smtp/Postman/Postman-Mail/sendgrid-php-3.2.0/lib" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/wp-content/plugins/postman-smtp/Postman/Postman-Mail/sendgrid-php-3.2.0/vendor/sendgrid/smtpapi/lib" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/js/bm/.archived" />
+      <excludeFolder url="file://$MODULE_DIR$/js/bm/minified" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

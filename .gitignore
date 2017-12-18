@@ -1,0 +1,42 @@
+# Created by .ignore support plugin (hsz.mobi)
+### WordPress template
+*.log
+wp-config.php
+wp-content/advanced-cache.php
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/uploads/
+wp-content/wp-cache-config.php
+wp-content/plugins/hello.php
+
+/.htaccess
+/license.txt
+/readme.html
+/sitemap.xml
+/sitemap.xml.gz
+
+# Other WordPress files
+/wp-admin/
+/wp-includes/
+/index.php
+/wp-blog-header.php
+/wp-comments-post.php
+/wp-activate.php
+/wp-load.php
+/wp-mail.php
+/wp-trackback.php
+/wp-cron.php
+/wp-login.php
+/wp-links-opml.php
+/wp-config-sample.php
+/wp-settings.php
+/xmlrpc.php
+/wp-signup.php
+
+# Custom files and folders
+/incident-media/
+/honour-roll/
+/api/
