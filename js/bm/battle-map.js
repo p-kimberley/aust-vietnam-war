@@ -261,9 +261,6 @@ BM.initMap = function ()
 				zoomInLabel: $('<span class="fa fa-plus"></span>')[0],
 				zoomOutLabel: $('<span class="fa fa-minus"></span>')[0]
 			}),
-			new ol.control.Rotate({
-				/*label: $('<span class="fa fa-compass"></span>')[0]*/
-			}),
 			new ol.control.ScaleLine(),
 			new ol.control.OverviewMap({
 				collapsible: false,
