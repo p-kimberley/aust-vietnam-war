@@ -937,6 +937,7 @@ BM.Media = (function() {
 			if (_currentMediaXHRRequest)
 				_currentMediaXHRRequest.abort();
 
+			var lonLat = ol.proj.toLonLat(coord);
 			_currentMediaXHRRequest = $.ajax({
 				url: '/api/es/search/avw_incident_media',
 				method: 'POST',
@@ -952,8 +953,8 @@ BM.Media = (function() {
 					"sort": [{
 						"_geo_distance": {
 							"Location": {
-								"lon": coord[0].toFixed(8),
-								"lat": coord[1].toFixed(8)
+								"lon": lonLat[0],
+								"lat": lonLat[1]
 							},
 							"order": "asc"
 						}
@@ -1044,7 +1045,7 @@ BM.Media = (function() {
 					.on('mouseover', function ()
 					{
 						_guidanceLine.setDOMTarget(thumbnail);
-						_guidanceLine.setMapTargetCoords([fields.Location.lon, fields.Location.lat]);
+						_guidanceLine.setMapTargetCoords(ol.proj.fromLonLat([fields.Location.lon, fields.Location.lat], 'EPSG:3857'));
 						_guidanceLine.show();
 					})
 					.on('mouseout', function ()

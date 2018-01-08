@@ -41,7 +41,7 @@ BM.StateManagement = (function()
 
 		if (mapCentre)
 		{
-			var mapCentreProj = ol.proj.toLonLat(mapCentre, 'EPSG:4326');
+			var mapCentreProj = ol.proj.toLonLat(mapCentre, 'EPSG:3857');
 
 			// Current look-at location and zoom
 			_setKeyValue(_urlStateKeyValueArray, 'at', mapCentreProj[1] + ',' + mapCentreProj[0] + ',' + mapView.getZoom());
@@ -223,7 +223,7 @@ BM.StateManagement = (function()
 							}
 							else
 							{
-								coords = ol.proj.fromLonLat([lon, lat], 'EPSG:4326');
+								coords = ol.proj.fromLonLat([lon, lat], 'EPSG:3857');
 							}
 
 							var zoom = Number(latLonZoom[2]);

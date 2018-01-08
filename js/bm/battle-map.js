@@ -246,14 +246,14 @@ BM.mapResize = function (callback)
 BM.initMap = function ()
 {
 	var hidpi = (BM.constants.devicePixelRatio > 1 ? '@2x' : '');
-	var mapCentre = ol.proj.fromLonLat([BM.options.map.at.lon, BM.options.map.at.lat], 'EPSG:4326');
+	var mapCentre = ol.proj.fromLonLat([BM.options.map.at.lon, BM.options.map.at.lat], 'EPSG:3857');
 
 	BM.map = new ol.Map({
 		target: document.getElementById('map'),
 		//renderer: 'webgl',
 		view: new ol.View({
 			center: mapCentre,
-			projection: 'EPSG:4326',
+			projection: 'EPSG:3857',
 			zoom: 5
 		}),
 		controls: [
@@ -266,7 +266,7 @@ BM.initMap = function ()
 				collapsible: false,
 				view: new ol.View({
 					center: mapCentre,
-					projection: 'EPSG:4326'
+					projection: 'EPSG:3857'
 				}),
 				layers: [
 					new ol.layer.Tile({

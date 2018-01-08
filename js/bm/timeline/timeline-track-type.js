@@ -204,7 +204,7 @@ BM.TimelineTrackType.prototype.fitViewToIncidents = function()
 			if (isNaN(incident.Location.lon) || isNaN(incident.Location.lat))
 				return;
 
-			points.push(ol.proj.fromLonLat([incident.Location.lon, incident.Location.lat], 'EPSG:4326'));
+			points.push(ol.proj.fromLonLat([incident.Location.lon, incident.Location.lat], 'EPSG:3857'));
 		});
 
 		var geom = new ol.geom.MultiPoint(points);
@@ -401,7 +401,7 @@ BM.TimelineTrackType.prototype.generateConnectingLines = function()
 
 			if (incident.Location.lon && incident.Location.lat && incident.DTG >= dateExtremes.min)
 			{
-				var point = ol.proj.transform([incident.Location.lon, incident.Location.lat], 'EPSG:4326', 'EPSG:3857');
+				var point = ol.proj.fromLonLat([incident.Location.lon, incident.Location.lat], 'EPSG:3857');
 				if (prevPoint)
 				{
 					var lineFeature = new ol.Feature({

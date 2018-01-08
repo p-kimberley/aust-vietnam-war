@@ -152,7 +152,7 @@ BM.Layer.Marker.Incident.Circles.prototype.generate = function(callback)
 
 		// Generate markers from the cached contact data array
 		$.each(self.incidentData, function(i, item) {
-			var coord = ol.proj.fromLonLat([item.Location.lon, item.Location.lat], 'EPSG:4326');
+			var coord = ol.proj.fromLonLat([item.Location.lon, item.Location.lat], 'EPSG:3857');
 			var point = new ol.geom.Point(coord);
 
 			point.set('altitudeMode', 'clampToGround');

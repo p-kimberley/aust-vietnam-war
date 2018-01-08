@@ -98,7 +98,7 @@ BM.Layer.Heatmap.Contact.prototype.generate = function(callback)
 		$.each(response.hits.hits, function (i, item) {
 			var fields = item._source;
 			var feature = new ol.Feature({
-				geometry: new ol.geom.Point(ol.proj.fromLonLat([fields.Location.lon, fields.Location.lat], 'EPSG:4326')),
+				geometry: new ol.geom.Point(ol.proj.fromLonLat([fields.Location.lon, fields.Location.lat], 'EPSG:3857')),
 				weight: fields[self.valueField]
 			});
 

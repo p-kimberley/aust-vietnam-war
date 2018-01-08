@@ -54,7 +54,7 @@ BM.Layer.Icon.prototype.generate = function(callback)
 
 				$.each(data, function(i, item) {
 					var marker = new ol.Feature({
-						geometry: new ol.geom.Point(ol.proj.transform([item.Lon, item.Lat], 'EPSG:4326'))
+						geometry: new ol.geom.Point(ol.proj.transform([item.Lon, item.Lat], 'EPSG:3857'))
 					});
 
 					marker.setStyle(style);

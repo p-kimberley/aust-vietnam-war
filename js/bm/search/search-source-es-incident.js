@@ -35,7 +35,7 @@ BM.SearchSource.ES.Incident.prototype.handleResultSelected = function(data)
 		layer.selectMarker(marker);		// Selecting the marker will also display the marker context sidebar
 
 		var location = data._source.Location;
-		var coords = ol.proj.fromLonLat([location.lon, location.lat], 'EPSG:4326');
+		var coords = ol.proj.fromLonLat([location.lon, location.lat], 'EPSG:3857');
 
 		BM.flyTo(coords, 12, 1000);
 	}

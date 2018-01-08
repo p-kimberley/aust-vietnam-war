@@ -136,7 +136,7 @@ BM.Layer.AirOperations.prototype.generate = function(callback)
 			STYLES: 'vietnam:air_sortie_point',
 			FORMAT: 'image/png8',
 			LAYERS: 'vietnam:air_operations',
-			CRS: 'EPSG:4326',
+			CRS: 'EPSG:3857',
 			VIEWPARAMS:
 			'q:' + JSON.stringify(layerQuery).replace(findEscapable, '\\,')
 		};
@@ -150,7 +150,7 @@ BM.Layer.AirOperations.prototype.generate = function(callback)
 				crossOrigin: 'anonymous',
 				serverType: 'geoserver',
 				params: layerParams,
-				projection: 'EPSG:4326'
+				projection: 'EPSG:3857'
 			});
 
 			self.olLayer = new ol.layer.Image({
@@ -181,7 +181,7 @@ BM.Layer.AirOperations.prototype.showTooltip = function(screenPosition)
 	var self = this;
 	var source = this.olLayer.getSource();
 	var coord = BM.map.getCoordinateFromPixel(screenPosition);
-	var url = source.getGetFeatureInfoUrl(coord, BM.map.getView().getResolution(), 'EPSG:4326', {
+	var url = source.getGetFeatureInfoUrl(coord, BM.map.getView().getResolution(), 'EPSG:3857', {
 		'INFO_FORMAT': 'application/json'
 	});
 

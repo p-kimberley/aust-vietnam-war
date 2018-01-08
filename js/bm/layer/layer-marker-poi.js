@@ -86,7 +86,7 @@ BM.Layer.Marker.PointOfInterest.prototype.generate = function (callback)
 		$.each(data.hits.hits, function (i, item) {
 			var fields = item._source;
 			var location = fields.Location;
-			var coords = ol.proj.transform([location.lon, location.lat], 'EPSG:4326');
+			var coords = ol.proj.transform([location.lon, location.lat], 'EPSG:3857');
 
 			var marker = new ol.Feature({
 				geometry: new ol.geom.Point(coords),
