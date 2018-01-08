@@ -707,6 +707,10 @@ BM.Timeline = (function()
 			});
 
 			_series = newSeries;
+
+			// If only one series remains, show it
+			if (_series.length === 1)
+				_series[0].setVisible(true);
 		}
 	}
 

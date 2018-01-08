@@ -23,7 +23,7 @@ BM.TimelineSeries.prototype.setVisible = function(visible)
 	this.options.visible = visible;
 	if (this.series)
 	{
-		if (this.series.visible !== visible)
+		if (this.series.visible !== visible && this.series.options)
 			this.series.setVisible(visible);
 	}
 };
