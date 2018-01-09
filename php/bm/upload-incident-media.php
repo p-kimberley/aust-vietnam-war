@@ -136,9 +136,10 @@ else
 		else
 			$approvalStatus = -1;
 		
-		$recordID = $wpdb->get_var($wpdb->prepare("CALL add_incident_media_file(%d, %s, %s, %s, %s, %s, %s, %ld, %s, %s, %s, %d, %d)",
+		$query = $wpdb->prepare("CALL add_incident_media_file(%d, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s, %d, %d)",
 			$featureID, $lat, $lon, $targetFileName, $targetFileExt, $mimeType, $relativePath, $targetFileSize, $dateTaken,
-			$attribution, $description, $current_user->ID, $approvalStatus));
+			$attribution, $description, $current_user->ID, $approvalStatus);
+		$recordID = $wpdb->get_var($query);
 		
 		// If no record ID retrieved, assume the query failed and remove the uploaded file
 		if (!$recordID)
@@ -165,16 +166,16 @@ else
             $indexName = 'avw_incident_media';
 			$currentDateTime = date('Y-m-d\TH:i:s', current_time('timestamp'));
 			$postData = array(
-                'FileName' => $targetFileName,
-                'FileExt' => $targetFileExt,
-                'MimeType' => $mimeType,
+                'File_Name' => $targetFileName,
+                'File_Ext' => $targetFileExt,
+                'Mime_Type' => $mimeType,
                 'Path' => $relativePath,
                 'Size' => $targetFileSize,
                 'Location' => array(
                     'lat' => $lat,
                     'lon' => $lon
                 ),
-                'DateTaken' => ($dateTaken != null ? $dateTaken->format('Y-m-d\TH:i:s') : null),
+                'Date_Taken' => $dateTaken,
                 'Attribution' => $attribution,
                 'Description' => $description,
                 'Tags' => $assignedTags,
@@ -186,7 +187,7 @@ else
                     'Name' => $current_user->display_name
                 ),
                 'Editor' => $current_user->ID,
-                'ApprovalStatus' => $approvalStatus
+                'Approval_Status' => $approvalStatus
             );
 
             $result = apiIndexPut($indexName, 'incident_media', $recordID, $postData);
