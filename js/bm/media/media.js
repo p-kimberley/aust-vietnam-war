@@ -383,12 +383,32 @@ BM.Media = (function() {
 				BM.ActivityLogging.logEvent(BM.LogEventTypes.openedMediaItem, itemProperties._id);
 		};
 
+		/**
+		 * Number of times this user has 'liked' the media item
+		 */
+		$scope.ownLikeCount = function()
+		{
+			var likes;
+
+			if ($scope.mediaInfo)
+			{
+				likes = $scope.mediaInfo._source.Likes;
+				if (likes)
+					likes = likes.filter(function(like) { return like.User.ID === BM.currentWPUser.ID; });
+			}
+
+			return likes ? likes.length : 0;
+		};
+
 		$scope.userLikesCaption = function()
 		{
 			if ($scope.mediaInfo)
 			{
-				var likes = $scope.mediaInfo._source.Likes.filter(function(like) { return like.Timestamp !== undefined; }).length;
-				if (likes < 1)
+				var likes = $scope.mediaInfo._source.Likes;
+				if (likes)
+					likes = likes.filter(function(like) { return like.Timestamp !== undefined; }).length;
+
+				if (!likes)
 					return "0 likes so far";
 				else if (likes === 1)
 					return "1 user likes this";
@@ -402,12 +422,13 @@ BM.Media = (function() {
 			$.post('/php/bm/record-user-media-like.php', {
 				mediaID: $scope.mediaInfo._id
 			}, function(data) {
-				$scope.mediaInfo._source.Likes.push({});
-				$scope.$apply();
-				_requeryMediaReel();
+				if (data)
+				{
+					$scope.mediaInfo._source.Likes.push(data);
+					$scope.$apply();
+					_requeryMediaReel();
+				}
 			});
-
-			$scope.mediaInfo._source.Likes.push({});
 		};
 
 		$scope.description = function()

@@ -1014,7 +1014,7 @@
         <tr>
             <th><span class="fa fa-thumbs-up" title="Number of likes"></span></th>
             <td>{{userLikesCaption()}}</td>
-            <td><button id="media-like-button" ng-click="likeMediaItem()" ng-show="mediaInfo._source.Likes.length < 1 && utilityServices.isUserLoggedIn()"><span class="fa fa-thumbs-up"></span> Like</button></td>
+            <td><button id="media-like-button" ng-click="likeMediaItem()" ng-show="!ownLikeCount() && utilityServices.isUserLoggedIn()"><span class="fa fa-thumbs-up"></span> Like</button></td>
         </tr>
     </table>
 </div>

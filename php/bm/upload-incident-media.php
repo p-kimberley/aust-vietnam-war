@@ -42,8 +42,8 @@ else
 		if ($_POST['location'] != 'null')
 		{
 			$location = explode(',', $_POST['location']);
-			$lon = $location[0];
-			$lat = $location[1];
+			$lon = floatval($location[0]);
+			$lat = floatval($location[1]);
 		}
 		
 		$tagString = $_POST['tags'];
@@ -136,7 +136,7 @@ else
 		else
 			$approvalStatus = -1;
 		
-		$query = $wpdb->prepare("CALL add_incident_media_file(%d, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s, %d, %d)",
+		$query = $wpdb->prepare("CALL add_incident_media_file(%d, %d, %d, %s, %s, %s, %s, %d, %s, %s, %s, %d, %d)",
 			$featureID, $lat, $lon, $targetFileName, $targetFileExt, $mimeType, $relativePath, $targetFileSize, $dateTaken,
 			$attribution, $description, $current_user->ID, $approvalStatus);
 		$recordID = $wpdb->get_var($query);
@@ -187,7 +187,8 @@ else
                     'Name' => $current_user->display_name
                 ),
                 'Editor' => $current_user->ID,
-                'Approval_Status' => $approvalStatus
+                'Approval_Status' => $approvalStatus,
+				'Likes' => []
             );
 
             $result = apiIndexPut($indexName, 'incident_media', $recordID, $postData);

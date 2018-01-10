@@ -1,6 +1,7 @@
 <?php
 require_once('../../wp-config.php');
 require_once('../../wp-includes/wp-db.php');
+require_once('./include/api-functions.php');
 ?>
 <?php
 	$mediaID = $_POST['mediaID'];
@@ -11,24 +12,28 @@ require_once('../../wp-includes/wp-db.php');
 	// Post the record to the ES index
 	$indexName = 'avw_incident_media';
 	$currentDateTime = date('Y-m-d\TH:i:s', current_time('timestamp'));
+	
+	$like = array(
+		'User' => array(
+			'ID' => $current_user->ID,
+			'Login' => $current_user->user_login,
+			'Name' => $current_user->display_name
+		),
+		'Timestamp' => $currentDateTime
+	);
+	
 	$postData = array(
 		'script' => array(
 			'inline' => 'ctx._source.Likes.add(like)',
 			'lang' => 'groovy',
 			'params' => array(
-				'like' => array(
-					'User' => array(
-						'ID' => $current_user->ID,
-						'Login' => $current_user->user_login,
-						'Name' => $current_user->display_name
-					),
-					'Timestamp' => $currentDateTime
-				)
+				'like' => $like
 			)
 		)
 	);
-
+	
 	$result = apiIndexUpdate($indexName, 'incident_media', $mediaID, $postData);
 	
-	echo 1;
+	header('Content-Type: application/json');
+	echo json_encode($like);
 ?>
