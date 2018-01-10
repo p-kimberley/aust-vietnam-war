@@ -3,11 +3,12 @@ require_once('../../wp-config.php');
 require_once('../../wp-includes/wp-db.php');
 require_once('./include/api-functions.php');
 ?>
+
 <?php
 	$mediaID = $_POST['mediaID'];
 	
 	// Increments the number of views a media record has had
-	$wpdb->query($wpdb->prepare("CALL record_user_media_like(%d, %d)", $mediaID, $current_user->ID));
+	$wpdb->query($wpdb->prepare("CALL record_user_media_like(%d, %d)", intval($mediaID), $current_user->ID));
 	
 	// Post the record to the ES index
 	$indexName = 'avw_incident_media';

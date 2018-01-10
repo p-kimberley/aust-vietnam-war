@@ -58,10 +58,6 @@ require_once('./include/api-functions.php');
 			$currentDateTime = date('Y-m-d\TH:i:s', current_time('timestamp'));
 			$postData = array(
                 'Incident_ID' => $incidentID,
-                'Location' => array(
-                    'lat' => $lat,
-                    'lon' => $lon
-                ),
                 'Title' => $noteTitle,
                 'Body' => $noteBody,
                 'Created' => $currentDateTime,
@@ -71,12 +67,17 @@ require_once('./include/api-functions.php');
                     'Login' => $current_user->user_login,
                     'Name' => $current_user->display_name
                 ),
-                'Editor' => $current_user->ID,
-                'ApprovalStatus' => $approvalStatus
+                'Editor' => array(
+					'ID' => $current_user->ID,
+					'Login' => $current_user->user_login,
+					'Name' => $current_user->display_name
+				),
+                'Approval_Status' => $approvalStatus,
+				'Comments' => []
             );
 
-            $result = apiIndexPut($indexName, 'incident_note', $newNoteID, $postData);
-
+			$result = apiIndexPut($indexName, 'incident_note', $newNoteID, $postData);
+			
             if (!$result)
             {
                 echo 'Failed to post to index. Post data: ' . json_encode($postData);
@@ -86,7 +87,6 @@ require_once('./include/api-functions.php');
             else
             {
 				wp_mail($recipients, "New incident note awaiting moderation", $body, $headers);
-                echo $newNoteID;
             }
 		}
 		

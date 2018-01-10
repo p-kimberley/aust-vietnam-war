@@ -1,6 +1,7 @@
 <?php
 require_once('../../wp-config.php');
 require_once('../../wp-includes/wp-db.php');
+require_once('./include/api-functions.php');
 ?>
 <?php
 	$params = json_decode(file_get_contents('php://input'), true);
@@ -35,35 +36,58 @@ require_once('../../wp-includes/wp-db.php');
 		{
 			$wpdb->query($wpdb->prepare("CALL update_incident_note(%d, %s, %s, %d, %d)", $noteID, $noteTitle, $noteBody, $userID, $approvalStatus));
 			
-			//if ($approvalStatus != 1)
+			// Update incident note ES record
+			$indexName = 'avw_incident_notes';
+			$currentDateTime = date('Y-m-d\TH:i:s', current_time('timestamp'));
+			$postData = array(
+				'doc' => array(
+					'Title' => $noteTitle,
+					'Body' => $noteBody,
+					'Modified' => $currentDateTime,
+					'Editor' => array(
+						'ID' => $current_user->ID,
+						'Login' => $current_user->user_login,
+						'Name' => $current_user->display_name
+					),
+					'Approval_Status' => $approvalStatus
+				)
+			);
+			
+			if ($approvalStatus != -1)
 			{
-				// Construct an array of email addresses, containing all editor and admin users
-				$recipients = [];
-				$editors = get_users('role=editor');
-				$admins = get_users('role=administrator');
-				foreach( $editors as $editor ) {
-					array_push($recipients, $editor->user_email);
-				}
-				foreach( $admins as $admin ) {
-					array_push($recipients, $admin->user_email);
-				}
-				
-				$serverProtocol = stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https://' : 'http://';
-				$siteUrl = $serverProtocol . $_SERVER['HTTP_HOST'];
-				$headers = "Content-Type: text/html; charset=ISO-8859-1\r\n";
-				$body = 
-					"<p>An incident note was updated by <a href='" . $noteAuthorProfile . "' target='_blank'>" . $noteAuthorData->first_name . " " . 
-						$noteAuthorData->last_name . "</a> for incident " . $incidentID . " on the " .
-					"<a href='https://vietnam.unsw.adfa.edu.au' target='_blank'>Australia's Vietnam War</a> website.</p>" . 
-					"<p>The revised note is awaiting moderation. <a href='" . $siteUrl . "/battlemap/?incident-note=" . $noteID .
-						"' target='_blank'>Open the note</a> to accept or reject it.</p>" . 
-					"<hr>" . 
-					"<p><strong>Title:</strong> " . $noteTitle . "<p>" . 
-					"<p><strong>Submitted at:</strong> " . current_time('d/m/Y H:i') . "<p>" . 
-					"<p><strong>Author email:</strong> " . $noteAuthorData->user_email . "</p>";
-	
-				wp_mail($recipients, "New incident note awaiting moderation", $body, $headers);
+				$postData['doc']['Approval_Status_Changed'] = $currentDateTime;
+				$postData['doc']['Approval_Status_Changed_By'] = $userID;
 			}
+
+			$result = apiIndexUpdate($indexName, 'incident_note', $noteID, $postData);
+			echo $result;
+			
+			// Construct an array of email addresses, containing all editor and admin users
+			$recipients = [];
+			$editors = get_users('role=editor');
+			$admins = get_users('role=administrator');
+			foreach( $editors as $editor ) {
+				array_push($recipients, $editor->user_email);
+			}
+			foreach( $admins as $admin ) {
+				array_push($recipients, $admin->user_email);
+			}
+			
+			$serverProtocol = stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https://' : 'http://';
+			$siteUrl = $serverProtocol . $_SERVER['HTTP_HOST'];
+			$headers = "Content-Type: text/html; charset=ISO-8859-1\r\n";
+			$body = 
+				"<p>An incident note was updated by <a href='" . $noteAuthorProfile . "' target='_blank'>" . $noteAuthorData->first_name . " " . 
+					$noteAuthorData->last_name . "</a> for incident " . $incidentID . " on the " .
+				"<a href='https://vietnam.unsw.adfa.edu.au' target='_blank'>Australia's Vietnam War</a> website.</p>" . 
+				"<p>The revised note is awaiting moderation. <a href='" . $siteUrl . "/battlemap/?incident-note=" . $noteID .
+					"' target='_blank'>Open the note</a> to accept or reject it.</p>" . 
+				"<hr>" . 
+				"<p><strong>Title:</strong> " . $noteTitle . "<p>" . 
+				"<p><strong>Submitted at:</strong> " . current_time('d/m/Y H:i') . "<p>" . 
+				"<p><strong>Author email:</strong> " . $noteAuthorData->user_email . "</p>";
+
+			wp_mail($recipients, "New incident note awaiting moderation", $body, $headers);
 			
 			echo 1;
 		}

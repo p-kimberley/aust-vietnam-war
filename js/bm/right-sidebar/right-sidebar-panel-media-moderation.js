@@ -36,7 +36,7 @@ BM.RightSidebarPanel.MediaModeration = function()
 				var currentDateGroup = null;
 				$.each(response.data.hits.hits, function (i, item)
 				{
-					var itemDate = moment(item.Created, 'YYYY-MM-DD').valueOf();
+					var itemDate = moment(item._source.Created, 'YYYY-MM-DD').valueOf();
 					if (currentDate !== itemDate)
 					{
 						// If the current date being processed is different, start a new date in the collection
@@ -82,13 +82,13 @@ BM.RightSidebarPanel.MediaModeration = function()
 				var targetEl = $(event.currentTarget);
 				mediaItem.statusChanging = true;
 				DisplayTinyLoadingIndicator(targetEl.parent().find('.spinner'));
-				mediaServices.setApprovalStatus([mediaItem.ID], approve ? 1 : 0)
+				mediaServices.setApprovalStatus([mediaItem._id], approve ? 1 : 0)
 					.then(function ()
 					{
 						// Remove the media item from the dateGroup it falls under
 						for(var i = 0; i < dateGroup.items.length; i++)
 						{
-							if (dateGroup.items[i].ID === mediaItem.ID)
+							if (dateGroup.items[i]._id === mediaItem._id)
 								dateGroup.items.splice(i, 1);
 						}
 
@@ -106,7 +106,7 @@ BM.RightSidebarPanel.MediaModeration = function()
 						});
 					}, function ()
 					{
-						InfoDialog('Set Media Approval Status', 'The approval status for media item ' + mediaItem.ID + ' could not be changed.<br/>' +
+						InfoDialog('Set Media Approval Status', 'The approval status for media item ' + mediaItem._id + ' could not be changed.<br/>' +
 							'The item may have been deleted or you may not have permission.');
 					})
 					.finally(function() {
@@ -123,7 +123,7 @@ BM.RightSidebarPanel.MediaModeration = function()
 		{
 			var idArray = [];
 			$.each(dateGroup.items, function(i, item) {
-				idArray.push(item.ID);
+				idArray.push(item._id);
 			});
 
 			// Disallow more than one attempt to change the status
@@ -172,8 +172,8 @@ BM.RightSidebarPanel.MediaModeration = function()
 
 		$scope.thumbnailImageUrl = function(mediaItem)
 		{
-			if ($scope.isSupportedImageMimeType(mediaItem.MimeType))
-				return BM.options.incidentMediaBaseUrl + mediaItem.Path;
+			if ($scope.isSupportedImageMimeType(mediaItem._source.Mime_Type))
+				return BM.options.incidentMediaBaseUrl + mediaItem._source.Path;
 			else
 				return '/images/Video-Placeholder.png';
 		};

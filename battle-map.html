@@ -199,7 +199,7 @@
                                         <div class="author">
                                             <a ng-href="{{ utilityServices.decodeURIComponent(userMeta.Profile_Page) }}"
                                                target="_blank" title="View the author's profile page">{{
-                                                noteData.Author_Display_Name }}</a>
+                                                noteData.Author.Name }}</a>
                                         </div>
                                         <div class="indicator user-posts" ng-show="userMeta.User_Note_Count > 0">{{
                                             userMeta.User_Note_Count }} notes posted
@@ -236,7 +236,7 @@
                                               maxlength="5000"
                                               placeholder="Comment on this incident note"></textarea>
                                         <button type="button" class="default" id="incident-note-comments-submit" ng-disabled="!comment"
-                                                ng-click="addComment(noteData.ID, comment)">Submit
+                                                ng-click="addComment(noteId, comment)">Submit
                                         </button>
                                         <div id="incident-note-comments-submit-status">
                                             <div class="status-icon"></div>
@@ -249,8 +249,7 @@
                                             <li ng-repeat="noteComment in noteComments">
                                                 <div class="note-comments-list-item">
                                                     <div class="comments-heading-container">
-                                                        <div class="comment-controlbox"
-                                                             ng-show="userHasCommentEditPermission(noteComment.Author.Name)">
+                                                        <div class="comment-controlbox" ng-show="userHasCommentEditPermission(noteComment.Author.ID)">
                                                             <a href="#" class="controlbox-button delete"
                                                                ng-click="deleteComment(noteComment.ID, $event)"
                                                                title="Delete comment"></a>
@@ -779,7 +778,7 @@
                                     <div class="panel-section media-thumbnail-container">
                                         <div class="item-thumbnail" ng-repeat="mediaItem in dateGroup.items">
                                             <div class="item-container">
-                                                <img media-thumbnail-image ng-src="{{thumbnailImageUrl(mediaItem)}}" alt="{{mediaItem.FileName + '.' + mediaItem.FileExt}}"/>
+                                                <img media-thumbnail-image ng-src="{{thumbnailImageUrl(mediaItem)}}" alt="{{mediaItem._source.File_Name + '.' + mediaItem._source.File_Ext}}"/>
                                                 <div class="info">
                                                     <div class="button-container approval">
                                                         <div class="spinner"></div>
@@ -792,9 +791,9 @@
                                                             <span class="fa fa-times"></span>
                                                         </div>
                                                     </div>
-                                                    <p class="filename">{{mediaItem.FileName + '.' + mediaItem.FileExt}}</p>
-                                                    <p><a ng-href="{{utilityServices.getUserProfileUrl(mediaItem.Author_User_Name)}}" target="_blank">{{mediaItem.Author_Display_Name}}</a></p>
-                                                    <p>{{mediaItem.Description ? mediaItem.Description : ''}}</p>
+                                                    <p class="filename">{{mediaItem._source.File_Name + '.' + mediaItem._source.File_Ext}}</p>
+                                                    <p><a ng-href="{{utilityServices.getUserProfileUrl(mediaItem._source.Author_User_Name)}}" target="_blank">{{mediaItem._source.Author_Display_Name}}</a></p>
+                                                    <p>{{mediaItem._source.Description ? mediaItem._source.Description : ''}}</p>
                                                 </div>
                                             </div>
                                         </div>

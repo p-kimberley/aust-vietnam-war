@@ -15,8 +15,7 @@ require_once('./include/api-functions.php');
 	// Ensure the requester is logged in
 	if ($commentAuthor != 0 && $noteID > 0 && $comment <> "")
 	{
-		$newCommentID = $wpdb->get_var($wpdb->query($wpdb->prepare("CALL add_incident_note_comment(%d, %s, %d)", $noteID, $comment, $commentAuthor)));
-		echo 1;
+		$newCommentID = $wpdb->get_var($wpdb->prepare("CALL add_incident_note_comment(%d, %s, %d)", $noteID, $comment, $commentAuthor));
 		
 		if ($newCommentID > 0)
 		{
@@ -79,7 +78,6 @@ require_once('./include/api-functions.php');
 				else
 				{
 					wp_mail($noteAuthorData->user_email, "New comment on your incident note", $body, $headers);
-					echo $newCommentID;
 				}
 			}
 			

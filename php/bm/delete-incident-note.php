@@ -1,6 +1,7 @@
 <?php
 require_once('../../wp-config.php');
 require_once('../../wp-includes/wp-db.php');
+require_once('./include/api-functions.php');
 ?>
 
 <?php
@@ -21,7 +22,8 @@ require_once('../../wp-includes/wp-db.php');
 	if (current_user_can('editor') || current_user_can('administrator') || $userID == $authorID)
 	{
 		$wpdb->query($wpdb->prepare("CALL delete_incident_note(%d)", $noteID));
-		echo 1;
+		$result = apiIndexDelete('avw_incident_notes', 'incident_note', $noteID);
+		echo $result;
 	}
 	else
 	{

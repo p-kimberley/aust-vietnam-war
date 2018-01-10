@@ -1,6 +1,7 @@
 <?php
 require_once('../../wp-config.php');
 require_once('../../wp-includes/wp-db.php');
+require_once('./include/api-functions.php');
 ?>
 
 <?php
@@ -17,6 +18,18 @@ require_once('../../wp-includes/wp-db.php');
 		foreach ($mediaItemIDs as $mediaItemID)
 		{
 			$wpdb->query($wpdb->prepare("CALL update_media_approval_status(%d, %d, %d)", intval($mediaItemID), $userID, $approvalStatus));
+			
+			// Update approval status in the ES record
+			$indexName = 'avw_incident_media';
+			$currentDateTime = date('Y-m-d\TH:i:s', current_time('timestamp'));
+			$postData = array(
+				'script' => array(
+					'inline' => "ctx._source.Approval_Status=$approvalStatus; ctx._source.Approval_Status_Changed='$currentDateTime'; ctx._source.Approval_Status_Changed_By=$userID",
+					'lang' => 'groovy'
+				)
+			);
+
+			$result = apiIndexUpdate($indexName, 'incident_media', $mediaItemID, $postData);
 		}
 		
 		echo 1;

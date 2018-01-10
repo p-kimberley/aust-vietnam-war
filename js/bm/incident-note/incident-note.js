@@ -3,11 +3,9 @@ BM.IncidentNote = (function() {
 	var _scope = null;
 	var _currentNoteID = null;
 	var _noteIncidentID = null;
-	var _commentsPanelShowing = true;
 	var _dialog = $('#incident-note-fullscreen-window-container');
 	var _noteContainer = $('#incident-note-container');
 	var _noteContentContainer = $('#incident-note-content-container');
-	var _noteCommentContainer = $('#incident-note-comments');
 
 	BM.angularApp.controller('incidentNoteController', ['$scope', '$http', '$log', '$timeout', 'BM.services.utility', 'BM.services.incidentNote',
 		function($scope, $http, $log, $timeout, utilityServices, incidentNoteServices)
@@ -26,6 +24,7 @@ BM.IncidentNote = (function() {
 				$http.get('/api/es/search/avw_incident_notes/incident_note/' + noteID).then(function (response)
 				{
 					HideLoadingIndicator(_noteContentContainer.find('.mCustomScrollBox'));
+					$scope.noteId = response.data._id;
 					$scope.noteData = response.data._source;
 					$scope.noteComments = $scope.noteData.Comments.filter(function(comment) { return comment.ID !== undefined; });
 					_currentNoteID = noteID;
@@ -229,11 +228,8 @@ BM.IncidentNote = (function() {
 
 			$scope.userHasNoteEditPermission = function ()
 			{
-				if ($scope.noteData)
-				{
-					if ($scope.noteData.Author)
-						return utilityServices.isPrivilegedUser() || (BM.currentWPUser.ID === $scope.noteData.Author.ID && BM.currentWPUser.ID !== 0);
-				}
+				if ($scope.noteData && $scope.noteData.Author)
+					return utilityServices.isPrivilegedUser() || (BM.currentWPUser.ID === $scope.noteData.Author.ID && BM.currentWPUser.ID !== 0);
 			};
 
 			$scope.userHasCommentEditPermission = function (authorID)
@@ -292,7 +288,7 @@ BM.IncidentNote = (function() {
 				{
 					DisplayTinyLoadingIndicator(submitStatus);
 
-					if (response.data == 1)
+					if (response.status === 200)
 					{
 						showStatusResult('success');
 

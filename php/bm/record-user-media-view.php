@@ -3,6 +3,7 @@ require_once('../../wp-config.php');
 require_once('../../wp-includes/wp-db.php');
 require_once('./include/api-functions.php');
 ?>
+
 <?php
 	$mediaID = $_POST['mediaID'];
 	
@@ -13,7 +14,7 @@ require_once('./include/api-functions.php');
 	$indexName = 'avw_incident_media';
 	$postData = array(
 		'script' => array(
-			'inline' => 'ctx._source.Views = ' + $views,
+			'inline' => ctx._source.Views=$views",
 			'lang' => 'groovy'
 		)
 	);

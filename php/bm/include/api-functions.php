@@ -11,7 +11,7 @@ function apiIndexPut($indexName, $typeName, $id, $postJson)
 {
     $apiKey = "51886680-6898-4402-95DA-C048E0EEC930";
     $postData = json_encode($postJson);
-    $request = curl_init(apiBaseUri() . '/api/es/index/' . $indexName . '/' . $typeName . '/' . $id . '?api_key=' . $apiKey);
+    $request = curl_init(apiBaseUri() . "/api/es/index/$indexName/$typeName/$id?api_key=$apiKey");
 
     curl_setopt($request, CURLOPT_CUSTOMREQUEST, "PUT");
     curl_setopt($request, CURLOPT_POSTFIELDS, $postData);
@@ -38,7 +38,7 @@ function apiIndexUpdate($indexName, $typeName, $id, $postJson)
 {
 	$apiKey = "51886680-6898-4402-95DA-C048E0EEC930";
 	$postData = json_encode($postJson);
-	$request = curl_init(apiBaseUri() . '/api/es/update/' . $indexName . '/' . $typeName . '/' . $id . '?api_key=' . $apiKey);
+	$request = curl_init(apiBaseUri() . "/api/es/update/$indexName/$typeName/$id?api_key=$apiKey");
 
 	curl_setopt($request, CURLOPT_CUSTOMREQUEST, "POST");
 	curl_setopt($request, CURLOPT_POSTFIELDS, $postData);
@@ -48,6 +48,25 @@ function apiIndexUpdate($indexName, $typeName, $id, $postJson)
 			'Content-Length: ' . strlen($postData))
 	);
 
+	$result = curl_exec($request);
+	curl_close($request);
+
+	return $result;
+}
+
+/**
+ * @param {string} $indexName
+ * @param {string} $typeName
+ * @param {Number} $id
+ * @return boolean
+ */
+function apiIndexDelete($indexName, $typeName, $id)
+{
+	$apiKey = "51886680-6898-4402-95DA-C048E0EEC930";
+	$request = curl_init(apiBaseUri() . "/api/es/delete/$indexName/$typeName/$id?api_key=$apiKey");
+
+	curl_setopt($request, CURLOPT_CUSTOMREQUEST, "DELETE");
+	
 	$result = curl_exec($request);
 	curl_close($request);
 
