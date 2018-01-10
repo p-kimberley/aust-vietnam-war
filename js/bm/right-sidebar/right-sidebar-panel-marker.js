@@ -120,8 +120,9 @@ BM.RightSidebarPanel.Marker = function ()
 					})
 				}).done(function(response) {
 					$.each(response.hits.hits, function(i, person) {
-						namesList.append('<option value="' + person.Service_Number + '">' +
-							person.Last_Name + ', ' + person.First_Name + (person.Second_Name ? ' ' + person.Second_Name : '') + ', ' + person.Rank + ', ' + person.Service + ', ' + person.Service_Number +
+						var fields = person._source;
+						namesList.append('<option value="' + fields.Service_Number + '">' +
+							fields.Last_Name + ', ' + fields.First_Name + (fields.Second_Name ? ' ' + fields.Second_Name : '') + ', ' + fields.Rank + ', ' + fields.Service + ', ' + fields.Service_Number +
 						'</option>');
 					});
 
