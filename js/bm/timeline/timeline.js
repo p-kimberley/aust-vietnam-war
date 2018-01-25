@@ -665,6 +665,16 @@ BM.Timeline = (function()
 	}
 
 	/**
+	 * Returns whether a series exists on the Timeline
+	 * @param {BM.TimelineSeries} series
+	 * @private
+	 */
+	function _hasSeries(series)
+	{
+		return _series.indexOf(series) >= 0;
+	}
+
+	/**
 	 * Adds a new series to the Timeline. The series can be used by passing the returned object to _removeSeries()
 	 * @param {BM.TimelineSeries} series
 	 * @returns {Highcharts.series}
@@ -874,6 +884,7 @@ BM.Timeline = (function()
 		update: _update,
 		destroy: _destroy,
 		redraw: _redraw,
+		hasSeries: _hasSeries,
 		addSeries: _addSeries,
 		removeSeries: _removeSeries,
 		isolateSeries: _isolateSeries,
