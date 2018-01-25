@@ -17,8 +17,8 @@ BM.Layers = (function ()
 		{
 			basemapLayer.olLayer = new ol.layer.Tile({
 				source: new ol.source.TileImage({
-					//url: 'https://api.mapbox.com/styles/v1/gradata-systems/ciz3d962m001y2rq7tymjoy5o/tiles/256/{z}/{x}/{y}' + _hidpi + '?access_token=pk.eyJ1IjoiZ3JhZGF0YS1zeXN0ZW1zIiwiYSI6ImNpZ29ldWo1djAwMnp1c20xOWVuZWsxaXQifQ.8ylL9OLBolBs6r2o25da5w',
-					url: 'http://tiles.intranet.gradata.com.au/styles/terrain/{z}/{x}/{y}@2x.png',
+					url: 'https://api.mapbox.com/styles/v1/gradata-systems/ciz3d962m001y2rq7tymjoy5o/tiles/256/{z}/{x}/{y}' + _hidpi + '?access_token=pk.eyJ1IjoiZ3JhZGF0YS1zeXN0ZW1zIiwiYSI6ImNpZ29ldWo1djAwMnp1c20xOWVuZWsxaXQifQ.8ylL9OLBolBs6r2o25da5w',
+					//url: 'http://tiles.intranet.gradata.com.au/styles/terrain/{z}/{x}/{y}@2x.png',
 					crossOrigin: 'Anonymous',
 					tilePixelRatio: BM.constants.devicePixelRatio,
 					projection: 'EPSG:3857'
