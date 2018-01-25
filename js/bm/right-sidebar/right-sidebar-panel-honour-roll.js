@@ -58,19 +58,7 @@ BM.RightSidebarPanel.HonourRoll = function()
 						"aggs": {
 							"people": {
 								"top_hits": {
-									"size": 999,
-									"_source": {
-										"include": [
-											"NR_ID",
-											"Last_Name",
-											"First_Name",
-											"Second_Name",
-											"Third_Name",
-											"Rank",
-											"Service_Number",
-											$scope.selectedCategory
-										]
-									}
+									"size": 999
 								}
 							}
 						}
