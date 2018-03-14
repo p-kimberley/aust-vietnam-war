@@ -1,9 +1,5 @@
 BM.Layers = (function ()
 {
-	var _incidentData = null;                           // Local copy of contact database results, used to generate contact markers
-	var _incidentDataDateIndex = undefined;				// Speeds up accessing incidentData elements by date
-	var _incidentDataIdIndex = undefined;
-	var _incidentDataDateCounts = undefined;			// Used to populate Timeline series
 	var _hidpi = BM.constants.devicePixelRatio > 1 ? '@2x' : '';
 
 	/**
