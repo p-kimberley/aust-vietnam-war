@@ -39,7 +39,7 @@ class AVW_Homepage_Image_Roll extends WP_Widget
         wp_enqueue_style('lightSlider', '/js/vendor/lightslider/css/lightslider.min.css', array(), false, 'all');
         wp_enqueue_style('lightGallery', '/js/vendor/lightgallery/css/lightgallery.min.css', array(), false, 'all');
         wp_enqueue_style('homepage', '/css/homepage/homepage.css', array(), false, 'all');
-		wp_enqueue_script('jquery', '/js/vendor/jquery-3.1.1.min.js', array(), false, false);
+		wp_enqueue_script('jquery', '/js/vendor/jquery-3.3.1.min.js', array(), false, false);
         wp_enqueue_script('lightSlider', '/js/vendor/lightslider/js/lightslider.min.js', array('jquery'), false, false);
         wp_enqueue_script('lightGallery', '/js/vendor/lightgallery/js/lightgallery-all.min.js', array('jquery'), false, false);
 

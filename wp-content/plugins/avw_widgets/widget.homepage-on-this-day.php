@@ -36,7 +36,7 @@ class AVW_Homepage_OnThisDay extends WP_Widget
         wp_enqueue_style('mapbox-gl', '/js/vendor/mapbox-gl/mapbox-gl.css', array(), false, 'all');
         wp_enqueue_style('homepage', '/css/homepage/homepage.css', array(), false, 'all');
 
-		wp_enqueue_script('jquery', '/js/vendor/jquery-3.1.1.min.js', array(), false, false);
+		wp_enqueue_script('jquery', '/js/vendor/jquery-3.3.1.min.js', array(), false, false);
         wp_enqueue_script('moment', '/js/vendor/momentjs/moment.min.js', array(), false, false);
         wp_enqueue_script('mapbox-gl', '/js/vendor/mapbox-gl/mapbox-gl.js', array(), false, false);
         wp_enqueue_script('mapbox-geojson-extent', '/js/vendor/mapbox-gl/geojson-extent.js', array(), false, false);

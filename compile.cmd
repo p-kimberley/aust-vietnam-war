@@ -1,11 +1,9 @@
 @echo off
-C:
-cd C:\inetpub\austvietnam2
 
 if exist ./js/bm/minified/battle-map.min.js del ./js/bm/minified/battle-map.min.js
 
 echo Compiling from source
-java -jar compiler.jar --compilation_level SIMPLE --jscomp_off suspiciousCode --js_output_file ./js/bm/minified/battle-map.min.js ^
+java -jar closure-compiler.jar --compilation_level SIMPLE --jscomp_off suspiciousCode --js_output_file ./js/bm/minified/battle-map.min.js ^
 ./js/vendor/bowser/bowser.js ^
 ./js/vendor/angular/angular.js ^
 ./js/vendor/angular/angular-animate.js ^
@@ -85,13 +83,14 @@ java -jar compiler.jar --compilation_level SIMPLE --jscomp_off suspiciousCode --
 ./js/bm/marker-tooltip/marker-tooltip.js ^
 ./js/bm/marker-tooltip/marker-tooltip-incident.js ^
 ./js/bm/marker-tooltip/marker-tooltip-poi.js ^
+./js/bm/marker-tooltip/marker-tooltip-air-sortie.js ^
+./js/bm/marker-tooltip/marker-tooltip-sea-operation.js ^
 ./js/bm/layer/option/layer-option.js ^
 ./js/bm/layer/option/layer-option-slider.js ^
 ./js/bm/layer/option/layer-option-selectmenu.js ^
 ./js/bm/layer/layer.js ^
 ./js/bm/layer/layer-basemap.js ^
 ./js/bm/layer/layer-tile.js ^
-./js/bm/layer/layer-image.js ^
 ./js/bm/layer/layer-icon.js ^
 ./js/bm/layer/layer-marker.js ^
 ./js/bm/layer/layer-marker-incident.js ^

@@ -37,7 +37,7 @@ class AVW_Homepage_OnThisDay_Casualties extends WP_Widget
 		wp_enqueue_style('tooltipster', '/js/vendor/tooltipster/css/tooltipster.bundle.min.css', array(), false, 'all');
         wp_enqueue_style('homepage', '/css/homepage/homepage.css', array(), false, 'all');
 
-        wp_enqueue_script('jquery', '/js/vendor/jquery-3.1.1.min.js', array(), false, false);
+        wp_enqueue_script('jquery', '/js/vendor/jquery-3.3.1.min.js', array(), false, false);
 		wp_enqueue_script('jquery-ui', '/js/vendor/jquery-ui-1.11/jquery-ui.min.js', array('jquery'), false, false);
 		wp_enqueue_script('jquery-touch-punch', '/js/vendor/jquery-touchpunch/jquery-ui-touch-punch.min.js', array('jquery', 'jquery-ui'), false, false);
 		wp_enqueue_script('tooltipster', '/js/vendor/tooltipster/js/tooltipster.bundle.min.js', array('jquery'), false, false);
