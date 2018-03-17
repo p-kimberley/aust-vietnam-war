@@ -52,11 +52,9 @@ BM.Layer.Marker = function(type, title, zIndex, layerOptions)
 			}
 		})
 		.on('bm:maximised.start', function(event) {
-			console.log('Interaction disabled');
 			self.interactionEnabled = false;
 		})
 		.on('bm:maximised.end', function(event) {
-			console.log('Interaction enabled');
 			self.interactionEnabled = true;
 		})
 		.on('bm:marker.hover', function(event) {
