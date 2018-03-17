@@ -232,14 +232,16 @@ BM.Filter.prototype.parseState = function(serialisedState) {};
 
 /**
  * Manages the creation and display of filters and the generation of a data service query parameter based on each filter's associated data field
+ * @param {string} id - Unique identifier for the filter in browser state
  * @param {jQuery} containerElement - DOM selector for the container the filter controls will be added to
  * @constructor
  */
-BM.FilterController = function(containerElement)
+BM.FilterController = function(id, containerElement)
 {
-	/**
-	 * @type {jQuery}
-	 */
+	/** @type {string} */
+	this.id = id;
+
+	/** @type {jQuery} */
 	this.containerElement = containerElement;
 
 	/** @type {[BM.Filter]} */

@@ -22,8 +22,10 @@ BM.StateManagement = (function()
 	// to Battle Map view states. They are processed in order from first to last
 	var _urlStateKeyValueArray = [                  // PARAMETER VALUE FORMAT:
 		['contact-filter', null],                   // Semi-colon separated list of filters and their values
-		['basemap', null],                          //
-		['layers', null],                           //
+		['sortie-filter', null],
+		['naval-gunfire-filter', null],
+		['basemap', null],
+		['layers', null],
 		['timeline', null],                         // Timeline date range
 		['incident', null],                         // <Incident ID>
 		['incident-note', null],                    // <Incident note ID>
@@ -71,9 +73,12 @@ BM.StateManagement = (function()
 			_setKeyValue(_urlStateKeyValueArray, 'layers', layerState);
 
 		// Contact filters
-		var contactFilter = BM.FilterPanel.contactFilterController.serialiseState();
-		if (contactFilter.length > 0)
-			_setKeyValue(_urlStateKeyValueArray, 'contact-filter', contactFilter);
+		if (BM.FilterPanel.currentFilterController)
+		{
+			var contactFilter = BM.FilterPanel.currentFilterController.serialiseState();
+			if (contactFilter.length > 0)
+				_setKeyValue(_urlStateKeyValueArray, BM.FilterPanel.currentFilterController.id, contactFilter);
+		}
 
 		// Timeline state. This is not set if the selected date range is wider than the min/max date range
 		var timelineState = BM.Timeline.serialiseState();
@@ -357,18 +362,27 @@ BM.StateManagement = (function()
 					}
 					return;
 				case 'contact-filter':
+				case 'sortie-filter':
+				case 'naval-gunfire-filter':
 					if (paramValue)
 					{
-						BM.FilterPanel.contactFilterController.parseState(paramValue);
-						BM.FilterPanel.applyFilter();
-						return processParameter(i + 1, processedParameters + 1);
+						var filterController = BM.FilterPanel.getFilterController(paramKey);
+						if (filterController)
+						{
+							BM.FilterPanel.getFilterController(paramKey).parseState(paramValue);
+							BM.FilterPanel.applyFilter();
+							return processParameter(i + 1, processedParameters + 1);
+						}
+						else
+						{
+							throw new Error('Invalid filter controller id: ' + paramKey);
+						}
 					}
 					else
 					{
 						// Retrieve unfiltered contact data
 						return processParameter(i + 1, processedParameters);
 					}
-					return;
 				case 'chart':
 					if (paramValue)
 					{

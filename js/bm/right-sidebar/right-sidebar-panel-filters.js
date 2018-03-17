@@ -7,9 +7,9 @@ BM.RightSidebarPanel.Filters = function () {
 	BM.RightSidebarPanel.call(this, 'filters', '#right-sidebar-button-filters', '#right-sidebar-panel-filters', true);
 
 	/** @type {BM.FilterController} */
-	this.contactFilterController = new BM.FilterController($('#contact-filter-container'));
-	this.sortieFilterController = new BM.FilterController($('#sortie-filter-container'));
-	this.navalGunfireFilterController = new BM.FilterController($('#naval-gunfire-filter-container'));
+	this.contactFilterController = new BM.FilterController('contact-filter', $('#contact-filter-container'));
+	this.sortieFilterController = new BM.FilterController('sortie-filter', $('#sortie-filter-container'));
+	this.navalGunfireFilterController = new BM.FilterController('naval-gunfire-filter', $('#naval-gunfire-filter-container'));
 
 	/** @type {BM.FilterController} */
 	this.currentFilterController = undefined;
@@ -17,6 +17,16 @@ BM.RightSidebarPanel.Filters = function () {
 
 BM.RightSidebarPanel.Filters.prototype = Object.create(BM.RightSidebarPanel.prototype);
 BM.RightSidebarPanel.Filters.prototype.constructor = BM.RightSidebarPanel.Filters;
+
+BM.RightSidebarPanel.Filters.prototype.getFilterController = function(id)
+{
+	if (id === this.contactFilterController.id)
+		return this.contactFilterController;
+	else if (id === this.sortieFilterController.id)
+		return this.sortieFilterController;
+	else if (id === this.navalGunfireFilterController.id)
+		return this.navalGunfireFilterController;
+};
 
 BM.RightSidebarPanel.Filters.prototype.init = function (callback) {
 	var self = this;
@@ -264,20 +274,22 @@ BM.RightSidebarPanel.Filters.prototype.loadNavalGunfireFilters = function (callb
  * @param {BM.FilterController} filterController - The filter controller this applies to
  * @param {boolean} [resetTimeline] - Whether to reset the date range of the Timeline, assuming the new datamin/datamax values
  * @param [callback]
- * @protected
  */
 BM.RightSidebarPanel.Filters.prototype.applyFilter = function (filterController, resetTimeline, callback) {
-	this.contactFilterController.deactivateAllFilterControls();
-	BM.LoadingProgress.init('Updating map layers', '', true);
-	BM.LoadingProgress.show(function () {
-		// Refresh contact data, to enable generation of contact layers
-		BM.ActivityLogging.logEvent(BM.LogEventTypes.appliedFilter, null, filterController.serialiseState());
-		BM.StateManagement.replaceState();
-		BM.LoadingProgress.hide();
+	if (this.currentFilterController)
+	{
+		this.contactFilterController.deactivateAllFilterControls();
+		BM.LoadingProgress.init('Updating map layers', '', true);
+		BM.LoadingProgress.show(function () {
+			// Refresh contact data, to enable generation of contact layers
+			BM.ActivityLogging.logEvent(BM.LogEventTypes.appliedFilter, null, filterController.serialiseState());
+			BM.StateManagement.replaceState();
+			BM.LoadingProgress.hide();
 
-		if (callback)
-			callback();
-	});
+			if (callback)
+				callback();
+		});
+	}
 };
 
 BM.RightSidebarPanel.Filters.prototype.applyContactFilter = function (resetTimeline, callback) {
