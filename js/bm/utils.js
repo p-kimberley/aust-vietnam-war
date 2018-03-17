@@ -43,32 +43,6 @@ function GetLoginPageURL()
 	return '/wp-login.php?redirect_to=' + encodeURIComponent(window.location.href);
 }
 
-// Pads a number with leading zeroes to a defined total number of digits
-function Pad(number, length)
-{
-    var str = number.toString();
-    while (str.length < length)
-    {
-        str = '0' + str;
-    }
-
-    return str;
-}
-
-/**
- * Replaces a numeric string that contains null or is empty, with a '0'
- * @return {string}
- */
-function Nz(numericString)
-{
-    if (numericString == null || numericString == "")
-        return "0";
-    else if (String(numericString).toLowerCase() == "null")
-        return "0";
-    else
-        return numericString;
-}
-
 function RetrieveWPUserProfileFields(fnCallback)
 {
     $.get('/php/bm/get-current-user.php', function (data)
@@ -174,29 +148,6 @@ function HideLoadingIndicator(container)
     }
 }
 
-/*
- Pulsate the specified jQueryUI button to draw attention to it
- Parameters:
- uiButton - Target jQueryUI button
- enableEffect - Boolean that enables (TRUE) or stops (FALSE) the effect
- */
-function PulseButton(uiButton, enableEffect)
-{
-    if (uiButton)
-    {
-        if (enableEffect)
-        {
-            uiButton.addClass('ui-state-highlight', 1000, 'linear', function ()
-            {
-                uiButton.removeClass('ui-state-highlight', 1000, 'linear', function ()
-                {
-
-                });
-            });
-        }
-    }
-}
-
 /**
  * Displays a modal dialog with a single close button
  * @param {string} title
@@ -233,28 +184,4 @@ function InfoDialog(title, message, callback)
             }
         }]
     }).html("<p>" + message + "</p>");
-}
-
-// Enables or disables AJAX cache to cater for certain scenarios where cache is not wanted (i.e. retrieving list of incident notes)
-function AJAXEnableCaching(enabled)
-{
-    $.ajaxSetup({cache: enabled});
-}
-
-// There is a discrepancy between current coordinates and 1970s MGRS coords - possibly due to magnetic declination.
-// Compensate approximately for these using the functions below.
-/**
- * @return {number}
- */
-function GetCalibratedLatitude(lat)
-{
-    return Math.round((lat + 0.0030) * 10000) / 10000;
-}
-
-/**
- * @return {number}
- */
-function GetCalibratedLongitude(lon)
-{
-    return Math.round((lon - 0.0030) * 10000) / 10000;
 }
