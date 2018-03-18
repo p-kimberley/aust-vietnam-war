@@ -253,7 +253,6 @@ BM.StateManagement = (function()
 					{
 						return processParameter(i + 1, processedParameters);
 					}
-					return;
 				case 'incident':
 					if (paramValue)
 					{
@@ -263,11 +262,11 @@ BM.StateManagement = (function()
 							var contactLayer = BM.LayerPanel.layerController.getSelectedLayerInGroup(BM.LayerGroupType.contact);
 							contactLayer.check(function() {
 								var result = BM.MarkerPanel.showForIncidentByID(incidentID, true);
-								if (result)
-									return processParameter(i + 1, processedParameters + 1);
-								else
+								if (!result)
 									throw new Error();
 							});
+
+							return processParameter(i + 1, processedParameters + 1);
 						}
 						catch(error)
 						{
@@ -283,7 +282,6 @@ BM.StateManagement = (function()
 
 						return processParameter(i + 1, processedParameters);
 					}
-					return;
 				case 'incident-note':
 					if (paramValue)
 					{
