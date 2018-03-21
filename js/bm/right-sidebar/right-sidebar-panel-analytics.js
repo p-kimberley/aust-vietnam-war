@@ -27,8 +27,8 @@ BM.RightSidebarPanel.Analytics.prototype.init = function()
 	this.chartController.addGroup(new BM.ChartGroup(BM.ChartType.weapon.groupName, 'Weapon Usage'))
 		.addChart(new BM.Chart.WeaponUseByRange('Rounds Fired by Range', 'Weapon Usage vs Engagement Range'))
 		.addChart(new BM.Chart.WeaponCasByRange('Casualties by Range', 'Weapon Casualty Estimates vs Engagement Range'))
-		.addChart(new BM.Chart.WeaponUseByUnitTask('Rounds Fired by Unit Task', 'Rounds Fired by Unit Task'))
-		.addChart(new BM.Chart.WeaponRdsFiredPerEnCas('Rounds Fired Per Casualty', 'Number of Rounds Fired Per Enemy Casualty'));
+		.addChart(new BM.Chart.WeaponUseByUnitTask('Rounds Fired by Unit Task', 'Rounds Fired by Unit Task'));
+		//.addChart(new BM.Chart.WeaponRdsFiredPerEnCas('Rounds Fired Per Casualty', 'Number of Rounds Fired Per Enemy Casualty'));
 	this.chartController.addGroup(new BM.ChartGroup(BM.ChartType.personnel.groupName, 'Personnel'))
 		.addChart(new BM.Chart.PersTourAges('Age Brackets', 'Age Brackets'))
 		.addChart(new BM.Chart.PersAgeByService('Age by Service', 'Avg Age by Service'))
