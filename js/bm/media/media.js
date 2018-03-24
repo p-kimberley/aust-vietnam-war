@@ -940,7 +940,8 @@ BM.Media = (function() {
 	 */
 	function _requeryMediaReelByPoint(point, callback)
 	{
-		_requeryMediaReelByLonLat(point, callback);
+		var lonLat = ol.proj.toLonLat(point);
+		_requeryMediaReelByLonLat(lonLat, callback);
 	}
 
 	/**
