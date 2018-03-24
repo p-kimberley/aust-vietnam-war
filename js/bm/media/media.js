@@ -958,7 +958,6 @@ BM.Media = (function() {
 			if (_currentMediaXHRRequest)
 				_currentMediaXHRRequest.abort();
 
-			var lonLat = ol.proj.toLonLat(coord);
 			_currentMediaXHRRequest = $.ajax({
 				url: '/api/es/search/avw_incident_media',
 				method: 'POST',
@@ -974,8 +973,8 @@ BM.Media = (function() {
 					"sort": [{
 						"_geo_distance": {
 							"Location": {
-								"lon": lonLat[0],
-								"lat": lonLat[1]
+								"lon": coord[0],
+								"lat": coord[1]
 							},
 							"order": "asc"
 						}
