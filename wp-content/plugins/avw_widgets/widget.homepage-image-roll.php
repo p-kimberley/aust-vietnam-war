@@ -75,11 +75,20 @@ class AVW_Homepage_Image_Roll extends WP_Widget
 						data: JSON.stringify({
 							"size": maxImages,
 							"query": {
-								"wildcard": {
-									"Mime_Type.raw": {
-										"value": "image/*"
-									}
-								}
+							    "bool": {
+							        "must": [
+									{
+                                        "wildcard": {
+                                            "Mime_Type.raw": {
+                                                "value": "image/*"
+                                            }
+                                        }
+                                    },{
+                                        "match": {
+                                            "Approval_Status": 1
+                                        }
+                                    }]
+                                }
 							},
 							"sort": [
 								{
