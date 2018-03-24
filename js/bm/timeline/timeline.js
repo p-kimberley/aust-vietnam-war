@@ -267,6 +267,7 @@ BM.Timeline = (function()
 
 		_initTimelineControls();
 		_initTimelineDatePickers();
+		_collapseTimeline();
 		BM.TimelineTracker.init();
 
 		if (callback)
