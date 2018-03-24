@@ -30,7 +30,7 @@ BM.TimelineSeries.prototype.setVisible = function(visible)
 
 BM.TimelineSeries.prototype.add = function()
 {
-	if (!BM.Timeline.hasSeries(this))
+	if (!BM.Timeline.hasSeries(this) || !this.series)
 		this.series = BM.Timeline.addSeries(this);
 };
 
