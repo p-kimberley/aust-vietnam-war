@@ -25,6 +25,10 @@ BM.Layer.Marker.MediaByLocation = function(title, zIndex)
 
 			BM.ActivityLogging.logEvent(BM.LogEventTypes.openedMediaItemFromMap, null, lat + "," + lon);
 		})
+		.on('bm:layer.enabled', function(event) {
+			if (event.layer === self && event.enabled)
+				self.regenerate();
+		})
 		.on('bm:media.uploadcompleted', function(event) {
 			// If the user has upload media items, regenerate this layer
 			self.regenerate();
@@ -55,6 +59,8 @@ BM.Layer.Marker.MediaByLocation.prototype.generate = function (callback)
 	if (this.canvas)
 		document.removeChild(this.canvas);
 
+	self.markers.clear();
+
 	$.ajax({
 		url: '/api/es/search/avw_incident_media',
 		method: 'POST',
@@ -66,13 +72,16 @@ BM.Layer.Marker.MediaByLocation.prototype.generate = function (callback)
 				"match": {
 					"Approval_Status": 1
 				}
+			},
+			"_source": {
+				"include": ["Location", "Path"]
 			}
 		})
-	}).done(function(response) {
+	}).then(function(response) {
 		$.each(response.hits.hits, function(i, item) {
 			var fields = item._source;
 			var marker = new ol.Feature({
-				geometry: new ol.geom.Point([fields.Location.lon, fields.Location.lat])
+				geometry: new ol.geom.Point(ol.proj.fromLonLat([fields.Location.lon, fields.Location.lat]))
 			});
 
 			marker.setProperties({
