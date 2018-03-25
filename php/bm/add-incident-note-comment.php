@@ -19,7 +19,7 @@ require_once('./include/api-functions.php');
 		
 		if ($newCommentID > 0)
 		{
-			$noteAuthorData = get_userdata($noteAuthor);
+			$noteAuthorData = get_userdata($noteAuthor['ID']);
 			$commentAuthorData = get_userdata($commentAuthor);
 			
 			// If the comment author is different to the note author, send a notification email
@@ -77,7 +77,7 @@ require_once('./include/api-functions.php');
 				}
 				else
 				{
-					wp_mail($noteAuthorData->user_email, "New comment on your incident note", $body, $headers);
+				    wp_mail($noteAuthorData->user_email, "New comment on your incident note", $body, $headers);
 				}
 			}
 			
