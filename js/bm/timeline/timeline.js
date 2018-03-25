@@ -267,7 +267,6 @@ BM.Timeline = (function()
 
 		_initTimelineControls();
 		_initTimelineDatePickers();
-		_collapseTimeline();
 		BM.TimelineTracker.init();
 
 		if (callback)
@@ -687,10 +686,7 @@ BM.Timeline = (function()
 		{
 			var newSeries = _chart.addSeries(series.getOptions());
 			_series.push(series);
-
-			// If this is the first series to be added and Timeline is collapsed, hide Highcharts UI elements
-			if (_series.length === 1)
-				_collapseTimeline();
+			_collapseTimeline();
 
 			return newSeries;
 		}
