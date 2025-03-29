@@ -419,7 +419,7 @@ BM.Media = (function() {
 
 		$scope.likeMediaItem = function()
 		{
-			$.post('/php/bm/record-user-media-like.php', {
+			$.post('/src/php/bm/record-user-media-like.php', {
 				mediaID: $scope.mediaInfo._id
 			}, function(data) {
 				if (data)
@@ -567,7 +567,7 @@ BM.Media = (function() {
 		}
 
 		_dropzone = new Dropzone("#media-dropzone", {
-			url: '/php/bm/upload-incident-media.php',
+			url: '/src/php/bm/upload-incident-media.php',
 			acceptedFiles: _acceptedFiles,
 			maxFiles: _maxFiles,
 			maxFilesize: 50,

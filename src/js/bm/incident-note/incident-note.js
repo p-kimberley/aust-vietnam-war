@@ -32,7 +32,7 @@ BM.IncidentNote = (function() {
 
 					$http({
 						method: 'GET',
-						url: '/php/bm/get-user-meta.php?' + $.param({
+						url: '/src/php/bm/get-user-meta.php?' + $.param({
 							userIDArray: $scope.noteData.Author.ID,
 							avatarSize: 60
 						})
@@ -71,7 +71,7 @@ BM.IncidentNote = (function() {
 			 */
 			$scope.addNote = function (incidentID, noteTitle, noteBody)
 			{
-				$http.post('/php/bm/add-incident-note.php', {
+				$http.post('/src/php/bm/add-incident-note.php', {
 					incidentID: incidentID,
 					noteTitle: encodeURIComponent(noteTitle),
 					noteBody: encodeURIComponent(noteBody)
@@ -122,7 +122,7 @@ BM.IncidentNote = (function() {
 			 */
 			$scope.updateNote = function (noteID, noteTitle, noteBody)
 			{
-				$http.post('/php/bm/update-incident-note.php', {
+				$http.post('/src/php/bm/update-incident-note.php', {
 					noteID: noteID,
 					noteTitle: encodeURIComponent(noteTitle),
 					noteBody: encodeURIComponent(noteBody)
@@ -144,7 +144,7 @@ BM.IncidentNote = (function() {
 			$scope.deleteNote = function (noteID)
 			{
 				// Delete the note after re-authenticating against the user's roles
-				$http.post('/php/bm/delete-incident-note.php', {
+				$http.post('/src/php/bm/delete-incident-note.php', {
 					noteID: noteID
 				}).then(function (response)
 				{
@@ -206,7 +206,7 @@ BM.IncidentNote = (function() {
 				var statusSpinner = _noteContainer.find('.status-spinner');
 
 				DisplayTinyLoadingIndicator(statusSpinner);
-				$http.post('/php/bm/update-incident-note-approval-status.php', {
+				$http.post('/src/php/bm/update-incident-note-approval-status.php', {
 					noteID: _currentNoteID,
 					approvalStatus: newStatus
 				}).then(function ()
@@ -246,7 +246,7 @@ BM.IncidentNote = (function() {
 					authorIDArray.push(item.Author.ID);
 				});
 
-				$http.get('/php/bm/get-user-meta.php?' + $.param({
+				$http.get('/src/php/bm/get-user-meta.php?' + $.param({
 					userIDArray: authorIDArray.toString(),
 					avatarSize: 30
 				})).then(function (response) {
@@ -280,7 +280,7 @@ BM.IncidentNote = (function() {
 				submitStatus.find('.status-icon').hide();
 				DisplayTinyLoadingIndicator(submitStatus);
 
-				$http.post('/php/bm/add-incident-note-comment.php', {
+				$http.post('/src/php/bm/add-incident-note-comment.php', {
 					noteID: noteID,
 					comment: encodeURIComponent(comment),
 					noteAuthor: $scope.noteData.Author
@@ -319,7 +319,7 @@ BM.IncidentNote = (function() {
 			{
 				if (confirm("Delete this comment?"))
 				{
-					$http.post('/php/bm/delete-incident-note-comment.php', {
+					$http.post('/src/php/bm/delete-incident-note-comment.php', {
 						commentID: commentID
 					}).then(function (response)
 					{

@@ -33,14 +33,14 @@ class AVW_Homepage_OnThisDay extends WP_Widget
      */
     public function widget($args, $instance)
     {
-        wp_enqueue_style('mapbox-gl', '/js/vendor/mapbox-gl/mapbox-gl.css', array(), false, 'all');
-        wp_enqueue_style('homepage', '/css/homepage/homepage.css', array(), false, 'all');
+        wp_enqueue_style('mapbox-gl', '/src/js/vendor/mapbox-gl/mapbox-gl.css', array(), false, 'all');
+        wp_enqueue_style('homepage', '/src/css/homepage/homepage.css', array(), false, 'all');
 
-		wp_enqueue_script('jquery', '/js/vendor/jquery-3.3.1.min.js', array(), false, false);
-        wp_enqueue_script('moment', '/js/vendor/momentjs/moment.min.js', array(), false, false);
-        wp_enqueue_script('mapbox-gl', '/js/vendor/mapbox-gl/mapbox-gl.js', array(), false, false);
-        wp_enqueue_script('mapbox-geojson-extent', '/js/vendor/mapbox-gl/geojson-extent.js', array(), false, false);
-        wp_enqueue_script('homepage-map', '/js/homepage-map.js', array('jquery', 'mapbox-gl'), false, false);
+		wp_enqueue_script('jquery', '/src/js/vendor/jquery-3.3.1.min.js', array(), false, false);
+        wp_enqueue_script('moment', '/src/js/vendor/momentjs/moment.min.js', array(), false, false);
+        wp_enqueue_script('mapbox-gl', '/src/js/vendor/mapbox-gl/mapbox-gl.js', array(), false, false);
+        wp_enqueue_script('mapbox-geojson-extent', '/src/js/vendor/mapbox-gl/geojson-extent.js', array(), false, false);
+        wp_enqueue_script('homepage-map', '/src/js/homepage-map.js', array('jquery', 'mapbox-gl'), false, false);
 
         $title = $instance['title'];
         echo '<div class="avw-homepage-widget sidebar-widget ' . $this->id_base . '">';

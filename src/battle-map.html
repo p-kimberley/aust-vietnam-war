@@ -3,19 +3,19 @@
     <meta charset="utf-8">
     <!--<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">-->
     <title>Battle Map</title>
-    <link rel="stylesheet" href="/css/vendor/fontawesome/font-awesome.min.css"/>
-    <link rel="stylesheet" href="/css/vendor/icheck/flat/blue.css"/>
-    <link rel="stylesheet" href="/js/vendor/select2/css/select2.min.css"/>
-    <link rel="stylesheet" href="/js/vendor/jquery-ui/jquery-ui.css?revision=34"/>
-    <link rel="stylesheet" href="/js/vendor/mcustom-scrollbar/jquery.mCustomScrollbar.min.css"/>
-    <link rel="stylesheet" href="/js/vendor/tooltipster/css/tooltipster.bundle.min.css"/>
-    <link rel="stylesheet" href="/js/vendor/tooltipster/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-light.min.css"/>
-    <link rel="stylesheet" href="/js/vendor/jstree/themes/default/style.min.css"/>
-    <link rel="stylesheet" href="/js/vendor/dropzone/min/dropzone.min.css"/>
-    <link rel="stylesheet" href="/js/vendor/videojs/video-js.min.css"/>
-    <link rel="stylesheet" href="/js/vendor/lightgallery/css/lightgallery.min.css">
-    <!--<link rel="stylesheet" href="/js/vendor/ol3-cesium/ol.css"/>-->
-    <link rel="stylesheet" href="/js/vendor/openlayers/ol.css"/>
+    <link rel="stylesheet" href="/src/css/vendor/fontawesome/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/src/css/vendor/icheck/flat/blue.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/select2/css/select2.min.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/jquery-ui/jquery-ui.css?revision=34"/>
+    <link rel="stylesheet" href="/src/js/vendor/mcustom-scrollbar/jquery.mCustomScrollbar.min.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/tooltipster/css/tooltipster.bundle.min.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/tooltipster/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-light.min.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/jstree/themes/default/style.min.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/dropzone/min/dropzone.min.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/videojs/video-js.min.css"/>
+    <link rel="stylesheet" href="/src/js/vendor/lightgallery/css/lightgallery.min.css">
+    <!--<link rel="stylesheet" href="/src/js/vendor/ol3-cesium/ol.css"/>-->
+    <link rel="stylesheet" href="/src/js/vendor/openlayers/ol.css"/>
 
     <!-- Usernoise styles -->
     <!--<link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/js/vendor/font/css/usernoise-embedded.css"/>-->
@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/js/discussion/dist/discussion.css"/>
     <link rel="stylesheet" type="text/css" href="/wp-content/plugins/usernoise/vendor/icons/css/embedded.css"/>
 
-    <link rel="stylesheet" href="/css/bm/battle-map.css?revision=43"/>
+    <link rel="stylesheet" href="/src/css/bm/battle-map.css?revision=43"/>
 </head>
 
 <body>
@@ -1180,149 +1180,149 @@
     </p>
 </div>
 
-<script src="/js/vendor/jquery-3.3.1.min.js"></script>
-<script src="/js/bm/utils.js?revision=31"></script>
+<script src="/src/js/vendor/jquery-3.3.1.min.js"></script>
+<script src="/src/js/bm/utils.js?revision=31"></script>
 <script>
     // Black out the screen while page elements are being initialised and positioned
     SetModalBackgroundOpacity(1.0);
 </script>
 
-<!--<script src="/js/vendor/bowser/bowser.js"></script>
-<script src="/js/vendor/angular/angular.js"></script>
-<script src="/js/vendor/angular/angular-animate.js"></script>
-<script src="/js/vendor/angular/angular-sanitize.js"></script>
-<script src="/js/vendor/ckeditor/ckeditor.js"></script>
-<script src="/js/vendor/ckeditor/adapters/jquery.js"></script>
-<script src="/js/vendor/momentjs/moment-with-locales.js"></script>
-<script src="/js/vendor/dropzone/dropzone.js"></script>
-<script src="/js/vendor/videojs/video.js"></script>
-<script src="/js/vendor/lightgallery/js/lightgallery.js"></script>
-<script src="/js/vendor/lightgallery/modules/lg-autoplay.js"></script>
-<script src="/js/vendor/lightgallery/modules/lg-fullscreen.js"></script>
-<script src="/js/vendor/lightgallery/modules/lg-pager.js"></script>
-<script src="/js/vendor/lightgallery/modules/lg-thumbnail.js"></script>
-<script src="/js/vendor/lightgallery/modules/lg-video.js"></script>
-<script src="/js/vendor/lightgallery/modules/lg-zoom.js"></script>
-<script src="/js/vendor/clipboard/clipboard.min.js"></script>
-<script src="/js/vendor/spin/spin.js"></script>
-<script src="/js/vendor/spin/jquery.spin.js"></script>
-<script src="/js/vendor/select2/js/select2.full.js"></script>
-<script src="/js/vendor/jquery-ui/jquery-ui.js"></script>
-<script src="/js/vendor/jquery-touchpunch/jquery.ui.touch-punch.js"></script>
-<script src="/js/vendor/velocity/velocity.js"></script>
-<script src="/js/vendor/icheck/icheck.js"></script>
-<script src="/js/vendor/jstree/jstree.js"></script>
-<script src="/js/vendor/mcustom-scrollbar/jquery.mCustomScrollbar.js"></script>
-<script src="/js/vendor/historyjs/jquery.history.js"></script>
-<script src="/js/vendor/tooltipster/js/tooltipster.bundle.js"></script>
-<script src="/js/vendor/tooltipster/js/plugins/tooltipster/tooltipster-discovery.js"></script>
-<script src="/js/vendor/openlayers/ol-debug.js"></script>
-<script src="/js/vendor/chroma/chroma.js"></script>
-<script src="/js/vendor/highstock/highstock.js"></script>
-<script src="/js/vendor/highstock/themes/dark-unica.js"></script>
-<script src="/js/vendor/highstock/highcharts-legend-highlighter.src.js"></script>
-<script src="/js/bm/globals.js"></script>
-<script src="/js/bm/window-manager/window-manager.js"></script>
-<script src="/js/bm/services/utility.js"></script>
-<script src="/js/bm/services/incident-note.js"></script>
-<script src="/js/bm/services/honour-roll.js"></script>
-<script src="/js/bm/services/media.js"></script>
-<script src="/js/bm/directives/incident-note.js"></script>
-<script src="/js/bm/directives/select-menu.js"></script>
-<script src="/js/bm/directives/date-picker.js"></script>
-<script src="/js/bm/directives/meta-tag-input.js"></script>
-<script src="/js/bm/directives/tooltipped.js"></script>
-<script src="/js/bm/directives/poppy-tooltip.js"></script>
-<script src="/js/bm/directives/casualty-list-item.js"></script>
-<script src="/js/bm/activity-logging.js"></script>
-<script src="/js/bm/progress.js"></script>
-<script src="/js/bm/quick-start-guide.js"></script>
-<script src="/js/bm/timeline/timeline-series.js"></script>
-<script src="/js/bm/timeline/timeline.js"></script>
-<script src="/js/bm/timeline/timeline-track-type.js"></script>
-<script src="/js/bm/timeline/timeline-track-type-unit.js"></script>
-<script src="/js/bm/timeline/timeline-tracker.js"></script>
-<script src="/js/bm/filter/filter.js"></script>
-<script src="/js/bm/filter/filter-unit-tree.js"></script>
-<script src="/js/bm/filter/filter-range-slider.js"></script>
-<script src="/js/bm/filter/filter-text-box.js"></script>
-<script src="/js/bm/filter/filter-single-select-list.js"></script>
-<script src="/js/bm/filter/filter-multi-select-list.js"></script>
-<script src="/js/bm/filter/filter-distinct-field-multi-select.js"></script>
-<script src="/js/bm/filter/filter-distinct-field-single-select.js"></script>
-<script src="/js/bm/filter/filter-incident-notes.js"></script>
-<script src="/js/bm/chart/chart-options.js"></script>
-<script src="/js/bm/chart/chart.js"></script>
-<script src="/js/bm/chart/chart-incident-freq-date.js"></script>
-<script src="/js/bm/chart/chart-incident-freq-time.js"></script>
-<script src="/js/bm/chart/chart-battle-damage-date.js"></script>
-<script src="/js/bm/chart/chart-battle-damage-time.js"></script>
-<script src="/js/bm/chart/chart-loss-ratio-by-fired-first-by-date.js"></script>
-<script src="/js/bm/chart/chart-loss-ratio-by-fired-first-by-time.js"></script>
-<script src="/js/bm/chart/chart-weapon-rds-fired.js"></script>
-<script src="/js/bm/chart/chart-weapon-rds-fired-by-unit-task.js"></script>
-<script src="/js/bm/chart/chart-weapon-cas-ranges.js"></script>
-<script src="/js/bm/chart/chart-weapon-rds-fired-per-en-cas.js"></script>
-<script src="/js/bm/chart/chart-pers-tour-ages.js"></script>
-<script src="/js/bm/chart/chart-pers-age-by-service.js"></script>
-<script src="/js/bm/chart/chart-pers-age-of-death-by-service.js"></script>
-<script src="/js/bm/marker-tooltip/marker-tooltip.js"></script>
-<script src="/js/bm/marker-tooltip/marker-tooltip-incident.js"></script>
-<script src="/js/bm/marker-tooltip/marker-tooltip-poi.js"></script>
-<script src="/js/bm/marker-tooltip/marker-tooltip-air-sortie.js"></script>
-<script src="/js/bm/marker-tooltip/marker-tooltip-sea-operation.js"></script>
-<script src="/js/bm/layer/option/layer-option.js"></script>
-<script src="/js/bm/layer/option/layer-option-slider.js"></script>
-<script src="/js/bm/layer/option/layer-option-selectmenu.js"></script>
-<script src="/js/bm/layer/layer.js"></script>
-<script src="/js/bm/layer/layer-basemap.js"></script>
-<script src="/js/bm/layer/layer-tile.js"></script>
-<script src="/js/bm/layer/layer-icon.js"></script>
-<script src="/js/bm/layer/layer-marker.js"></script>
-<script src="/js/bm/layer/layer-marker-incident.js"></script>
-<script src="/js/bm/layer/layer-marker-incident-circles.js"></script>
-<script src="/js/bm/layer/layer-marker-media.js"></script>
-<script src="/js/bm/layer/layer-marker-poi.js"></script>
-<script src="/js/bm/layer/layer-air-operations.js"></script>
-<script src="/js/bm/layer/layer-sea-operations.js"></script>
-<script src="/js/bm/layer/layer-heatmap.js"></script>
-<script src="/js/bm/layer/layer-heatmap-contact.js"></script>
-<script src="/js/bm/layer/layers.js"></script>
-<script src="/js/bm/guidance-line.js"></script>
-<script src="/js/bm/incident-note/incident-note.js"></script>
-<script src="/js/bm/casualty-info-dialog.js"></script>
-<script src="/js/bm/search/search-source.js"></script>
-<script src="/js/bm/search/search-source-es.js"></script>
-<script src="/js/bm/search/search-source-es-operation.js"></script>
-<script src="/js/bm/search/search-source-es-incident.js"></script>
-<script src="/js/bm/search/search-source-es-incident-note.js"></script>
-<script src="/js/bm/search/search-source-es-media.js"></script>
-<script src="/js/bm/search/search-source-es-person.js"></script>
-<script src="/js/bm/search/search.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel-layers.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel-filters.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel-analytics.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel-notes.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel-honour-roll.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel-marker.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar-panel-media-moderation.js"></script>
-<script src="/js/bm/right-sidebar/right-sidebar.js"></script>
-<script src="/js/bm/media/media.js"></script>
-<script src="/js/bm/state-management.js"></script>
-<script src="/js/bm/main-toolbox.js"></script>
-<script src="/js/bm/battle-map.js"></script>-->
+<!--<script src="/src/js/vendor/bowser/bowser.js"></script>
+<script src="/src/js/vendor/angular/angular.js"></script>
+<script src="/src/js/vendor/angular/angular-animate.js"></script>
+<script src="/src/js/vendor/angular/angular-sanitize.js"></script>
+<script src="/src/js/vendor/ckeditor/ckeditor.js"></script>
+<script src="/src/js/vendor/ckeditor/adapters/jquery.js"></script>
+<script src="/src/js/vendor/momentjs/moment-with-locales.js"></script>
+<script src="/src/js/vendor/dropzone/dropzone.js"></script>
+<script src="/src/js/vendor/videojs/video.js"></script>
+<script src="/src/js/vendor/lightgallery/js/lightgallery.js"></script>
+<script src="/src/js/vendor/lightgallery/modules/lg-autoplay.js"></script>
+<script src="/src/js/vendor/lightgallery/modules/lg-fullscreen.js"></script>
+<script src="/src/js/vendor/lightgallery/modules/lg-pager.js"></script>
+<script src="/src/js/vendor/lightgallery/modules/lg-thumbnail.js"></script>
+<script src="/src/js/vendor/lightgallery/modules/lg-video.js"></script>
+<script src="/src/js/vendor/lightgallery/modules/lg-zoom.js"></script>
+<script src="/src/js/vendor/clipboard/clipboard.min.js"></script>
+<script src="/src/js/vendor/spin/spin.js"></script>
+<script src="/src/js/vendor/spin/jquery.spin.js"></script>
+<script src="/src/js/vendor/select2/js/select2.full.js"></script>
+<script src="/src/js/vendor/jquery-ui/jquery-ui.js"></script>
+<script src="/src/js/vendor/jquery-touchpunch/jquery.ui.touch-punch.js"></script>
+<script src="/src/js/vendor/velocity/velocity.js"></script>
+<script src="/src/js/vendor/icheck/icheck.js"></script>
+<script src="/src/js/vendor/jstree/jstree.js"></script>
+<script src="/src/js/vendor/mcustom-scrollbar/jquery.mCustomScrollbar.js"></script>
+<script src="/src/js/vendor/historyjs/jquery.history.js"></script>
+<script src="/src/js/vendor/tooltipster/js/tooltipster.bundle.js"></script>
+<script src="/src/js/vendor/tooltipster/js/plugins/tooltipster/tooltipster-discovery.js"></script>
+<script src="/src/js/vendor/openlayers/ol-debug.js"></script>
+<script src="/src/js/vendor/chroma/chroma.js"></script>
+<script src="/src/js/vendor/highstock/highstock.js"></script>
+<script src="/src/js/vendor/highstock/themes/dark-unica.js"></script>
+<script src="/src/js/vendor/highstock/highcharts-legend-highlighter.src.js"></script>
+<script src="/src/js/bm/globals.js"></script>
+<script src="/src/js/bm/window-manager/window-manager.js"></script>
+<script src="/src/js/bm/services/utility.js"></script>
+<script src="/src/js/bm/services/incident-note.js"></script>
+<script src="/src/js/bm/services/honour-roll.js"></script>
+<script src="/src/js/bm/services/media.js"></script>
+<script src="/src/js/bm/directives/incident-note.js"></script>
+<script src="/src/js/bm/directives/select-menu.js"></script>
+<script src="/src/js/bm/directives/date-picker.js"></script>
+<script src="/src/js/bm/directives/meta-tag-input.js"></script>
+<script src="/src/js/bm/directives/tooltipped.js"></script>
+<script src="/src/js/bm/directives/poppy-tooltip.js"></script>
+<script src="/src/js/bm/directives/casualty-list-item.js"></script>
+<script src="/src/js/bm/activity-logging.js"></script>
+<script src="/src/js/bm/progress.js"></script>
+<script src="/src/js/bm/quick-start-guide.js"></script>
+<script src="/src/js/bm/timeline/timeline-series.js"></script>
+<script src="/src/js/bm/timeline/timeline.js"></script>
+<script src="/src/js/bm/timeline/timeline-track-type.js"></script>
+<script src="/src/js/bm/timeline/timeline-track-type-unit.js"></script>
+<script src="/src/js/bm/timeline/timeline-tracker.js"></script>
+<script src="/src/js/bm/filter/filter.js"></script>
+<script src="/src/js/bm/filter/filter-unit-tree.js"></script>
+<script src="/src/js/bm/filter/filter-range-slider.js"></script>
+<script src="/src/js/bm/filter/filter-text-box.js"></script>
+<script src="/src/js/bm/filter/filter-single-select-list.js"></script>
+<script src="/src/js/bm/filter/filter-multi-select-list.js"></script>
+<script src="/src/js/bm/filter/filter-distinct-field-multi-select.js"></script>
+<script src="/src/js/bm/filter/filter-distinct-field-single-select.js"></script>
+<script src="/src/js/bm/filter/filter-incident-notes.js"></script>
+<script src="/src/js/bm/chart/chart-options.js"></script>
+<script src="/src/js/bm/chart/chart.js"></script>
+<script src="/src/js/bm/chart/chart-incident-freq-date.js"></script>
+<script src="/src/js/bm/chart/chart-incident-freq-time.js"></script>
+<script src="/src/js/bm/chart/chart-battle-damage-date.js"></script>
+<script src="/src/js/bm/chart/chart-battle-damage-time.js"></script>
+<script src="/src/js/bm/chart/chart-loss-ratio-by-fired-first-by-date.js"></script>
+<script src="/src/js/bm/chart/chart-loss-ratio-by-fired-first-by-time.js"></script>
+<script src="/src/js/bm/chart/chart-weapon-rds-fired.js"></script>
+<script src="/src/js/bm/chart/chart-weapon-rds-fired-by-unit-task.js"></script>
+<script src="/src/js/bm/chart/chart-weapon-cas-ranges.js"></script>
+<script src="/src/js/bm/chart/chart-weapon-rds-fired-per-en-cas.js"></script>
+<script src="/src/js/bm/chart/chart-pers-tour-ages.js"></script>
+<script src="/src/js/bm/chart/chart-pers-age-by-service.js"></script>
+<script src="/src/js/bm/chart/chart-pers-age-of-death-by-service.js"></script>
+<script src="/src/js/bm/marker-tooltip/marker-tooltip.js"></script>
+<script src="/src/js/bm/marker-tooltip/marker-tooltip-incident.js"></script>
+<script src="/src/js/bm/marker-tooltip/marker-tooltip-poi.js"></script>
+<script src="/src/js/bm/marker-tooltip/marker-tooltip-air-sortie.js"></script>
+<script src="/src/js/bm/marker-tooltip/marker-tooltip-sea-operation.js"></script>
+<script src="/src/js/bm/layer/option/layer-option.js"></script>
+<script src="/src/js/bm/layer/option/layer-option-slider.js"></script>
+<script src="/src/js/bm/layer/option/layer-option-selectmenu.js"></script>
+<script src="/src/js/bm/layer/layer.js"></script>
+<script src="/src/js/bm/layer/layer-basemap.js"></script>
+<script src="/src/js/bm/layer/layer-tile.js"></script>
+<script src="/src/js/bm/layer/layer-icon.js"></script>
+<script src="/src/js/bm/layer/layer-marker.js"></script>
+<script src="/src/js/bm/layer/layer-marker-incident.js"></script>
+<script src="/src/js/bm/layer/layer-marker-incident-circles.js"></script>
+<script src="/src/js/bm/layer/layer-marker-media.js"></script>
+<script src="/src/js/bm/layer/layer-marker-poi.js"></script>
+<script src="/src/js/bm/layer/layer-air-operations.js"></script>
+<script src="/src/js/bm/layer/layer-sea-operations.js"></script>
+<script src="/src/js/bm/layer/layer-heatmap.js"></script>
+<script src="/src/js/bm/layer/layer-heatmap-contact.js"></script>
+<script src="/src/js/bm/layer/layers.js"></script>
+<script src="/src/js/bm/guidance-line.js"></script>
+<script src="/src/js/bm/incident-note/incident-note.js"></script>
+<script src="/src/js/bm/casualty-info-dialog.js"></script>
+<script src="/src/js/bm/search/search-source.js"></script>
+<script src="/src/js/bm/search/search-source-es.js"></script>
+<script src="/src/js/bm/search/search-source-es-operation.js"></script>
+<script src="/src/js/bm/search/search-source-es-incident.js"></script>
+<script src="/src/js/bm/search/search-source-es-incident-note.js"></script>
+<script src="/src/js/bm/search/search-source-es-media.js"></script>
+<script src="/src/js/bm/search/search-source-es-person.js"></script>
+<script src="/src/js/bm/search/search.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel-layers.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel-filters.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel-analytics.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel-notes.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel-honour-roll.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel-marker.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar-panel-media-moderation.js"></script>
+<script src="/src/js/bm/right-sidebar/right-sidebar.js"></script>
+<script src="/src/js/bm/media/media.js"></script>
+<script src="/src/js/bm/state-management.js"></script>
+<script src="/src/js/bm/main-toolbox.js"></script>
+<script src="/src/js/bm/battle-map.js"></script>-->
 
 <!-- Manually include Usernoise as the WordPress footer code is not loaded -->
-<script src="/js/bm/usernoise-config.js?revision=2"></script>
+<script src="/src/js/bm/usernoise-config.js?revision=2"></script>
 <script type='text/javascript' src='/wp-content/plugins/usernoise/js/usernoise.js?ver=4.1.5'></script>
 <script type='text/javascript' src='/wp-content/plugins/usernoise/js/button.js?ver=4.1.5'></script>
 
-<script src="/js/vendor/velocity/velocity.min.js?revision=222"></script>
-<script src="/js/vendor/openlayers/ol.js?revision=222"></script>
-<script src="/js/vendor/ckeditor/ckeditor.js?revision=222"></script>
-<script src="/js/vendor/ckeditor/adapters/jquery.js?revision=222"></script>
-<script src="/js/bm/minified/battle-map.min.js?revision=222"></script>
+<script src="/src/js/vendor/velocity/velocity.min.js?revision=222"></script>
+<script src="/src/js/vendor/openlayers/ol.js?revision=222"></script>
+<script src="/src/js/vendor/ckeditor/ckeditor.js?revision=222"></script>
+<script src="/src/js/vendor/ckeditor/adapters/jquery.js?revision=222"></script>
+<script src="/src/js/bm/minified/battle-map.min.js?revision=222"></script>
 
 </body>
 

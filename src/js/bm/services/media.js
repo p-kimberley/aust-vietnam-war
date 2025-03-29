@@ -8,7 +8,7 @@ BM.angularApp.service('BM.services.media', ['$http', function($http) {
 	 */
 	this.setApprovalStatus = function(mediaItemIDs, approvalStatus)
 	{
-		return $http.post('/php/bm/update-media-approval-status.php', {
+		return $http.post('/src/php/bm/update-media-approval-status.php', {
 			mediaItemIDs: mediaItemIDs.toString(),
 			approvalStatus: approvalStatus
 		});

@@ -39,7 +39,7 @@ BM.MainToolbox = (function() {
 			$scope.logoutUrl = '';
 			$scope.userFlyoutHeader = 'Account Options';
 
-			$http.get('/php/bm/get-logout-url.php')
+			$http.get('/src/php/bm/get-logout-url.php')
 				.then(function (response)
 				{
 					var url = utilityServices.decodeURIComponent(response.data);
@@ -53,7 +53,7 @@ BM.MainToolbox = (function() {
 
 			if (BM.currentWPUser.ID > 0)
 			{
-				$http.get('/php/bm/get-user-meta.php?' + $.param({
+				$http.get('/src/php/bm/get-user-meta.php?' + $.param({
 						userIDArray: BM.currentWPUser.ID,
 						avatarSize: 48
 					})).then(function (response)

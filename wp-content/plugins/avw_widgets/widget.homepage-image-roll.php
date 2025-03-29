@@ -36,12 +36,12 @@ class AVW_Homepage_Image_Roll extends WP_Widget
     {
         $this->instance = $instance;
 
-        wp_enqueue_style('lightSlider', '/js/vendor/lightslider/css/lightslider.min.css', array(), false, 'all');
-        wp_enqueue_style('lightGallery', '/js/vendor/lightgallery/css/lightgallery.min.css', array(), false, 'all');
-        wp_enqueue_style('homepage', '/css/homepage/homepage.css', array(), false, 'all');
-		wp_enqueue_script('jquery', '/js/vendor/jquery-3.3.1.min.js', array(), false, false);
-        wp_enqueue_script('lightSlider', '/js/vendor/lightslider/js/lightslider.min.js', array('jquery'), false, false);
-        wp_enqueue_script('lightGallery', '/js/vendor/lightgallery/js/lightgallery-all.min.js', array('jquery'), false, false);
+        wp_enqueue_style('lightSlider', '/src/js/vendor/lightslider/css/lightslider.min.css', array(), false, 'all');
+        wp_enqueue_style('lightGallery', '/src/js/vendor/lightgallery/css/lightgallery.min.css', array(), false, 'all');
+        wp_enqueue_style('homepage', '/src/css/homepage/homepage.css', array(), false, 'all');
+		wp_enqueue_script('jquery', '/src/js/vendor/jquery-3.3.1.min.js', array(), false, false);
+        wp_enqueue_script('lightSlider', '/src/js/vendor/lightslider/js/lightslider.min.js', array('jquery'), false, false);
+        wp_enqueue_script('lightGallery', '/src/js/vendor/lightgallery/js/lightgallery-all.min.js', array('jquery'), false, false);
 
         $title = $instance['title'];
         echo '<div class="avw-homepage-widget sidebar-widget ' . $this->id_base . '">';

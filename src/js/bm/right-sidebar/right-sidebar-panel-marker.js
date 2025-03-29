@@ -158,7 +158,7 @@ BM.RightSidebarPanel.Marker = function ()
 								return;
 							}
 
-							$.post('/php/bm/record-casualty-information.php', JSON.stringify({
+							$.post('/src/php/bm/record-casualty-information.php', JSON.stringify({
 								incidentID: incidentID,
 								casType: encodeURIComponent(casTypeList.val()),
 								casData: encodeURIComponent(namesList.val().toString()),

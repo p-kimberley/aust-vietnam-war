@@ -106,7 +106,7 @@ add_filter( 'bbp_after_get_the_content_parse_args', function($args = array()) {
  * Include Fontawesome
  */
 add_action('wp_head', function() {
-    echo '<link rel="stylesheet" href="/css/vendor/fontawesome/font-awesome.min.css"/>';
+    echo '<link rel="stylesheet" href="/src/css/vendor/fontawesome/font-awesome.min.css"/>';
 });
 
 ?>

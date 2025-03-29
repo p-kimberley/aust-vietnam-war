@@ -45,7 +45,7 @@ function GetLoginPageURL()
 
 function RetrieveWPUserProfileFields(fnCallback)
 {
-    $.get('/php/bm/get-current-user.php', function (data)
+    $.get('/src/php/bm/get-current-user.php', function (data)
     {
         BM.currentWPUser = $.parseJSON(data);
 

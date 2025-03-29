@@ -73,7 +73,7 @@ BM.angularApp.directive('casualtyListItem', [function() {
 			$scope.addTribute = function(person)
 			{
 				localStorage.setItem('tribute-submitted-' + person.NR_ID, moment().toISOString());
-				$.post('/php/bm/add-tribute.php', JSON.stringify({
+				$.post('/src/php/bm/add-tribute.php', JSON.stringify({
 					person: person.NR_ID,
 					comment: $scope.tributeInput ? encodeURIComponent($scope.tributeInput) : null
 				})).done(function(response) {

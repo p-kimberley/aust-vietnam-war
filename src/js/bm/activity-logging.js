@@ -25,7 +25,7 @@ BM.ActivityLogging = (function()
 	{
 		if (BM.StateManagement.initialStateLoaded())
 		{
-			$.post('/php/bm/log-user-activity.php', {
+			$.post('/src/php/bm/log-user-activity.php', {
 				eventType: eventType,
 				eventKey: eventKey,
 				eventData: eventData

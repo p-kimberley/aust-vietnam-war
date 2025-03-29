@@ -33,15 +33,15 @@ class AVW_Homepage_OnThisDay_Casualties extends WP_Widget
      */
     public function widget($args, $instance)
     {
-        wp_enqueue_style('jquery-ui', '/js/vendor/jquery-ui-1.11/jquery-ui.min.css', array(), false, 'all');
-		wp_enqueue_style('tooltipster', '/js/vendor/tooltipster/css/tooltipster.bundle.min.css', array(), false, 'all');
-        wp_enqueue_style('homepage', '/css/homepage/homepage.css', array(), false, 'all');
+        wp_enqueue_style('jquery-ui', '/src/js/vendor/jquery-ui-1.11/jquery-ui.min.css', array(), false, 'all');
+		wp_enqueue_style('tooltipster', '/src/js/vendor/tooltipster/css/tooltipster.bundle.min.css', array(), false, 'all');
+        wp_enqueue_style('homepage', '/src/css/homepage/homepage.css', array(), false, 'all');
 
-        wp_enqueue_script('jquery', '/js/vendor/jquery-3.3.1.min.js', array(), false, false);
-		wp_enqueue_script('jquery-ui', '/js/vendor/jquery-ui-1.11/jquery-ui.min.js', array('jquery'), false, false);
-		wp_enqueue_script('jquery-touch-punch', '/js/vendor/jquery-touchpunch/jquery-ui-touch-punch.min.js', array('jquery', 'jquery-ui'), false, false);
-		wp_enqueue_script('tooltipster', '/js/vendor/tooltipster/js/tooltipster.bundle.min.js', array('jquery'), false, false);
-		wp_enqueue_script('moment', '/js/vendor/momentjs/moment.min.js', array(), false, false);
+        wp_enqueue_script('jquery', '/src/js/vendor/jquery-3.3.1.min.js', array(), false, false);
+		wp_enqueue_script('jquery-ui', '/src/js/vendor/jquery-ui-1.11/jquery-ui.min.js', array('jquery'), false, false);
+		wp_enqueue_script('jquery-touch-punch', '/src/js/vendor/jquery-touchpunch/jquery-ui-touch-punch.min.js', array('jquery', 'jquery-ui'), false, false);
+		wp_enqueue_script('tooltipster', '/src/js/vendor/tooltipster/js/tooltipster.bundle.min.js', array('jquery'), false, false);
+		wp_enqueue_script('moment', '/src/js/vendor/momentjs/moment.min.js', array(), false, false);
 
         $title = $instance['title'];
         echo '<div class="avw-homepage-widget sidebar-widget ' . $this->id_base . '">';
@@ -283,7 +283,7 @@ class AVW_Homepage_OnThisDay_Casualties extends WP_Widget
 					{
                     	if (person != undefined)
                         {
-                        	$.post('/php/bm/add-tribute.php', JSON.stringify({
+                        	$.post('/src/php/bm/add-tribute.php', JSON.stringify({
                         		person: person,
                                 comment: null
                             }));
