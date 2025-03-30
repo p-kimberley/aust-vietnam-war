@@ -55,11 +55,6 @@ Template: x
     border-top: solid 1px #000
 }
 
-.x-navbar .x-nav-wrap.desktop ul.x-nav > li.menu-item.menu-item-has-children > a span:after {
-    margin-left: .5em;
-    content: "\f0d7"
-}
-
 .x-navbar .x-nav-wrap.desktop ul.x-nav > li.menu-item.x-megamenu > ul.sub-menu {
     font-size: 1em;
     border: solid 1px #000;
