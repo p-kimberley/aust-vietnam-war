@@ -13,10 +13,19 @@ public sealed class FakeContactSource : IContactSource
 {
     public int Calls;
     public Exception? Failure;
-    public List<ContactSummary> Contacts { get; } =
+    public string? LastSearch;
+    public int[] SearchResult = [2];
+
+    public List<ContactRecord> Contacts { get; } =
     [
-        new(2, "1966-03-03T19:50:00", 10.5525, 107.1653, 25, 0, 5, 0, [3]),
-        new(9, "1966-03-05T08:10:00", 10.61, 107.2, 40, 2, 12, 7, [3, 4]),
+        new(2, "1966-03-03T19:50:00", 10.5525, 107.1653, 25, 0, 5, 0, [3], "Hardihood", "Patrol", "1ATF", false),
+        new(9, "1966-03-05T08:10:00", 10.61, 107.2, 40, 2, 12, 7, [3, 4], null, null, "1ATF", true),
+    ];
+
+    public List<UnitInfo> Units { get; } =
+    [
+        new(3, null, "1", "RAR", "1 RAR", "1 Battalion, Royal Australian Regiment", "1 Battalion, Royal Australian Regiment"),
+        new(4, 3, "A", "Coy", "A Coy, 1 RAR", "A Company, 1 Battalion", "1 Battalion, Royal Australian Regiment|A Company"),
     ];
 
     public Dictionary<int, ContactDetail> Details { get; } = new()
@@ -29,7 +38,13 @@ public sealed class FakeContactSource : IContactSource
     public Task<ContactDetail?> GetAsync(int id, CancellationToken ct) =>
         Task.FromResult(Details.GetValueOrDefault(id));
 
-    public Task<IReadOnlyList<ContactSummary>> GetAllAsync(CancellationToken ct)
+    public Task<int[]> SearchAsync(string text, CancellationToken ct)
+    {
+        LastSearch = text;
+        return Task.FromResult(SearchResult);
+    }
+
+    public Task<ContactSet> GetAllAsync(CancellationToken ct)
     {
         Interlocked.Increment(ref Calls);
         if (Failure is not null)
@@ -37,7 +52,7 @@ public sealed class FakeContactSource : IContactSource
             throw Failure;
         }
 
-        return Task.FromResult<IReadOnlyList<ContactSummary>>(Contacts.ToList());
+        return Task.FromResult(new ContactSet(Contacts.ToList(), Units.ToList()));
     }
 }
 
@@ -183,13 +198,15 @@ public class ContactCatalogueTests
 
         clock.Now = clock.Now.AddSeconds(2);
         var unchanged = await catalogue.GetAsync(default);
-        Assert.Equal(first.ETag, unchanged.ETag);
+        Assert.Equal(first.Contacts.ETag, unchanged.Contacts.ETag);
+        Assert.Equal(first.Filters.ETag, unchanged.Filters.ETag);
 
-        source.Contacts.Add(new(11, "1966-04-01T00:00:00", 10.7, 107.3, 1, 0, 1, 0, []));
+        source.Contacts.Add(new(11, "1966-04-01T00:00:00", 10.7, 107.3, 1, 0, 1, 0, [], null, null, null, null));
         clock.Now = clock.Now.AddSeconds(2);
         var changed = await catalogue.GetAsync(default);
-        Assert.NotEqual(first.ETag, changed.ETag);
-        Assert.Equal(3, changed.Count);
+        Assert.NotEqual(first.Contacts.ETag, changed.Contacts.ETag);
+        Assert.NotEqual(first.Filters.ETag, changed.Filters.ETag);
+        Assert.Equal(3, changed.Contacts.Count);
     }
 
     [Fact]
@@ -257,7 +274,8 @@ public class ElasticsearchContactSourceTests
     {
         var (source, _) = Create(Response);
 
-        var contacts = await source.GetAllAsync(default);
+        var set = await source.GetAllAsync(default);
+        var contacts = set.Contacts;
 
         Assert.Equal(2, contacts.Count);
         Assert.Equal(2, contacts[0].Id);

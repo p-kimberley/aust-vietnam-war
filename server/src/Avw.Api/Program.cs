@@ -73,6 +73,8 @@ app.UseResponseCompression();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
+app.UseRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<CsrfHeaderMiddleware>();
