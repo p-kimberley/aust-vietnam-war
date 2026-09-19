@@ -1,0 +1,137 @@
+<div class="filters">
+  <div class="summary">
+    <p class="summary__count" role="status" aria-live="polite">
+      <strong>{{ shown() }}</strong> of {{ total() }} contacts
+    </p>
+    @if (active().length) {
+      <button type="button" class="summary__clear" (click)="clearAll()">Clear all</button>
+    }
+  </div>
+
+  @if (active().length) {
+    <ul class="chips" aria-label="Active filters">
+      @for (key of active(); track key) {
+        <li>
+          <button type="button" class="chip" [attr.aria-label]="'Remove filter: ' + describe(key)" (click)="clear(key)">
+            {{ describe(key) }} <span aria-hidden="true">×</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  <details>
+    <summary>Dates and time</summary>
+    <div class="section">
+      <label class="date">
+        <span>From</span>
+        <input
+          type="date"
+          [min]="catalogue().dateMin"
+          [max]="catalogue().dateMax"
+          [value]="state().from ?? catalogue().dateMin"
+          (change)="setDate('from', $any($event.target).value)"
+        />
+      </label>
+      <label class="date">
+        <span>To</span>
+        <input
+          type="date"
+          [min]="catalogue().dateMin"
+          [max]="catalogue().dateMax"
+          [value]="state().to ?? catalogue().dateMax"
+          (change)="setDate('to', $any($event.target).value)"
+        />
+      </label>
+      <app-range-filter label="Hour of day" [bounds]="hourBounds" [value]="state().hours" (changed)="setRange('hours', $event)" />
+    </div>
+  </details>
+
+  <details>
+    <summary>Units involved @if (state().units.size) { <span class="badge">{{ state().units.size }}</span> }</summary>
+    <div class="section">
+      <app-unit-tree [tree]="tree()" [selected]="state().units" [counts]="unitCounts()" (toggled)="toggleUnit($event)" />
+    </div>
+  </details>
+
+  <details>
+    <summary>Operation @if (state().operations.size) { <span class="badge">{{ state().operations.size }}</span> }</summary>
+    <div class="section">
+      <app-checklist-filter
+        label="Operations"
+        [items]="catalogue().operations"
+        [selected]="state().operations"
+        (changed)="setNames('operations', $event)"
+      />
+    </div>
+  </details>
+
+  <details>
+    <summary>Unit task @if (state().tasks.size) { <span class="badge">{{ state().tasks.size }}</span> }</summary>
+    <div class="section">
+      <app-checklist-filter label="Unit tasks" [items]="catalogue().tasks" [selected]="state().tasks" (changed)="setNames('tasks', $event)" />
+    </div>
+  </details>
+
+  <details>
+    <summary>Data source @if (state().series.size) { <span class="badge">{{ state().series.size }}</span> }</summary>
+    <div class="section">
+      <app-checklist-filter
+        label="Data sources"
+        [items]="catalogue().series"
+        [selected]="state().series"
+        [display]="seriesLabel"
+        (changed)="setNames('series', $event)"
+      />
+    </div>
+  </details>
+
+  <details>
+    <summary>Strength and casualties</summary>
+    <div class="section">
+      @for (r of ranges; track r.key) {
+        <app-range-filter [label]="r.label" [bounds]="catalogue()[r.key]" [value]="rangeValue(r.key)" (changed)="setRange(r.key, $event)" />
+      }
+    </div>
+  </details>
+
+  <details>
+    <summary>Mine incident @if (state().mine !== 'any') { <span class="badge">1</span> }</summary>
+    <div class="section">
+      <fieldset class="radios">
+        <legend class="visually-hidden">Mine incident</legend>
+        @for (option of [['any', 'Any'], ['yes', 'Yes'], ['no', 'No']]; track option[0]) {
+          <label>
+            <input type="radio" name="mine" [value]="option[0]" [checked]="state().mine === option[0]" (change)="setMine($any(option[0]))" />
+            {{ option[1] }}
+          </label>
+        }
+      </fieldset>
+      <p class="hint">Contacts with no mine information recorded match neither Yes nor No.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Incident report @if (state().text.trim().length >= minText) { <span class="badge">1</span> }</summary>
+    <div class="section">
+      <input
+        type="search"
+        class="text"
+        autocomplete="off"
+        maxlength="100"
+        placeholder="Words in the report"
+        aria-label="Words in the incident report"
+        [value]="state().text"
+        (input)="setText($any($event.target).value)"
+      />
+      <p class="hint" role="status" aria-live="polite">
+        @switch (textStatus()) {
+          @case ('searching') { Searching… }
+          @case ('error') { The search failed. Try again in a moment. }
+          @case ('ready') { Every word must appear in the report. }
+          @default { Type at least {{ minText }} letters. Every word must appear. }
+        }
+      </p>
+    </div>
+  </details>
+</div>

@@ -1,0 +1,27 @@
+<fieldset class="range">
+  <legend>{{ label() }}</legend>
+  <label>
+    <span class="range__hint">From</span>
+    <input
+      type="number"
+      inputmode="numeric"
+      [attr.aria-label]="label() + ' from'"
+      [min]="bounds().min"
+      [max]="bounds().max"
+      [value]="low()"
+      (change)="commit('low', $any($event.target).value)"
+    />
+  </label>
+  <label>
+    <span class="range__hint">to</span>
+    <input
+      type="number"
+      inputmode="numeric"
+      [attr.aria-label]="label() + ' to'"
+      [min]="bounds().min"
+      [max]="bounds().max"
+      [value]="high()"
+      (change)="commit('high', $any($event.target).value)"
+    />
+  </label>
+</fieldset>

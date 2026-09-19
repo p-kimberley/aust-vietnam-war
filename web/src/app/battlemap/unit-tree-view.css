@@ -1,0 +1,88 @@
+:host {
+  display: block;
+}
+
+.tree__search {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.4rem;
+  padding: 0.3rem 0.4rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.tree__none {
+  margin: 0.25rem 0;
+  color: var(--khaki);
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tree__list {
+  max-height: 16rem;
+  overflow: auto;
+}
+
+.node__children {
+  padding-left: 1rem;
+}
+
+.node__row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.node__toggle,
+.node__spacer {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.node__toggle {
+  padding: 0;
+  font: inherit;
+  line-height: 1;
+  color: var(--khaki);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.node__label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.1rem 0;
+  cursor: pointer;
+}
+
+.node__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.node__count {
+  flex: none;
+  color: var(--khaki);
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 1px;
+}

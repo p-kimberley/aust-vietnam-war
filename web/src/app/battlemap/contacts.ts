@@ -17,6 +17,14 @@ export interface Contact {
   enCas: number;
   /** Ids of the friendly units involved. */
   units: number[];
+  /** 1-based position in the catalogue's operations; 0 when none is recorded. */
+  op: number;
+  /** 1-based position in the catalogue's unit tasks; 0 when none is recorded. */
+  task: number;
+  /** 1-based position in the catalogue's data sources; 0 when unknown. */
+  series: number;
+  /** 0 not recorded, 1 no mine incident, 2 mine incident. */
+  mine: number;
 }
 
 /** A friendly unit involved in a contact. */
@@ -85,7 +93,7 @@ export function fieldRange(contacts: readonly Contact[], field: HeatField): Rang
   return { min, max };
 }
 
-export type ContactProperties = Omit<Contact, 'lat' | 'lon' | 'units'>;
+export type ContactProperties = Pick<Contact, 'id' | 'dtg' | 'fr' | 'frCas' | 'en' | 'enCas'>;
 
 /** GeoJSON is what the map library consumes; the id doubles as the feature id so clicks can be traced back. */
 export function toGeoJson(contacts: readonly Contact[]): FeatureCollection<Point, ContactProperties> {

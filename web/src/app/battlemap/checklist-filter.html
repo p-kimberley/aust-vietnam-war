@@ -1,0 +1,25 @@
+@if (searchable()) {
+  <input
+    type="search"
+    class="list__search"
+    autocomplete="off"
+    [attr.aria-label]="'Search ' + label().toLowerCase()"
+    [placeholder]="'Search ' + label().toLowerCase()"
+    [value]="query()"
+    (input)="query.set($any($event.target).value)"
+  />
+}
+
+<ul class="list" [attr.aria-label]="label()">
+  @for (item of shown(); track item.name) {
+    <li>
+      <label>
+        <input type="checkbox" [checked]="selected().has(item.name)" (change)="toggle(item.name, $any($event.target).checked)" />
+        <span class="list__text" [attr.title]="display()(item.name)">{{ display()(item.name) }}</span>
+        <span class="list__count">{{ item.count }}</span>
+      </label>
+    </li>
+  } @empty {
+    <li class="list__none" role="status">Nothing matches.</li>
+  }
+</ul>

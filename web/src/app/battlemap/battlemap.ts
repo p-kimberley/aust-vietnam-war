@@ -9,26 +9,44 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import type { Map } from 'maplibre-gl';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import type { Map as MapLibreMap } from 'maplibre-gl';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
-import { HEAT_LAYER, POINT_LAYER, addContactLayers, setContactVisibility, setHeatField, setSelectedContact } from './contact-layers';
+import {
+  HEAT_LAYER,
+  POINT_LAYER,
+  addContactLayers,
+  setContactVisibility,
+  setContacts,
+  setHeatField,
+  setSelectedContact,
+} from './contact-layers';
 import { Contact, DEFAULT_HEAT_FIELD, HEAT_FIELDS, HeatField, fieldRange, isHeatField } from './contacts';
 import { ContactsService } from './contacts.service';
+import { FilterCatalogue, FilterCatalogueService } from './filter-catalogue';
+import { FiltersPanel, TextStatus } from './filters-panel';
+import { FilterState, MIN_TEXT_LENGTH, NO_FILTERS, activeKeys, applyFilters, fromParams, hasText, toParams } from './filters';
 import { MapConfig, MapConfigService } from './map-config';
 import { Camera, formatAt, parseAt } from './map-url';
+import { UnitTree } from './unit-tree';
 
 type Status = 'loading' | 'ready' | 'error';
+type Tab = 'layers' | 'filters';
+
+/** How long typing must pause before the report search is sent. */
+const SEARCH_DELAY_MS = 400;
 
 /**
- * The Battle Map (client-only route). Loads the runtime map catalogue and every contact, then draws a heatmap and
- * incident markers on a MapLibre GL map. The view is kept in the URL (`?at=`, `?basemap=`, `?terrain=`, `?field=`,
- * `?overlays=`, `?incident=`) so a link reproduces what the sender was looking at.
+ * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
+ * draws a heatmap and incident markers on a MapLibre GL map. Filters run in the browser over the loaded contacts (the
+ * dataset is small); only the incident-report word search goes to the server. The view is kept in the URL (`?at=`,
+ * `?basemap=`, `?terrain=`, `?field=`, `?overlays=`, `?incident=` and the filter parameters described in
+ * `filters.ts`) so a link reproduces what the sender was looking at.
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, IncidentPanel],
+  imports: [RouterLink, IncidentPanel, FiltersPanel],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -44,26 +62,49 @@ export class Battlemap {
   readonly incident = input<string>();
 
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly configService = inject(MapConfigService);
   private readonly contactsService = inject(ContactsService);
+  private readonly filterService = inject(FilterCatalogueService);
   protected readonly basemaps = inject(BasemapService);
   private readonly canvas = viewChild.required<ElementRef<HTMLElement>>('canvas');
 
-  private map?: Map;
-  private contacts: Contact[] = [];
+  private map?: MapLibreMap;
   private urlTimer?: ReturnType<typeof setTimeout>;
+  private searchTimer?: ReturnType<typeof setTimeout>;
+  /** Identifies the latest search, so a slow answer to an older one is dropped. */
+  private searchSeq = 0;
 
   protected readonly status = signal<Status>('loading');
   protected readonly message = signal('');
   protected readonly config = signal<MapConfig | null>(null);
-  protected readonly contactCount = signal(0);
   protected readonly selectedId = signal<number | null>(null);
+  protected readonly tab = signal<Tab>('layers');
   protected readonly panelOpen = signal(true);
   protected readonly showHeatmap = signal(true);
   protected readonly showMarkers = signal(true);
   protected readonly heatField = signal<HeatField>(DEFAULT_HEAT_FIELD);
   protected readonly heatFields = HEAT_FIELDS;
   protected readonly canTerrain = computed(() => !!this.config()?.terrain);
+
+  // ---- filters
+  protected readonly allContacts = signal<readonly Contact[]>([]);
+  protected readonly catalogue = signal<FilterCatalogue | null>(null);
+  protected readonly tree = computed(() => {
+    const c = this.catalogue();
+    return c ? new UnitTree(c.units) : null;
+  });
+  protected readonly filters = signal<FilterState>(NO_FILTERS);
+  /** Contacts whose report matches the search text; `null` before the first answer, or when there is no text. */
+  protected readonly textIds = signal<ReadonlySet<number> | null>(null);
+  protected readonly textStatus = signal<TextStatus>('idle');
+  /** The contacts that pass the filters: what is drawn on the map. */
+  protected readonly visible = computed(() => {
+    const c = this.catalogue();
+    return c ? applyFilters(this.allContacts(), this.filters(), c, this.textIds()) : this.allContacts();
+  });
+  protected readonly unitCounts = computed(() => this.tree()?.countContacts(this.allContacts()) ?? new Map<number, number>());
+  protected readonly activeCount = computed(() => activeKeys(this.filters()).length);
 
   constructor() {
     afterNextRender(() => void this.start());
@@ -74,6 +115,11 @@ export class Battlemap {
     this.selectedId.set(id);
     if (this.map) setSelectedContact(this.map, id);
     this.syncUrl();
+  }
+
+  protected showTab(tab: Tab): void {
+    this.tab.set(tab);
+    this.panelOpen.set(true);
   }
 
   protected setBasemap(id: string): void {
@@ -106,16 +152,45 @@ export class Battlemap {
       return;
     }
     this.heatField.set(value);
-    if (this.map) setHeatField(this.map, value, fieldRange(this.contacts, value));
+    this.refreshContacts();
+    this.syncUrl();
+  }
+
+  /** Applies a change from the filter panel: redraws the map, starts a report search if the text changed, updates the URL. */
+  protected setFilters(next: FilterState): void {
+    const changedText = next.text !== this.filters().text;
+    this.filters.set(next);
+    if (changedText) {
+      this.queueSearch(next.text);
+    }
+    this.refreshContacts();
     this.syncUrl();
   }
 
   private async start(): Promise<void> {
     try {
-      const [config, contacts] = await Promise.all([this.configService.load(), this.contactsService.load()]);
+      const [config, contacts, catalogue] = await Promise.all([
+        this.configService.load(),
+        this.contactsService.load(),
+        // Without the catalogue the map still works, just without filters.
+        this.filterService.load().catch((e) => {
+          console.warn('The filter catalogue could not be loaded', e);
+          return null;
+        }),
+      ]);
       this.config.set(config);
-      this.contacts = contacts;
-      this.contactCount.set(contacts.length);
+      this.allContacts.set(contacts);
+
+      if (catalogue) {
+        this.catalogue.set(catalogue);
+        this.filters.set(fromParams(this.route.snapshot.queryParams, catalogue, this.tree()!));
+        if (hasText(this.filters())) {
+          await this.searchNow(this.filters().text);
+        }
+        if (this.activeCount() > 0) {
+          this.tab.set('filters');
+        }
+      }
 
       const field = this.field();
       if (field && isHeatField(field)) {
@@ -141,7 +216,8 @@ export class Battlemap {
         },
         {
           styleLoaded: (map) => {
-            addContactLayers(map, this.contacts, this.heatField(), fieldRange(this.contacts, this.heatField()), {
+            const shown = this.visible();
+            addContactLayers(map, shown, this.heatField(), fieldRange(shown, this.heatField()), {
               heatmap: this.showHeatmap(),
               markers: this.showMarkers(),
               selectedId: this.selectedId(),
@@ -167,6 +243,50 @@ export class Battlemap {
     }
   }
 
+  /** Puts the filtered contacts on the map and rescales the heatmap to them, so a small subset still shows its hotspots. */
+  private refreshContacts(): void {
+    const map = this.map;
+    if (!map) {
+      return;
+    }
+    const shown = this.visible();
+    setContacts(map, shown);
+    setHeatField(map, this.heatField(), fieldRange(shown, this.heatField()));
+  }
+
+  /** Waits for typing to pause, then asks the server which reports contain the words. */
+  private queueSearch(text: string): void {
+    clearTimeout(this.searchTimer);
+    const seq = ++this.searchSeq;
+    const words = text.trim();
+    if (words.length < MIN_TEXT_LENGTH) {
+      this.textIds.set(null);
+      this.textStatus.set('idle');
+      return;
+    }
+    this.textStatus.set('searching');
+    this.searchTimer = setTimeout(() => void this.runSearch(words, seq), SEARCH_DELAY_MS);
+  }
+
+  private searchNow(text: string): Promise<void> {
+    return this.runSearch(text.trim(), ++this.searchSeq);
+  }
+
+  private async runSearch(words: string, seq: number): Promise<void> {
+    try {
+      const ids = await this.filterService.search(words);
+      if (seq !== this.searchSeq) return;
+      this.textIds.set(new Set(ids));
+      this.textStatus.set('ready');
+    } catch (e) {
+      if (seq !== this.searchSeq) return;
+      console.warn('The report search failed', e);
+      this.textIds.set(null);
+      this.textStatus.set('error');
+    }
+    this.refreshContacts();
+  }
+
   private fail(message: string): void {
     this.message.set(message);
     this.status.set('error');
@@ -184,6 +304,7 @@ export class Battlemap {
       const camera: Camera = { lat: c.lat, lon: c.lng, zoom: map.getZoom() };
       const basemapId = this.basemaps.basemapId();
       const defaultBasemap = this.config()?.basemaps.find((b) => b.default)?.id;
+      const tree = this.tree();
       void this.router.navigate([], {
         queryParams: {
           at: formatAt(camera),
@@ -192,6 +313,7 @@ export class Battlemap {
           field: this.heatField() !== DEFAULT_HEAT_FIELD ? this.heatField() : null,
           overlays: this.basemaps.overlayIds().join(',') || null,
           incident: this.selectedId(),
+          ...(tree ? toParams(this.filters(), tree) : {}),
         },
         queryParamsHandling: 'merge',
         replaceUrl: true,

@@ -5,7 +5,13 @@
     <a class="bm__back" routerLink="/">← Australia's Vietnam War</a>
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
-      <span class="bm__count data">{{ contactCount() }} contacts</span>
+      <span class="bm__count data">
+        @if (activeCount()) {
+          {{ visible().length }} of {{ allContacts().length }} contacts
+        } @else {
+          {{ allContacts().length }} contacts
+        }
+      </span>
     }
   </header>
 
@@ -23,76 +29,132 @@
   }
 
   @if (status() === 'ready' && config(); as cfg) {
-    <aside class="panel" [class.panel--closed]="!panelOpen()" [class.panel--shifted]="selectedId() !== null" aria-label="Map layers">
-      <button
-        type="button"
-        class="panel__toggle"
-        [attr.aria-expanded]="panelOpen()"
-        aria-controls="layers-panel"
-        (click)="panelOpen.set(!panelOpen())"
-      >
-        Layers
-      </button>
+    <aside
+      class="panel"
+      [class.panel--wide]="tab() === 'filters'"
+      [class.panel--closed]="!panelOpen()"
+      [class.panel--shifted]="selectedId() !== null"
+      aria-label="Map controls"
+    >
+      <div class="panel__head">
+        <div class="tabs" role="tablist" aria-label="Map controls">
+          <button
+            type="button"
+            role="tab"
+            id="tab-layers"
+            class="tab"
+            aria-controls="tabpanel"
+            [attr.aria-selected]="tab() === 'layers'"
+            [class.tab--on]="tab() === 'layers'"
+            (click)="showTab('layers')"
+          >
+            Layers
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-filters"
+            class="tab"
+            aria-controls="tabpanel"
+            [attr.aria-selected]="tab() === 'filters'"
+            [class.tab--on]="tab() === 'filters'"
+            (click)="showTab('filters')"
+          >
+            Filters
+            @if (activeCount()) {
+              <span class="badge" aria-label="{{ activeCount() }} active">{{ activeCount() }}</span>
+            }
+          </button>
+        </div>
+        <button
+          type="button"
+          class="panel__toggle"
+          [attr.aria-expanded]="panelOpen()"
+          aria-controls="tabpanel"
+          (click)="panelOpen.set(!panelOpen())"
+        >
+          {{ panelOpen() ? 'Hide' : 'Show' }}
+        </button>
+      </div>
 
-      <div id="layers-panel" class="panel__body" [hidden]="!panelOpen()">
-        <fieldset>
-          <legend>Basemap</legend>
-          @for (b of cfg.basemaps; track b.id) {
-            <label>
-              <input
-                type="radio"
-                name="basemap"
-                [value]="b.id"
-                [checked]="basemaps.basemapId() === b.id"
-                (change)="setBasemap(b.id)"
-              />
-              {{ b.name }}
-            </label>
-          }
-        </fieldset>
-
-        @if (canTerrain()) {
-          <label class="panel__row">
-            <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
-            3D terrain
-          </label>
-        }
-
-        @if (cfg.overlays.length) {
+      <div id="tabpanel" class="panel__body" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()" [hidden]="!panelOpen()">
+        @if (tab() === 'layers') {
           <fieldset>
-            <legend>Overlays</legend>
-            @for (o of cfg.overlays; track o.id) {
+            <legend>Basemap</legend>
+            @for (b of cfg.basemaps; track b.id) {
               <label>
                 <input
-                  type="checkbox"
-                  [checked]="basemaps.overlayIds().includes(o.id)"
-                  (change)="setOverlay(o.id, $any($event.target).checked)"
+                  type="radio"
+                  name="basemap"
+                  [value]="b.id"
+                  [checked]="basemaps.basemapId() === b.id"
+                  (change)="setBasemap(b.id)"
                 />
-                {{ o.name }}
+                {{ b.name }}
               </label>
             }
           </fieldset>
-        }
 
-        <fieldset>
-          <legend>Contacts</legend>
-          <label>
-            <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
-            Heatmap
-          </label>
-          <label>
-            <input type="checkbox" [checked]="showMarkers()" (change)="setMarkersVisible($any($event.target).checked)" />
-            Incident markers
-          </label>
-          <label class="panel__select">
-            Heatmap shows
-            <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
-              @for (f of heatFields; track f.value) {
-                <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
+          @if (canTerrain()) {
+            <label class="panel__row">
+              <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
+              3D terrain
+            </label>
+          }
+
+          @if (cfg.overlays.length) {
+            <fieldset>
+              <legend>Overlays</legend>
+              @for (o of cfg.overlays; track o.id) {
+                <label>
+                  <input
+                    type="checkbox"
+                    [checked]="basemaps.overlayIds().includes(o.id)"
+                    (change)="setOverlay(o.id, $any($event.target).checked)"
+                  />
+                  {{ o.name }}
+                </label>
               }
-            </select>
-          </label>
-        </fieldset>
+            </fieldset>
+          }
+
+          <fieldset>
+            <legend>Contacts</legend>
+            <label>
+              <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
+              Heatmap
+            </label>
+            <label>
+              <input type="checkbox" [checked]="showMarkers()" (change)="setMarkersVisible($any($event.target).checked)" />
+              Incident markers
+            </label>
+            <label class="panel__select">
+              Heatmap shows
+              <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
+                @for (f of heatFields; track f.value) {
+                  <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
+                }
+              </select>
+            </label>
+          </fieldset>
+        } @else {
+          @if (catalogue(); as cat) {
+            @if (tree(); as unitTree) {
+              <app-filters-panel
+                [state]="filters()"
+                [catalogue]="cat"
+                [tree]="unitTree"
+                [unitCounts]="unitCounts()"
+                [shown]="visible().length"
+                [total]="allContacts().length"
+                [textStatus]="textStatus()"
+                (changed)="setFilters($event)"
+              />
+            }
+          } @else {
+            <p class="panel__note" role="status">The filters could not be loaded. The map still shows every contact.</p>
+          }
+        }
       </div>
     </aside>
   }

@@ -1,0 +1,56 @@
+<input
+  type="search"
+  class="tree__search"
+  placeholder="Search units"
+  aria-label="Search units"
+  autocomplete="off"
+  [value]="query()"
+  (input)="query.set($any($event.target).value)"
+/>
+
+@if (search() && roots().length === 0) {
+  <p class="tree__none" role="status">No units match.</p>
+}
+
+<ul class="tree__list">
+  @for (id of roots(); track id) {
+    <ng-container *ngTemplateOutlet="node; context: { $implicit: id }" />
+  }
+</ul>
+
+<ng-template #node let-id>
+  <li class="node">
+    <div class="node__row">
+      @if (hasChildren(id)) {
+        <button
+          type="button"
+          class="node__toggle"
+          [attr.aria-expanded]="isOpen(id)"
+          [attr.aria-label]="(isOpen(id) ? 'Collapse ' : 'Expand ') + label(id)"
+          (click)="toggleOpen(id)"
+        >
+          {{ isOpen(id) ? '▾' : '▸' }}
+        </button>
+      } @else {
+        <span class="node__spacer" aria-hidden="true"></span>
+      }
+      <label class="node__label" [attr.title]="name(id)">
+        <input
+          type="checkbox"
+          [checked]="state(id) === 'all'"
+          [indeterminate]="state(id) === 'some'"
+          (change)="toggled.emit(id)"
+        />
+        <span class="node__text">{{ label(id) }}</span>
+        <span class="node__count">{{ counts().get(id) ?? 0 }}</span>
+      </label>
+    </div>
+    @if (hasChildren(id) && isOpen(id)) {
+      <ul class="node__children">
+        @for (child of children(id); track child) {
+          <ng-container *ngTemplateOutlet="node; context: { $implicit: child }" />
+        }
+      </ul>
+    }
+  </li>
+</ng-template>
