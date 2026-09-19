@@ -43,9 +43,35 @@ RAIL = "#4a4136"
 BOUNDARY = "#8a4a3a"
 PROVINCE = "#8a5a3c"
 
-BOLD = ["Noto Sans Bold", "Noto Sans Regular"]
-REGULAR = ["Noto Sans Regular", "Open Sans Regular"]
-ITALIC = ["Noto Sans Italic", "Noto Sans Regular"]
+# Names are "<family> <style>", as TileServer GL derives them from the font files (see ../fonts). Each stack ends with a
+# Noto Sans face that is already on the server, so scripts these fonts do not cover (Khmer on the Cambodian side of the
+# map, for example) still draw.
+SERIF = ["Noto Serif Regular", "Noto Sans Regular"]
+SERIF_BOLD = ["Noto Serif Bold", "Noto Sans Bold"]
+SERIF_ITALIC = ["Noto Serif Italic", "Noto Sans Italic"]
+MONO = ["IBM Plex Mono Regular", "Noto Sans Regular"]
+MONO_BOLD = ["IBM Plex Mono Bold", "Noto Sans Bold"]
+MONO_ITALIC = ["IBM Plex Mono Italic", "Noto Sans Italic"]
+STENCIL = ["Saira Stencil One Regular", "Noto Sans Bold"]
+
+# Which face each label layer uses: serifs for names, a typewriter face for roads and contours (the period's sheets
+# were typeset, and a slab mono reads as such), and a stencil for provinces and countries.
+FONT_BY_LAYER = {
+    "water_name": SERIF_ITALIC,
+    "contour_label": MONO_ITALIC,
+    "highway_name_other": MONO,
+    "highway_name_motorway": MONO_BOLD,
+    "place_other": SERIF_ITALIC,
+    "place_suburb": SERIF_ITALIC,
+    "place_village": SERIF,
+    "place_town": SERIF,
+    "place_city": SERIF_BOLD,
+    "place_city_large": SERIF_BOLD,
+    "place_state": STENCIL,
+    "place_country_other": STENCIL,
+    "place_country_minor": STENCIL,
+    "place_country_major": STENCIL,
+}
 
 
 def stops(*pairs, base_=None):
@@ -175,37 +201,43 @@ for bid in ("boundary_country_z0-4", "boundary_country_z5-"):
 
 # ---- labels ----------------------------------------------------------------------------------------------------
 NAME = "{name:latin}\n{name:nonlatin}"
-layers.append(clone("water_name", layout={"text-font": ITALIC, "text-size": 12, "text-letter-spacing": 0.08},
+layers.append(clone("water_name", layout={"text-size": 12, "text-letter-spacing": 0.08},
                     paint={"text-color": WATER_TEXT, "text-halo-color": WATER, "text-halo-width": 1.2}))
 layers.append(new("contour_label", "symbol", source="contours", **{"source-layer": "contour"}, minzoom=13,
                   filter=["all", ["==", "$type", "LineString"], ["in", "nth_line", 10, 5], [">", "height", 0]],
-                  layout={"symbol-placement": "line", "text-field": "{height}", "text-font": ITALIC,
+                  layout={"symbol-placement": "line", "text-field": "{height}",
                           "text-size": stops((13, 8.5), (17, 11)), "text-padding": 10, "text-rotation-alignment": "map",
                           "symbol-avoid-edges": True},
                   paint={"text-color": CONTOUR_INDEX, **HALO}))
-layers.append(clone("highway_name_other", layout={"text-font": REGULAR, "text-size": 9.5, "text-letter-spacing": 0.1},
+layers.append(clone("highway_name_other", layout={"text-size": 9.5, "text-letter-spacing": 0.1},
                     paint={"text-color": INK_SOFT, **HALO}))
-layers.append(clone("highway_name_motorway", layout={"text-font": BOLD, "text-size": 10},
+layers.append(clone("highway_name_motorway", layout={"text-size": 10},
                     paint={"text-color": ROAD_MAJOR_CASE, **HALO}))
 
 place_common = {"text-color": INK, **HALO}
-layers.append(clone("place_other", layout={"text-font": ITALIC, "text-size": 9.5, "text-letter-spacing": 0.06, "text-transform": "none"},
+layers.append(clone("place_other", layout={"text-size": 9.5, "text-letter-spacing": 0.06, "text-transform": "none"},
                     paint={"text-color": INK_SOFT, **HALO}))
-layers.append(clone("place_suburb", layout={"text-font": ITALIC, "text-size": 10, "text-letter-spacing": 0.06, "text-transform": "none"},
+layers.append(clone("place_suburb", layout={"text-size": 10, "text-letter-spacing": 0.06, "text-transform": "none"},
                     paint={"text-color": INK_SOFT, **HALO}))
-layers.append(clone("place_village", layout={"text-font": REGULAR, "text-size": stops((8, 9), (13, 11)), "text-letter-spacing": 0.08},
+layers.append(clone("place_village", layout={"text-size": stops((8, 9), (13, 11)), "text-letter-spacing": 0.08},
                     paint={"icon-opacity": 0.85, **place_common}))
-layers.append(clone("place_town", layout={"text-font": REGULAR, "text-size": stops((8, 10), (13, 12.5)), "text-letter-spacing": 0.14},
+layers.append(clone("place_town", layout={"text-size": stops((8, 10), (13, 12.5)), "text-letter-spacing": 0.14},
                     paint={"icon-opacity": 0.9, **place_common}))
-layers.append(clone("place_city", layout={"text-font": BOLD, "text-size": stops((6, 11), (12, 15)), "text-letter-spacing": 0.14},
+layers.append(clone("place_city", layout={"text-size": stops((6, 11), (12, 15)), "text-letter-spacing": 0.14},
                     paint={"icon-opacity": 0.9, **place_common}))
-layers.append(clone("place_city_large", layout={"text-font": BOLD, "text-size": stops((4, 12), (10, 18)), "text-letter-spacing": 0.16},
+layers.append(clone("place_city_large", layout={"text-size": stops((4, 12), (10, 18)), "text-letter-spacing": 0.16},
                     paint={"icon-opacity": 0.95, **place_common}))
-layers.append(clone("place_state", layout={"text-font": ITALIC, "text-size": 11.5, "text-letter-spacing": 0.24},
+layers.append(clone("place_state", layout={"text-size": 11, "text-letter-spacing": 0.3},
                     paint={"text-color": PROVINCE, **HALO}))
-for cid, font in (("place_country_other", ITALIC), ("place_country_minor", REGULAR), ("place_country_major", BOLD)):
-    layers.append(clone(cid, layout={"text-font": font, "text-letter-spacing": 0.24},
+for cid in ("place_country_other", "place_country_minor", "place_country_major"):
+    layers.append(clone(cid, layout={"text-letter-spacing": 0.24},
                         paint={"text-color": BOUNDARY, "text-halo-color": PAPER_LIGHT, "text-halo-width": 1.6}))
+
+for layer in layers:
+    if layer["id"] in FONT_BY_LAYER:
+        layer["layout"]["text-font"] = FONT_BY_LAYER[layer["id"]]
+unassigned = [l["id"] for l in layers if l["type"] == "symbol" and "text-font" in l.get("layout", {}) and l["id"] not in FONT_BY_LAYER]
+assert not unassigned, unassigned
 
 # every layer that was in the base must still be here, unless it was deliberately replaced
 kept = {layer["id"] for layer in layers}
@@ -239,7 +271,12 @@ preview = copy.deepcopy(style)
 preview["sources"][SRC]["url"] = f"{T}/data/v3.json"
 preview["sources"]["hillshading"]["url"] = f"{T}/data/hillshading.json"
 preview["sources"]["contours"]["url"] = f"{T}/data/contours.json"
-preview["glyphs"] = f"{T}/fonts/{{fontstack}}/{{range}}.pbf"
+# The generated glyphs are served by the preview server next to the style, and stacks are cut to their first face because
+# that server does not merge stacks the way TileServer GL does.
+preview["glyphs"] = "http://localhost:5190/fonts/{fontstack}/{range}.pbf"
+for layer in preview["layers"]:
+    if "text-font" in layer.get("layout", {}):
+        layer["layout"]["text-font"] = layer["layout"]["text-font"][:1]
 preview["sprite"] = "http://localhost:5190/sprite"
 json.dump(preview, open(os.path.join(out_dir, "style.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 print(len(layers), "layers")

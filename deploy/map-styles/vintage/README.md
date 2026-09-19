@@ -32,7 +32,7 @@ The style refers to things that must already exist on the server (the `terrain` 
 | data id `v3` | OpenMapTiles vector tiles: land cover, water, roads, places |
 | data id `hillshading` | the raster hillshade |
 | data id `contours` | vector contour lines (`contour` layer, `height` and `nth_line`) |
-| fonts `Noto Sans Regular`, `Noto Sans Bold`, `Noto Sans Italic`, `Open Sans Regular` | every label |
+| fonts `Noto Serif` (Regular, Bold, Italic), `IBM Plex Mono` (Regular, Bold, Italic), `Saira Stencil One Regular`, plus the `Noto Sans` faces already on the server | every label. Install from `../fonts` (see its README) |
 
 `style-local.json` keeps the TileServer GL placeholders (`mbtiles://{v3}`, `{styleJsonFolder}/sprite`,
 `{fontstack}/{range}.pbf`), exactly as the `ww2` package does.
@@ -45,7 +45,7 @@ The API serves the basemap list from configuration. Once the style is on the til
 - local development: `server/src/Avw.Api/appsettings.Development.json`, `Map:Basemaps`
 - clusters: `map.basemaps` in `deploy/helm/avw-api/values.yaml`
 
-(Both still point at `ww2` until the package is imported.)
+(Both now point at the imported `vintage` style, and it is the default basemap.)
 
 ## Palette
 
@@ -71,22 +71,24 @@ Paper, ink, brass and contact red come from the design tokens in `web/src/styles
 - Added: land cover (wood, grass, farmland, wetland, sand), hillshade, contours with elevation labels, and a road
   hierarchy by class (trunk/primary, secondary, everything else). Tertiary roads are drawn as minor roads, and
   low-zoom roads show only trunk and primary, so the overview is not a web of red lines.
-- Place names: bold capitals for cities, regular capitals for towns and villages, italics for provinces, districts and
-  water, all letter-spaced. Only fonts already on the server are used. A serif or typewriter face would suit the period
-  better, but it needs glyph files (PBF) generated and installed on the tile server first.
+- Type: Noto Serif for names (bold capitals for cities, regular capitals for towns and villages, italics for districts
+  and water), IBM Plex Mono for road names and contour heights (a typewriter feel), and Saira Stencil One for provinces
+  and countries. All are open-licence and cover every Vietnamese letter; see `../fonts/README.md`, which also explains
+  why the site's own Courier Prime and Stardos Stencil could not be used on the map.
 
 ## Rebuilding
 
-`build.py` generates `style-local.json` from the `ww2` package with the palette above, so a colour change is a one-line
-edit:
+`build.py` generates `style-local.json` from the `ww2` package with the palette and fonts above, so a colour or font
+change is a one-line edit:
 
 ```
 python build.py <path to ww2/style-local.json> <output folder>
 ```
 
 It writes `style-local.json` (the package file) and `style.json`, a copy with the placeholders resolved to
-`https://tiles.hosting.gradata.com.au` and a sprite at `http://localhost:5190/sprite`, for previewing in a browser (serve
-the output folder with any static server on port 5190 with CORS, and point a basemap entry at it).
+`https://tiles.hosting.gradata.com.au`, a sprite at `http://localhost:5190/sprite` and glyphs at
+`http://localhost:5190/fonts/...`, for previewing in a browser (serve the output folder, with the glyph folders copied to
+`fonts/` inside it, from any static server on port 5190 with CORS, and point a basemap entry at it).
 
 ## Checked
 

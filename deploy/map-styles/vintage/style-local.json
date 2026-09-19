@@ -1767,8 +1767,8 @@
         "symbol-spacing": 500,
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Italic",
-          "Noto Sans Regular"
+          "Noto Serif Italic",
+          "Noto Sans Italic"
         ],
         "text-rotation-alignment": "map",
         "text-size": 12,
@@ -1808,10 +1808,6 @@
       "layout": {
         "symbol-placement": "line",
         "text-field": "{height}",
-        "text-font": [
-          "Noto Sans Italic",
-          "Noto Sans Regular"
-        ],
         "text-size": {
           "stops": [
             [
@@ -1826,7 +1822,11 @@
         },
         "text-padding": 10,
         "text-rotation-alignment": "map",
-        "symbol-avoid-edges": true
+        "symbol-avoid-edges": true,
+        "text-font": [
+          "IBM Plex Mono Italic",
+          "Noto Sans Italic"
+        ]
       },
       "paint": {
         "text-color": "#875c33",
@@ -1861,8 +1861,8 @@
         "symbol-spacing": 350,
         "text-field": "{name:latin} {name:nonlatin}",
         "text-font": [
-          "Noto Sans Regular",
-          "Open Sans Regular"
+          "IBM Plex Mono Regular",
+          "Noto Sans Regular"
         ],
         "text-max-angle": 30,
         "text-pitch-alignment": "viewport",
@@ -1909,8 +1909,8 @@
         "symbol-spacing": 350,
         "text-field": "{ref}",
         "text-font": [
-          "Noto Sans Bold",
-          "Noto Sans Regular"
+          "IBM Plex Mono Bold",
+          "Noto Sans Bold"
         ],
         "text-pitch-alignment": "viewport",
         "text-rotation-alignment": "viewport",
@@ -1956,8 +1956,8 @@
         "text-anchor": "center",
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Italic",
-          "Noto Sans Regular"
+          "Noto Serif Italic",
+          "Noto Sans Italic"
         ],
         "text-justify": "center",
         "text-offset": [
@@ -2002,8 +2002,8 @@
         "text-anchor": "center",
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Italic",
-          "Noto Sans Regular"
+          "Noto Serif Italic",
+          "Noto Sans Italic"
         ],
         "text-justify": "center",
         "text-offset": [
@@ -2049,8 +2049,8 @@
         "text-anchor": "left",
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Regular",
-          "Open Sans Regular"
+          "Noto Serif Regular",
+          "Noto Sans Regular"
         ],
         "text-justify": "left",
         "text-offset": [
@@ -2133,8 +2133,8 @@
         },
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Regular",
-          "Open Sans Regular"
+          "Noto Serif Regular",
+          "Noto Sans Regular"
         ],
         "text-justify": "left",
         "text-offset": [
@@ -2222,8 +2222,8 @@
         },
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Bold",
-          "Noto Sans Regular"
+          "Noto Serif Bold",
+          "Noto Sans Bold"
         ],
         "text-justify": "left",
         "text-offset": [
@@ -2311,8 +2311,8 @@
         },
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Bold",
-          "Noto Sans Regular"
+          "Noto Serif Bold",
+          "Noto Sans Bold"
         ],
         "text-justify": "left",
         "text-offset": [
@@ -2368,13 +2368,13 @@
       "layout": {
         "text-field": "{name:latin}\n{name:nonlatin}",
         "text-font": [
-          "Noto Sans Italic",
-          "Noto Sans Regular"
+          "Saira Stencil One Regular",
+          "Noto Sans Bold"
         ],
-        "text-size": 11.5,
+        "text-size": 11,
         "text-transform": "uppercase",
         "visibility": "visible",
-        "text-letter-spacing": 0.24
+        "text-letter-spacing": 0.3
       },
       "paint": {
         "text-color": "#8a5a3c",
@@ -2412,8 +2412,8 @@
       "layout": {
         "text-field": "{name:latin}",
         "text-font": [
-          "Noto Sans Italic",
-          "Noto Sans Regular"
+          "Saira Stencil One Regular",
+          "Noto Sans Bold"
         ],
         "text-size": {
           "base": 1,
@@ -2472,8 +2472,8 @@
       "layout": {
         "text-field": "{name:latin}",
         "text-font": [
-          "Noto Sans Regular",
-          "Open Sans Regular"
+          "Saira Stencil One Regular",
+          "Noto Sans Bold"
         ],
         "text-size": {
           "base": 1,
@@ -2533,8 +2533,8 @@
         "text-anchor": "center",
         "text-field": "{name:latin}",
         "text-font": [
-          "Noto Sans Bold",
-          "Noto Sans Regular"
+          "Saira Stencil One Regular",
+          "Noto Sans Bold"
         ],
         "text-size": {
           "base": 1.4,

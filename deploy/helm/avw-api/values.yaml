@@ -28,8 +28,8 @@ map:
   center: [107.17, 10.55]
   zoom: 8
   basemaps:
-    - { id: terrain, name: Terrain, style: "https://tiles.hosting.gradata.com.au/styles/terrain/style.json", default: true }
-    - { id: ww2, name: Vintage, style: "https://tiles.hosting.gradata.com.au/styles/ww2/style.json" }
+    - { id: vintage, name: Vintage, style: "https://tiles.hosting.gradata.com.au/styles/vintage/style.json", default: true }
+    - { id: terrain, name: Terrain, style: "https://tiles.hosting.gradata.com.au/styles/terrain/style.json" }
     - { id: bright, name: Bright, style: "https://tiles.hosting.gradata.com.au/styles/bright/style.json" }
     - { id: positron, name: Light, style: "https://tiles.hosting.gradata.com.au/styles/positron/style.json" }
     - { id: dark-matter, name: Dark, style: "https://tiles.hosting.gradata.com.au/styles/dark-matter/style.json" }
