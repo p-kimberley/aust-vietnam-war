@@ -1,0 +1,157 @@
+:host {
+  display: block;
+}
+
+.incident {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: color-mix(in srgb, var(--olive-900) 94%, transparent);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  color: var(--paper);
+  font-size: 0.9rem;
+}
+
+.incident__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--olive-500);
+}
+
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--smoke-yellow);
+}
+
+h2:focus {
+  outline: none;
+}
+
+h2:focus-visible {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 2px;
+}
+
+.incident__close,
+.incident__retry {
+  font: inherit;
+  color: var(--paper);
+  background: none;
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.incident__close {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.incident__retry {
+  padding: 0.3rem 0.75rem;
+}
+
+.incident__close:focus-visible,
+.incident__retry:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 2px;
+}
+
+.incident__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem 1rem;
+}
+
+h3 {
+  margin: 1rem 0 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+}
+
+h3.incident__when {
+  margin-top: 0.25rem;
+  font-size: 1.05rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--paper);
+}
+
+.incident__line {
+  margin: 0.15rem 0;
+}
+
+.incident__line strong {
+  display: inline-block;
+  min-width: 7.5rem;
+  color: var(--khaki);
+  font-weight: 600;
+}
+
+.incident__units {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.incident__none {
+  margin: 0;
+  color: var(--khaki);
+}
+
+.incident__stats {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+  text-align: right;
+}
+
+.incident__stats caption {
+  padding-bottom: 0.25rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+}
+
+.incident__stats th,
+.incident__stats td {
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--olive-700);
+  font-weight: 400;
+}
+
+.incident__stats th[scope='row'] {
+  text-align: left;
+  color: var(--khaki);
+}
+
+.incident__stats .friendly {
+  color: #8fb6d6;
+}
+
+.incident__stats .enemy {
+  color: var(--contact-red-bright);
+}
+
+.incident__report {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
+a {
+  color: var(--smoke-yellow);
+}

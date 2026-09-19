@@ -19,6 +19,36 @@ export interface Contact {
   units: number[];
 }
 
+/** A friendly unit involved in a contact. */
+export interface ContactUnit {
+  id: number;
+  shortName: string;
+  longName: string;
+}
+
+/** Mirrors `GET /api/contacts/{id}`: everything the incident panel shows for one contact. */
+export interface ContactDetail {
+  id: number;
+  dtg: string;
+  lat: number;
+  lon: number;
+  gridRef: string | null;
+  operation: string | null;
+  unitTask: string | null;
+  units: ContactUnit[];
+  frForce: number;
+  enForce: number;
+  frKia: number;
+  frWia: number;
+  enKia: number;
+  enWia: number;
+  /** The original incident report. */
+  description: string | null;
+  archivalSource: string | null;
+  /** An absolute http(s) URL, already vetted by the API. */
+  sourceUrl: string | null;
+}
+
 export type HeatField = 'fr' | 'frCas' | 'en' | 'enCas';
 
 /** The values a heatmap can be weighted by, named as in the legacy map. */

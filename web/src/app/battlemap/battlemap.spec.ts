@@ -4,8 +4,8 @@ import { provideRouter } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
 import { BasemapService, MapHooks } from './basemap.service';
 import { Battlemap } from './battlemap';
-import { HEAT_LAYER, POINT_LAYER, contactSummaryElement, heatWeight } from './contact-layers';
-import { Contact, fieldRange, formatDtg, toGeoJson } from './contacts';
+import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight } from './contact-layers';
+import { Contact, ContactDetail, fieldRange, formatDtg, toGeoJson } from './contacts';
 import { ContactsService } from './contacts.service';
 import { MapConfig, MapConfigService, needsMapboxToken, pickBasemap } from './map-config';
 import { formatAt, parseAt } from './map-url';
@@ -15,6 +15,13 @@ const contacts: Contact[] = [
   { id: 9, dtg: '1966-03-05T08:10:00', lat: 10.61, lon: 107.2, fr: 40, frCas: 2, en: 12, enCas: 7, units: [3, 4] },
   { id: 11, dtg: '1966-04-01T00:00:00', lat: 10.7, lon: 107.3, fr: 10, frCas: 1, en: 0, enCas: 3, units: [] },
 ];
+
+const detail: ContactDetail = {
+  id: 2, dtg: '1966-03-03T19:50:00', lat: 10.55, lon: 107.16, gridRef: 'YS374671', operation: 'Hardihood', unitTask: null,
+  units: [{ id: 3, shortName: '1 Pl, A Coy', longName: '1 Platoon, A Company' }],
+  frForce: 25, enForce: 5, frKia: 1, frWia: 2, enKia: 3, enWia: 4,
+  description: 'AT LOC STATED.', archivalSource: 'Intel V-dat Base', sourceUrl: null,
+};
 
 const config: MapConfig = {
   mapboxToken: 'pk.test',
@@ -58,15 +65,6 @@ describe('heatWeight', () => {
 
   it('avoids a degenerate scale when every value is equal', () => {
     expect(heatWeight('fr', { min: 5, max: 5 })).toBe(0.5);
-  });
-});
-
-describe('contactSummaryElement', () => {
-  it('renders values as text, never markup', () => {
-    const el = contactSummaryElement({ id: 1, dtg: '1966-03-03T19:50:00', fr: 25, frCas: 0, en: 5, enCas: 0 });
-    expect(el.querySelector('strong')?.textContent).toBe('3 Mar 1966 19:50');
-    expect([...el.querySelectorAll('dd')].map((d) => d.textContent)).toEqual(['25', '0', '5', '0']);
-    expect(el.innerHTML).not.toContain('<script');
   });
 });
 
@@ -120,6 +118,7 @@ function fakeMap() {
     getLayer: (id: string) => (layers.has(id) ? {} : undefined),
     addSource: vi.fn((id: string) => void sources.add(id)),
     addLayer: vi.fn((l: { id: string }) => void layers.add(l.id)),
+    setFilter: vi.fn(),
     getCenter: () => ({ lat: 10.55, lng: 107.17 }),
     getZoom: () => 8,
   };
@@ -141,7 +140,9 @@ class FakeBasemapService {
   setBasemap = vi.fn();
   setTerrain = vi.fn();
   setOverlay = vi.fn();
-  bindPopup = vi.fn();
+  flyTo = vi.fn();
+  clickHandler?: (p: Record<string, unknown>) => void;
+  bindClick = vi.fn((_layer: string, handler: (p: Record<string, unknown>) => void) => (this.clickHandler = handler));
 }
 
 async function render(opts: {
@@ -161,7 +162,10 @@ async function render(opts: {
       },
       {
         provide: ContactsService,
-        useValue: { load: () => (opts.contacts instanceof Error ? fail(opts.contacts) : Promise.resolve(opts.contacts ?? contacts)) },
+        useValue: {
+          load: () => (opts.contacts instanceof Error ? fail(opts.contacts) : Promise.resolve(opts.contacts ?? contacts)),
+          detail: (id: number) => Promise.resolve({ ...detail, id }),
+        },
       },
     ],
   });
@@ -181,7 +185,7 @@ describe('Battlemap', () => {
   it('adds the contact layers and shows the layer panel once the map is ready', async () => {
     const { el, basemaps } = await render({});
 
-    expect(basemaps.map.layers).toEqual(new Set([HEAT_LAYER, POINT_LAYER]));
+    expect(basemaps.map.layers).toEqual(new Set([HEAT_LAYER, POINT_LAYER, SELECTED_LAYER]));
     expect(el.querySelector('.bm__count')?.textContent).toContain('3 contacts');
     expect([...el.querySelectorAll('input[name=basemap]')]).toHaveLength(2);
     expect(el.textContent).toContain('3D terrain');
@@ -238,5 +242,49 @@ describe('Battlemap', () => {
     fixture.detectChanges();
 
     expect(el.querySelector('[role=alert]')?.textContent).toContain('rejected');
+  });
+
+  it('opens the incident panel when a marker is clicked, and rings it on the map', async () => {
+    const { el, basemaps, fixture } = await render({});
+    expect(el.querySelector('app-incident-panel')).toBeNull();
+
+    basemaps.clickHandler!({ id: 9 });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(el.querySelector('app-incident-panel')).not.toBeNull();
+    expect(basemaps.map.setFilter).toHaveBeenCalledWith(SELECTED_LAYER, ['==', ['get', 'id'], 9]);
+  });
+
+  it('closes the incident panel and clears the ring', async () => {
+    const { el, basemaps, fixture } = await render({ inputs: { incident: '2' } });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    el.querySelector<HTMLButtonElement>('.incident__close')!.click();
+    fixture.detectChanges();
+
+    expect(el.querySelector('app-incident-panel')).toBeNull();
+    expect(basemaps.map.setFilter).toHaveBeenLastCalledWith(SELECTED_LAYER, ['==', ['get', 'id'], -1]);
+  });
+
+  it('opens straight onto an incident from the link and frames it when the link has no view', async () => {
+    const { el, basemaps } = await render({ inputs: { incident: '9' } });
+
+    expect(el.querySelector('app-incident-panel')).not.toBeNull();
+    expect(basemaps.flyTo).toHaveBeenCalledWith(10.61, 107.2, 11);
+  });
+
+  it('keeps the view from the link rather than jumping to the incident', async () => {
+    const { basemaps } = await render({ inputs: { incident: '9', at: '10.6,107.2,11' } });
+    expect(basemaps.flyTo).not.toHaveBeenCalled();
+  });
+
+  it.each(['abc', '99999', '-1', '2.5'])('ignores an incident link that is not a real contact (%s)', async (bad) => {
+    const { el, basemaps } = await render({ inputs: { incident: bad } });
+
+    expect(el.querySelector('app-incident-panel')).toBeNull();
+    expect(basemaps.flyTo).not.toHaveBeenCalled();
   });
 });

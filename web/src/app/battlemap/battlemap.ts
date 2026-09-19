@@ -12,15 +12,9 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import type { Map } from 'mapbox-gl';
 import { BasemapService } from './basemap.service';
-import {
-  HEAT_LAYER,
-  POINT_LAYER,
-  addContactLayers,
-  contactSummaryElement,
-  setContactVisibility,
-  setHeatField,
-} from './contact-layers';
-import { Contact, ContactProperties, DEFAULT_HEAT_FIELD, HEAT_FIELDS, HeatField, fieldRange, isHeatField } from './contacts';
+import { IncidentPanel } from './incident-panel';
+import { HEAT_LAYER, POINT_LAYER, addContactLayers, setContactVisibility, setHeatField, setSelectedContact } from './contact-layers';
+import { Contact, DEFAULT_HEAT_FIELD, HEAT_FIELDS, HeatField, fieldRange, isHeatField } from './contacts';
 import { ContactsService } from './contacts.service';
 import { MapConfig, MapConfigService, needsMapboxToken } from './map-config';
 import { Camera, formatAt, parseAt } from './map-url';
@@ -30,11 +24,11 @@ type Status = 'loading' | 'ready' | 'error';
 /**
  * The Battle Map (client-only route). Loads the runtime map catalogue and every contact, then draws a heatmap and
  * incident markers on a Mapbox GL map. The view is kept in the URL (`?at=`, `?basemap=`, `?terrain=`, `?field=`,
- * `?overlays=`) so a link reproduces what the sender was looking at.
+ * `?overlays=`, `?incident=`) so a link reproduces what the sender was looking at.
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink],
+  imports: [RouterLink, IncidentPanel],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -47,6 +41,7 @@ export class Battlemap {
   readonly terrain = input<string>();
   readonly field = input<string>();
   readonly overlays = input<string>();
+  readonly incident = input<string>();
 
   private readonly router = inject(Router);
   private readonly configService = inject(MapConfigService);
@@ -62,6 +57,7 @@ export class Battlemap {
   protected readonly message = signal('');
   protected readonly config = signal<MapConfig | null>(null);
   protected readonly contactCount = signal(0);
+  protected readonly selectedId = signal<number | null>(null);
   protected readonly panelOpen = signal(true);
   protected readonly showHeatmap = signal(true);
   protected readonly showMarkers = signal(true);
@@ -71,6 +67,13 @@ export class Battlemap {
 
   constructor() {
     afterNextRender(() => void this.start());
+  }
+
+  /** Opens the incident panel for a contact (or closes it), ringing the marker and keeping the URL in step. */
+  protected select(id: number | null): void {
+    this.selectedId.set(id);
+    if (this.map) setSelectedContact(this.map, id);
+    this.syncUrl();
   }
 
   protected setBasemap(id: string): void {
@@ -124,6 +127,13 @@ export class Battlemap {
         this.heatField.set(field);
       }
 
+      // A shared link may open straight onto an incident. Ignore ids that are not real contacts.
+      const requested = Number(this.incident());
+      const opened = Number.isInteger(requested) ? contacts.find((c) => c.id === requested) : undefined;
+      if (opened) {
+        this.selectedId.set(opened.id);
+      }
+
       let firstStyle = true;
       this.map = await this.basemaps.create(
         this.canvas().nativeElement,
@@ -139,10 +149,11 @@ export class Battlemap {
             addContactLayers(map, this.contacts, this.heatField(), fieldRange(this.contacts, this.heatField()), {
               heatmap: this.showHeatmap(),
               markers: this.showMarkers(),
+              selectedId: this.selectedId(),
             });
             if (firstStyle) {
               firstStyle = false;
-              this.basemaps.bindPopup(POINT_LAYER, (p) => contactSummaryElement(p as unknown as ContactProperties));
+              this.basemaps.bindClick(POINT_LAYER, (p) => this.select(Number(p['id'])));
               this.status.set('ready');
             }
           },
@@ -150,6 +161,11 @@ export class Battlemap {
           failed: (message) => this.fail(message),
         },
       );
+
+      // With no explicit view in the link, bring the incident into frame.
+      if (opened && !parseAt(this.at())) {
+        this.basemaps.flyTo(opened.lat, opened.lon, 11);
+      }
     } catch (e) {
       console.error('Battle Map failed to start', e);
       this.fail('The Battle Map could not be loaded. Please try again shortly.');
@@ -180,6 +196,7 @@ export class Battlemap {
           terrain: this.basemaps.terrainEnabled() ? '1' : null,
           field: this.heatField() !== DEFAULT_HEAT_FIELD ? this.heatField() : null,
           overlays: this.basemaps.overlayIds().join(',') || null,
+          incident: this.selectedId(),
         },
         queryParamsHandling: 'merge',
         replaceUrl: true,

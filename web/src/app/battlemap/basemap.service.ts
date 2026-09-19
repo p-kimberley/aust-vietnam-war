@@ -1,6 +1,5 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import type { Map } from 'mapbox-gl';
-import type { Point } from 'geojson';
 import { MapConfig, OverlayConfig, pickBasemap } from './map-config';
 import { Camera } from './map-url';
 
@@ -32,7 +31,6 @@ export interface MapHooks {
  */
 @Injectable()
 export class BasemapService implements OnDestroy {
-  private mapbox?: typeof import('mapbox-gl').default;
   private map?: Map;
   private config?: MapConfig;
 
@@ -44,7 +42,6 @@ export class BasemapService implements OnDestroy {
   async create(container: HTMLElement, config: MapConfig, start: MapStart, hooks: MapHooks): Promise<Map> {
     loadStylesheet();
     const { default: mapboxgl } = await import('mapbox-gl');
-    this.mapbox = mapboxgl;
     this.config = config;
     mapboxgl.accessToken = config.mapboxToken ?? '';
 
@@ -125,24 +122,28 @@ export class BasemapService implements OnDestroy {
     this.applyOverlays(map);
   }
 
-  /** Shows `build(properties)` in a popup when a feature on `layerId` is clicked. Survives style changes. */
-  bindPopup(layerId: string, build: (properties: Record<string, unknown>) => HTMLElement): void {
-    const { map, mapbox } = this;
-    if (!map || !mapbox) {
+  /** Calls `handler` with a feature's properties when it is clicked on `layerId`. Survives style changes. */
+  bindClick(layerId: string, handler: (properties: Record<string, unknown>) => void): void {
+    const map = this.map;
+    if (!map) {
       return;
     }
     map.on('click', layerId, (e) => {
-      const feature = e.features?.[0];
-      if (!feature?.properties) {
-        return;
+      const properties = e.features?.[0]?.properties;
+      if (properties) {
+        handler(properties);
       }
-      new mapbox.Popup({ maxWidth: '260px' })
-        .setLngLat((feature.geometry as Point).coordinates as [number, number])
-        .setDOMContent(build(feature.properties))
-        .addTo(map);
     });
     map.on('mouseenter', layerId, () => (map.getCanvas().style.cursor = 'pointer'));
     map.on('mouseleave', layerId, () => (map.getCanvas().style.cursor = ''));
+  }
+
+  /** Eases the camera to a point, zooming in if the view is currently wider than `minZoom`. */
+  flyTo(lat: number, lon: number, minZoom: number): void {
+    const map = this.map;
+    if (map) {
+      map.easeTo({ center: [lon, lat], zoom: Math.max(map.getZoom(), minZoom), duration: 800 });
+    }
   }
 
   ngOnDestroy(): void {

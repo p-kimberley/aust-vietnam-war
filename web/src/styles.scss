@@ -142,32 +142,3 @@ a:hover {
     transition-duration: 0.01ms !important;
   }
 }
-
-// Popups are created by Mapbox GL outside any component, so their content is styled globally.
-.mapboxgl-popup-content .contact-popup {
-  font-family: var(--font-body);
-  color: var(--ink);
-
-  strong {
-    display: block;
-    margin-bottom: 0.3rem;
-    font-family: var(--font-data);
-  }
-
-  dl {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.1rem 0.75rem;
-    margin: 0;
-  }
-
-  dt {
-    color: var(--text-muted);
-  }
-
-  dd {
-    margin: 0;
-    text-align: right;
-    font-family: var(--font-data);
-  }
-}

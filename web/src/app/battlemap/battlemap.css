@@ -71,6 +71,33 @@
   font-size: 0.9rem;
 }
 
+.bm__incident {
+  position: absolute;
+  top: 3rem;
+  right: 0.75rem;
+  bottom: 2.5rem;
+  width: min(22rem, calc(100vw - 1.5rem));
+}
+
+/* With an incident open the layer controls sit beside it; on narrow screens the incident takes the space. */
+.panel--shifted {
+  right: calc(min(22rem, 100vw - 1.5rem) + 1.5rem);
+}
+
+@media (max-width: 45rem) {
+  .bm__incident {
+    top: auto;
+    left: 0.75rem;
+    width: auto;
+    height: 55dvh;
+    bottom: 0.75rem;
+  }
+
+  .panel--shifted {
+    display: none;
+  }
+}
+
 .panel__toggle {
   width: 100%;
   padding: 0.5rem 0.75rem;

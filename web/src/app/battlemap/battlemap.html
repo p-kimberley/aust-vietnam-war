@@ -16,8 +16,14 @@
     <p class="bm__notice bm__notice--error" role="alert">{{ message() }}</p>
   }
 
+  @if (status() === 'ready' && selectedId(); as id) {
+    <div class="bm__incident">
+      <app-incident-panel [contactId]="id" (closed)="select(null)" />
+    </div>
+  }
+
   @if (status() === 'ready' && config(); as cfg) {
-    <aside class="panel" [class.panel--closed]="!panelOpen()" aria-label="Map layers">
+    <aside class="panel" [class.panel--closed]="!panelOpen()" [class.panel--shifted]="selectedId() !== null" aria-label="Map layers">
       <button
         type="button"
         class="panel__toggle"

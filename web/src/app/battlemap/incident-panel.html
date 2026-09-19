@@ -1,0 +1,78 @@
+<section class="incident" aria-labelledby="incident-title">
+  <header class="incident__head">
+    <h2 id="incident-title" #heading tabindex="-1">About this incident</h2>
+    <button type="button" class="incident__close" aria-label="Close incident panel" (click)="closed.emit()">×</button>
+  </header>
+
+  <div class="incident__body">
+    @if (incident.isLoading()) {
+      <p role="status">Loading…</p>
+    } @else if (incident.error()) {
+      <p role="alert">This incident could not be loaded.</p>
+      <button type="button" class="incident__retry" (click)="incident.reload()">Try again</button>
+    } @else if (incident.value(); as d) {
+      <h3 class="incident__when data">{{ formatDtg(d.dtg) }}</h3>
+      @if (d.operation) {
+        <p class="incident__line"><strong>Operation</strong> {{ d.operation }}</p>
+      }
+      @if (d.unitTask) {
+        <p class="incident__line"><strong>Unit task</strong> {{ d.unitTask }}</p>
+      }
+      @if (d.gridRef) {
+        <p class="incident__line"><strong>Grid reference</strong> <span class="data">{{ d.gridRef }}</span></p>
+      }
+
+      <h3>Friendly units</h3>
+      @if (d.units.length) {
+        <ul class="incident__units">
+          @for (u of d.units; track u.id) {
+            <li [attr.title]="u.longName">{{ u.shortName }}</li>
+          }
+        </ul>
+      } @else {
+        <p class="incident__none">Unknown</p>
+      }
+
+      <table class="incident__stats data">
+        <caption>Strength and casualties</caption>
+        <thead>
+          <tr>
+            <td></td>
+            <th scope="col" class="friendly">Friendly</th>
+            <th scope="col" class="enemy">Enemy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Present</th>
+            <td class="friendly">{{ d.frForce }}</td>
+            <td class="enemy">{{ d.enForce }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Killed</th>
+            <td class="friendly">{{ d.frKia }}</td>
+            <td class="enemy">{{ d.enKia }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Wounded</th>
+            <td class="friendly">{{ d.frWia }}</td>
+            <td class="enemy">{{ d.enWia }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Original incident report</h3>
+      <p class="incident__report data">{{ d.description || 'No report is recorded.' }}</p>
+
+      @if (d.archivalSource) {
+        <h3>Archival source</h3>
+        <p>{{ d.archivalSource }}</p>
+      }
+      @if (d.sourceUrl) {
+        <p><a [href]="d.sourceUrl" target="_blank" rel="noopener noreferrer">Australian War Memorial collection</a></p>
+      }
+    } @else {
+      <p role="status">This incident was not found.</p>
+    }
+  </div>
+</section>
