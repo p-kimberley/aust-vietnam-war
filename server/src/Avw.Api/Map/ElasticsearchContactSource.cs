@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 
@@ -11,6 +12,9 @@ namespace Avw.Api.Map;
 public sealed class ElasticsearchContactSource(
     HttpClient http, IOptions<ElasticsearchOptions> options, ILogger<ElasticsearchContactSource> logger) : IContactSource
 {
+    // Elasticsearch field names are case-sensitive (`DTG`, not `dtg`), so request bodies must not be re-cased.
+    private static readonly JsonSerializerOptions RequestJson = new() { PropertyNamingPolicy = null };
+
     private static readonly string[] Fields =
     [
         "DTG", "Location", "Fr_Force_Present", "Total_Fr_Cas", "En_Force", "Total_En_Cas", "Fr_Units._id",
@@ -28,8 +32,8 @@ public sealed class ElasticsearchContactSource(
             query = new { exists = new { field = "Location" } },
         };
 
-        using var res = await http.PostAsJsonAsync($"{Uri.EscapeDataString(o.ContactsIndex)}/_search", body, ct);
-        res.EnsureSuccessStatusCode();
+        using var res = await http.PostAsJsonAsync($"{Uri.EscapeDataString(o.ContactsIndex)}/_search", body, RequestJson, ct);
+        await EnsureSuccessAsync(res, ct);
         var page = await res.Content.ReadFromJsonAsync<SearchResponse>(ct)
                    ?? throw new InvalidOperationException("Elasticsearch returned an empty response.");
 
@@ -77,7 +81,7 @@ public sealed class ElasticsearchContactSource(
             return null;
         }
 
-        res.EnsureSuccessStatusCode();
+        await EnsureSuccessAsync(res, ct);
         var doc = await res.Content.ReadFromJsonAsync<DocResponse>(ct);
         if (doc is not { Found: true, Source: { } s } || s.Location is null || s.Dtg is null)
         {
@@ -94,6 +98,19 @@ public sealed class ElasticsearchContactSource(
                 .ToArray(),
             s.FrForce, s.EnForce, s.FrKia, s.FrWia, s.EnKia, s.EnWia,
             Clean(s.Description), Clean(s.ArchivalSource), HttpUrlOrNull(s.SourceHyperlink));
+    }
+
+    /// <summary>Throws with Elasticsearch's own error text, which says which field or privilege was the problem.</summary>
+    private static async Task EnsureSuccessAsync(HttpResponseMessage res, CancellationToken ct)
+    {
+        if (res.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        var text = await res.Content.ReadAsStringAsync(ct);
+        throw new HttpRequestException(
+            $"Elasticsearch returned {(int)res.StatusCode}: {(text.Length > 500 ? text[..500] : text)}", null, res.StatusCode);
     }
 
     private static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

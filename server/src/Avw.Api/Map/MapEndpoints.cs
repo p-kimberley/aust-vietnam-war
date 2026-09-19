@@ -13,7 +13,7 @@ public static class MapEndpoints
             .ValidateOnStart();
         services.Configure<MapOptions>(config.GetSection(MapOptions.Section));
 
-        services.AddHttpClient<IContactSource, ElasticsearchContactSource>((sp, http) =>
+        var client = services.AddHttpClient<IContactSource, ElasticsearchContactSource>((sp, http) =>
         {
             var o = sp.GetRequiredService<IOptions<ElasticsearchOptions>>().Value;
             http.BaseAddress = new Uri(o.Url.TrimEnd('/') + "/");
@@ -22,6 +22,19 @@ public static class MapEndpoints
             {
                 http.DefaultRequestHeaders.Authorization = new("ApiKey", o.ApiKey);
             }
+        });
+        client.ConfigurePrimaryHttpMessageHandler(sp =>
+        {
+            var handler = new SocketsHttpHandler();
+            var ca = sp.GetRequiredService<IOptions<ElasticsearchOptions>>().Value.CaCertificatePath;
+            if (!string.IsNullOrWhiteSpace(ca))
+            {
+                var validation = PrivateCaValidation.FromFile(ca);
+                handler.SslOptions.RemoteCertificateValidationCallback =
+                    (_, cert, chain, errors) => validation.Validate(cert, chain, errors);
+            }
+
+            return handler;
         });
         services.AddSingleton<ContactCatalogue>();
         return services;

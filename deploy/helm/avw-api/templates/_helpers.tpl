@@ -52,6 +52,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   value: {{ .Values.elasticsearch.url | quote }}
 - name: Elasticsearch__ContactsIndex
   value: {{ .Values.elasticsearch.contactsIndex | quote }}
+{{- if .Values.elasticsearch.caSecret }}
+- name: Elasticsearch__CaCertificatePath
+  value: /etc/avw/es-ca/ca.crt
+{{- end }}
 - name: Elasticsearch__ApiKey
   valueFrom:
     secretKeyRef:

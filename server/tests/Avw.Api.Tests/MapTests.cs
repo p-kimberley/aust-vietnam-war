@@ -60,6 +60,18 @@ public class ContactsEndpointTests(ApiFactory factory) : IClassFixture<ApiFactor
     }
 
     [Fact]
+    public async Task Contacts_are_compressed_for_clients_that_accept_it()
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, "/api/contacts");
+        req.Headers.AcceptEncoding.ParseAdd("gzip");
+
+        var res = await Client().SendAsync(req);
+
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        Assert.Contains("gzip", res.Content.Headers.ContentEncoding);
+    }
+
+    [Fact]
     public async Task A_matching_etag_returns_304_without_a_body()
     {
         var client = Client();
@@ -203,7 +215,7 @@ public class ContactCatalogueTests
 
 public class ElasticsearchContactSourceTests
 {
-    private sealed class Stub(string response) : HttpMessageHandler
+    private sealed class Stub(string response, HttpStatusCode status = HttpStatusCode.OK) : HttpMessageHandler
     {
         public HttpRequestMessage? Request;
         public string? RequestBody;
@@ -212,7 +224,7 @@ public class ElasticsearchContactSourceTests
         {
             Request = request;
             RequestBody = request.Content is null ? null : await request.Content.ReadAsStringAsync(ct);
-            return new HttpResponseMessage(HttpStatusCode.OK)
+            return new HttpResponseMessage(status)
             {
                 Content = new StringContent(response, Encoding.UTF8, "application/json"),
             };
@@ -270,6 +282,36 @@ public class ElasticsearchContactSourceTests
         var fields = body.RootElement.GetProperty("_source").EnumerateArray().Select(f => f.GetString()).ToArray();
         Assert.Contains("Location", fields);
         Assert.DoesNotContain("Description_of_Incident", fields);
+    }
+
+    [Fact]
+    public async Task Sends_field_names_exactly_as_indexed_not_camel_cased()
+    {
+        var (source, handler) = Create(Response);
+
+        await source.GetAllAsync(default);
+
+        // Elasticsearch fields are case-sensitive: a re-cased `dtg` is an unmapped field and the search fails with 400.
+        using var body = JsonDocument.Parse(handler.RequestBody!);
+        Assert.True(body.RootElement.GetProperty("sort")[0].TryGetProperty("DTG", out _));
+        Assert.True(body.RootElement.GetProperty("query").GetProperty("exists").TryGetProperty("field", out var f));
+        Assert.Equal("Location", f.GetString());
+        Assert.True(body.RootElement.TryGetProperty("track_total_hits", out _));
+    }
+
+    [Fact]
+    public async Task A_failed_search_reports_what_elasticsearch_said()
+    {
+        var handler = new Stub("""{"error":{"reason":"No mapping found for [dtg] in order to sort on"},"status":400}""", HttpStatusCode.BadRequest);
+        var http = new HttpClient(handler) { BaseAddress = new Uri("http://es.test/") };
+        var source = new ElasticsearchContactSource(
+            http, Options.Create(new ElasticsearchOptions { Url = "http://es.test" }), NullLogger<ElasticsearchContactSource>.Instance);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => source.GetAllAsync(default));
+
+        Assert.Contains("400", ex.Message);
+        Assert.Contains("No mapping found for [dtg]", ex.Message);
+        Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
     }
 
     private const string DocResponse = """

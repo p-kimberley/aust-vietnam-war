@@ -42,6 +42,11 @@ spec:
             - name: map-config
               mountPath: /etc/avw/map
               readOnly: true
+            {{- if .Values.elasticsearch.caSecret }}
+            - name: es-ca
+              mountPath: /etc/avw/es-ca
+              readOnly: true
+            {{- end }}
           startupProbe:
             httpGet: { path: /api/health/live, port: http }
             failureThreshold: 30
@@ -63,6 +68,14 @@ spec:
         - name: map-config
           configMap:
             name: {{ include "avw-api.name" . }}-map
+        {{- if .Values.elasticsearch.caSecret }}
+        - name: es-ca
+          secret:
+            secretName: {{ .Values.elasticsearch.caSecret }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -16,6 +16,9 @@ auth:
 elasticsearch:
   url: https://elasticsearch.example.internal:9200
   contactsIndex: avw_contacts
+  # Secret holding the private CA (key ca.crt) that signed the cluster's certificate, for example the public certs
+  # secret the Elasticsearch operator publishes. Leave empty when the certificate is publicly trusted.
+  caSecret: ""
 
 # Runtime map catalogue, mounted into the API as /etc/avw/map/map.json and re-read without a restart. Basemaps,
 # overlays and terrain are data, so a provider or GeoServer layer can change here without a new image.

@@ -5,6 +5,7 @@ using Avw.Api.Map;
 using Avw.Data;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,9 @@ services.AddAvwAuth(builder.Environment);
 services.AddHealthChecks()
     .AddDbContextCheck<AvwDbContext>("mysql", tags: ["ready"]);
 
+// The contact list is about 800 KB of JSON and compresses roughly tenfold. Only public, non-personalised data is
+// served this way; per-user responses (auth) are tiny and not affected in practice.
+services.AddResponseCompression(o => o.EnableForHttps = true);
 services.AddOpenApi();
 services.AddProblemDetails();
 services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -65,6 +69,7 @@ services.Configure<ForwardedHeadersOptions>(o =>
 var app = builder.Build();
 
 app.UseForwardedHeaders();
+app.UseResponseCompression();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
