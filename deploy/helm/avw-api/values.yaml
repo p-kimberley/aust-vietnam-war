@@ -13,8 +13,35 @@ auth:
   authority: https://auth.vietnam-war.au/realms/avw
   clientId: avw-api
 
+elasticsearch:
+  url: https://elasticsearch.example.internal:9200
+  contactsIndex: avw_contacts
+
+# Runtime map catalogue, mounted into the API as /etc/avw/map/map.json and re-read without a restart. Basemaps,
+# overlays and terrain are data, so a provider or GeoServer layer can change here without a new image.
+# mapboxToken is sent to every visitor: use a public (pk.) token restricted to the site's URL, never a secret one.
+map:
+  mapboxToken: ""
+  center: [107.17, 10.55]
+  zoom: 8
+  basemaps:
+    - { id: terrain, name: Terrain, style: "mapbox://styles/mapbox/outdoors-v12", default: true }
+    - { id: satellite, name: Satellite, style: "mapbox://styles/mapbox/satellite-streets-v12" }
+    - { id: light, name: Light, style: "mapbox://styles/mapbox/light-v11" }
+    - { id: dark, name: Dark, style: "mapbox://styles/mapbox/dark-v11" }
+  # Raster overlays such as the 1ATF topographic maps from GeoServer, for example:
+  #   - id: 1atf-hillshaded
+  #     name: "1ATF topo (hillshaded)"
+  #     tiles: ["https://vietnam-war.au/geoserver/gwc/service/wmts/rest/avw:1atf/EPSG:900913/EPSG:900913:{z}/{y}/{x}?format=image/png"]
+  #     opacity: 0.85
+  overlays: []
+  terrain:
+    source: "mapbox://mapbox.mapbox-terrain-dem-v1"
+    exaggeration: 1.5
+
 # Secret holding the sensitive settings, as environment-style keys:
 #   ConnectionStrings__Default          e.g. Server=mysql-router;Port=6446;Database=avw;User=avw;Password=...
+#   Elasticsearch__ApiKey              optional: base64 API key with read access to the contacts index
 #   Auth__ClientSecret                  the avw-api client secret set in Keycloak
 #   DataProtection__CertificatePassword password of the key-protection certificate
 # Create it out of band (sealed-secrets, external-secrets, ...). `create` exists for local clusters only.

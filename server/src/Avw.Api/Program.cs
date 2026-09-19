@@ -1,6 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Serialization;
 using Avw.Api.Auth;
+using Avw.Api.Map;
 using Avw.Data;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -8,6 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
+
+// The map catalogue (basemaps, overlays, terrain) is deployment configuration. In the cluster it arrives as a mounted
+// ConfigMap so it can change without a new image; it is optional so local runs use appsettings.
+builder.Configuration.AddJsonFile(
+    builder.Configuration["MapConfigFile"] ?? "/etc/avw/map/map.json", optional: true, reloadOnChange: true);
 
 services.AddOptions<AuthOptions>()
     .Bind(builder.Configuration.GetSection(AuthOptions.Section))
@@ -37,6 +43,7 @@ else if (!builder.Configuration.GetValue<bool>("DataProtection:AllowUnencryptedK
 }
 
 services.AddSingleton(TimeProvider.System);
+services.AddAvwMap(builder.Configuration);
 services.AddAvwAuth(builder.Environment);
 
 services.AddHealthChecks()
@@ -67,6 +74,7 @@ app.UseMiddleware<CsrfHeaderMiddleware>();
 
 var api = app.MapGroup("/api");
 api.MapAuthEndpoints();
+api.MapMapEndpoints();
 api.MapOpenApi("/openapi/{documentName}.json");
 
 api.MapHealthChecks("/health/live", new() { Predicate = _ => false });

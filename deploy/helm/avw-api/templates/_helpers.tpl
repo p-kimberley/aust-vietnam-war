@@ -48,6 +48,16 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     secretKeyRef:
       name: {{ include "avw-api.secretName" . }}
       key: Auth__ClientSecret
+- name: Elasticsearch__Url
+  value: {{ .Values.elasticsearch.url | quote }}
+- name: Elasticsearch__ContactsIndex
+  value: {{ .Values.elasticsearch.contactsIndex | quote }}
+- name: Elasticsearch__ApiKey
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "avw-api.secretName" . }}
+      key: Elasticsearch__ApiKey
+      optional: true
 - name: DataProtection__CertificatePath
   value: /etc/avw/keys/key-protection.pfx
 - name: DataProtection__CertificatePassword

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Avw.Api.Map;
 using Avw.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -34,6 +35,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             ["Auth:Authority"] = "https://auth.test/realms/avw",
             ["Auth:ClientId"] = "avw-api",
             ["Auth:ClientSecret"] = "test-secret",
+            ["Elasticsearch:Url"] = "http://es.test",
         }));
 
         builder.ConfigureServices(services =>
@@ -42,6 +44,9 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             // MySQL and in-memory providers are never registered together.
             services.RemoveAll<DbContextOptions<AvwDbContext>>();
             services.RemoveAll<IDbContextOptionsConfiguration<AvwDbContext>>();
+            services.RemoveAll<IContactSource>();
+            services.AddSingleton<FakeContactSource>();
+            services.AddSingleton<IContactSource>(sp => sp.GetRequiredService<FakeContactSource>());
             services.AddDbContext<AvwDbContext>(o => o.UseInMemoryDatabase(_dbName));
 
             // No network: give the OIDC handler a fixed discovery document.

@@ -39,6 +39,9 @@ spec:
             - name: key-protection
               mountPath: /etc/avw/keys
               readOnly: true
+            - name: map-config
+              mountPath: /etc/avw/map
+              readOnly: true
           startupProbe:
             httpGet: { path: /api/health/live, port: http }
             failureThreshold: 30
@@ -57,6 +60,9 @@ spec:
         - name: key-protection
           secret:
             secretName: {{ .Values.dataProtection.certificateSecret }}
+        - name: map-config
+          configMap:
+            name: {{ include "avw-api.name" . }}-map
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
