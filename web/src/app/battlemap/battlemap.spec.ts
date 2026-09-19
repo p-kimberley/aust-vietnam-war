@@ -7,7 +7,7 @@ import { Battlemap } from './battlemap';
 import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight } from './contact-layers';
 import { Contact, ContactDetail, fieldRange, formatDtg, toGeoJson } from './contacts';
 import { ContactsService } from './contacts.service';
-import { MapConfig, MapConfigService, needsMapboxToken, pickBasemap } from './map-config';
+import { MapConfig, MapConfigService, TOKEN_PLACEHOLDER, accessTokenFor, needsMapboxToken, pickBasemap } from './map-config';
 import { formatAt, parseAt } from './map-url';
 
 const contacts: Contact[] = [
@@ -94,6 +94,12 @@ describe('map config helpers', () => {
     expect(pickBasemap(config, 'gone')?.id).toBe('terrain');
     expect(pickBasemap({ ...config, basemaps: [{ ...config.basemaps[1] }] }, null)?.id).toBe('dark');
     expect(pickBasemap({ ...config, basemaps: [] })).toBeUndefined();
+  });
+
+  it('passes a placeholder token when none is configured, since Mapbox GL renders nothing without one', () => {
+    expect(accessTokenFor({ ...config, mapboxToken: 'pk.real' })).toBe('pk.real');
+    expect(accessTokenFor({ ...config, mapboxToken: '' })).toBe(TOKEN_PLACEHOLDER);
+    expect(accessTokenFor({ ...config, mapboxToken: null })).toBe(TOKEN_PLACEHOLDER);
   });
 
   it('needs a token only when something is served by Mapbox', () => {

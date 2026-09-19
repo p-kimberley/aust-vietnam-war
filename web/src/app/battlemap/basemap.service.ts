@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import type { Map } from 'mapbox-gl';
-import { MapConfig, OverlayConfig, pickBasemap } from './map-config';
+import { MapConfig, OverlayConfig, accessTokenFor, pickBasemap } from './map-config';
 import { Camera } from './map-url';
 
 const DEM_SOURCE = 'avw-dem';
@@ -43,7 +43,7 @@ export class BasemapService implements OnDestroy {
     loadStylesheet();
     const { default: mapboxgl } = await import('mapbox-gl');
     this.config = config;
-    mapboxgl.accessToken = config.mapboxToken ?? '';
+    mapboxgl.accessToken = accessTokenFor(config);
 
     const basemap = pickBasemap(config, start.basemapId);
     if (!basemap) {
@@ -65,7 +65,8 @@ export class BasemapService implements OnDestroy {
     });
     this.map = map;
 
-    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'bottom-right');
+    // Bottom-left keeps the bottom-right corner clear for the attribution, which must stay visible under the side panels.
+    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'bottom-left');
     map.addControl(new mapboxgl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
     // A style load replaces the whole style, so terrain, overlays and data layers are put back each time.

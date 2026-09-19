@@ -63,3 +63,14 @@ export function needsMapboxToken(config: MapConfig): boolean {
     config.basemaps.some((b) => b.style.startsWith('mapbox://')) || (config.terrain?.source.startsWith('mapbox://') ?? false)
   );
 }
+
+/**
+ * Mapbox GL v3 draws nothing at all when no access token is set, even for a style that does not use Mapbox (a
+ * self-hosted tile server, for example). A token-free deployment therefore passes a placeholder: it is never used to
+ * fetch Mapbox resources, and {@link needsMapboxToken} already blocks the map when a real one is required.
+ */
+export const TOKEN_PLACEHOLDER = 'pk.token-not-required';
+
+export function accessTokenFor(config: MapConfig): string {
+  return config.mapboxToken || TOKEN_PLACEHOLDER;
+}

@@ -54,7 +54,7 @@ export function addContactLayers(
       layout: { visibility: state.heatmap ? 'visible' : 'none' },
       paint: {
         'heatmap-weight': heatWeight(field, range),
-        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 6, 0.6, 12, 2],
+        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 6, 0.9, 12, 2.4],
         'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 6, 8, 10, 22, 14, 40],
         'heatmap-color': [
           'interpolate',
@@ -66,8 +66,8 @@ export function addContactLayers(
           0.7, 'rgba(217,130,43,0.85)',
           1, 'rgba(194,58,38,0.95)',
         ],
-        // Markers take over as the view closes in.
-        'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.9, 14, 0.35],
+        // Markers are faint and small zoomed out, so the heatmap carries the overview; they take over as the view closes in.
+        'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0.95, 14, 0.3],
       },
     });
   }
@@ -79,11 +79,11 @@ export function addContactLayers(
       source: CONTACT_SOURCE,
       layout: { visibility: state.markers ? 'visible' : 'none' },
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 1.5, 10, 3.5, 14, 7],
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 7, 0.8, 10, 2.5, 12, 5, 14, 8],
         'circle-color': CONTACT_RED,
         'circle-stroke-color': PAPER,
         'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 8, 0, 12, 1],
-        'circle-opacity': ['interpolate', ['linear'], ['zoom'], 6, 0.55, 11, 0.95],
+        'circle-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.2, 10, 0.5, 12, 0.95],
       },
     });
   }

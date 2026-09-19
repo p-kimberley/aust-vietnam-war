@@ -1,12 +1,13 @@
 :host {
   display: block;
+  height: 100%;
 }
 
 .incident {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: color-mix(in srgb, var(--olive-900) 94%, transparent);
+  background: color-mix(in srgb, var(--olive-900) 97%, transparent);
   border: 1px solid var(--olive-500);
   border-radius: var(--radius);
   color: var(--paper);
@@ -28,13 +29,10 @@ h2 {
   color: var(--smoke-yellow);
 }
 
+/* The heading is only focused programmatically (to move keyboard and screen-reader users into the panel); it is not
+   interactive, so it gets no focus ring. */
 h2:focus {
   outline: none;
-}
-
-h2:focus-visible {
-  outline: 2px solid var(--smoke-yellow);
-  outline-offset: 2px;
 }
 
 .incident__close,

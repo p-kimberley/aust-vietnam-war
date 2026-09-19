@@ -13,6 +13,7 @@
 
 .bm__bar {
   position: absolute;
+  z-index: 3;
   top: 0;
   left: 0;
   right: 0;
@@ -62,10 +63,11 @@
 
 .panel {
   position: absolute;
+  z-index: 3;
   top: 3rem;
   right: 0.75rem;
   width: min(16rem, calc(100vw - 1.5rem));
-  background: color-mix(in srgb, var(--olive-900) 92%, transparent);
+  background: color-mix(in srgb, var(--olive-900) 97%, transparent);
   border: 1px solid var(--olive-500);
   border-radius: var(--radius);
   font-size: 0.9rem;
@@ -73,6 +75,7 @@
 
 .bm__incident {
   position: absolute;
+  z-index: 3;
   top: 3rem;
   right: 0.75rem;
   bottom: 2.5rem;
@@ -85,12 +88,29 @@
 }
 
 @media (max-width: 45rem) {
+  .bm__bar {
+    gap: 0.6rem;
+  }
+
+  .bm__back,
+  .bm__title {
+    white-space: nowrap;
+  }
+
+  .bm__back {
+    font-size: 0.85rem;
+  }
+
+  .bm__count {
+    display: none;
+  }
+
   .bm__incident {
     top: auto;
     left: 0.75rem;
     width: auto;
     height: 55dvh;
-    bottom: 0.75rem;
+    bottom: 2.5rem;
   }
 
   .panel--shifted {
