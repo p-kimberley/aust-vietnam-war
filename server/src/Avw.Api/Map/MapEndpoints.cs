@@ -11,7 +11,10 @@ public static class MapEndpoints
             .Bind(config.GetSection(ElasticsearchOptions.Section))
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        services.Configure<MapOptions>(config.GetSection(MapOptions.Section));
+        services.AddSingleton<IValidateOptions<MapOptions>, MapOptionsValidator>();
+        services.AddOptions<MapOptions>()
+            .Bind(config.GetSection(MapOptions.Section))
+            .ValidateOnStart();
 
         var client = services.AddHttpClient<IContactSource, ElasticsearchContactSource>((sp, http) =>
         {

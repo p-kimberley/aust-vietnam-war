@@ -28,7 +28,7 @@ Latent bugs found and **not** to be ported: SQL injection in `delete-incident-no
 | Area | Decision |
 |---|---|
 | Web app | Latest stable Angular (standalone components, signals, Router-driven URL state). **SSR** for public content; **client-only** lazy routes for `/battlemap` and `/studio`. One app so auth, design tokens and code are shared. |
-| Map | **Mapbox GL JS v3** behind a thin `BasemapService`. Basemaps, terrain DEM and GeoServer layers come from a runtime-config catalogue (Helm values), so providers can be swapped. Native GL heatmap, clustering and 3D terrain replace the OpenLayers layer classes. |
+| Map | **MapLibre GL JS** (BSD-licensed, no access token, no vendor calls; switched from Mapbox GL JS v3 on 2026-09-20) behind a thin `BasemapService`. Basemaps, terrain DEM and GeoServer layers come from a runtime-config catalogue (Helm values), so providers can be swapped. Native GL heatmap, clustering and 3D terrain replace the OpenLayers layer classes. |
 | Charts | Apache ECharts (Highstock needs a commercial licence). |
 | API | .NET 10 LTS Web API plus a separate one-replica **worker** deployment (same image). OpenAPI with a generated TypeScript client. Typed endpoints, no raw Elasticsearch passthrough. |
 | Relational store | Dedicated database on the existing **MySQL 8.4 InnoDB Cluster**, via MySQL Router. |
@@ -36,7 +36,7 @@ Latent bugs found and **not** to be ported: SQL injection in `delete-incident-no
 | Identity | **Keycloak 26** (operator deployed), dedicated realm for this app, self-registration enabled. |
 | Editor | **TipTap (ProseMirror)**, stored as **sanitised HTML**. Server-side allowlist sanitiser on every save. Verify the current licence terms at kickoff. |
 | Media storage | Shared RWX volume (CephFS or NFS) for final images, plus a per-pod **RWO** scratch volume. See section 6. |
-| Basemap fallback | If the Mapbox GL v2+ token/billing model is a problem, MapLibre GL is near-API-identical. |
+| Basemap styles | Absolute http(s) style URLs served by a tile server (currently TileServer GL at `tiles.hosting.gradata.com.au`: terrain, bright, light, dark, `ww2`). `mapbox://` styles cannot be loaded and the API refuses to start with one. |
 
 ## 3. Scope
 
@@ -66,7 +66,7 @@ Latent bugs found and **not** to be ported: SQL injection in `delete-incident-no
 ```
 vietnam-war.au (one host, path-based ingress)
  ├─ /                    avw-web   Angular SSR: home, articles, pages, help, search
- │   ├─ /battlemap         client-only lazy route (Mapbox GL, charts)
+ │   ├─ /battlemap         client-only lazy route (MapLibre GL, charts)
  │   └─ /studio            client-only lazy route (editor, media, moderation, admin)
  ├─ /api                 avw-api   .NET: map data, CMS, community, media, auth (BFF)
  │                                  ├─ Elasticsearch 9    map data and search projections
@@ -115,7 +115,7 @@ Rules preserved: editors and admins auto-approve their own notes and media; ever
 ### 4.4 Map UI notes
 
 - Layout follows the legacy one (right icon rail, media filmstrip on the left, floating controls, minimap, scale bar, full-width waveform timeline, incident panel with statistics and honour roll) and reskins it. See the mockups.
-- Layers: basemaps (Terrain, Satellite, Light, Dark), 1ATF topo overlays (Hillshaded, Classic) and Bases-and-towns from GeoServer, combat incident markers or concentrations, community content, and new **3D terrain** (DEM source, exaggeration, pitch, sky). The 1ATF rasters drape over the terrain; verify heatmap and marker behaviour on terrain early.
+- Layers: basemaps from the tile-server catalogue (Terrain, Vintage, Bright, Light, Dark), 1ATF topo overlays (Hillshaded, Classic) and Bases-and-towns from GeoServer, combat incident markers or concentrations, community content, and new **3D terrain** (DEM source, exaggeration, pitch, sky). The 1ATF rasters drape over the terrain; verify heatmap and marker behaviour on terrain early.
 - The dataset is small enough (about 6,200 contacts) to load whole and filter client-side; analytics use server-side aggregations.
 
 ## 5. Data
@@ -230,12 +230,12 @@ With two people, the map track (phases 2, 4, 5) and the CMS track (phase 3) are 
 | Item | Notes |
 |---|---|
 | EF Core MySQL provider vs .NET 10 | Pomelo has historically lagged new .NET releases. Verify at kickoff; fallback MySqlConnector plus Dapper. |
-| Mapbox GL JS v2+ licensing | Requires a token and bills each map load even with non-Mapbox tiles. Decision recorded: start on Mapbox GL JS behind `BasemapService`; MapLibre is the fallback. |
-| Mapbox account ownership | The vintage styles and tilesets live in two personal accounts (`kimberleyp`, `gradata-systems`), and one legacy tileset may be deprecated. Decide who owns styles and tokens going forward; rotate the leaked tokens. |
+| Map library (resolved) | Mapbox GL JS v3 renders nothing without an access token and depends on reaching Mapbox even for a self-hosted style, so it was replaced with MapLibre GL JS on 2026-09-20. Its worker and shared chunk are copied to `/vendor` and set explicitly, because the bundler cannot resolve the worker. |
+| Vintage styles and tilesets | The vintage styles and tilesets live in two personal Mapbox accounts (`kimberleyp`, `gradata-systems`). MapLibre cannot load `mapbox://` resources, and Mapbox's terms do not allow using its hosted tiles from other libraries, so the vintage look must be re-created as a style on the tile server (the existing `ww2` style is a dark base to start from). Rotate the leaked Mapbox tokens regardless. |
 | TipTap licence | Core is MIT; confirm any extension used. CKEditor and TinyMCE need licence keys or commercial terms. |
 | InnoDB Cluster | Primary keys required; connect through MySQL Router's read/write port. |
 | Storage classes | Need the RWX class (CephFS or NFS) and the RWO class for scratch. |
-| 3D terrain behaviour | Heatmap and marker rendering on terrain, and DEM provider choice (Mapbox terrain-DEM vs another). Spike in Phase 2. |
+| 3D terrain | Works in MapLibre with heatmap and markers drawn over it, but the tile server has no elevation tileset. Development uses public Terrarium tiles (AWS Open Data); production needs a DEM source chosen and hosted (`map.terrain` in the Helm values). Check heatmap and marker behaviour on steep terrain. |
 | Air and naval layers | Decide whether they must be in before cutover. |
 | Legacy files | Owner is copying `incident-media/` and `honour-roll/`; confirm what `nomroll_personnel_media.ImageUrl` references. |
 | Old-host redirects | `vietnam.unsw.adfa.edu.au` → new host needs UNSW DNS; outside this project. |

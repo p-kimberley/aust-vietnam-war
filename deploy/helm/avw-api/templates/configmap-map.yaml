@@ -7,7 +7,6 @@ metadata:
 data:
   map.json: |
     {{- dict "Map" (dict
-        "MapboxToken" .Values.map.mapboxToken
         "Center" .Values.map.center
         "Zoom" .Values.map.zoom
         "Basemaps" .Values.map.basemaps

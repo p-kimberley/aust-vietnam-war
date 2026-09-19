@@ -36,6 +36,10 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             ["Auth:ClientId"] = "avw-api",
             ["Auth:ClientSecret"] = "test-secret",
             ["Elasticsearch:Url"] = "http://es.test",
+            ["Map:Basemaps:0:Id"] = "plain",
+            ["Map:Basemaps:0:Name"] = "Plain",
+            ["Map:Basemaps:0:Style"] = "https://tiles.test/styles/plain/style.json",
+            ["Map:Basemaps:0:Default"] = "true",
         }));
 
         builder.ConfigureServices(services =>

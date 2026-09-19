@@ -119,6 +119,8 @@ public class ContactsEndpointTests(ApiFactory factory) : IClassFixture<ApiFactor
 
         Assert.Equal(HttpStatusCode.OK, res.StatusCode);
         Assert.Equal(107.17, json.GetProperty("center")[0].GetDouble());
+        Assert.Equal("plain", json.GetProperty("basemaps")[0].GetProperty("id").GetString());
+        Assert.False(json.TryGetProperty("mapboxToken", out _));
     }
 
     [Fact]
@@ -359,5 +361,87 @@ public class ElasticsearchContactSourceTests
     {
         var (source, _) = Create("""{"_index":"avw_contacts","_id":"77","found":false}""");
         Assert.Null(await source.GetAsync(77, default));
+    }
+}
+
+public class MapOptionsValidatorTests
+{
+    private static MapOptions Valid() => new()
+    {
+        Basemaps = [new() { Id = "terrain", Name = "Terrain", Style = "https://tiles.test/styles/terrain/style.json", Default = true }],
+    };
+
+    private static string[] Failures(MapOptions o)
+    {
+        var result = new MapOptionsValidator().Validate(null, o);
+        return result.Failed ? result.Failures!.ToArray() : [];
+    }
+
+    [Fact]
+    public void A_catalogue_of_http_styles_is_valid()
+    {
+        var o = Valid();
+        o.Overlays = [new() { Id = "topo", Name = "Topo", Tiles = ["https://geo.test/wmts/{z}/{x}/{y}.png"] }];
+        o.Terrain = new() { Tiles = ["https://dem.test/{z}/{x}/{y}.png"] };
+
+        Assert.Empty(Failures(o));
+    }
+
+    [Fact]
+    public void At_least_one_basemap_is_required()
+    {
+        Assert.Contains(Failures(new MapOptions()), f => f.Contains("at least one basemap"));
+    }
+
+    [Theory]
+    [InlineData("mapbox://styles/mapbox/outdoors-v12")]
+    [InlineData("/styles/terrain/style.json")]
+    [InlineData("")]
+    [InlineData("javascript:alert(1)")]
+    public void A_style_must_be_an_absolute_http_url(string style)
+    {
+        var o = Valid();
+        o.Basemaps[0].Style = style;
+
+        var failure = Assert.Single(Failures(o));
+        Assert.Contains("absolute http(s) URL", failure);
+    }
+
+    [Fact]
+    public void The_mapbox_error_says_what_to_do_instead()
+    {
+        var o = Valid();
+        o.Basemaps[0].Style = "mapbox://styles/gradata-systems/abc";
+
+        Assert.Contains("host the style on a tile server", Failures(o).Single());
+    }
+
+    [Fact]
+    public void Duplicate_ids_are_rejected()
+    {
+        var o = Valid();
+        o.Basemaps.Add(new() { Id = "TERRAIN", Name = "Again", Style = "https://tiles.test/x/style.json" });
+
+        Assert.Contains(Failures(o), f => f.Contains("more than one entry with id"));
+    }
+
+    [Fact]
+    public void An_overlay_needs_tile_urls()
+    {
+        var o = Valid();
+        o.Overlays = [new() { Id = "topo", Name = "Topo", Tiles = [] }];
+
+        Assert.Contains(Failures(o), f => f.Contains("Overlays 'topo'"));
+    }
+
+    [Theory]
+    [InlineData(null, "terrarium")]
+    [InlineData("https://dem.test/tiles.json", "elevation")]
+    public void Terrain_needs_a_source_and_a_known_encoding(string? url, string encoding)
+    {
+        var o = Valid();
+        o.Terrain = new() { Url = url, Encoding = encoding };
+
+        Assert.NotEmpty(Failures(o));
     }
 }
