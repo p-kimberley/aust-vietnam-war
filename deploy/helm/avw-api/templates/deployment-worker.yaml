@@ -1,0 +1,48 @@
+{{- if .Values.worker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "avw-api.name" . }}-worker
+  labels:
+    {{- include "avw-api.labels" . | nindent 4 }}
+    app.kubernetes.io/component: worker
+spec:
+  # Scheduled publishing and sweeps must run in exactly one place.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "avw-api.selector" . | nindent 6 }}
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+      labels:
+        {{- include "avw-api.selector" . | nindent 8 }}
+        app.kubernetes.io/component: worker
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: worker
+          image: {{ include "avw-api.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["dotnet", "/app/worker/Avw.Worker.dll"]
+          env:
+            {{- include "avw-api.env" . | nindent 12 }}
+          volumeMounts:
+            {{- include "avw-api.volumeMounts" . | nindent 12 }}
+          resources: {{ toYaml .Values.worker.resources | nindent 12 }}
+          securityContext: {{ include "avw-api.containerSecurity" . | nindent 12 }}
+      volumes:
+        {{- include "avw-api.volumes" . | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: avw-keycloak
+description: The "avw" Keycloak realm (roles, avw-api client, MFA flow) as a KeycloakRealmImport for the Keycloak operator
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

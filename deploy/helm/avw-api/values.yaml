@@ -1,0 +1,95 @@
+# MySQL, Elasticsearch, Keycloak and GeoServer are external. This chart only needs their addresses and secrets.
+
+image:
+  repository: avw-server
+  tag: ""                       # defaults to the chart appVersion
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# Public host. The ingress routes /api here; the avw-web chart routes everything else.
+host: vietnam-war.au
+
+auth:
+  authority: https://auth.vietnam-war.au/realms/avw
+  clientId: avw-api
+
+# Secret holding the sensitive settings, as environment-style keys:
+#   ConnectionStrings__Default          e.g. Server=mysql-router;Port=6446;Database=avw;User=avw;Password=...
+#   Auth__ClientSecret                  the avw-api client secret set in Keycloak
+#   DataProtection__CertificatePassword password of the key-protection certificate
+# Create it out of band (sealed-secrets, external-secrets, ...). `create` exists for local clusters only.
+secrets:
+  existingSecret: avw-api
+  create: false
+  values: {}
+
+# ASP.NET Data Protection keys (which sign the session cookie) are stored in MySQL and encrypted with this
+# certificate. Provide a Secret with a PKCS#12 file named key-protection.pfx, for example:
+#   openssl req -x509 -newkey rsa:3072 -nodes -keyout k.pem -out c.pem -days 3650 -subj "/CN=avw-key-protection"
+#   openssl pkcs12 -export -inkey k.pem -in c.pem -out key-protection.pfx -passout pass:<password>
+#   kubectl create secret generic avw-key-protection --from-file=key-protection.pfx
+dataProtection:
+  certificateSecret: avw-key-protection
+
+api:
+  replicas: 2
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { memory: 512Mi }
+
+worker:
+  enabled: true                 # always exactly one replica
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 256Mi }
+
+# Applies EF Core migrations before each install and upgrade.
+migrate:
+  enabled: true
+
+service:
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}               # e.g. cert-manager.io/cluster-issuer: letsencrypt
+  tls:
+    enabled: true
+    secretName: avw-tls
+
+# Shared final-image volume, mounted in the API and worker. Not used until the media pipeline lands (phase 3).
+media:
+  enabled: false
+  mountPath: /var/lib/avw/media
+  storage:
+    type: pvc                   # pvc | existingClaim | nfs
+    existingClaim: ""
+    pvc: { storageClassName: "", accessModes: [ReadWriteMany], size: 20Gi }   # a CephFS class
+    nfs: { server: "", path: "" }
+  keepOriginals: false
+
+# Per-pod scratch volume for uploads and image processing (API only). Because it is ReadWriteOnce, processing
+# happens in the pod that received the upload.
+scratch:
+  enabled: false
+  mountPath: /var/lib/avw/scratch
+  type: ephemeralPvc            # ephemeralPvc | emptyDir
+  ephemeralPvc:
+    storageClassName: ""        # e.g. a Ceph RBD class
+    accessModes: [ReadWriteOnce]
+    size: 5Gi
+  emptyDir: { sizeLimit: 5Gi }  # local development
+  maxUploadBytes: 26214400
+  maxConcurrentUploads: 4
+
+# .NET images run as UID 1654. Adjust fsGroup for your CephFS/NFS export permissions.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1654
+  fsGroup: 1654
+  seccompProfile: { type: RuntimeDefault }
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

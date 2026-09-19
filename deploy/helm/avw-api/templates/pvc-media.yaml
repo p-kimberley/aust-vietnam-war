@@ -1,0 +1,19 @@
+{{- if and .Values.media.enabled (eq .Values.media.storage.type "pvc") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "avw-api.name" . }}-media
+  labels:
+    {{- include "avw-api.labels" . | nindent 4 }}
+  annotations:
+    # Uploaded media outlives the release: never delete it on uninstall.
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes: {{ toYaml .Values.media.storage.pvc.accessModes | nindent 4 }}
+  {{- with .Values.media.storage.pvc.storageClassName }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.media.storage.pvc.size }}
+{{- end }}

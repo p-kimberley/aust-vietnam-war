@@ -1,0 +1,12 @@
+# Public origin of the site, without a trailing slash. Substituted into the client's redirect and post-logout URIs.
+publicUrl: https://vietnam-war.au
+
+keycloak:
+  # Name of the operator-managed Keycloak resource (kind: Keycloak) in this namespace.
+  crName: keycloak
+
+# Secret holding the avw-api client secret. It must contain the key below, and must match Auth__ClientSecret
+# in the avw-api chart's secret.
+clientSecret:
+  secretName: avw-keycloak-client
+  key: client-secret

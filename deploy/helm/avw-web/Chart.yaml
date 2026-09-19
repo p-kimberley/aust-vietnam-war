@@ -1,0 +1,6 @@
+apiVersion: v2
+name: avw-web
+description: Australia's Vietnam War Angular app (server-side rendered public site, client-only Battle Map and Studio)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

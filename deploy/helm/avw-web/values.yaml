@@ -1,0 +1,37 @@
+image:
+  repository: avw-web
+  tag: ""                       # defaults to the chart appVersion
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# Public host. Must match the ingress host: the SSR server rejects any other Host header (SSRF guard).
+host: vietnam-war.au
+
+# Where server-side rendering reaches the API inside the cluster (the avw-api Service).
+apiInternalUrl: http://avw-api
+
+replicas: 2
+resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits: { memory: 384Mi }
+
+service:
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  tls:
+    enabled: true
+    secretName: avw-tls
+
+# The node image runs as the built-in `node` user (UID 1000).
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  seccompProfile: { type: RuntimeDefault }
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

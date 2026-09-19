@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "avw-api.name" . }}
+  labels:
+    {{- include "avw-api.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      {{- include "avw-api.selector" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        {{- include "avw-api.selector" . | nindent 8 }}
+        app.kubernetes.io/component: api
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: api
+          image: {{ include "avw-api.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["dotnet", "/app/api/Avw.Api.dll"]
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            {{- include "avw-api.env" . | nindent 12 }}
+            {{- include "avw-api.apiEnv" . | nindent 12 }}
+          volumeMounts:
+            {{- include "avw-api.volumeMounts" . | nindent 12 }}
+            {{- include "avw-api.scratchMount" . | nindent 12 }}
+            - name: key-protection
+              mountPath: /etc/avw/keys
+              readOnly: true
+          startupProbe:
+            httpGet: { path: /api/health/live, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: { path: /api/health/live, port: http }
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /api/health/ready, port: http }
+            periodSeconds: 10
+          resources: {{ toYaml .Values.api.resources | nindent 12 }}
+          securityContext: {{ include "avw-api.containerSecurity" . | nindent 12 }}
+      volumes:
+        {{- include "avw-api.volumes" . | nindent 8 }}
+        {{- include "avw-api.scratchVolume" . | nindent 8 }}
+        - name: key-protection
+          secret:
+            secretName: {{ .Values.dataProtection.certificateSecret }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}

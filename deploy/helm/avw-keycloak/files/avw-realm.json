@@ -1,0 +1,141 @@
+{
+  "realm": "avw",
+  "displayName": "Australia's Vietnam War",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "verifyEmail": true,
+  "rememberMe": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "passwordPolicy": "length(10) and notUsername",
+  "eventsEnabled": true,
+  "eventsExpiration": 2592000,
+  "adminEventsEnabled": true,
+  "browserFlow": "browser-avw",
+  "defaultRole": {
+    "name": "default-roles-avw",
+    "description": "${role_default-roles}",
+    "composite": true,
+    "clientRole": false
+  },
+  "roles": {
+    "realm": [
+      { "name": "member", "description": "Registered community member: notes, photos, tributes." },
+      {
+        "name": "author",
+        "description": "Writes and submits articles. Requires MFA.",
+        "composite": true,
+        "composites": { "realm": ["member"] }
+      },
+      {
+        "name": "editor",
+        "description": "Reviews, publishes and moderates. Requires MFA.",
+        "composite": true,
+        "composites": { "realm": ["author"] }
+      },
+      {
+        "name": "admin",
+        "description": "Site settings and user administration. Requires MFA.",
+        "composite": true,
+        "composites": { "realm": ["editor"] }
+      },
+      {
+        "name": "default-roles-avw",
+        "description": "${role_default-roles}",
+        "composite": true,
+        "composites": { "realm": ["offline_access", "uma_authorization", "member"] }
+      },
+      { "name": "offline_access", "description": "${role_offline-access}" },
+      { "name": "uma_authorization", "description": "${role_uma_authorization}" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "avw-api",
+      "name": "Australia's Vietnam War (web + API)",
+      "description": "Confidential client used by the API-hosted login (BFF). Browsers never receive tokens.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${AVW_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "${AVW_PUBLIC_URL}",
+      "baseUrl": "/",
+      "redirectUris": ["${AVW_PUBLIC_URL}/api/auth/signin-oidc"],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${AVW_PUBLIC_URL}/*",
+        "client.session.idle.timeout": "28800"
+      },
+      "defaultClientScopes": ["web-origins", "acr", "profile", "email"],
+      "optionalClientScopes": [],
+      "protocolMappers": [
+        {
+          "name": "realm roles (flat)",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "false",
+            "userinfo.claim": "false",
+            "introspection.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "mfa-for-author-and-above",
+      "config": { "condUserRole": "author", "negate": "false" }
+    }
+  ],
+  "authenticationFlows": [
+    {
+      "alias": "browser-avw",
+      "description": "Browser login. Authors, editors and admins must also present a one-time code (author is a composite parent of editor and admin, so this one condition covers all three).",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        { "authenticator": "auth-cookie", "authenticatorFlow": false, "requirement": "ALTERNATIVE", "priority": 10, "userSetupAllowed": false },
+        { "authenticatorFlow": true, "requirement": "ALTERNATIVE", "priority": 30, "flowAlias": "browser-avw forms", "userSetupAllowed": false }
+      ]
+    },
+    {
+      "alias": "browser-avw forms",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        { "authenticator": "auth-username-password-form", "authenticatorFlow": false, "requirement": "REQUIRED", "priority": 10, "userSetupAllowed": false },
+        { "authenticatorFlow": true, "requirement": "CONDITIONAL", "priority": 20, "flowAlias": "browser-avw mfa", "userSetupAllowed": false }
+      ]
+    },
+    {
+      "alias": "browser-avw mfa",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        { "authenticator": "conditional-user-role", "authenticatorFlow": false, "requirement": "REQUIRED", "priority": 10, "authenticatorConfig": "mfa-for-author-and-above", "userSetupAllowed": false },
+        { "authenticator": "auth-otp-form", "authenticatorFlow": false, "requirement": "REQUIRED", "priority": 20, "userSetupAllowed": false }
+      ]
+    }
+  ]
+}
