@@ -39,5 +39,4 @@ wp-content/plugins/hello.php
 # Custom files and folders
 /incident-media/
 /honour-roll/
-/api/
 /js/bm/minified/
