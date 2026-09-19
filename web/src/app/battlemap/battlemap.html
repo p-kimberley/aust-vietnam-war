@@ -1,0 +1,93 @@
+<div class="bm">
+  <div #canvas class="bm__canvas" role="application" aria-label="Battle Map"></div>
+
+  <header class="bm__bar">
+    <a class="bm__back" routerLink="/">← Australia's Vietnam War</a>
+    <h1 class="bm__title">Battle Map</h1>
+    @if (status() === 'ready') {
+      <span class="bm__count data">{{ contactCount() }} contacts</span>
+    }
+  </header>
+
+  @if (status() === 'loading') {
+    <p class="bm__notice" role="status">Loading the map…</p>
+  }
+  @if (status() === 'error') {
+    <p class="bm__notice bm__notice--error" role="alert">{{ message() }}</p>
+  }
+
+  @if (status() === 'ready' && config(); as cfg) {
+    <aside class="panel" [class.panel--closed]="!panelOpen()" aria-label="Map layers">
+      <button
+        type="button"
+        class="panel__toggle"
+        [attr.aria-expanded]="panelOpen()"
+        aria-controls="layers-panel"
+        (click)="panelOpen.set(!panelOpen())"
+      >
+        Layers
+      </button>
+
+      <div id="layers-panel" class="panel__body" [hidden]="!panelOpen()">
+        <fieldset>
+          <legend>Basemap</legend>
+          @for (b of cfg.basemaps; track b.id) {
+            <label>
+              <input
+                type="radio"
+                name="basemap"
+                [value]="b.id"
+                [checked]="basemaps.basemapId() === b.id"
+                (change)="setBasemap(b.id)"
+              />
+              {{ b.name }}
+            </label>
+          }
+        </fieldset>
+
+        @if (canTerrain()) {
+          <label class="panel__row">
+            <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
+            3D terrain
+          </label>
+        }
+
+        @if (cfg.overlays.length) {
+          <fieldset>
+            <legend>Overlays</legend>
+            @for (o of cfg.overlays; track o.id) {
+              <label>
+                <input
+                  type="checkbox"
+                  [checked]="basemaps.overlayIds().includes(o.id)"
+                  (change)="setOverlay(o.id, $any($event.target).checked)"
+                />
+                {{ o.name }}
+              </label>
+            }
+          </fieldset>
+        }
+
+        <fieldset>
+          <legend>Contacts</legend>
+          <label>
+            <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
+            Heatmap
+          </label>
+          <label>
+            <input type="checkbox" [checked]="showMarkers()" (change)="setMarkersVisible($any($event.target).checked)" />
+            Incident markers
+          </label>
+          <label class="panel__select">
+            Heatmap shows
+            <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
+              @for (f of heatFields; track f.value) {
+                <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
+              }
+            </select>
+          </label>
+        </fieldset>
+      </div>
+    </aside>
+  }
+</div>

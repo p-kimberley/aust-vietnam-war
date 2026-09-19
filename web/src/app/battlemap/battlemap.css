@@ -1,0 +1,136 @@
+.bm {
+  position: relative;
+  height: 100dvh;
+  background: var(--olive-900);
+  color: var(--paper);
+  overflow: hidden;
+}
+
+.bm__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.bm__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(var(--olive-900), transparent);
+  pointer-events: none;
+}
+
+.bm__bar > * {
+  pointer-events: auto;
+}
+
+.bm__back {
+  color: var(--khaki);
+}
+
+.bm__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--smoke-yellow);
+}
+
+.bm__count {
+  margin-left: auto;
+  color: var(--khaki);
+  font-size: 0.85rem;
+}
+
+.bm__notice {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.bm__notice--error {
+  color: var(--contact-red-bright);
+}
+
+.panel {
+  position: absolute;
+  top: 3rem;
+  right: 0.75rem;
+  width: min(16rem, calc(100vw - 1.5rem));
+  background: color-mix(in srgb, var(--olive-900) 92%, transparent);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.panel__toggle {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font: inherit;
+  font-family: var(--font-display);
+  color: var(--smoke-yellow);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.panel__body {
+  padding: 0 0.75rem 0.75rem;
+}
+
+fieldset {
+  margin: 0 0 0.6rem;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  padding: 0;
+  margin-bottom: 0.2rem;
+  color: var(--brass);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+  cursor: pointer;
+}
+
+.panel__row {
+  margin-bottom: 0.6rem;
+}
+
+.panel__select {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  margin-top: 0.4rem;
+}
+
+select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.25rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 2px;
+}
