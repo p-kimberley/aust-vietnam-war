@@ -85,6 +85,9 @@ export class BasemapService implements OnDestroy {
       const status = (e.error as { status?: number } | undefined)?.status;
       if (status === 401 || status === 403) {
         hooks.failed('Mapbox rejected the access token. Check map.mapboxToken and its URL restrictions.');
+      } else {
+        // Tile 404s are routine, but a rejected layer or expression also arrives here and must not vanish silently.
+        console.warn('Map error:', e.error?.message ?? e.error);
       }
     });
 
