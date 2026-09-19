@@ -59,5 +59,21 @@ public static class MapEndpoints
             .WithName("GetContacts")
             .Produces<ContactSummary[]>()
             .Produces(StatusCodes.Status304NotModified);
+
+        // The int constraint keeps anything but a plain number out of the Elasticsearch URL.
+        g.MapGet("/contacts/{id:int:min(1)}", async (int id, IContactSource source, HttpContext ctx, CancellationToken ct) =>
+            {
+                var detail = await source.GetAsync(id, ct);
+                if (detail is null)
+                {
+                    return Results.NotFound();
+                }
+
+                ctx.Response.Headers.CacheControl = "public, max-age=300";
+                return Results.Ok(detail);
+            })
+            .WithName("GetContact")
+            .Produces<ContactDetail>()
+            .Produces(StatusCodes.Status404NotFound);
     }
 }

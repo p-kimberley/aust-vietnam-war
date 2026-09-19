@@ -19,6 +19,16 @@ public sealed class FakeContactSource : IContactSource
         new(9, "1966-03-05T08:10:00", 10.61, 107.2, 40, 2, 12, 7, [3, 4]),
     ];
 
+    public Dictionary<int, ContactDetail> Details { get; } = new()
+    {
+        [2] = new(2, "1966-03-03T19:50:00", 10.5525, 107.1653, "YS374671", "Hardihood", null,
+            [new(3, "1 Pl, A Coy, 5 RAR", "1 Platoon, A Company, 5 Battalion, Royal Australian Regiment")],
+            25, 5, 1, 2, 3, 4, "AT LOC STATED, CONTACTED 5 EN.", "Intel V-dat Base", null),
+    };
+
+    public Task<ContactDetail?> GetAsync(int id, CancellationToken ct) =>
+        Task.FromResult(Details.GetValueOrDefault(id));
+
     public Task<IReadOnlyList<ContactSummary>> GetAllAsync(CancellationToken ct)
     {
         Interlocked.Increment(ref Calls);
@@ -64,6 +74,32 @@ public class ContactsEndpointTests(ApiFactory factory) : IClassFixture<ApiFactor
     }
 
     [Fact]
+    public async Task A_contact_is_returned_in_full()
+    {
+        var res = await Client().GetAsync("/api/contacts/2");
+        var detail = await res.Content.ReadFromJsonAsync<ContactDetail>(new JsonSerializerOptions(JsonSerializerDefaults.Web));
+
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        Assert.Equal("YS374671", detail!.GridRef);
+        Assert.Equal("Hardihood", detail.Operation);
+        Assert.Equal("1 Pl, A Coy, 5 RAR", Assert.Single(detail.Units).ShortName);
+        Assert.Equal((25, 5, 1, 2, 3, 4), (detail.FrForce, detail.EnForce, detail.FrKia, detail.FrWia, detail.EnKia, detail.EnWia));
+        Assert.Contains("public", res.Headers.CacheControl!.ToString());
+    }
+
+    [Theory]
+    [InlineData("/api/contacts/999")]
+    [InlineData("/api/contacts/0")]
+    [InlineData("/api/contacts/-4")]
+    [InlineData("/api/contacts/abc")]
+    [InlineData("/api/contacts/2%2F..%2F_search")]
+    public async Task An_unknown_or_malformed_contact_is_not_found(string path)
+    {
+        var res = await Client().GetAsync(path);
+        Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+    }
+
+    [Fact]
     public async Task Map_config_is_served_without_signing_in()
     {
         var res = await Client().GetAsync("/api/map/config");
@@ -79,6 +115,7 @@ public class ContactsEndpointTests(ApiFactory factory) : IClassFixture<ApiFactor
         var json = await Client().GetStringAsync("/api/openapi/v1.json");
         Assert.Contains("/api/contacts", json);
         Assert.Contains("/api/map/config", json);
+        Assert.Contains("/api/contacts/{id}", json);
     }
 }
 
@@ -233,5 +270,52 @@ public class ElasticsearchContactSourceTests
         var fields = body.RootElement.GetProperty("_source").EnumerateArray().Select(f => f.GetString()).ToArray();
         Assert.Contains("Location", fields);
         Assert.DoesNotContain("Description_of_Incident", fields);
+    }
+
+    private const string DocResponse = """
+        {"_index":"avw_contacts","_id":"2","found":true,"_source":{
+          "DTG":"1966-03-03T19:50:00","Location":{"lat":10.55,"lon":107.16},"Grid_Ref":"YS374671","Operation":"Hardihood","Unit_Task":"  ",
+          "Fr_Units":[
+            {"_id":5,"ShortDisplayName":"Z Coy","LongDisplayName":"Z Company"},
+            {"_id":3,"ShortDisplayName":"1 Pl, A Coy","LongDisplayName":"1 Platoon, A Company"},
+            {"_id":9,"ShortDisplayName":"Secret","LongDisplayName":"Secret unit","Hidden":true}],
+          "Fr_Force_Present":25,"En_Force":5,"Fr_KIA":1,"Fr_WIA":2,"En_KIA":3,"En_WIA":4,
+          "Description_of_Incident":"AT LOC STATED.","Archival_Source_Data":"Intel V-dat Base",
+          "Source_Hyperlink":"https://www.awm.gov.au/collection/R1"}}
+        """;
+
+    [Fact]
+    public async Task Maps_a_document_to_detail_hiding_hidden_units_and_blank_fields()
+    {
+        var (source, handler) = Create(DocResponse);
+
+        var d = await source.GetAsync(2, default);
+
+        Assert.Equal("/avw_contacts/_doc/2", handler.Request!.RequestUri!.AbsolutePath);
+        Assert.Contains("Description_of_Incident", handler.Request.RequestUri.Query);
+        Assert.Equal("Hardihood", d!.Operation);
+        Assert.Null(d.UnitTask);
+        Assert.Equal(new[] { "1 Pl, A Coy", "Z Coy" }, d.Units.Select(u => u.ShortName));
+        Assert.DoesNotContain(d.Units, u => u.Id == 9);
+        Assert.Equal((1, 2, 3, 4), (d.FrKia, d.FrWia, d.EnKia, d.EnWia));
+        Assert.Equal("https://www.awm.gov.au/collection/R1", d.SourceUrl);
+    }
+
+    [Theory]
+    [InlineData("javascript:alert(1)")]
+    [InlineData("data:text/html,<script>1</script>")]
+    [InlineData("/relative/path")]
+    [InlineData("not a url")]
+    public async Task Drops_source_links_that_are_not_http_urls(string link)
+    {
+        var (source, _) = Create(DocResponse.Replace("https://www.awm.gov.au/collection/R1", link));
+        Assert.Null((await source.GetAsync(2, default))!.SourceUrl);
+    }
+
+    [Fact]
+    public async Task A_missing_document_is_null()
+    {
+        var (source, _) = Create("""{"_index":"avw_contacts","_id":"77","found":false}""");
+        Assert.Null(await source.GetAsync(77, default));
     }
 }

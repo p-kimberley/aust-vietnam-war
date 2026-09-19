@@ -60,6 +60,75 @@ public sealed class ElasticsearchContactSource(
         return list;
     }
 
+    private static readonly string[] DetailFields =
+    [
+        "DTG", "Location", "Grid_Ref", "Operation", "Unit_Task", "Fr_Units", "Fr_Force_Present", "En_Force",
+        "Fr_KIA", "Fr_WIA", "En_KIA", "En_WIA", "Description_of_Incident", "Archival_Source_Data", "Source_Hyperlink",
+    ];
+
+    public async Task<ContactDetail?> GetAsync(int id, CancellationToken ct)
+    {
+        var o = options.Value;
+        var path = $"{Uri.EscapeDataString(o.ContactsIndex)}/_doc/{id}?_source_includes={string.Join(',', DetailFields)}";
+
+        using var res = await http.GetAsync(path, ct);
+        if (res.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        res.EnsureSuccessStatusCode();
+        var doc = await res.Content.ReadFromJsonAsync<DocResponse>(ct);
+        if (doc is not { Found: true, Source: { } s } || s.Location is null || s.Dtg is null)
+        {
+            return null;
+        }
+
+        return new ContactDetail(
+            id, s.Dtg, s.Location.Lat, s.Location.Lon,
+            Clean(s.GridRef), Clean(s.Operation), Clean(s.UnitTask),
+            (s.FrUnits ?? [])
+                .Where(u => u.Hidden != true)
+                .Select(u => new ContactUnit(u.Id, u.ShortName ?? u.LongName ?? "Unknown", u.LongName ?? u.ShortName ?? "Unknown"))
+                .OrderBy(u => u.ShortName, StringComparer.OrdinalIgnoreCase)
+                .ToArray(),
+            s.FrForce, s.EnForce, s.FrKia, s.FrWia, s.EnKia, s.EnWia,
+            Clean(s.Description), Clean(s.ArchivalSource), HttpUrlOrNull(s.SourceHyperlink));
+    }
+
+    private static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    /// <summary>The link is rendered as an anchor by the client, so anything but http(s) (for example <c>javascript:</c>) is dropped here.</summary>
+    private static string? HttpUrlOrNull(string? value) =>
+        Uri.TryCreate(value?.Trim(), UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https" ? uri.AbsoluteUri : null;
+
+    private sealed record DocResponse(
+        bool Found,
+        [property: JsonPropertyName("_source")] DetailSource? Source);
+
+    private sealed record DetailSource(
+        [property: JsonPropertyName("DTG")] string? Dtg,
+        [property: JsonPropertyName("Location")] GeoPoint? Location,
+        [property: JsonPropertyName("Grid_Ref")] string? GridRef,
+        [property: JsonPropertyName("Operation")] string? Operation,
+        [property: JsonPropertyName("Unit_Task")] string? UnitTask,
+        [property: JsonPropertyName("Fr_Units")] List<DetailUnit>? FrUnits,
+        [property: JsonPropertyName("Fr_Force_Present")] int FrForce,
+        [property: JsonPropertyName("En_Force")] int EnForce,
+        [property: JsonPropertyName("Fr_KIA")] int FrKia,
+        [property: JsonPropertyName("Fr_WIA")] int FrWia,
+        [property: JsonPropertyName("En_KIA")] int EnKia,
+        [property: JsonPropertyName("En_WIA")] int EnWia,
+        [property: JsonPropertyName("Description_of_Incident")] string? Description,
+        [property: JsonPropertyName("Archival_Source_Data")] string? ArchivalSource,
+        [property: JsonPropertyName("Source_Hyperlink")] string? SourceHyperlink);
+
+    private sealed record DetailUnit(
+        [property: JsonPropertyName("_id")] int Id,
+        [property: JsonPropertyName("ShortDisplayName")] string? ShortName,
+        [property: JsonPropertyName("LongDisplayName")] string? LongName,
+        [property: JsonPropertyName("Hidden")] bool? Hidden);
+
     private sealed record SearchResponse(HitsEnvelope Hits);
 
     private sealed record HitsEnvelope(Total Total, List<Hit> Hits);
