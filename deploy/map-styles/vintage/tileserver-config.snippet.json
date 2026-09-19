@@ -1,0 +1,8 @@
+{
+  "_comment": "Add the vintage entry to the existing styles block of the TileServer GL config.json. The data ids v3, hillshading and contours are the ones the terrain style already uses.",
+  "styles": {
+    "vintage": {
+      "style": "vintage/style-local.json"
+    }
+  }
+}
