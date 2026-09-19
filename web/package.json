@@ -21,7 +21,7 @@
     "@angular/router": "^22.0.0",
     "@angular/ssr": "^22.0.4",
     "express": "^5.1.0",
-    "mapbox-gl": "^3.31.0",
+    "maplibre-gl": "^6.10.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -29,6 +29,7 @@
     "@angular/build": "^22.0.4",
     "@angular/cli": "^22.0.4",
     "@angular/compiler-cli": "^22.0.0",
+    "@maplibre/maplibre-gl-style-spec": "^26.4.4",
     "@types/express": "^5.0.1",
     "@types/geojson": "^7946.0.16",
     "@types/node": "^20.17.19",

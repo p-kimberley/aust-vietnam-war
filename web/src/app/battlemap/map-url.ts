@@ -1,6 +1,6 @@
 /**
  * Camera state in the URL, compatible with the legacy map's `?at=<lat>,<lng>,<zoom>` links (which people have
- * shared for years). The legacy zoom was an OpenLayers zoom, which is one level above the Mapbox GL zoom for the
+ * shared for years). The legacy zoom was an OpenLayers zoom, which is one level above the MapLibre GL zoom for the
  * same view, so the offset is applied in both directions and old and new links stay interchangeable.
  */
 const LEGACY_ZOOM_OFFSET = 1;
@@ -8,7 +8,7 @@ const LEGACY_ZOOM_OFFSET = 1;
 export interface Camera {
   lat: number;
   lon: number;
-  /** Mapbox GL zoom. */
+  /** MapLibre GL zoom. */
   zoom: number;
 }
 

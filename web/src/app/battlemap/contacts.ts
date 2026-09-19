@@ -87,7 +87,7 @@ export function fieldRange(contacts: readonly Contact[], field: HeatField): Rang
 
 export type ContactProperties = Omit<Contact, 'lat' | 'lon' | 'units'>;
 
-/** GeoJSON is what Mapbox GL consumes; the id doubles as the feature id so clicks can be traced back. */
+/** GeoJSON is what the map library consumes; the id doubles as the feature id so clicks can be traced back. */
 export function toGeoJson(contacts: readonly Contact[]): FeatureCollection<Point, ContactProperties> {
   const features: Feature<Point, ContactProperties>[] = contacts.map((c) => ({
     type: 'Feature',

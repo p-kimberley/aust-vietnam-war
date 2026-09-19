@@ -1,12 +1,12 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
-import type { Map } from 'mapbox-gl';
-import { MapConfig, OverlayConfig, accessTokenFor, pickBasemap } from './map-config';
+import type { Map } from 'maplibre-gl';
+import { MapConfig, OverlayConfig, pickBasemap } from './map-config';
 import { Camera } from './map-url';
 
 const DEM_SOURCE = 'avw-dem';
-const SKY_LAYER = 'avw-sky';
 const OVERLAY_PREFIX = 'avw-overlay-';
 const TERRAIN_PITCH = 60;
+const WORKER_URL = '/vendor/maplibre-gl-worker.mjs';
 
 export interface MapStart {
   basemapId?: string | null;
@@ -23,9 +23,9 @@ export interface MapHooks {
 }
 
 /**
- * The single place that talks to Mapbox GL for basemaps, 3D terrain and raster overlays, so a provider swap
- * (for example to MapLibre) touches this file and not the features built on top of it. The catalogue comes from the
- * API's runtime configuration.
+ * The single place that talks to the map library for basemaps, 3D terrain and raster overlays, so a library or
+ * provider swap touches this file and not the features built on top of it. The catalogue comes from the API's
+ * runtime configuration. The library is MapLibre GL (BSD-licensed, no access token, no vendor calls).
  *
  * Provided per map component: one service instance owns one map.
  */
@@ -38,12 +38,14 @@ export class BasemapService implements OnDestroy {
   readonly terrainEnabled = signal(false);
   readonly overlayIds = signal<readonly string[]>([]);
 
-  /** Loads Mapbox GL on demand (it is large and browser-only) and creates the map. */
+  /** Loads MapLibre GL on demand (it is large and browser-only) and creates the map. */
   async create(container: HTMLElement, config: MapConfig, start: MapStart, hooks: MapHooks): Promise<Map> {
     loadStylesheet();
-    const { default: mapboxgl } = await import('mapbox-gl');
+    const maplibre = await import('maplibre-gl');
+    // The bundler cannot find the library's web worker (the dev server answers 404 and the map silently loses vector
+    // tiles and GeoJSON), so the worker and its shared chunk are copied to /vendor by angular.json and loaded from there.
+    maplibre.setWorkerUrl(WORKER_URL);
     this.config = config;
-    mapboxgl.accessToken = accessTokenFor(config);
 
     const basemap = pickBasemap(config, start.basemapId);
     if (!basemap) {
@@ -54,20 +56,19 @@ export class BasemapService implements OnDestroy {
     this.overlayIds.set((start.overlays ?? []).filter((id) => config.overlays.some((o) => o.id === id)));
 
     const camera = start.camera ?? { lat: config.center[1], lon: config.center[0], zoom: config.zoom };
-    const map = new mapboxgl.Map({
+    const map = new maplibre.Map({
       container,
       style: basemap.style,
       center: [camera.lon, camera.lat],
       zoom: camera.zoom,
       pitch: this.terrainEnabled() ? TERRAIN_PITCH : 0,
-      hash: false,
-      attributionControl: true,
+      attributionControl: { compact: true },
     });
     this.map = map;
 
     // Bottom-left keeps the bottom-right corner clear for the attribution, which must stay visible under the side panels.
-    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'bottom-left');
-    map.addControl(new mapboxgl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+    map.addControl(new maplibre.NavigationControl({ visualizePitch: true }), 'bottom-left');
+    map.addControl(new maplibre.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
     // A style load replaces the whole style, so terrain, overlays and data layers are put back each time.
     map.on('style.load', () => {
@@ -80,12 +81,12 @@ export class BasemapService implements OnDestroy {
       hooks.cameraChanged({ lat: c.lat, lon: c.lng, zoom: map.getZoom() });
     });
     map.on('error', (e) => {
-      const status = (e.error as { status?: number } | undefined)?.status;
-      if (status === 401 || status === 403) {
-        hooks.failed('Mapbox rejected the access token. Check map.mapboxToken and its URL restrictions.');
+      const error = e.error as { message?: string; status?: number; url?: string } | undefined;
+      // A style that cannot be fetched leaves a blank map, so say so. Individual tile failures are routine.
+      if (error?.url && error.url === this.currentStyleUrl() && error.status !== undefined) {
+        hooks.failed(`The basemap style could not be loaded (${error.status}). Check the map catalogue in the API configuration.`);
       } else {
-        // Tile 404s are routine, but a rejected layer or expression also arrives here and must not vanish silently.
-        console.warn('Map error:', e.error?.message ?? e.error);
+        console.warn('Map error:', error?.message ?? e.error);
       }
     });
 
@@ -152,6 +153,10 @@ export class BasemapService implements OnDestroy {
     this.map = undefined;
   }
 
+  private currentStyleUrl(): string | undefined {
+    return this.config?.basemaps.find((b) => b.id === this.basemapId())?.style;
+  }
+
   private applyTerrain(map: Map): void {
     const terrain = this.config?.terrain;
     if (!terrain) {
@@ -159,20 +164,28 @@ export class BasemapService implements OnDestroy {
     }
     if (this.terrainEnabled()) {
       if (!map.getSource(DEM_SOURCE)) {
-        map.addSource(DEM_SOURCE, { type: 'raster-dem', url: terrain.source, tileSize: 512, maxzoom: 14 });
-      }
-      map.setTerrain({ source: DEM_SOURCE, exaggeration: terrain.exaggeration });
-      if (!map.getLayer(SKY_LAYER)) {
-        map.addLayer({
-          id: SKY_LAYER,
-          type: 'sky',
-          paint: { 'sky-type': 'atmosphere', 'sky-atmosphere-sun': [0, 0], 'sky-atmosphere-sun-intensity': 12 },
+        map.addSource(DEM_SOURCE, {
+          type: 'raster-dem',
+          ...(terrain.url ? { url: terrain.url } : { tiles: terrain.tiles }),
+          encoding: terrain.encoding,
+          tileSize: terrain.tileSize,
+          maxzoom: terrain.maxZoom,
+          attribution: terrain.attribution ?? undefined,
         });
       }
+      map.setTerrain({ source: DEM_SOURCE, exaggeration: terrain.exaggeration });
+      // Colours from the style guide (khaki haze at the horizon); only visible once the view is pitched.
+      map.setSky({
+        'sky-color': '#9dbad0',
+        'horizon-color': '#e6ddb8',
+        'fog-color': '#e6ddb8',
+        'sky-horizon-blend': 0.6,
+        'horizon-fog-blend': 0.6,
+        'fog-ground-blend': 0.4,
+      });
     } else {
       // Terrain must be detached before its source can be removed.
       map.setTerrain(null);
-      if (map.getLayer(SKY_LAYER)) map.removeLayer(SKY_LAYER);
       if (map.getSource(DEM_SOURCE)) map.removeSource(DEM_SOURCE);
     }
   }
@@ -203,14 +216,14 @@ export class BasemapService implements OnDestroy {
   }
 }
 
-/** Mapbox GL's stylesheet is copied to /vendor by angular.json and loaded only on this route, not on every page. */
+/** The library's stylesheet is copied to /vendor by angular.json and loaded only on this route, not on every page. */
 function loadStylesheet(): void {
-  if (document.querySelector('link[data-mapbox-gl]')) {
+  if (document.querySelector('link[data-maplibre-gl]')) {
     return;
   }
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '/vendor/mapbox-gl.css';
-  link.dataset['mapboxGl'] = '';
+  link.href = '/vendor/maplibre-gl.css';
+  link.dataset['maplibreGl'] = '';
   document.head.append(link);
 }

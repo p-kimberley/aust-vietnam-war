@@ -10,20 +10,20 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import type { Map } from 'mapbox-gl';
+import type { Map } from 'maplibre-gl';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { HEAT_LAYER, POINT_LAYER, addContactLayers, setContactVisibility, setHeatField, setSelectedContact } from './contact-layers';
 import { Contact, DEFAULT_HEAT_FIELD, HEAT_FIELDS, HeatField, fieldRange, isHeatField } from './contacts';
 import { ContactsService } from './contacts.service';
-import { MapConfig, MapConfigService, needsMapboxToken } from './map-config';
+import { MapConfig, MapConfigService } from './map-config';
 import { Camera, formatAt, parseAt } from './map-url';
 
 type Status = 'loading' | 'ready' | 'error';
 
 /**
  * The Battle Map (client-only route). Loads the runtime map catalogue and every contact, then draws a heatmap and
- * incident markers on a Mapbox GL map. The view is kept in the URL (`?at=`, `?basemap=`, `?terrain=`, `?field=`,
+ * incident markers on a MapLibre GL map. The view is kept in the URL (`?at=`, `?basemap=`, `?terrain=`, `?field=`,
  * `?overlays=`, `?incident=`) so a link reproduces what the sender was looking at.
  */
 @Component({
@@ -116,11 +116,6 @@ export class Battlemap {
       this.config.set(config);
       this.contacts = contacts;
       this.contactCount.set(contacts.length);
-
-      if (needsMapboxToken(config) && !config.mapboxToken) {
-        this.fail('The map needs a Mapbox access token. Set map.mapboxToken in the API configuration.');
-        return;
-      }
 
       const field = this.field();
       if (field && isHeatField(field)) {

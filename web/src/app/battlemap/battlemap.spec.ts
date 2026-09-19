@@ -7,7 +7,7 @@ import { Battlemap } from './battlemap';
 import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight } from './contact-layers';
 import { Contact, ContactDetail, fieldRange, formatDtg, toGeoJson } from './contacts';
 import { ContactsService } from './contacts.service';
-import { MapConfig, MapConfigService, TOKEN_PLACEHOLDER, accessTokenFor, needsMapboxToken, pickBasemap } from './map-config';
+import { MapConfig, MapConfigService, pickBasemap } from './map-config';
 import { formatAt, parseAt } from './map-url';
 
 const contacts: Contact[] = [
@@ -24,17 +24,16 @@ const detail: ContactDetail = {
 };
 
 const config: MapConfig = {
-  mapboxToken: 'pk.test',
   center: [107.17, 10.55],
   zoom: 8,
   basemaps: [
-    { id: 'terrain', name: 'Terrain', style: 'mapbox://styles/mapbox/outdoors-v12', default: true },
-    { id: 'dark', name: 'Dark', style: 'mapbox://styles/mapbox/dark-v11', default: false },
+    { id: 'terrain', name: 'Terrain', style: 'https://tiles.test/styles/terrain/style.json', default: true },
+    { id: 'dark', name: 'Dark', style: 'https://tiles.test/styles/dark/style.json', default: false },
   ],
   overlays: [
     { id: 'topo', name: '1ATF topo', tiles: ['https://tiles.test/{z}/{x}/{y}.png'], tileSize: 256, attribution: null, opacity: 0.8 },
   ],
-  terrain: { source: 'mapbox://mapbox.mapbox-terrain-dem-v1', exaggeration: 1.5 },
+  terrain: { url: null, tiles: ['https://dem.test/{z}/{x}/{y}.png'], encoding: 'terrarium', tileSize: 256, maxZoom: 15, exaggeration: 1.5, attribution: null },
 };
 
 describe('contacts', () => {
@@ -69,7 +68,7 @@ describe('heatWeight', () => {
 });
 
 describe('map URL state', () => {
-  it('reads legacy at= links, whose OpenLayers zoom is one above Mapbox', () => {
+  it('reads legacy at= links, whose OpenLayers zoom is one above MapLibre GL', () => {
     expect(parseAt('10.55,107.17,10')).toEqual({ lat: 10.55, lon: 107.17, zoom: 9 });
   });
 
@@ -95,25 +94,9 @@ describe('map config helpers', () => {
     expect(pickBasemap({ ...config, basemaps: [{ ...config.basemaps[1] }] }, null)?.id).toBe('dark');
     expect(pickBasemap({ ...config, basemaps: [] })).toBeUndefined();
   });
-
-  it('passes a placeholder token when none is configured, since Mapbox GL renders nothing without one', () => {
-    expect(accessTokenFor({ ...config, mapboxToken: 'pk.real' })).toBe('pk.real');
-    expect(accessTokenFor({ ...config, mapboxToken: '' })).toBe(TOKEN_PLACEHOLDER);
-    expect(accessTokenFor({ ...config, mapboxToken: null })).toBe(TOKEN_PLACEHOLDER);
-  });
-
-  it('needs a token only when something is served by Mapbox', () => {
-    expect(needsMapboxToken(config)).toBe(true);
-    const open: MapConfig = {
-      ...config,
-      basemaps: [{ id: 'osm', name: 'OSM', style: 'https://tiles.test/style.json', default: true }],
-      terrain: null,
-    };
-    expect(needsMapboxToken(open)).toBe(false);
-  });
 });
 
-/** A stand-in for the Mapbox map that records what the feature code asks of it. */
+/** A stand-in for the map that records what the feature code asks of it. */
 function fakeMap() {
   const sources = new Set<string>();
   const layers = new Set<string>();
@@ -226,13 +209,6 @@ describe('Battlemap', () => {
     expect(el.textContent).not.toContain('3D terrain');
   });
 
-  it('explains a missing Mapbox token instead of showing a blank map', async () => {
-    const { el, basemaps } = await render({ config: { ...config, mapboxToken: '' } });
-
-    expect(el.querySelector('[role=alert]')?.textContent).toContain('Mapbox access token');
-    expect(basemaps.create).not.toHaveBeenCalled();
-  });
-
   it('reports a load failure', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { el } = await render({ contacts: new Error('boom') });
@@ -241,13 +217,13 @@ describe('Battlemap', () => {
     spy.mockRestore();
   });
 
-  it('surfaces a token rejection reported by the map', async () => {
+  it('surfaces a basemap failure reported by the map', async () => {
     const { el, basemaps, fixture } = await render({});
 
-    basemaps.hooks!.failed('Mapbox rejected the access token.');
+    basemaps.hooks!.failed('The basemap style could not be loaded (404).');
     fixture.detectChanges();
 
-    expect(el.querySelector('[role=alert]')?.textContent).toContain('rejected');
+    expect(el.querySelector('[role=alert]')?.textContent).toContain('basemap style');
   });
 
   it('opens the incident panel when a marker is clicked, and rings it on the map', async () => {

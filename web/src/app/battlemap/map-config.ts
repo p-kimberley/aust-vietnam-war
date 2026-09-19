@@ -4,7 +4,6 @@ import { firstValueFrom } from 'rxjs';
 
 /** Mirrors `GET /api/map/config`: the basemap, overlay and terrain catalogue is deployment configuration. */
 export interface MapConfig {
-  mapboxToken: string | null;
   /** `[lon, lat]`. */
   center: [number, number];
   zoom: number;
@@ -16,7 +15,7 @@ export interface MapConfig {
 export interface BasemapConfig {
   id: string;
   name: string;
-  /** A style URL: `mapbox://styles/...` or https. */
+  /** An absolute http(s) URL of a MapLibre-compatible style (validated by the API at startup). */
   style: string;
   default: boolean;
 }
@@ -30,9 +29,15 @@ export interface OverlayConfig {
   opacity: number;
 }
 
+/** An elevation (raster-dem) source: a TileJSON `url` or explicit `tiles`, plus how the PNGs encode height. */
 export interface TerrainConfig {
-  source: string;
+  url: string | null;
+  tiles: string[];
+  encoding: 'terrarium' | 'mapbox';
+  tileSize: number;
+  maxZoom: number;
   exaggeration: number;
+  attribution: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -55,22 +60,4 @@ export function pickBasemap(config: MapConfig, requestedId?: string | null): Bas
   return (
     config.basemaps.find((b) => b.id === requestedId) ?? config.basemaps.find((b) => b.default) ?? config.basemaps[0]
   );
-}
-
-/** True when a Mapbox-hosted style or terrain source is configured, which makes a token mandatory. */
-export function needsMapboxToken(config: MapConfig): boolean {
-  return (
-    config.basemaps.some((b) => b.style.startsWith('mapbox://')) || (config.terrain?.source.startsWith('mapbox://') ?? false)
-  );
-}
-
-/**
- * Mapbox GL v3 draws nothing at all when no access token is set, even for a style that does not use Mapbox (a
- * self-hosted tile server, for example). A token-free deployment therefore passes a placeholder: it is never used to
- * fetch Mapbox resources, and {@link needsMapboxToken} already blocks the map when a real one is required.
- */
-export const TOKEN_PLACEHOLDER = 'pk.token-not-required';
-
-export function accessTokenFor(config: MapConfig): string {
-  return config.mapboxToken || TOKEN_PLACEHOLDER;
 }

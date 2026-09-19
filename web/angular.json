@@ -23,15 +23,14 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "allowedCommonJsDependencies": ["mapbox-gl"],
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
               },
               {
-                "glob": "mapbox-gl.css",
-                "input": "node_modules/mapbox-gl/dist",
+                "glob": "{maplibre-gl.css,maplibre-gl-worker.mjs,maplibre-gl-shared.mjs}",
+                "input": "node_modules/maplibre-gl/dist",
                 "output": "/vendor"
               }
             ],

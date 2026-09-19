@@ -1,4 +1,5 @@
-import type { ExpressionSpecification, GeoJSONSource, Map } from 'mapbox-gl';
+import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
+import type { GeoJSONSource, Map } from 'maplibre-gl';
 import { Contact, HeatField, Range, toGeoJson } from './contacts';
 
 export const CONTACT_SOURCE = 'avw-contacts';
@@ -6,7 +7,7 @@ export const HEAT_LAYER = 'avw-contacts-heat';
 export const POINT_LAYER = 'avw-contacts-points';
 export const SELECTED_LAYER = 'avw-contacts-selected';
 
-// Colours match the style guide tokens in styles.scss; Mapbox paint properties cannot read CSS variables.
+// Colours match the style guide tokens in styles.scss; map paint properties cannot read CSS variables.
 const CONTACT_RED = '#c23a26';
 const PAPER = '#efe7cc';
 const SMOKE_YELLOW = '#e3b92e';

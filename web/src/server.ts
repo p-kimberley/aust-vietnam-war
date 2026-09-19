@@ -5,7 +5,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -21,13 +21,20 @@ app.get('/healthz', (_req, res) => {
 });
 
 /**
- * Serve static files from /browser
+ * Serve static files from /browser. Build output is content-hashed, so it can be cached for a year. Files under
+ * /vendor are copied from node_modules with their original names, so they are revalidated (ETag) instead and an
+ * upgrade of the library is picked up straight away.
  */
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
     index: false,
     redirect: false,
+    setHeaders: (res, filePath) => {
+      if (filePath.includes(`${sep}vendor${sep}`)) {
+        res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+      }
+    },
   }),
 );
 
