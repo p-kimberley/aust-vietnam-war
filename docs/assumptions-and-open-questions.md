@@ -26,7 +26,6 @@ that is easy to flip.
 | 2.6 | `Source_Hyperlink` and `Hidden` **do not exist** in the live index. | The AWM link field is read if present, so it appears once reindexed. | Reindex with the field, or drop the link. |
 | 2.7 | Legacy `?contact-filter=` links are **not** honoured (you said they need not be). | New readable parameters. | n/a |
 | 2.8 | Unit tree labels (for example `D Coy`) come from `Title` + `ShortTypeName`; 34 parent units are synthetic groups named from `Path`. | Built as described in `UnitTreeBuilder`. | n/a |
-
 | 2.9 | **Points of interest**: the legacy map only drew fire support bases (`FSB`, `FSPB`) and hid rows with `Visible = 'N'`. | All `Visible = 'Y'` rows are shown (97 FSB, 14 FSPB and 2 landing zones), on by default, under the contacts. Hidden rows stay in the table but never reach the API. | Change the filter in `PoiEndpoints`, or the default in `showPois`. |
 | 2.10 | POI history text was HTML with external images (Google proxy URLs). | Reduced to plain text on import; images dropped. | Say if the images should be brought over. |
 | 2.11 | 7 legacy POI rows have no name (all hidden fire support bases). | Skipped by the importer and counted in its report. | n/a |
