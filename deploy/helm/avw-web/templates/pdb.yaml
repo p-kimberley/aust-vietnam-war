@@ -1,0 +1,14 @@
+{{- if and .Values.pdb.enabled (gt (int .Values.replicas) 1) }}
+# Keeps one web pod serving while nodes are drained for maintenance.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "avw-web.name" . }}
+  labels:
+    {{- include "avw-web.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "avw-web.selector" . | nindent 6 }}
+{{- end }}

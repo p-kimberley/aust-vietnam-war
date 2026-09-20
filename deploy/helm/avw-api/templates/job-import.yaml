@@ -1,0 +1,99 @@
+{{- if .Values.import.enabled }}
+# A one-off job that copies the legacy community content (and, when the files are supplied, the pictures) into the new database.
+# Not a hook: run it on purpose, for example
+#   helm upgrade avw deploy/helm/avw-api --reuse-values --set import.enabled=true
+# It starts as a dry run that only reports counts; set import.dryRun=false once the counts look right. Repeating it is safe.
+# The name carries the release revision so each run is a new Job (a finished Job cannot be changed).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "avw-api.name" . }}-import-{{ .Release.Revision }}
+  labels:
+    {{- include "avw-api.labels" . | nindent 4 }}
+    app.kubernetes.io/component: import
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        {{- include "avw-api.selector" . | nindent 8 }}
+        app.kubernetes.io/component: import
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: import
+          image: {{ include "avw-api.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["dotnet", "/app/migrator/Avw.Migrator.dll"]
+          args:
+            - {{ .Values.import.command | quote }}
+            {{- if .Values.import.dryRun }}
+            - --dry-run
+            {{- end }}
+            {{- if and (eq .Values.import.command "import-community") (or .Values.import.legacyFiles.existingClaim .Values.import.legacyFiles.nfs.server) }}
+            - --media-root
+            - /legacy-files
+            {{- end }}
+          env:
+            - name: ConnectionStrings__Default
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "avw-api.secretName" . }}
+                  key: ConnectionStrings__Default
+            # The legacy MySQL, reached read-only. Add it to the same secret; it is only needed here.
+            - name: ConnectionStrings__Legacy
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "avw-api.secretName" . }}
+                  key: ConnectionStrings__Legacy
+            {{- if .Values.media.enabled }}
+            - name: Media__RootPath
+              value: {{ .Values.media.mountPath | quote }}
+            {{- end }}
+            - name: Media__ScratchPath
+              value: /scratch
+            - name: TMPDIR
+              value: /scratch
+          resources:
+            requests: { cpu: 200m, memory: 512Mi }
+            limits: { memory: 1Gi }
+          securityContext: {{ include "avw-api.containerSecurity" . | nindent 12 }}
+          volumeMounts:
+            {{- include "avw-api.volumeMounts" . | nindent 12 }}
+            - name: scratch
+              mountPath: /scratch
+            {{- if or .Values.import.legacyFiles.existingClaim .Values.import.legacyFiles.nfs.server }}
+            - name: legacy-files
+              mountPath: /legacy-files
+              readOnly: true
+            {{- end }}
+      volumes:
+        {{- include "avw-api.volumes" . | nindent 8 }}
+        - name: scratch
+          emptyDir:
+            sizeLimit: {{ .Values.import.scratchSize }}
+        {{- if .Values.import.legacyFiles.existingClaim }}
+        - name: legacy-files
+          persistentVolumeClaim:
+            claimName: {{ .Values.import.legacyFiles.existingClaim }}
+            readOnly: true
+        {{- else if .Values.import.legacyFiles.nfs.server }}
+        - name: legacy-files
+          nfs:
+            server: {{ .Values.import.legacyFiles.nfs.server }}
+            path: {{ required "import.legacyFiles.nfs.path is required" .Values.import.legacyFiles.nfs.path }}
+            readOnly: true
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

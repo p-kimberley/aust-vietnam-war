@@ -22,6 +22,10 @@ jobs:
       - run: dotnet restore Avw.slnx
       - run: dotnet build Avw.slnx --no-restore -c Release
       - run: dotnet test Avw.slnx --no-build -c Release
+      - name: Fail on packages with known vulnerabilities
+        run: |
+          dotnet list Avw.slnx package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
+          ! grep -q "has the following vulnerable packages" vulnerable.txt
 
   web:
     runs-on: ubuntu-latest
@@ -38,6 +42,8 @@ jobs:
       - run: npm ci
       - run: npx ng test --watch=false
       - run: npx ng build
+      - name: Fail on high-severity advisories in what ships
+        run: npm audit --omit=dev --audit-level=high
 
   helm:
     runs-on: ubuntu-latest
@@ -52,6 +58,16 @@ jobs:
           done
       - name: Render with the media and scratch volumes enabled
         run: helm template avw deploy/helm/avw-api --set media.enabled=true --set scratch.enabled=true > /dev/null
+      - name: Render the one-off import job, both ways
+        run: |
+          helm template avw deploy/helm/avw-api --set import.enabled=true > /dev/null
+          helm template avw deploy/helm/avw-api --set import.enabled=true --set import.dryRun=false --set import.legacyFiles.existingClaim=legacy-uploads > /dev/null
+      - name: Check the rendered manifests against the Kubernetes schemas
+        run: |
+          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz | tar xz kubeconform
+          for chart in deploy/helm/*/; do
+            helm template avw "$chart" --set import.enabled=true | ./kubeconform -strict -summary -ignore-missing-schemas
+          done
 
   images:
     runs-on: ubuntu-latest

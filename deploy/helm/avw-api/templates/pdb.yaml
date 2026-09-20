@@ -1,0 +1,15 @@
+{{- if and .Values.pdb.enabled (gt (int .Values.api.replicas) 1) }}
+# Keeps one API pod serving while nodes are drained for maintenance.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "avw-api.name" . }}
+  labels:
+    {{- include "avw-api.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "avw-api.selector" . | nindent 6 }}
+      app.kubernetes.io/component: api
+{{- end }}

@@ -13,6 +13,20 @@ apiInternalUrl: http://avw-api
 publicUrl: ""
 
 replicas: 2
+
+# Keeps a pod serving while nodes are drained. Only applies with more than one replica.
+pdb:
+  enabled: true
+  minAvailable: 1
+
+# Content security policy for the site's pages. `report-only` watches without blocking, and the API logs what would have been
+# blocked (search the logs for "CSP"); switch to `enforce` once that has been quiet through a normal week. `off` sends none.
+csp:
+  mode: report-only
+  # Other hosts the map fetches from: the tile server for the basemaps and, if used, the elevation tiles and GeoServer.
+  extraOrigins:
+    - https://tiles.hosting.gradata.com.au
+    - https://s3.amazonaws.com
 resources:
   requests: { cpu: 100m, memory: 128Mi }
   limits: { memory: 384Mi }

@@ -99,6 +99,24 @@ worker:
 migrate:
   enabled: true
 
+# One-off import of the legacy community content (see docs/runbook.md). Off by default; run it on purpose with
+#   helm upgrade avw deploy/helm/avw-api --reuse-values --set import.enabled=true
+# Add ConnectionStrings__Legacy (read-only access to the old MySQL) to the secret first.
+import:
+  enabled: false
+  command: import-community     # or import-poi
+  dryRun: true                  # report counts only; set false to write
+  scratchSize: 2Gi
+  # The legacy incident-media/ folder, mounted read-only, so the pictures can be imported too. Leave both empty to skip pictures.
+  legacyFiles:
+    existingClaim: ""
+    nfs: { server: "", path: "" }
+
+# Keeps a pod serving while nodes are drained. Only applies with more than one API replica.
+pdb:
+  enabled: true
+  minAvailable: 1
+
 service:
   port: 80
 
