@@ -6,6 +6,7 @@
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
       <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" />
+      <button type="button" class="bm__charts" [attr.aria-pressed]="chartsOpen()" (click)="setChartsOpen(!chartsOpen())">Charts</button>
       <span class="bm__count data">
         @if (activeCount()) {
           {{ visible().length }} of {{ allContacts().length }} contacts
@@ -21,6 +22,18 @@
   }
   @if (status() === 'error') {
     <p class="bm__notice bm__notice--error" role="alert">{{ message() }}</p>
+  }
+
+  @if (status() === 'ready') {
+    <div class="bm__timeline">
+      <app-timeline [all]="allContacts()" [visible]="visible()" [from]="filters().from" [to]="filters().to" (rangeChange)="setDateRange($event)" />
+    </div>
+  }
+
+  @if (status() === 'ready' && chartsOpen()) {
+    <div class="bm__analytics">
+      <app-analytics-panel [ids]="visibleIds()" [filtered]="activeCount() > 0" (closed)="setChartsOpen(false)" />
+    </div>
   }
 
   @if (status() === 'ready' && selectedId(); as id) {
@@ -132,6 +145,27 @@
               </label>
             </fieldset>
           }
+
+          <fieldset>
+            <legend>Units</legend>
+            <label>
+              <input type="checkbox" [checked]="showTrack()" (change)="setTrackVisible($any($event.target).checked)" />
+              Follow chosen units
+            </label>
+            @if (showTrack()) {
+              @if (!filters().units.size) {
+                <p class="panel__note">Choose a unit in the Filters tab to see where it went.</p>
+              } @else if (filters().units.size > maxTracks) {
+                <p class="panel__note">That is too many units to follow at once. Choose {{ maxTracks }} or fewer, such as one company or platoon.</p>
+              } @else if (singleTrack(); as t) {
+                <div class="panel__step" role="group" aria-label="Step through the unit's incidents">
+                  <button type="button" (click)="stepTrack(-1)" aria-label="Previous incident">‹</button>
+                  <span class="data">{{ t.stops.length }} incidents</span>
+                  <button type="button" (click)="stepTrack(1)" aria-label="Next incident">›</button>
+                </div>
+              }
+            }
+          </fieldset>
 
           <fieldset>
             <legend>Contacts</legend>

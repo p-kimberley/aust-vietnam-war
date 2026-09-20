@@ -73,12 +73,64 @@
   font-size: 0.9rem;
 }
 
+/* The timeline runs along the bottom; everything else keeps clear of it. */
+.bm {
+  --timeline-h: 9rem;
+}
+
+.bm__timeline {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--timeline-h);
+}
+
+.bm__analytics {
+  position: absolute;
+  z-index: 3;
+  top: 3rem;
+  left: 0.75rem;
+  bottom: calc(var(--timeline-h) + 0.75rem);
+  width: min(40rem, calc(100vw - 1.5rem));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.bm__analytics > * {
+  max-height: 100%;
+}
+
+.bm__charts {
+  padding: 0.2rem 0.75rem;
+  border: 1px solid var(--olive-500);
+  background: var(--olive-700);
+  color: var(--paper);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.bm__charts[aria-pressed='true'] {
+  background: var(--brass);
+  color: var(--ink);
+  border-color: var(--brass);
+}
+
+/* MapLibre's own controls and credit line would otherwise sit under the timeline. */
+:host ::ng-deep .maplibregl-ctrl-bottom-left,
+:host ::ng-deep .maplibregl-ctrl-bottom-right {
+  margin-bottom: var(--timeline-h);
+}
+
 .bm__incident {
   position: absolute;
   z-index: 3;
   top: 3rem;
   right: 0.75rem;
-  bottom: 2.5rem;
+  bottom: calc(var(--timeline-h) + 0.75rem);
   width: min(22rem, calc(100vw - 1.5rem));
 }
 
@@ -114,7 +166,12 @@
     left: 0.75rem;
     width: auto;
     height: 55dvh;
-    bottom: 2.5rem;
+    bottom: calc(var(--timeline-h) + 0.75rem);
+  }
+
+  .bm__analytics {
+    right: 0.75rem;
+    width: auto;
   }
 
   .panel--shifted {
@@ -208,6 +265,25 @@ label {
   align-items: center;
   gap: 0.5rem;
   padding: 0.15rem 0;
+  cursor: pointer;
+}
+
+.panel__step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.panel__step button {
+  width: 2.2rem;
+  padding: 0.1rem 0;
+  border: 1px solid var(--olive-500);
+  background: var(--olive-700);
+  color: var(--paper);
+  font-size: 1.2rem;
+  line-height: 1;
   cursor: pointer;
 }
 

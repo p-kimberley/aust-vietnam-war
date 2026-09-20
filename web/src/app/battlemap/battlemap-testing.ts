@@ -2,6 +2,10 @@ import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
+import { AnalyticsPanel } from './analytics/analytics-panel';
+import { AnalyticsService, ChartInfo, ChartResult } from './analytics/analytics';
+import { stubEchartIn } from './analytics/echart-stub';
+import { Timeline } from './analytics/timeline';
 import { BasemapService, MapHooks } from './basemap.service';
 import { Battlemap } from './battlemap';
 import { Contact, ContactDetail } from './contacts';
@@ -51,11 +55,19 @@ export function fakeMap() {
   const sources = new Set<string>();
   const layers = new Set<string>();
   const setData = vi.fn();
+  // Data set on any source other than the contacts (tracks, points of interest) is recorded per source, so `setData` stays
+  // the record of what the map was told to draw for contacts.
+  const otherData = new Map<string, ReturnType<typeof vi.fn>>();
+  const dataFor = (id: string) => {
+    if (!otherData.has(id)) otherData.set(id, vi.fn());
+    return otherData.get(id)!;
+  };
   return {
     sources,
     layers,
     setData,
-    getSource: (id: string) => (sources.has(id) ? { setData } : undefined),
+    dataFor,
+    getSource: (id: string) => (sources.has(id) ? { setData: id === 'avw-contacts' ? setData : dataFor(id) } : undefined),
     getLayer: (id: string) => (layers.has(id) ? {} : undefined),
     addSource: vi.fn((id: string, _spec?: unknown) => void sources.add(id)),
     addLayer: vi.fn((l: { id: string }) => void layers.add(l.id)),
@@ -103,6 +115,24 @@ export interface RenderOptions {
   queryParams?: Record<string, string | string[]>;
 }
 
+export const CHARTS: ChartInfo[] = [
+  { id: 'battle-damage-date', title: 'Casualties over time', group: 'Casualties', description: 'Killed and wounded each day.', usesFilter: true },
+  { id: 'age-at-death', title: 'Age at death, by service', group: 'Personnel', description: 'Average age at death.', usesFilter: false },
+];
+
+export const CHART: ChartResult = {
+  id: 'battle-damage-date',
+  title: 'Casualties over time',
+  shape: 'Area',
+  x: 'Time',
+  xLabel: 'Date',
+  yLabel: 'Casualties',
+  categories: null,
+  series: [{ name: 'Enemy killed', points: [[Date.UTC(1966, 2, 3), 3], [Date.UTC(1966, 2, 5), 7]] }],
+  rows: 3,
+  note: null,
+};
+
 export async function render(opts: RenderOptions = {}) {
   const basemaps = new FakeBasemapService();
   const fail = (e: Error) => Promise.reject(e);
@@ -134,6 +164,13 @@ export async function render(opts: RenderOptions = {}) {
       { provide: PoiService, useValue: poiService },
     ],
   });
+  const analytics = {
+    charts: vi.fn(() => Promise.resolve(CHARTS)),
+    draw: vi.fn((id: string, _ids: readonly number[] | null) => Promise.resolve({ ...CHART, id })),
+  };
+  TestBed.configureTestingModule({ providers: [{ provide: AnalyticsService, useValue: analytics }] });
+  stubEchartIn(Timeline);
+  stubEchartIn(AnalyticsPanel);
   TestBed.overrideComponent(Battlemap, { set: { providers: [{ provide: BasemapService, useValue: basemaps }] } });
   const fixture = TestBed.createComponent(Battlemap);
   for (const [k, v] of Object.entries(opts.inputs ?? {})) {
@@ -143,7 +180,7 @@ export async function render(opts: RenderOptions = {}) {
   await fixture.whenStable();
   await new Promise((r) => setTimeout(r));
   fixture.detectChanges();
-  return { fixture, basemaps, filterService, poiService, el: fixture.nativeElement as HTMLElement };
+  return { fixture, basemaps, filterService, poiService, analytics, el: fixture.nativeElement as HTMLElement };
 }
 
 /** Lets pending promises and a change-detection pass settle. */

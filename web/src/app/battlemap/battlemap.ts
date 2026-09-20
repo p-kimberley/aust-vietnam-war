@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import type { Map as MapLibreMap } from 'maplibre-gl';
+import { AnalyticsPanel } from './analytics/analytics-panel';
+import { DateRange, Timeline } from './analytics/timeline';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
@@ -33,6 +35,7 @@ import { FiltersPanel, TextStatus } from './filters-panel';
 import { FilterState, MIN_TEXT_LENGTH, NO_FILTERS, activeKeys, applyFilters, fromParams, hasText, toParams } from './filters';
 import { MapConfig, MapConfigService } from './map-config';
 import { Camera, formatAt, parseAt } from './map-url';
+import { MAX_SEPARATE_TRACKS, Track, addTrackLayers, buildTracks, neighbour, setTrackVisibility, setTracks } from './track';
 import { UnitTree } from './unit-tree';
 
 type Status = 'loading' | 'ready' | 'error';
@@ -50,7 +53,7 @@ const SEARCH_DELAY_MS = 400;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, IncidentPanel, PoiPanel, FiltersPanel, SearchBox],
+  imports: [RouterLink, IncidentPanel, PoiPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -65,6 +68,8 @@ export class Battlemap {
   readonly overlays = input<string>();
   readonly incident = input<string>();
   readonly poi = input<string>();
+  readonly charts = input<string>();
+  readonly track = input<string>();
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -94,6 +99,10 @@ export class Battlemap {
   protected readonly showMarkers = signal(true);
   protected readonly heatField = signal<HeatField>(DEFAULT_HEAT_FIELD);
   protected readonly heatFields = HEAT_FIELDS;
+  /** The charts drawer, opened from the top bar. */
+  protected readonly chartsOpen = signal(false);
+  /** Draws the path of each chosen unit, contact by contact in date order. */
+  protected readonly showTrack = signal(false);
   protected readonly canTerrain = computed(() => !!this.config()?.terrain);
 
   // ---- filters
@@ -114,6 +123,12 @@ export class Battlemap {
   });
   protected readonly unitCounts = computed(() => this.tree()?.countContacts(this.allContacts()) ?? new Map<number, number>());
   protected readonly activeCount = computed(() => activeKeys(this.filters()).length);
+  /** The ids the charts are drawn from: what the map shows. */
+  protected readonly visibleIds = computed(() => this.visible().map((c) => c.id));
+  protected readonly tracks = computed<Track[]>(() => (this.showTrack() ? buildTracks(this.visible(), this.filters().units) : []));
+  protected readonly maxTracks = MAX_SEPARATE_TRACKS;
+  /** With exactly one unit followed, its incidents can be stepped through one by one. */
+  protected readonly singleTrack = computed(() => (this.tracks().length === 1 ? this.tracks()[0] : null));
 
   constructor() {
     afterNextRender(() => void this.start());
@@ -199,6 +214,34 @@ export class Battlemap {
     this.syncUrl();
   }
 
+  /** The timeline sets the same date filter as the filter panel does. */
+  protected setDateRange(range: DateRange): void {
+    this.setFilters({ ...this.filters(), from: range.from, to: range.to });
+  }
+
+  protected setChartsOpen(open: boolean): void {
+    this.chartsOpen.set(open);
+    this.syncUrl();
+  }
+
+  /** Opens the previous or next incident of the followed unit, flying to it. */
+  protected stepTrack(direction: 1 | -1): void {
+    const track = this.singleTrack();
+    const next = track ? neighbour(track, this.selectedId(), direction) : null;
+    if (next) {
+      this.openContact(next.id);
+    }
+  }
+
+  protected setTrackVisible(visible: boolean): void {
+    this.showTrack.set(visible);
+    if (this.map) {
+      setTracks(this.map, this.tracks());
+      setTrackVisibility(this.map, visible);
+    }
+    this.syncUrl();
+  }
+
   /** Applies a change from the filter panel: redraws the map, starts a report search if the text changed, updates the URL. */
   protected setFilters(next: FilterState): void {
     const changedText = next.text !== this.filters().text;
@@ -241,6 +284,9 @@ export class Battlemap {
         }
       }
 
+      this.chartsOpen.set(this.charts() === '1');
+      this.showTrack.set(this.track() === '1');
+
       const field = this.field();
       if (field && isHeatField(field)) {
         this.heatField.set(field);
@@ -280,6 +326,7 @@ export class Battlemap {
               markers: this.showMarkers(),
               selectedId: this.selectedId(),
             });
+            addTrackLayers(map, this.tracks(), this.showTrack());
             if (firstStyle) {
               firstStyle = false;
               // Registered in this order so that, where a contact sits on a base, the contact (drawn on top) wins.
@@ -313,6 +360,7 @@ export class Battlemap {
     const shown = this.visible();
     setContacts(map, shown);
     setHeatField(map, this.heatField(), fieldRange(shown, this.heatField()));
+    setTracks(map, this.tracks());
   }
 
   /** Waits for typing to pause, then asks the server which reports contain the words. */
@@ -375,6 +423,8 @@ export class Battlemap {
           overlays: this.basemaps.overlayIds().join(',') || null,
           incident: this.selectedId(),
           poi: this.selectedPoiId(),
+          charts: this.chartsOpen() ? '1' : null,
+          track: this.showTrack() ? '1' : null,
           ...(tree ? toParams(this.filters(), tree) : {}),
         },
         queryParamsHandling: 'merge',
