@@ -374,6 +374,14 @@ public static class CommunityImporter
             var asset = await db.MediaAssets.FirstOrDefaultAsync(m => m.Sha256 == image.Sha256, ct)
                         ?? await AddAssetAsync(db, image, row, uploader, ct);
 
+            // Approval belongs to the file, so an unreviewed submission of a file that is already public would put it on a new
+            // incident or place without anyone having looked at that. It is left out, and an editor can add it by hand.
+            if (row.ApprovalStatus != 1 && asset.Status == MediaStatus.Approved)
+            {
+                report.Skip("not approved, and the same file is already approved elsewhere");
+                continue;
+            }
+
             var (name, hash) = authors.Of(row.Author);
             var contact = row.FeatureId is > 0 ? row.FeatureId : null;
             if (contact is not null && await db.IncidentMedia.AnyAsync(m => m.ContactId == contact && m.MediaId == asset.Id, ct))

@@ -31,8 +31,18 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
     /// MySQL hands back timestamps with no time-zone kind. Everything stored is UTC, so say so on the way out: the JSON
     /// then ends in <c>Z</c> and a browser in any time zone reads the same moment.
     /// </summary>
-    protected override void ConfigureConventions(ModelConfigurationBuilder configuration) =>
+    protected override void ConfigureConventions(ModelConfigurationBuilder configuration)
+    {
         configuration.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+
+        // Oracle's MySQL connector hands back a `date` column as a DateTime and cannot read it as a DateOnly, so a query that returned
+        // any row with a date failed. The column stays a `date`; only what crosses the connector changes.
+        configuration.Properties<DateOnly>().HaveConversion<DateOnlyConverter>().HaveColumnType("date");
+    }
+
+    public sealed class DateOnlyConverter()
+        : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateOnly, DateTime>(
+            v => v.ToDateTime(TimeOnly.MinValue), v => DateOnly.FromDateTime(v));
 
     private sealed class UtcDateTimeConverter()
         : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(

@@ -289,6 +289,22 @@ public sealed class CommunityImporterTests : IDisposable
     }
 
     [Fact]
+    public async Task An_unapproved_submission_of_a_file_that_is_already_approved_is_not_attached_anywhere_new()
+    {
+        using var processor = Processor();
+        var bytes = TestImages.Jpeg(640, 480);
+        var files = new Files(new() { ["a.jpg"] = bytes, ["b.jpg"] = bytes });
+
+        var report = await CommunityImporter.ImportMediaAsync(
+            [Pic(1, "a.jpg", approval: 1), Pic(2, "b.jpg", feature: 200, approval: 0)], [], Authors, files, processor, _db, false, TimeProvider.System);
+
+        Assert.Equal(1, report.Added);
+        Assert.Equal(1, report.Skipped["not approved, and the same file is already approved elsewhere"]);
+        Assert.Equal(100, (await _db.IncidentMedia.SingleAsync()).ContactId);
+        Assert.Equal(MediaStatus.Approved, (await _db.MediaAssets.SingleAsync()).Status);
+    }
+
+    [Fact]
     public async Task A_dry_run_checks_for_the_files_and_stores_nothing()
     {
         using var processor = Processor();

@@ -96,7 +96,9 @@ MySQL 5.6 dump that contains personal data: keep it off shared machines and neve
 4. Run for real with `--set import.dryRun=false`. A second run must report **0 added** (everything "unchanged").
 5. Pictures: copy the old `incident-media/` folder onto a volume, name it in `import.legacyFiles`, and run again. Files that are
    missing are skipped and reported, so it can be repeated as more arrive. The dump lists 353 pictures. Each is checked, straightened,
-   resized to fit 1920x1080, stored as a JPEG under its content hash with a 480 px thumbnail.
+   resized to fit 1920x1080, stored as a JPEG under its content hash with a 480 px thumbnail. Expected: 352 added (one is the same
+   picture twice on an incident), 337 distinct files, about 42 MB. Most (329) have no incident and appear only on the map's
+   picture layer, once that is built.
 6. Portraits for the honour roll are separate: put `<service number>.jpg` files in `portraits/` inside the media volume.
 7. Authors are matched by a hash of their email. Nothing else about them is kept. When they sign in with the same **verified** email
    they see their old notes, comments, tributes and pictures as their own.
@@ -172,8 +174,18 @@ Common problems:
 | Pictures in a box from MySQL, 16 connections | about 5,500 per second, 2 ms median |
 | Home page rendered on the server, 16 connections | about 160 per second, 94 ms median, no errors |
 
-Requests that query Elasticsearch on every call (an incident's details, the honour roll, the charts) were **not** load-tested,
-because that would be load on the production cluster. Do it against a test cluster, or agree a window and a ceiling first.
+Requests that reach Elasticsearch, tested against production read-only in steps up to 8 connections (one API process, laptop):
+
+| Request | At 8 connections |
+|---|---|
+| One incident's details (a document fetch, unique ids) | about 3,800 per second, 2 ms median |
+| Contact text search (a search on every call) | about 600 per second, 12 ms median, 29 ms at the 99th percentile; scales in step with connections |
+| Honour roll search | about 4,000 per second, 2 ms median |
+| Charts | about 900 per second, 2 ms median (they use cached data; the first is slower) |
+
+Nothing failed or slowed as connections rose. That is a small load; it says the code is not the bottleneck, not what the cluster can take.
+Search is limited to 60 a minute per client address (`elasticsearch.searchPermitsPerMinute`), so anything above that gets 429, which is the
+API protecting Elasticsearch. Count response statuses in any test you run.
 
 ## 9. Cutover
 

@@ -58,6 +58,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 - name: Elasticsearch__PersonnelIndex
   value: {{ .Values.elasticsearch.personnelIndex | quote }}
+- name: Elasticsearch__SearchPermitsPerMinute
+  value: {{ .Values.elasticsearch.searchPermitsPerMinute | quote }}
 {{- if .Values.smtp.host }}
 - name: Smtp__Host
   value: {{ .Values.smtp.host | quote }}

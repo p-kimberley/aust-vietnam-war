@@ -18,6 +18,9 @@ elasticsearch:
   contactsIndex: avw_contacts
   # The nominal roll, read for the honour roll and the personnel charts.
   personnelIndex: avw_nomroll
+  # Text searches (contacts, "find", honour roll) reach Elasticsearch on every call, so each client address may make this many a
+  # minute, all kinds together. A school or office behind one address shares it.
+  searchPermitsPerMinute: 60
   # Secret holding the private CA (key ca.crt) that signed the cluster's certificate, for example the public certs
   # secret the Elasticsearch operator publishes. Leave empty when the certificate is publicly trusted.
   caSecret: ""
@@ -122,8 +125,11 @@ service:
 
 ingress:
   enabled: true
-  className: ""
-  annotations: {}               # e.g. cert-manager.io/cluster-issuer: letsencrypt
+  className: nginx
+  annotations:
+    # ingress-nginx refuses request bodies over 1 MB by default, which would reject every picture upload (the limit is 25 MB).
+    nginx.ingress.kubernetes.io/proxy-body-size: 30m
+    # cert-manager.io/cluster-issuer: letsencrypt
   tls:
     enabled: true
     secretName: avw-tls
@@ -146,7 +152,7 @@ scratch:
   mountPath: /var/lib/avw/scratch
   type: ephemeralPvc            # ephemeralPvc | emptyDir
   ephemeralPvc:
-    storageClassName: ""        # e.g. a Ceph RBD class
+    storageClassName: ceph-rbd
     accessModes: [ReadWriteOnce]
     size: 5Gi
   emptyDir: { sizeLimit: 5Gi }  # local development
