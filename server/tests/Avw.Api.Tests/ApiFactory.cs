@@ -90,7 +90,7 @@ public sealed class TestAuthHandler(
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var claims = new List<Claim> { new("sub", "test-sub"), new("name", name.ToString()), new("avw_uid", "42") };
+        var claims = new List<Claim> { new("sub", "test-sub"), new("name", name.ToString()), new("avw_uid", Request.Headers.TryGetValue("X-Test-Uid", out var uid) ? uid.ToString() : "42") };
         foreach (var role in Request.Headers["X-Test-Roles"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
             claims.Add(new Claim("roles", role));

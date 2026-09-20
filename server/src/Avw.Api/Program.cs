@@ -1,6 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Serialization;
 using Avw.Api.Auth;
+using Avw.Api.Cms;
 using Avw.Api.Map;
 using Avw.Data;
 using Microsoft.AspNetCore.DataProtection;
@@ -46,6 +47,7 @@ else if (!builder.Configuration.GetValue<bool>("DataProtection:AllowUnencryptedK
 services.AddSingleton(TimeProvider.System);
 services.AddAvwMap(builder.Configuration);
 services.AddAvwAuth(builder.Environment);
+services.AddAvwCms();
 
 services.AddHealthChecks()
     .AddDbContextCheck<AvwDbContext>("mysql", tags: ["ready"]);
@@ -83,6 +85,7 @@ var api = app.MapGroup("/api");
 api.MapAuthEndpoints();
 api.MapMapEndpoints();
 api.MapPoiEndpoints();
+api.MapCmsEndpoints(builder.Configuration);
 api.MapOpenApi("/openapi/{documentName}.json");
 
 api.MapHealthChecks("/health/live", new() { Predicate = _ => false });
