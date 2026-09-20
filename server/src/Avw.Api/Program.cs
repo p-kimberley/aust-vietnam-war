@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Avw.Api.Auth;
 using Avw.Api.Cms;
 using Avw.Api.Map;
+using Avw.Api.Media;
 using Avw.Data;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -48,6 +49,7 @@ services.AddSingleton(TimeProvider.System);
 services.AddAvwMap(builder.Configuration);
 services.AddAvwAuth(builder.Environment);
 services.AddAvwCms();
+services.AddAvwMedia(builder.Configuration);
 
 services.AddHealthChecks()
     .AddDbContextCheck<AvwDbContext>("mysql", tags: ["ready"]);
@@ -75,6 +77,7 @@ app.UseResponseCompression();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
+app.UseAvwMedia();
 app.UseRateLimiter();
 
 app.UseAuthentication();
@@ -86,6 +89,7 @@ api.MapAuthEndpoints();
 api.MapMapEndpoints();
 api.MapPoiEndpoints();
 api.MapCmsEndpoints(builder.Configuration);
+api.MapMediaEndpoints();
 api.MapOpenApi("/openapi/{documentName}.json");
 
 api.MapHealthChecks("/health/live", new() { Predicate = _ => false });

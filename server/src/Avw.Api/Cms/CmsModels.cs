@@ -11,6 +11,8 @@ public enum CmsError
     Forbidden,
     Conflict,
     Invalid,
+    TooLarge,
+    Unavailable,
 }
 
 /// <summary>The outcome of a CMS operation: a value, or an error the endpoint turns into a status code.</summary>

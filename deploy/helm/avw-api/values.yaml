@@ -95,9 +95,9 @@ ingress:
     enabled: true
     secretName: avw-tls
 
-# Shared final-image volume, mounted in the API and worker. Not used until the media pipeline lands (phase 3).
+# Shared final-image volume, mounted in the API and worker; the API serves it at /media.
 media:
-  enabled: false
+  enabled: true
   mountPath: /var/lib/avw/media
   storage:
     type: pvc                   # pvc | existingClaim | nfs
@@ -109,7 +109,7 @@ media:
 # Per-pod scratch volume for uploads and image processing (API only). Because it is ReadWriteOnce, processing
 # happens in the pod that received the upload.
 scratch:
-  enabled: false
+  enabled: true
   mountPath: /var/lib/avw/scratch
   type: ephemeralPvc            # ephemeralPvc | emptyDir
   ephemeralPvc:

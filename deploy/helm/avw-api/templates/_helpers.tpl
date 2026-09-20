@@ -70,7 +70,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       name: {{ include "avw-api.secretName" . }}
       key: DataProtection__CertificatePassword
 {{- if .Values.media.enabled }}
-- name: Media__Path
+- name: Media__RootPath
   value: {{ .Values.media.mountPath | quote }}
 - name: Media__KeepOriginals
   value: {{ .Values.media.keepOriginals | quote }}

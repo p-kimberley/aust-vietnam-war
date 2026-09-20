@@ -195,7 +195,7 @@ public static class CmsEndpoints
     }
 
     /// <summary>Turns a service outcome into a response. Studio responses are never cached.</summary>
-    private static IResult Respond<T>(CmsResult<T> result, bool created = false)
+    public static IResult Respond<T>(CmsResult<T> result, bool created = false)
     {
         if (result.Ok)
         {
@@ -207,6 +207,8 @@ public static class CmsEndpoints
             CmsError.NotFound => StatusCodes.Status404NotFound,
             CmsError.Forbidden => StatusCodes.Status403Forbidden,
             CmsError.Conflict => StatusCodes.Status409Conflict,
+            CmsError.TooLarge => StatusCodes.Status413PayloadTooLarge,
+            CmsError.Unavailable => StatusCodes.Status503ServiceUnavailable,
             _ => StatusCodes.Status400BadRequest,
         };
 

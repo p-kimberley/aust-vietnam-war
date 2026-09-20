@@ -24,6 +24,24 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     public const string TestScheme = "Test";
     private readonly string _dbName = Guid.NewGuid().ToString();
 
+    /// <summary>A private folder for uploaded pictures, removed with the factory.</summary>
+    public string MediaDir { get; } = Path.Combine(Path.GetTempPath(), "avw-test-" + Guid.NewGuid().ToString("N"));
+
+    /// <summary>Extra settings for a test that needs a different limit, applied on top of the defaults.</summary>
+    public Dictionary<string, string?> Extra { get; } = [];
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        try
+        {
+            Directory.Delete(MediaDir, recursive: true);
+        }
+        catch (IOException)
+        {
+        }
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -40,7 +58,10 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             ["Map:Basemaps:0:Name"] = "Plain",
             ["Map:Basemaps:0:Style"] = "https://tiles.test/styles/plain/style.json",
             ["Map:Basemaps:0:Default"] = "true",
+            ["Media:RootPath"] = Path.Combine(MediaDir, "media"),
+            ["Media:ScratchPath"] = Path.Combine(MediaDir, "scratch"),
         }));
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(Extra));
 
         builder.ConfigureServices(services =>
         {
