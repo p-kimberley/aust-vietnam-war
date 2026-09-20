@@ -140,6 +140,14 @@ The procedures are in `runbook.md`.
 | 7.14 | **Still deferred** (kept deferred, as you said): the air and naval layers (Phase 2b), self-serve profile pages (5.13), chart export (4.9). | Left out. | Say when. |
 | 7.15 | **A local component-style budget warning** (4 kB) was raised to 5 kB because the Battle Map's own style sheet was 14 bytes over. | Done. | `web/angular.json`. |
 
+## Search indexing: keeping Elasticsearch in step with the database
+
+The rest of this section is written when the feature is finished.
+
+| # | Assumption / gap | Default taken | Change it by |
+|---|---|---|---|
+| 8.1 | **OPEN DECISION: what to do with incident note comments.** The old site put each comment inside its note's document in `avw_incident_notes` (a `Comments` list, added by a script when a comment was posted, but never removed when one was deleted). The live index, as it is now, has **no `Comments` field at all** (its mapping has none, and none of the 230 documents has one), and the 46 comments in the 2017 dump are not in it. So the indexer currently sends **no comments**, matching what the live index carries. The choices are: leave comments out; put them in the note document as the old code did (this needs a decision on the field name and shape, and on removing them when deleted or when a moderator removes them); or give them an index of their own. It also matters who reads the index and whether they expect comments. Poppies have the same question: the old site added each to the honour-roll person's document in `avw_nomroll` (a `Tributes` list, including the writer's host address), but the live honour-roll index has no such field on any document, and the API's key for that index is read-only. Poppies are not indexed either. | Not indexed, pending your decision. | Tell me which, and what reads these indexes. |
+
 ## Later phases
 
 Added as the work proceeds.
