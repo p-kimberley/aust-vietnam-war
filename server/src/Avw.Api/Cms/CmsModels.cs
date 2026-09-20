@@ -68,6 +68,7 @@ public sealed record ArticleEdit(
     string AuthorName,
     long? CategoryId,
     long? FeaturedMediaId,
+    string? FeaturedMediaUrl,
     bool FeatureOnHomepage,
     long? ParentId,
     int SortOrder,

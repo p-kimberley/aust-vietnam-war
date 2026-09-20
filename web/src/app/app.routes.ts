@@ -20,7 +20,12 @@ export const routes: Routes = [
     canActivate: [roleGuard('author')],
     title: `Studio · ${site}`,
     loadComponent: () => import('./studio/studio-shell').then((m) => m.StudioShell),
-    children: [{ path: '', loadComponent: () => import('./studio/studio-home').then((m) => m.StudioHome) }],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'articles' },
+      { path: 'articles', pathMatch: 'full', loadComponent: () => import('./studio/studio-articles').then((m) => m.StudioArticles) },
+      { path: 'articles/:id', loadComponent: () => import('./studio/article-editor').then((m) => m.ArticleEditor) },
+      { path: 'media', loadComponent: () => import('./studio/studio-media').then((m) => m.StudioMedia) },
+    ],
   },
   {
     path: '',

@@ -1,15 +1,19 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 
-/** Client-only authoring area for author, editor and admin roles. The editor, media library and moderation land in phase 3. */
+/** Client-only authoring area for author, editor and admin roles: articles and pages, and the picture library. */
 @Component({
   selector: 'app-studio-shell',
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="top">
       <strong class="title">Studio</strong>
+      <nav class="tabs" aria-label="Studio">
+        <a routerLink="/studio/articles" routerLinkActive="is-active">{{ auth.hasRole('editor') ? 'Articles and pages' : 'Your articles' }}</a>
+        <a routerLink="/studio/media" routerLinkActive="is-active">Pictures</a>
+      </nav>
       <span class="grow"></span>
       <a routerLink="/">View site</a>
       <span class="data">{{ auth.user().name }}</span>
@@ -39,6 +43,19 @@ import { AuthService } from '../core/auth.service';
     }
     .grow {
       flex: 1;
+    }
+    .tabs {
+      display: flex;
+      gap: 1rem;
+    }
+    .tabs a {
+      padding-bottom: 0.15rem;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+    }
+    .tabs a.is-active {
+      color: var(--smoke-yellow);
+      border-bottom-color: var(--smoke-yellow);
     }
     .top a {
       color: var(--khaki);

@@ -59,7 +59,7 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
 
     public async Task<CmsResult<ArticleEdit>> GetAsync(long id, Actor actor, CancellationToken ct)
     {
-        var article = await db.Articles.AsNoTracking().Include(a => a.Author).Include(a => a.Tags).ThenInclude(t => t.Tag)
+        var article = await db.Articles.AsNoTracking().Include(a => a.Author).Include(a => a.FeaturedMedia).Include(a => a.Tags).ThenInclude(t => t.Tag)
             .FirstOrDefaultAsync(a => a.Id == id, ct);
         return article is null || !CanSee(article, actor)
             ? CmsResult<ArticleEdit>.Fail(CmsError.NotFound, "There is no such item.")
@@ -360,7 +360,7 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
         actor.IsEditor || article.Kind == ContentKind.Article && article.AuthorId == actor.Id;
 
     private Task<Article?> Load(long id, CancellationToken ct) =>
-        db.Articles.Include(a => a.Tags).ThenInclude(t => t.Tag).Include(a => a.Author).FirstOrDefaultAsync(a => a.Id == id, ct);
+        db.Articles.Include(a => a.Tags).ThenInclude(t => t.Tag).Include(a => a.Author).Include(a => a.FeaturedMedia).FirstOrDefaultAsync(a => a.Id == id, ct);
 
     private static CmsResult<ArticleEdit> Stale() =>
         CmsResult<ArticleEdit>.Fail(CmsError.Conflict, "Someone else has changed this item since you opened it. Reload it to see their changes.");
@@ -554,7 +554,7 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
 
     private static ArticleEdit ToEdit(Article a, Actor actor) => new(
         a.Id, a.Kind, a.Slug, a.Title, a.Excerpt, a.BodyHtml, a.Status, a.AuthorId, a.Author?.DisplayName ?? "",
-        a.CategoryId, a.FeaturedMediaId, a.FeatureOnHomepage, a.ParentId, a.SortOrder, a.SeoTitle, a.SeoDescription,
+        a.CategoryId, a.FeaturedMediaId, a.FeaturedMedia is null ? null : PublicContent.MediaUrl(a.FeaturedMedia.Sha256), a.FeatureOnHomepage, a.ParentId, a.SortOrder, a.SeoTitle, a.SeoDescription,
         a.Tags.Select(t => t.Tag.Name).OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToArray(),
         a.PublishedUtc, a.ScheduledUtc, a.CreatedUtc, a.UpdatedUtc, a.Version, CanEdit(a, actor), Transitions(a, actor));
 
