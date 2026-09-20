@@ -117,6 +117,15 @@ public sealed class CmsEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Searches_titles_summaries_and_text_of_published_articles_only()
+    {
+        Assert.Equal(["coral"], (await Get<Paged<ArticleCard>>("/api/content/articles?q=Balmoral")).Items.Select(a => a.Slug));      // title
+        Assert.Equal(["long-tan"], (await Get<Paged<ArticleCard>>("/api/content/articles?q=Body of Long")).Items.Select(a => a.Slug)); // text
+        Assert.Empty((await Get<Paged<ArticleCard>>("/api/content/articles?q=Draft piece")).Items);                                    // drafts never match
+        Assert.Equal(2, (await Get<Paged<ArticleCard>>("/api/content/articles?q=%20%20")).Total);                                      // blank means no search
+    }
+
+    [Fact]
     public async Task Serves_a_published_article_with_related_reading_and_a_short_shared_cache()
     {
         Seed();
@@ -231,7 +240,7 @@ public sealed class CmsEndpointTests : IDisposable
         Assert.Equal(ArticleStatus.InReview, (await moved.Content.ReadFromJsonAsync<ArticleEdit>(Json))!.Status);
 
         var revisions = await http.SendAsync(Req(HttpMethod.Get, $"/api/studio/articles/{a.Id}/revisions", "author", 1));
-        Assert.Equal(2, (await revisions.Content.ReadFromJsonAsync<List<RevisionSummary>>(Json))!.Count);
+        Assert.Single((await revisions.Content.ReadFromJsonAsync<List<RevisionSummary>>(Json))!);      // both saves were minutes apart at most, so they share a revision
     }
 
     [Fact]
@@ -286,5 +295,116 @@ public sealed class CmsEndpointTests : IDisposable
         var page = (await res.Content.ReadFromJsonAsync<Paged<ArticleRow>>(Json))!;
         Assert.Contains(page.Items, r => r.Slug == "draft-piece");
         Assert.All(page.Items, r => Assert.Equal(ArticleStatus.Draft, r.Status));
+    }
+}
+
+public sealed class FeedbackEndpointTests : IDisposable
+{
+    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    private readonly ApiFactory _factory = new();
+
+    public void Dispose() => _factory.Dispose();
+
+    private Task<HttpResponseMessage> Send(object body, HttpClient? http = null)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post, "/api/feedback") { Content = JsonContent.Create(body) };
+        req.Headers.Add("X-Requested-With", "avw");
+        return (http ?? _factory.CreateClient()).SendAsync(req);
+    }
+
+    private List<FeedbackMessage> Stored()
+    {
+        using var scope = _factory.Services.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<AvwDbContext>().Feedback.ToList();
+    }
+
+    [Fact]
+    public async Task Stores_a_message_with_an_optional_name_and_email()
+    {
+        var res = await Send(new { name = "  Pat ", email = "pat@example.com", message = "  Thank you for the map, it is wonderful.  " });
+
+        Assert.Equal(HttpStatusCode.Accepted, res.StatusCode);
+        var f = Assert.Single(Stored());
+        Assert.Equal(("Pat", "pat@example.com", "Thank you for the map, it is wonderful.", false), (f.Name, f.Email, f.Message, f.Handled));
+
+        Assert.Equal(HttpStatusCode.Accepted, (await Send(new { message = "Anonymous but polite feedback." })).StatusCode);
+        Assert.Equal(2, Stored().Count);
+    }
+
+    [Theory]
+    [InlineData("short", null, "message")]
+    [InlineData("", null, "message")]
+    [InlineData("A perfectly fine message here.", "not-an-email", "email")]
+    [InlineData("A perfectly fine message here.", "a@b", "email")]
+    public async Task Refuses_bad_input_and_says_which_field(string message, string? email, string field)
+    {
+        var res = await Send(new { message, email });
+
+        Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+        Assert.True(JsonDocument.Parse(await res.Content.ReadAsStringAsync()).RootElement.GetProperty("errors").TryGetProperty(field, out _));
+        Assert.Empty(Stored());
+    }
+
+    [Fact]
+    public async Task Refuses_an_over_long_message()
+    {
+        Assert.Equal(HttpStatusCode.BadRequest, (await Send(new { message = new string('x', FeedbackEndpoints.MaxMessage + 1) })).StatusCode);
+    }
+
+    [Fact]
+    public async Task Pretends_to_accept_but_keeps_nothing_when_the_decoy_field_is_filled()
+    {
+        var res = await Send(new { message = "Buy cheap watches at my website now", website = "https://spam.example" });
+
+        Assert.Equal(HttpStatusCode.Accepted, res.StatusCode);
+        Assert.Empty(Stored());
+    }
+
+    [Fact]
+    public async Task Limits_how_often_one_visitor_can_send()
+    {
+        using var limited = new ApiFactory { Extra = { ["Feedback:PermitsPer10Minutes"] = "2" } };
+        var http = limited.CreateClient();
+        var codes = new List<HttpStatusCode>();
+        for (var i = 0; i < 3; i++)
+        {
+            codes.Add((await Send(new { message = $"Message number {i} to the editors." }, http)).StatusCode);
+        }
+
+        Assert.Equal([HttpStatusCode.Accepted, HttpStatusCode.Accepted, HttpStatusCode.TooManyRequests], codes);
+    }
+
+    [Fact]
+    public async Task Only_editors_can_read_the_inbox_and_mark_messages_handled()
+    {
+        await Send(new { message = "Please correct the date of the battle." });
+        var http = _factory.CreateClient();
+        HttpRequestMessage Studio(HttpMethod method, string url, string? role, object? body = null)
+        {
+            var req = new HttpRequestMessage(method, url);
+            req.Headers.Add("X-Requested-With", "avw");
+            if (role is not null)
+            {
+                req.Headers.Add("X-Test-User", "T");
+                req.Headers.Add("X-Test-Roles", role);
+            }
+
+            if (body is not null)
+            {
+                req.Content = JsonContent.Create(body);
+            }
+
+            return req;
+        }
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await http.SendAsync(Studio(HttpMethod.Get, "/api/studio/feedback", "author"))).StatusCode);
+
+        var list = await http.SendAsync(Studio(HttpMethod.Get, "/api/studio/feedback", "editor"));
+        var rows = (await list.Content.ReadFromJsonAsync<List<FeedbackRow>>(Json))!;
+        Assert.Equal(["Please correct the date of the battle."], rows.Select(r => r.Message));
+
+        var marked = await http.SendAsync(Studio(HttpMethod.Post, $"/api/studio/feedback/{rows[0].Id}/handled", "editor", new { handled = true }));
+        Assert.True((await marked.Content.ReadFromJsonAsync<FeedbackRow>(Json))!.Handled);
+        Assert.Equal(HttpStatusCode.NotFound, (await http.SendAsync(Studio(HttpMethod.Post, "/api/studio/feedback/999/handled", "editor", new { handled = true }))).StatusCode);
     }
 }

@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Seo } from '../core/seo.service';
 import { ArticleCardView } from './article-card';
 import { ArticleCard, CategoryView, Paged } from './content';
@@ -15,6 +15,12 @@ const PAGE_SIZE = 12;
   template: `
     <div class="wrap page">
       <h1>Stories</h1>
+
+      <form class="search" role="search" (submit)="$event.preventDefault(); search(box.value)">
+        <label class="visually-hidden" for="story-search">Search stories</label>
+        <input #box id="story-search" type="search" [value]="q() ?? ''" placeholder="Search stories" maxlength="100" />
+        <button class="btn" type="submit">Search</button>
+      </form>
 
       @if (categories.value().length) {
         <nav class="filters" aria-label="Categories">
@@ -47,7 +53,7 @@ const PAGE_SIZE = 12;
             </nav>
           }
         } @else {
-          <p>No stories have been published here yet.</p>
+          <p>{{ q() ? 'No stories match “' + q() + '”.' : 'No stories have been published here yet.' }}</p>
         }
       } @else {
         <p class="data" aria-live="polite">Loading…</p>
@@ -57,6 +63,17 @@ const PAGE_SIZE = 12;
   styles: `
     .page {
       padding-block: 2.5rem;
+    }
+    .search {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      max-width: 28rem;
+    }
+    .search input {
+      flex: 1;
+      padding: 0.5rem;
+      font: inherit;
     }
     .filters {
       display: flex;
@@ -94,15 +111,17 @@ const PAGE_SIZE = 12;
 })
 export class ArticleList {
   readonly category = input<string | undefined>();
+  readonly q = input<string | undefined>();
   readonly page = input<string | undefined>();
 
   private readonly seo = inject(Seo);
+  private readonly router = inject(Router);
 
   protected readonly current = computed(() => Math.max(1, Number.parseInt(this.page() ?? '1', 10) || 1));
 
   protected readonly articles = httpResource<Paged<ArticleCard>>(() => ({
     url: '/api/content/articles',
-    params: { pageSize: PAGE_SIZE, page: this.current(), ...(this.category() ? { category: this.category()! } : {}) },
+    params: { pageSize: PAGE_SIZE, page: this.current(), ...(this.category() ? { category: this.category()! } : {}), ...(this.q() ? { q: this.q()! } : {}) },
   }));
   protected readonly categories = httpResource<CategoryView[]>(() => '/api/content/categories', { defaultValue: [] });
 
@@ -122,7 +141,11 @@ export class ArticleList {
     });
   }
 
+  protected search(text: string): void {
+    void this.router.navigate(['/articles'], { queryParams: { q: text.trim() || null, category: this.category() ?? null } });
+  }
+
   protected link(page: number): Record<string, string | null> {
-    return { category: this.category() ?? null, page: page > 1 ? String(page) : null };
+    return { category: this.category() ?? null, q: this.q() ?? null, page: page > 1 ? String(page) : null };
   }
 }

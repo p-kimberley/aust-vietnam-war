@@ -21,6 +21,9 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
     public const int MaxPageDepth = 5;
     private const int ExcerptChars = 200;
 
+    /// <summary>How long one person's saves are folded into a single revision.</summary>
+    public static readonly TimeSpan RevisionWindow = TimeSpan.FromMinutes(10);
+
     /// <summary>What may follow each status. Editors may take any of these; authors only the first two rows, on their own items.</summary>
     private static readonly Dictionary<ArticleStatus, ArticleStatus[]> Next = new()
     {
@@ -171,7 +174,7 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
 
         if (article.Title != oldTitle || article.BodyHtml != oldBody)
         {
-            AddRevision(article, actor, await NextRevisionNo(article.Id, ct));
+            await RecordRevisionAsync(article, actor, ct);
         }
 
         Touch(article);
@@ -369,6 +372,25 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
     {
         article.UpdatedUtc = clock.GetUtcNow().UtcDateTime;
         article.Version++;
+    }
+
+    /// <summary>
+    /// Autosave saves every few seconds of pause, so a revision per save would bury the history. Saves by the same person
+    /// within <see cref="RevisionWindow"/> of the revision's start update it in place; the next save after that starts a
+    /// new one. Restoring an old version is a deliberate act and always starts a new revision.
+    /// </summary>
+    private async Task RecordRevisionAsync(Article article, Actor actor, CancellationToken ct)
+    {
+        var now = clock.GetUtcNow().UtcDateTime;
+        var last = await db.ArticleRevisions.OrderByDescending(r => r.RevisionNo).FirstOrDefaultAsync(r => r.ArticleId == article.Id, ct);
+        if (last is not null && last.CreatedById == actor.Id && now - last.CreatedUtc < RevisionWindow)
+        {
+            last.Title = article.Title;
+            last.BodyHtml = article.BodyHtml;
+            return;
+        }
+
+        AddRevision(article, actor, (last?.RevisionNo ?? 0) + 1);
     }
 
     private async Task<int> NextRevisionNo(long articleId, CancellationToken ct) =>

@@ -8,7 +8,7 @@ import { PageView, isNotFound } from './content';
 import { CmsBody } from './cms-body';
 
 /** First path segments that belong to the application or its infrastructure, never to an authored page. */
-const RESERVED = new Set(['api', 'studio', 'battlemap', 'articles', 'media', 'forbidden', 'feed.xml', 'sitemap.xml', 'vendor', 'assets']);
+const RESERVED = new Set(['api', 'studio', 'battlemap', 'articles', 'media', 'forbidden', 'feedback', 'feed.xml', 'sitemap.xml', 'vendor', 'assets']);
 
 /** Matches any non-reserved path and hands the whole thing to the page as `path` (for example `about/team`). */
 export const cmsPageMatcher: UrlMatcher = (segments) => {

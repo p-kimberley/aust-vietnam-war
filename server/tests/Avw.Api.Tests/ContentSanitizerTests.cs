@@ -116,6 +116,13 @@ public class ContentSanitizerTests
     [Fact]
     public void A_frame_with_no_source_is_removed() => Assert.Equal("<p>t</p>", Clean("<iframe></iframe><p>t</p>"));
 
+    [Theory]
+    [InlineData("<p>Text</p><p></p>", "<p>Text</p>")]
+    [InlineData("<ul><li><p>One</p></li></ul><p><br></p><p> </p>", "<ul><li><p>One</p></li></ul>")]
+    [InlineData("<p>One</p><p></p><p>Two</p>", "<p>One</p><p></p><p>Two</p>")]      // a deliberate gap in the middle is left alone
+    [InlineData("<p></p>", "")]
+    public void Drops_the_empty_paragraph_an_editor_leaves_at_the_end(string html, string expected) => Assert.Equal(expected, Clean(html));
+
     [Fact]
     public void Turns_a_body_h1_into_an_h2_because_the_title_is_the_h1()
     {

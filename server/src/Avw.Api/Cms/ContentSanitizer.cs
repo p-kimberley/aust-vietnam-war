@@ -13,7 +13,7 @@ namespace Avw.Api.Cms;
 /// <c>mailto</c>; images may only be <c>https</c> or site-relative (never <c>data:</c>); and frames survive only for the
 /// approved video hosts. External links are hardened with <c>rel="noopener noreferrer"</c>.
 /// </remarks>
-public sealed class ContentSanitizer
+public sealed partial class ContentSanitizer
 {
     /// <summary>Hosts whose embeds are allowed. Privacy-enhanced YouTube and Vimeo's player only.</summary>
     public static readonly string[] EmbedHosts = ["www.youtube-nocookie.com", "player.vimeo.com"];
@@ -31,6 +31,9 @@ public sealed class ContentSanitizer
 
     private readonly HtmlSanitizer _sanitizer = Build();
 
+    [System.Text.RegularExpressions.GeneratedRegex(@"(<p>\s*(<br>)?\s*</p>\s*)+$")]
+    private static partial System.Text.RegularExpressions.Regex TrailingEmptyParagraphs();
+
     /// <summary>Returns safe HTML for <paramref name="html"/>. Null and blank input give an empty string.</summary>
     public string Sanitize(string? html)
     {
@@ -41,7 +44,8 @@ public sealed class ContentSanitizer
 
         // The page title is the h1, so a body h1 becomes an h2 rather than losing its text.
         html = System.Text.RegularExpressions.Regex.Replace(html, @"<(/?)h1(?=[\s>/])", "<$1h2", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        return _sanitizer.Sanitize(html).Trim();
+        // The editor leaves an empty paragraph after the last block so there is somewhere to click; it is not content.
+        return TrailingEmptyParagraphs().Replace(_sanitizer.Sanitize(html).Trim(), "").Trim();
     }
 
     private static HtmlSanitizer Build()

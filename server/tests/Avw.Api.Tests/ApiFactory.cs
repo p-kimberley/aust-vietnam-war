@@ -61,7 +61,11 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             ["Media:RootPath"] = Path.Combine(MediaDir, "media"),
             ["Media:ScratchPath"] = Path.Combine(MediaDir, "scratch"),
         }));
-        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(Extra));
+        // Host settings, because Program.cs reads some values eagerly, before app configuration is added.
+        foreach (var (key, value) in Extra)
+        {
+            builder.UseSetting(key, value);
+        }
 
         builder.ConfigureServices(services =>
         {

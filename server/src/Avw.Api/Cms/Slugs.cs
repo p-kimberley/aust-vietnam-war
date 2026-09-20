@@ -10,7 +10,7 @@ public static class Slugs
 
     /// <summary>First path segments that belong to the application, so a top-level page cannot shadow them.</summary>
     public static readonly string[] Reserved =
-        ["api", "studio", "battlemap", "articles", "media", "forbidden", "feed", "sitemap", "login", "logout", "vendor", "assets"];
+        ["api", "studio", "battlemap", "articles", "media", "forbidden", "feed", "sitemap", "login", "logout", "vendor", "assets", "feedback"];
 
     public static string From(string? text)
     {

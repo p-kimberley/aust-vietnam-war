@@ -25,6 +25,7 @@ export const routes: Routes = [
       { path: 'articles', pathMatch: 'full', loadComponent: () => import('./studio/studio-articles').then((m) => m.StudioArticles) },
       { path: 'articles/:id', loadComponent: () => import('./studio/article-editor').then((m) => m.ArticleEditor) },
       { path: 'media', loadComponent: () => import('./studio/studio-media').then((m) => m.StudioMedia) },
+      { path: 'feedback', canActivate: [roleGuard('editor')], loadComponent: () => import('./studio/studio-feedback').then((m) => m.StudioFeedback) },
     ],
   },
   {
@@ -34,6 +35,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', title: site, loadComponent: () => import('./pages/home').then((m) => m.Home) },
       { path: 'articles', pathMatch: 'full', loadComponent: () => import('./content/article-list').then((m) => m.ArticleList) },
       { path: 'articles/:slug', loadComponent: () => import('./content/article-page').then((m) => m.ArticlePage) },
+      { path: 'feedback', loadComponent: () => import('./pages/feedback').then((m) => m.Feedback) },
       { path: 'forbidden', title: `Not permitted · ${site}`, loadComponent: () => import('./pages/forbidden').then((m) => m.Forbidden) },
       // Anything else is looked up as an authored page; the page shows Not found (and a 404 status) if there is none.
       { matcher: cmsPageMatcher, loadComponent: () => import('./content/cms-page').then((m) => m.CmsPage) },

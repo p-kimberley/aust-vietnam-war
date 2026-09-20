@@ -52,6 +52,7 @@ public sealed record SitemapEntry(string Path, DateTime UpdatedUtc);
 public sealed class PublicContent(AvwDbContext db, TimeProvider clock)
 {
     public const int MaxPageSize = 50;
+    public const int MaxSearchChars = 100;
 
     /// <summary>Where a media asset is served from: <c>/media/&lt;first two hex&gt;/&lt;sha256&gt;.jpg</c> (see docs/rebuild-plan.md, section 6).</summary>
     public static string MediaUrl(string sha256) => $"/media/{sha256[..2]}/{sha256}.jpg";
@@ -63,7 +64,7 @@ public sealed class PublicContent(AvwDbContext db, TimeProvider clock)
             .Where(a => a.Kind == kind && a.Status == ArticleStatus.Published && a.PublishedUtc != null && a.PublishedUtc <= now);
     }
 
-    public async Task<Paged<ArticleCard>> ArticlesAsync(string? category, string? tag, bool? featured, int page, int pageSize, CancellationToken ct)
+    public async Task<Paged<ArticleCard>> ArticlesAsync(string? category, string? tag, bool? featured, int page, int pageSize, CancellationToken ct, string? text = null)
     {
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, MaxPageSize);
@@ -82,6 +83,12 @@ public sealed class PublicContent(AvwDbContext db, TimeProvider clock)
         if (featured is true)
         {
             q = q.Where(a => a.FeatureOnHomepage);
+        }
+
+        if (text?.Trim() is { Length: > 0 } needle)
+        {
+            needle = needle.Length > MaxSearchChars ? needle[..MaxSearchChars] : needle;
+            q = q.Where(a => a.Title.Contains(needle) || (a.Excerpt != null && a.Excerpt.Contains(needle)) || a.BodyHtml.Contains(needle));
         }
 
         var total = await q.CountAsync(ct);

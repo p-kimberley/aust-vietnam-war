@@ -14,6 +14,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
     public DbSet<Poi> Pois => Set<Poi>();
+    public DbSet<FeedbackMessage> Feedback => Set<FeedbackMessage>();
 
     /// <summary>Shared ASP.NET Data Protection keys, so every API replica can read the auth cookie.</summary>
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -50,6 +51,15 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.Name).HasMaxLength(100);
             e.Property(x => x.Details).HasColumnType("text");
             e.HasIndex(x => x.Visible);
+        });
+
+        b.Entity<FeedbackMessage>(e =>
+        {
+            e.ToTable("feedback");
+            e.Property(x => x.Name).HasMaxLength(100);
+            e.Property(x => x.Email).HasMaxLength(200);
+            e.Property(x => x.Message).HasMaxLength(2000);
+            e.HasIndex(x => new { x.Handled, x.CreatedUtc });
         });
 
         b.Entity<Category>(e =>

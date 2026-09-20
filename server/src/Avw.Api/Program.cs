@@ -49,6 +49,7 @@ services.AddSingleton(TimeProvider.System);
 services.AddAvwMap(builder.Configuration);
 services.AddAvwAuth(builder.Environment);
 services.AddAvwCms();
+services.AddAvwFeedback(builder.Configuration);
 services.AddAvwMedia(builder.Configuration);
 
 services.AddHealthChecks()
@@ -90,6 +91,7 @@ api.MapMapEndpoints();
 api.MapPoiEndpoints();
 api.MapCmsEndpoints(builder.Configuration);
 api.MapMediaEndpoints();
+api.MapFeedbackEndpoints();
 api.MapOpenApi("/openapi/{documentName}.json");
 
 api.MapHealthChecks("/health/live", new() { Predicate = _ => false });

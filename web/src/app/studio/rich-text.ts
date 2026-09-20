@@ -161,6 +161,9 @@ type Bar = 'link' | 'video' | null;
     .rt__body .tiptap h3 {
       margin: 1.4em 0 0.4em;
     }
+    .rt__body .tiptap li > p {
+      margin: 0.2em 0;
+    }
     .rt__body .tiptap blockquote {
       margin-inline: 0;
       padding-left: 1rem;

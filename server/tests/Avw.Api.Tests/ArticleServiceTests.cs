@@ -27,7 +27,8 @@ public class ArticleServiceTests
         db.Users.AddRange(
             new AppUser { Id = 1, Subject = "a", DisplayName = "Ann Author" },
             new AppUser { Id = 2, Subject = "b", DisplayName = "Bo Author" },
-            new AppUser { Id = 3, Subject = "e", DisplayName = "Ed Editor" });
+            new AppUser { Id = 3, Subject = "e", DisplayName = "Ed Editor" },
+            new AppUser { Id = 4, Subject = "f", DisplayName = "Flo Editor" });
         db.SaveChanges();
         var clock = new Clock(T0);
         return new Fixture(db, new ArticleService(db, new ContentSanitizer(), clock), clock);
@@ -354,6 +355,7 @@ public class ArticleServiceTests
         var a = await Create(f, Editor);
 
         var same = (await f.Svc.UpdateAsync(a.Id, Input(version: a.Version, feature: true), Editor, default)).Value!;       // only a flag changed
+        f.Clock.Now = T0 + ArticleService.RevisionWindow + TimeSpan.FromMinutes(1);
         var text = (await f.Svc.UpdateAsync(a.Id, Input(body: "<p>New text.</p>", version: same.Version), Editor, default)).Value!;
 
         Assert.Equal((2, 3), (same.Version, text.Version));
@@ -362,10 +364,41 @@ public class ArticleServiceTests
     }
 
     [Fact]
+    public async Task Autosaves_by_the_same_person_shortly_after_each_other_share_one_revision()
+    {
+        var f = Make();
+        var a = await Create(f, Author, Input(body: "<p>One.</p>"));
+
+        var second = (await f.Svc.UpdateAsync(a.Id, Input(body: "<p>One. Two.</p>", version: a.Version), Author, default)).Value!;
+        f.Clock.Now = T0.AddMinutes(9);
+        var third = (await f.Svc.UpdateAsync(a.Id, Input(body: "<p>One. Two. Three.</p>", version: second.Version), Author, default)).Value!;
+
+        Assert.Equal(3, third.Version);                                            // every save is still a new version of the record
+        var revisions = (await f.Svc.RevisionsAsync(a.Id, Author, default)).Value!;
+        Assert.Single(revisions);
+        Assert.Equal("<p>One. Two. Three.</p>", (await f.Svc.RevisionAsync(a.Id, 1, Author, default)).Value!.BodyHtml);
+    }
+
+    [Fact]
+    public async Task A_save_after_the_window_or_by_someone_else_starts_a_new_revision()
+    {
+        var f = Make();
+        var a = await Create(f, Editor, Input(body: "<p>One.</p>"));
+
+        var byOther = (await f.Svc.UpdateAsync(a.Id, Input(body: "<p>Two.</p>", version: a.Version), new Actor(4, true), default)).Value!;
+        f.Clock.Now = T0 + ArticleService.RevisionWindow + TimeSpan.FromSeconds(1);
+        var later = (await f.Svc.UpdateAsync(a.Id, Input(body: "<p>Three.</p>", version: byOther.Version), new Actor(4, true), default)).Value!;
+
+        Assert.Equal([3, 2, 1], (await f.Svc.RevisionsAsync(a.Id, Editor, default)).Value!.Select(r => r.RevisionNo));
+        Assert.Equal(3, later.Version);
+    }
+
+    [Fact]
     public async Task Restores_an_old_revision_as_a_new_one()
     {
         var f = Make();
         var a = await Create(f, Editor, Input("Original", "<p>First.</p>"));
+        f.Clock.Now = T0 + ArticleService.RevisionWindow + TimeSpan.FromMinutes(1);
         var b = (await f.Svc.UpdateAsync(a.Id, Input("Changed", "<p>Second.</p>", a.Version), Editor, default)).Value!;
 
         var restored = (await f.Svc.RestoreAsync(a.Id, 1, new(b.Version), Editor, default)).Value!;

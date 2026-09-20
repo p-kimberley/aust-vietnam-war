@@ -607,3 +607,32 @@ describe('MediaLibrary', () => {
     expect(el.querySelector('h2')?.textContent).toBe('Choose a picture');
   });
 });
+
+describe('StudioFeedback', () => {
+  it('lists messages with a reply link and lets an editor mark them done', async () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()] });
+    const ctl = TestBed.inject(HttpTestingController);
+    const { StudioFeedback } = await import('./studio-feedback');
+    const fixture = TestBed.createComponent(StudioFeedback);
+    fixture.detectChanges();
+    const row = { id: 4, name: null, email: 'pat@example.com', message: 'The date is wrong.', createdUtc: '2026-03-01T00:00:00Z', handled: false };
+    ctl.expectOne('/api/studio/feedback').flush([row]);
+    await wait();
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+
+    expect(el.textContent).toContain('Anonymous');
+    expect(el.textContent).toContain('The date is wrong.');
+    expect(el.querySelector('a')?.getAttribute('href')).toBe('mailto:pat@example.com');
+
+    el.querySelector<HTMLButtonElement>('button')!.click();
+    const req = ctl.expectOne('/api/studio/feedback/4/handled');
+    expect(req.request.body).toEqual({ handled: true });
+    req.flush({ ...row, handled: true });
+    await wait();
+    fixture.detectChanges();
+    expect(el.querySelector('.item.is-done')).not.toBeNull();
+    expect(el.textContent).toContain('Mark as not done');
+  });
+});

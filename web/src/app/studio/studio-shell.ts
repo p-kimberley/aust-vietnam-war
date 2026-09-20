@@ -13,6 +13,9 @@ import { AuthService } from '../core/auth.service';
       <nav class="tabs" aria-label="Studio">
         <a routerLink="/studio/articles" routerLinkActive="is-active">{{ auth.hasRole('editor') ? 'Articles and pages' : 'Your articles' }}</a>
         <a routerLink="/studio/media" routerLinkActive="is-active">Pictures</a>
+        @if (auth.hasRole('editor')) {
+          <a routerLink="/studio/feedback" routerLinkActive="is-active">Feedback</a>
+        }
       </nav>
       <span class="grow"></span>
       <a routerLink="/">View site</a>

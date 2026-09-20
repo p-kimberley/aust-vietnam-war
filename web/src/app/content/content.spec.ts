@@ -2,8 +2,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { RESPONSE_INIT, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UrlSegment, provideRouter } from '@angular/router';
-import { describe, expect, it } from 'vitest';
+import { Router, UrlSegment, provideRouter } from '@angular/router';
+import { describe, expect, it, vi } from 'vitest';
 import { SITE_URL, Seo } from '../core/seo.service';
 import { ArticleList } from './article-list';
 import { ArticlePage } from './article-page';
@@ -97,7 +97,7 @@ describe('cmsPageMatcher', () => {
   });
 
   it('leaves the application and infrastructure paths alone, and the home page', () => {
-    for (const reserved of ['api', 'studio', 'battlemap', 'articles', 'media', 'forbidden', 'feed.xml', 'sitemap.xml', 'vendor', 'assets']) {
+    for (const reserved of ['api', 'studio', 'battlemap', 'articles', 'media', 'forbidden', 'feedback', 'feed.xml', 'sitemap.xml', 'vendor', 'assets']) {
       expect(match(reserved, 'x'), reserved).toBeNull();
     }
     expect(match()).toBeNull();
@@ -234,6 +234,35 @@ describe('ArticleList', () => {
     expect(pager.querySelector('a[rel=prev]')).not.toBeNull();
     expect(pager.querySelector('a[rel=next]')).not.toBeNull();
     expect(document.title).toBe("Stories: Battles · Australia's Vietnam War");
+  });
+
+  it('searches by the text in the address, and says when nothing matches', async () => {
+    const ctl = setup();
+    const fixture = TestBed.createComponent(ArticleList);
+    fixture.componentRef.setInput('q', 'claymore');
+
+    const list = await nextRequest(fixture, ctl, (u) => u === '/api/content/articles');
+    expect(list.request.params.get('q')).toBe('claymore');
+    list.flush({ items: [], total: 0, page: 1, pageSize: 12 });
+    (await nextRequest(fixture, ctl, (u) => u === '/api/content/categories')).flush([]);
+    const el = await settled(fixture);
+
+    expect(el.textContent).toContain('No stories match “claymore”.');
+    expect(el.querySelector<HTMLInputElement>('input[type=search]')!.value).toBe('claymore');
+  });
+
+  it('goes to the results when a search is made', async () => {
+    const ctl = setup();
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const fixture = TestBed.createComponent(ArticleList);
+    (await nextRequest(fixture, ctl, (u) => u === '/api/content/articles')).flush({ items: [], total: 0, page: 1, pageSize: 12 });
+    (await nextRequest(fixture, ctl, (u) => u === '/api/content/categories')).flush([]);
+    const el = await settled(fixture);
+
+    el.querySelector<HTMLInputElement>('input[type=search]')!.value = '  Long Tan ';
+    el.querySelector<HTMLFormElement>('form.search')!.dispatchEvent(new Event('submit', { cancelable: true }));
+
+    expect(navigate).toHaveBeenCalledWith(['/articles'], { queryParams: { q: 'Long Tan', category: null } });
   });
 
   it('says so when nothing has been published', async () => {

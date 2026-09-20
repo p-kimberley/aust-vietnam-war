@@ -31,6 +31,9 @@ import { DomSanitizer } from '@angular/platform-browser';
       font-size: 1.1rem;
       text-transform: uppercase;
     }
+    .prose li > p {
+      margin: 0.2em 0;
+    }
     .prose blockquote {
       margin: 1.5em 0;
       padding: 0.25em 1.25em;

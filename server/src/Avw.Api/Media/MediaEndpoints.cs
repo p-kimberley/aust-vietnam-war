@@ -2,8 +2,6 @@ using System.Threading.RateLimiting;
 using Avw.Api.Auth;
 using Avw.Api.Cms;
 using Avw.Data.Entities;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
@@ -74,7 +72,17 @@ public static class MediaEndpoints
                     return Results.Problem(detail: "Send the picture as a multipart form.", statusCode: StatusCodes.Status415UnsupportedMediaType);
                 }
 
-                var form = await ctx.Request.ReadFormAsync(ct);
+                IFormCollection form;
+                try
+                {
+                    form = await ctx.Request.ReadFormAsync(ct);
+                }
+                catch (InvalidDataException)
+                {
+                    // The multipart body was longer than the limit set in AddAvwMedia.
+                    return Results.Problem(detail: "That file is too large.", statusCode: StatusCodes.Status413PayloadTooLarge, extensions: new Dictionary<string, object?> { ["field"] = "file" });
+                }
+
                 if (form.Files.Count != 1)
                 {
                     return Results.Problem(detail: "Send exactly one picture.", statusCode: StatusCodes.Status400BadRequest, extensions: new Dictionary<string, object?> { ["field"] = "file" });

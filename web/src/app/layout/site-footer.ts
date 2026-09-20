@@ -18,6 +18,7 @@ import { SiteNav } from '../content/content';
           }
           <a routerLink="/articles">Stories</a>
           <a routerLink="/battlemap">Battle Map</a>
+          <a routerLink="/feedback">Feedback</a>
           <a href="/feed.xml">RSS</a>
         </nav>
       </div>

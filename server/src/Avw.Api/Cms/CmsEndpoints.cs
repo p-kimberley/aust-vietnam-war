@@ -32,10 +32,10 @@ public static class CmsEndpoints
         var g = api.MapGroup("/content").WithTags("Content");
 
         // Short shared caching: a publish shows within a minute, and a burst of readers costs one query.
-        g.MapGet("/articles", async (PublicContent content, HttpContext ctx, string? category, string? tag, bool? featured, int? page, int? pageSize, CancellationToken ct) =>
+        g.MapGet("/articles", async (PublicContent content, HttpContext ctx, string? category, string? tag, bool? featured, string? q, int? page, int? pageSize, CancellationToken ct) =>
             {
                 ctx.Response.Headers.CacheControl = PublicCache;
-                return await content.ArticlesAsync(category, tag, featured, page ?? 1, pageSize ?? 12, ct);
+                return await content.ArticlesAsync(category, tag, featured, page ?? 1, pageSize ?? 12, ct, q);
             })
             .WithName("GetArticles")
             .Produces<Paged<ArticleCard>>();
