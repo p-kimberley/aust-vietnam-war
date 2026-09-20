@@ -28,7 +28,7 @@ services:
       AVW_CLIENT_SECRET: avw-dev-secret
     ports: ["8080:8080"]
     volumes:
-      - ../helm/avw-keycloak/files/avw-realm.json:/opt/keycloak/data/import/avw-realm.json:ro
+      - ../keycloak/avw-realm.json:/opt/keycloak/data/import/avw-realm.json:ro
 
 volumes:
   mysql-data:

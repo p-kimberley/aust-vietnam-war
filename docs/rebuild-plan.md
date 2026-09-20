@@ -84,7 +84,7 @@ avw-worker (1 replica): scheduled publishing, search sync, orphan sweeps
 - Data Protection keys are shared across API replicas (persisted, not per-pod).
 - Roles: `member` (self-registered: notes, photos, tributes), `author` (writes and submits articles), `editor` (reviews, publishes, moderates), `admin` (settings). Roles are assigned in Keycloak; nobody is pre-created. **MFA is required for author and above.**
 - Registration needs email verification plus a bot check (the old site had a real spam problem).
-- The realm, clients and roles are declared in a `KeycloakRealmImport` resource in the Helm chart.
+- The realm, clients and roles are declared in `deploy/keycloak/avw-realm.json`. Local development imports it directly; in the cluster it is applied through the Keycloak operator that already runs there (there is no chart for it). Placeholders: `${AVW_PUBLIC_URL}` and `${AVW_CLIENT_SECRET}`.
 - **Legacy authors:** notes and media keep a stored display name and a hash of the author's email (no plaintext email). When someone registers or logs in with a verified matching email, their old content is linked to them, so they can edit and delete their own notes.
 - Notification recipients (new pending notes) come from Keycloak role membership via a cached service-account query. The API sends email directly by SMTP; Keycloak sends its own verification and reset email.
 
@@ -202,7 +202,7 @@ podSecurityContext: { fsGroup: 1654 }   # .NET images run as UID 1654; adjust fo
 
 - Two charts: **`avw-api`** (API, worker, EF migration job) and **`avw-web`** (Angular SSR). MySQL, Elasticsearch, Keycloak and GeoServer are external, configured through values and secrets.
 - Ingress on one host with path routing (see the diagram); TLS via cert-manager.
-- Keycloak: `KeycloakRealmImport` for the realm, clients, roles and MFA policy; a custom theme (Keycloakify or plain CSS) matching the site.
+- Keycloak: the realm, clients, roles and MFA policy as `deploy/keycloak/avw-realm.json` (applied via the existing Keycloak operator); a custom theme (Keycloakify or plain CSS) matching the site.
 - Observability: OpenTelemetry, health checks, structured logs. API rate limiting; CSP; audit log of Studio admin actions.
 - Suggested repo layout: `web/` (Angular workspace), `api/` (solution: `Avw.Api`, `Avw.Worker`, `Avw.Migrator`, tests), `keycloak/` (realm resource, theme), `deploy/helm/{avw-api,avw-web}`, `docs/`. The legacy `src/`, `wp-content/`, `Dockerfile` and `api` submodule stay as reference until cutover, then are removed. Decide whether the new API lives in the existing `aust-vietnam-war-data-api` repository or in-tree.
 

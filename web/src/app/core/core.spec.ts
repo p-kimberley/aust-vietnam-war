@@ -1,16 +1,16 @@
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, HttpRequest, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { PLATFORM_ID, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
-import { API_BASE, apiInterceptor } from './api';
+import { apiInterceptor, rewriteApiUrl } from './api';
 import { AuthService, Me } from './auth.service';
 import { roleGuard } from './role.guard';
 
 const editor: Me = { authenticated: true, id: 7, name: 'Pat', roles: ['editor'] };
 
-function setup(platform: 'browser' | 'server' = 'browser', apiBase?: string) {
+function setup(platform: 'browser' | 'server' = 'browser') {
   TestBed.configureTestingModule({
     providers: [
       provideZonelessChangeDetection(),
@@ -18,7 +18,6 @@ function setup(platform: 'browser' | 'server' = 'browser', apiBase?: string) {
       provideHttpClient(withInterceptors([apiInterceptor])),
       provideHttpClientTesting(),
       { provide: PLATFORM_ID, useValue: platform },
-      ...(apiBase ? [{ provide: API_BASE, useValue: apiBase }] : []),
     ],
   });
   return { http: TestBed.inject(HttpClient), ctl: TestBed.inject(HttpTestingController) };
@@ -38,17 +37,38 @@ describe('apiInterceptor', () => {
     expect(ctl.expectOne('/api/thing').request.headers.get('X-Requested-With')).toBe('avw');
   });
 
-  it('points requests at the internal API during SSR', () => {
-    const { http, ctl } = setup('server', 'http://avw-api:8080/api');
+  it('does not rewrite URLs itself, so the SSR transfer cache sees the same URL on the server and in the browser', () => {
+    const { http, ctl } = setup('server');
     http.get('/api/articles?x=1').subscribe();
-    ctl.expectOne('http://avw-api:8080/api/articles?x=1');
+    ctl.expectOne('/api/articles?x=1');
   });
-
   it('does not touch non-API URLs', () => {
-    const { http, ctl } = setup('browser', 'http://avw-api:8080/api');
+    const { http, ctl } = setup('browser');
     http.post('https://elsewhere.example/hook', {}).subscribe();
     const req = ctl.expectOne('https://elsewhere.example/hook');
     expect(req.request.headers.has('X-Requested-With')).toBe(false);
+  });
+});
+
+describe('rewriteApiUrl', () => {
+  const internal = 'http://avw-api:8080/api';
+  const page = 'http://localhost:4300';
+  const url = (u: string, base = internal) => rewriteApiUrl(new HttpRequest('GET', u), base, page).url;
+
+  it('points API requests at the internal service address', () => {
+    expect(url('/api/articles?x=1')).toBe('http://avw-api:8080/api/articles?x=1');
+  });
+
+  it('also matches the form Angular gives a relative URL on the server: absolute against the page being rendered', () => {
+    expect(url('http://localhost:4300/api/articles?x=1')).toBe('http://avw-api:8080/api/articles?x=1');
+  });
+
+  it('leaves other URLs, and the default base, alone', () => {
+    expect(url('https://elsewhere.example/api/x')).toBe('https://elsewhere.example/api/x');
+    expect(url('http://localhost:4300/apiary')).toBe('http://localhost:4300/apiary');
+    expect(url('/apiary')).toBe('/apiary');
+    expect(url('http://avw-api:8080/api/x')).toBe('http://avw-api:8080/api/x');
+    expect(url('/api/x', '/api')).toBe('/api/x');
   });
 });
 
