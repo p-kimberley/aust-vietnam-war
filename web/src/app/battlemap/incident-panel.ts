@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, output, resource, signal, viewChild } from '@angular/core';
 import { NotesTab } from './community/notes-tab';
 import { PeopleTab } from './community/people-tab';
+import { NearbyPicture } from './community/community';
 import { PicturesTab } from './community/pictures-tab';
 import { ContactsService } from './contacts.service';
 import { formatDtg } from './contacts';
@@ -18,7 +19,11 @@ import { formatDtg } from './contacts';
 })
 export class IncidentPanel {
   readonly contactId = input.required<number>();
+  /** The tab to show when an incident opens (a note found by search opens on its notes). */
+  readonly startTab = input<'details' | 'notes' | 'pictures' | 'people'>('details');
   readonly closed = output<void>();
+  /** Opens a photo taken near this incident, on the map. */
+  readonly openPicture = output<NearbyPicture>();
   /** Opens a person on the honour roll, by service number. */
   readonly openPerson = output<string>();
 
@@ -40,8 +45,8 @@ export class IncidentPanel {
     effect(() => {
       this.contactId();
       this.heading()?.nativeElement.focus();
-      // Another incident starts on its own details, with counts to be found again.
-      this.tab.set('details');
+      // Another incident starts on its own details (or where search sent it), with counts to be found again.
+      this.tab.set(this.startTab());
       this.notesCount.set(null);
       this.picturesCount.set(null);
       this.peopleCount.set(null);

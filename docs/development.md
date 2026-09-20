@@ -111,7 +111,14 @@ the imported content again, delete rows with a `LegacyId` from `incident_notes`,
 
 ## Tests
 
-No database, Keycloak or Elasticsearch is needed.
+No database, Keycloak or Elasticsearch is needed for almost all of them. Four tests run MySQL's full-text search for real and are skipped unless you point them at a
+MySQL that lets them create a database (they make one, run the migrations into it, and drop it):
+
+```
+AVW_TEST_MYSQL="Server=127.0.0.1;Port=3307;User=root;Password=root;CharSet=utf8mb4" dotnet test server/Avw.slnx --filter FullyQualifiedName~MySqlFullText
+```
+
+The rest:
 
 ```
 dotnet test server/Avw.slnx

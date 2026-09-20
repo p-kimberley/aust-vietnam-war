@@ -4,6 +4,7 @@
   color: var(--paper);
 }
 
+h3,
 h4 {
   margin: 0 0 0.15rem;
   font-size: 1rem;

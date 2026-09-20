@@ -94,3 +94,19 @@ mark {
 .search__note:empty {
   display: none;
 }
+
+.search__photo {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  column-gap: 0.5rem;
+  align-items: center;
+}
+
+.search__thumb {
+  grid-row: span 2;
+  width: 3rem;
+  height: 2.25rem;
+  object-fit: cover;
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+}

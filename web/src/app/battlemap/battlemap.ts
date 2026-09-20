@@ -106,6 +106,8 @@ export class Battlemap {
   protected readonly pictures = signal<readonly IncidentMediaView[]>([]);
   protected readonly showPhotos = signal(true);
   protected readonly selectedPictureId = signal<number | null>(null);
+  /** The tab an incident opens on. Search sends a note's reader straight to the notes; anything else starts on the details. */
+  protected readonly incidentTab = signal<'details' | 'notes'>('details');
   protected readonly tab = signal<Tab>('layers');
   protected readonly panelOpen = signal(true);
   protected readonly showHeatmap = signal(true);
@@ -149,6 +151,7 @@ export class Battlemap {
 
   /** Opens the incident panel for a contact (or closes it), ringing the marker and keeping the URL in step. */
   protected select(id: number | null): void {
+    this.incidentTab.set('details');
     this.selectedId.set(id);
     if (id !== null) {
       this.selectedPoiId.set(null);
@@ -222,6 +225,18 @@ export class Battlemap {
     const contact = this.allContacts().find((c) => c.id === id);
     this.select(id);
     if (contact) this.basemaps.flyTo(contact.lat, contact.lon, 13);
+  }
+
+  /** Opens the incident a found note is about, on its notes tab. */
+  protected openNote(contactId: number): void {
+    this.openContact(contactId);
+    this.incidentTab.set('notes');
+  }
+
+  /** Opens a photo (found by search, or taken near an incident) and brings its place into view. */
+  protected openPictureAt(picture: { id: number; lat: number | null; lon: number | null }): void {
+    this.selectPicture(picture.id);
+    if (picture.lat !== null && picture.lon !== null) this.basemaps.flyTo(picture.lat, picture.lon, 14);
   }
 
   /** Opens the base chosen from the search results and brings it into view. */

@@ -23,6 +23,34 @@ export interface FindResult {
   total: number;
 }
 
+/** A note that matched, from `GET /api/community-search`. `snippet` marks the words that were searched for. */
+export interface NoteHit {
+  id: number;
+  contactId: number;
+  title: string;
+  snippet: SnippetPart[];
+  authorName: string;
+  createdUtc: string;
+}
+
+/** A picture that matched, by its caption or credit. */
+export interface PictureHit {
+  id: number;
+  contactId: number | null;
+  thumbUrl: string;
+  caption: string | null;
+  credit: string | null;
+  lat: number | null;
+  lon: number | null;
+}
+
+export interface CommunitySearchResult {
+  notes: NoteHit[];
+  noteTotal: number;
+  pictures: PictureHit[];
+  pictureTotal: number;
+}
+
 /** Search text shorter than this is not sent: one letter matches nearly everything. */
 export const MIN_SEARCH_LENGTH = 2;
 
@@ -34,6 +62,12 @@ export class SearchService {
   find(text: string, limit = 8): Promise<FindResult> {
     const params = new HttpParams().set('q', text).set('limit', limit);
     return firstValueFrom(this.http.get<FindResult>('/api/contacts/find', { params }));
+  }
+
+  /** Notes and pictures (approved ones only) whose words match every word of `text`. */
+  community(text: string, limit = 4): Promise<CommunitySearchResult> {
+    const params = new HttpParams().set('q', text).set('limit', limit);
+    return firstValueFrom(this.http.get<CommunitySearchResult>('/api/community-search', { params }));
   }
 
   /** The best few people on the honour roll whose name or service number matches every word of `text`. */

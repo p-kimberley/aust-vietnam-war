@@ -67,6 +67,18 @@ export interface IncidentMediaView {
   canRemove: boolean;
 }
 
+/** A picture taken near an incident (not one of its own), from `GET /api/contacts/{id}/nearby-media`. */
+export interface NearbyPicture {
+  id: number;
+  contactId: number | null;
+  thumbUrl: string;
+  caption: string | null;
+  credit: string | null;
+  lat: number;
+  lon: number;
+  distanceMetres: number;
+}
+
 export interface LikeResult {
   likes: number;
   liked: boolean;
@@ -220,6 +232,12 @@ export class CommunityService {
   mediaOnMap(): Promise<IncidentMediaView[]> {
     const params = new HttpParams().set('minLat', -90).set('minLon', -180).set('maxLat', 90).set('maxLon', 180);
     return firstValueFrom(this.http.get<IncidentMediaView[]>('/api/community-media', { params }));
+  }
+
+  /** Approved pictures placed near an incident, nearest first, leaving out the incident's own. */
+  nearbyMedia(contactId: number, radiusKm = 2, limit = 8): Promise<NearbyPicture[]> {
+    const params = new HttpParams().set('radiusKm', radiusKm).set('limit', limit);
+    return firstValueFrom(this.http.get<NearbyPicture[]>(`/api/contacts/${contactId}/nearby-media`, { params }));
   }
 
   /** One picture as this viewer sees it (their own like, whether they can remove it), or `null` when there is no such picture for them. */

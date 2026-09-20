@@ -92,7 +92,7 @@
 
     <!-- The community tabs stay in the page while hidden, so their counts are ready when the tab bar is looked at. -->
     <div [hidden]="tab() !== 'notes'"><app-incident-notes [contactId]="contactId()" (counted)="notesCount.set($event)" /></div>
-    <div [hidden]="tab() !== 'pictures'"><app-incident-pictures [contactId]="contactId()" (counted)="picturesCount.set($event)" /></div>
+    <div [hidden]="tab() !== 'pictures'"><app-incident-pictures [contactId]="contactId()" (counted)="picturesCount.set($event)" (openNearby)="openPicture.emit($event)" /></div>
     <div [hidden]="tab() !== 'people'"><app-incident-people [contactId]="contactId()" (counted)="peopleCount.set($event)" (open)="openPerson.emit($event)" /></div>
   </div>
 </section>

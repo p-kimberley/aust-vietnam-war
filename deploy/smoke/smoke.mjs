@@ -178,6 +178,21 @@ await check('api: pictures on the map come back, and one opens with its image', 
   return `${pictures.length} pictures`;
 });
 
+await check('api: notes and photos can be searched, and the answer can be cached', async () => {
+  const res = await get(`${api}/api/community-search?q=patrol`);
+  assert(res.status === 200, `status ${res.status}`);
+  assert(res.headers.get('cache-control')?.includes('max-age'), 'not cacheable');
+  const found = await res.json();
+  assert(Array.isArray(found.notes) && Array.isArray(found.pictures), 'not the expected shape');
+  return `${found.noteTotal} notes, ${found.pictureTotal} photos`;
+});
+
+await check('api: an incident lists the photos taken near it', async () => {
+  assert(firstContact !== null, 'no contact to look up');
+  const res = await get(`${api}/api/contacts/${firstContact}/nearby-media`);
+  assert(res.status === 200 && Array.isArray(await res.json()), `status ${res.status}`);
+});
+
 await check('api: nobody is signed in, and the Studio is closed to them', async () => {
   const me = await (await get(`${api}/api/auth/me`)).json();
   assert(me.authenticated === false, 'authenticated without signing in');

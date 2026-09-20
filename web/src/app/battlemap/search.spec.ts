@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { POIS, render, settle } from './battlemap-testing';
 import { HonourSummary } from './community/community';
 import { Poi } from './poi';
-import { FindResult, SearchService, matchPois } from './search';
+import { CommunitySearchResult, FindResult, SearchService, matchPois } from './search';
 import { SearchBox } from './search-box';
 
 const text = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, ' ').trim();
@@ -20,6 +20,8 @@ const BASES: Poi[] = [
   { id: 4, type: 'FSB', name: 'Balmoral Coral Sea', established: 1968, lat: 11.6, lon: 106.9 },
   { id: 5, type: 'LZ', name: 'Hawk', established: null, lat: 10.5, lon: 107.1 },
 ];
+
+const NO_COMMUNITY: CommunitySearchResult = { notes: [], noteTotal: 0, pictures: [], pictureTotal: 0 };
 
 const FOUND: FindResult = {
   total: 327,
@@ -49,7 +51,7 @@ const WHITE: HonourSummary = { serviceNumber: '5715978', name: 'James Mungo Whit
 describe('SearchBox honour roll', () => {
   function withPeople(people: (q: string) => Promise<{ items: HonourSummary[]; total: number }>) {
     TestBed.resetTestingModule();
-    const service = { find: vi.fn(() => Promise.resolve(FOUND)), people: vi.fn(people) };
+    const service = { find: vi.fn(() => Promise.resolve(FOUND)), people: vi.fn(people), community: vi.fn(() => Promise.resolve(NO_COMMUNITY)) };
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), { provide: SearchService, useValue: service }] });
     const fixture: ComponentFixture<SearchBox> = TestBed.createComponent(SearchBox);
     fixture.componentRef.setInput('pois', BASES);
@@ -127,7 +129,7 @@ describe('SearchService', () => {
 describe('SearchBox', () => {
   function box(find: (q: string) => Promise<FindResult> = () => Promise.resolve(FOUND), people: (q: string) => Promise<{ items: HonourSummary[]; total: number }> = () => Promise.resolve({ items: [], total: 0 })) {
     TestBed.resetTestingModule();
-    const service = { find: vi.fn(find), people: vi.fn(people) };
+    const service = { find: vi.fn(find), people: vi.fn(people), community: vi.fn(() => Promise.resolve(NO_COMMUNITY)) };
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), { provide: SearchService, useValue: service }] });
     const fixture: ComponentFixture<SearchBox> = TestBed.createComponent(SearchBox);
     fixture.componentRef.setInput('pois', BASES);

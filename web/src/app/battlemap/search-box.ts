@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, si
 import { HonourSummary } from './community/community';
 import { formatDtg } from './contacts';
 import { Poi, poiLabel, typeName } from './poi';
-import { ContactHit, MIN_SEARCH_LENGTH, SearchService, matchPois } from './search';
+import { ContactHit, MIN_SEARCH_LENGTH, NoteHit, PictureHit, SearchService, matchPois } from './search';
 
 type Status = 'idle' | 'searching' | 'ready' | 'error';
 
@@ -10,13 +10,15 @@ type Status = 'idle' | 'searching' | 'ready' | 'error';
 type Option =
   | { kind: 'poi'; id: number; poi: Poi }
   | { kind: 'person'; id: string; person: HonourSummary }
-  | { kind: 'contact'; id: number; hit: ContactHit };
+  | { kind: 'contact'; id: number; hit: ContactHit }
+  | { kind: 'note'; id: number; note: NoteHit }
+  | { kind: 'picture'; id: number; picture: PictureHit };
 
 /** How long typing must pause before the report search is sent. */
 const DELAY_MS = 300;
 
 /**
- * Search for a base by name or an incident by the words in its report. Follows the ARIA combobox pattern: the field
+ * Search for a base by name, a person on the honour roll, an incident by the words in its report, or a note or photo by its words. Follows the ARIA combobox pattern: the field
  * keeps focus while Up and Down move through the results, Enter opens one and Escape closes the list.
  */
 @Component({
@@ -30,6 +32,9 @@ export class SearchBox {
   readonly pickContact = output<number>();
   readonly pickPoi = output<number>();
   readonly pickPerson = output<string>();
+  /** The incident a note is about, so it can be opened on its notes. */
+  readonly pickNote = output<number>();
+  readonly pickPicture = output<PictureHit>();
 
   private readonly service = inject(SearchService);
   private timer?: ReturnType<typeof setTimeout>;
@@ -41,15 +46,19 @@ export class SearchBox {
   protected readonly active = signal(-1);
   protected readonly hits = signal<readonly ContactHit[]>([]);
   protected readonly people = signal<readonly HonourSummary[]>([]);
+  protected readonly notes = signal<readonly NoteHit[]>([]);
+  protected readonly pictures = signal<readonly PictureHit[]>([]);
   protected readonly total = signal(0);
   protected readonly minLength = MIN_SEARCH_LENGTH;
 
   protected readonly poiMatches = computed(() => matchPois(this.pois(), this.query()));
-  /** Bases first, then people on the honour roll, then incidents. */
+  /** Bases first, then people on the honour roll, then incidents, then what members have written and added. */
   protected readonly options = computed<Option[]>(() => [
     ...this.poiMatches().map((poi): Option => ({ kind: 'poi', id: poi.id, poi })),
     ...this.people().map((person): Option => ({ kind: 'person', id: person.serviceNumber, person })),
     ...this.hits().map((hit): Option => ({ kind: 'contact', id: hit.id, hit })),
+    ...this.notes().map((note): Option => ({ kind: 'note', id: note.id, note })),
+    ...this.pictures().map((picture): Option => ({ kind: 'picture', id: picture.id, picture })),
   ]);
   protected readonly nothingFound = computed(
     () => this.query().trim().length >= MIN_SEARCH_LENGTH && this.status() === 'ready' && this.options().length === 0,
@@ -73,6 +82,8 @@ export class SearchBox {
     if (words.length < MIN_SEARCH_LENGTH) {
       this.hits.set([]);
       this.people.set([]);
+      this.notes.set([]);
+      this.pictures.set([]);
       this.total.set(0);
       this.status.set('idle');
       return;
@@ -117,6 +128,8 @@ export class SearchBox {
     this.active.set(-1);
     if (option.kind === 'poi') this.pickPoi.emit(option.id);
     else if (option.kind === 'person') this.pickPerson.emit(option.id);
+    else if (option.kind === 'note') this.pickNote.emit(option.note.contactId);
+    else if (option.kind === 'picture') this.pickPicture.emit(option.picture);
     else this.pickContact.emit(option.id);
   }
 
@@ -129,11 +142,17 @@ export class SearchBox {
 
   private async run(words: string, seq: number): Promise<void> {
     try {
-      // The honour roll is an extra: if it cannot be searched, incidents and bases still can.
-      const [found, roll] = await Promise.all([this.service.find(words), this.service.people(words).catch(() => ({ items: [] as HonourSummary[], total: 0 }))]);
+      // The honour roll, notes and photos are extras: if any cannot be searched, incidents and bases still can.
+      const [found, roll, community] = await Promise.all([
+        this.service.find(words),
+        this.service.people(words).catch(() => ({ items: [] as HonourSummary[], total: 0 })),
+        this.service.community(words).catch(() => ({ notes: [], noteTotal: 0, pictures: [], pictureTotal: 0 })),
+      ]);
       if (seq !== this.seq) return;
       this.hits.set(found.hits);
       this.people.set(roll.items);
+      this.notes.set(community.notes);
+      this.pictures.set(community.pictures);
       this.total.set(found.total);
       this.status.set('ready');
     } catch (e) {
@@ -141,6 +160,8 @@ export class SearchBox {
       console.warn('The search failed', e);
       this.hits.set([]);
       this.people.set([]);
+      this.notes.set([]);
+      this.pictures.set([]);
       this.status.set('error');
     }
   }

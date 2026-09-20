@@ -28,6 +28,9 @@ public sealed record IncidentMediaView(
 
 public sealed record LikeResult(int Likes, bool Liked);
 
+/// <summary>A picture taken near an incident (not one of the incident's own), with how far away, for the incident's "nearby photos".</summary>
+public sealed record NearbyPicture(long Id, int? ContactId, string ThumbUrl, string? Caption, string? Credit, double Lat, double Lon, int DistanceMetres);
+
 public sealed record TributeInput(string? Message);
 
 public sealed record TributeView(long Id, string AuthorName, string Message, DateTime CreatedUtc, bool Mine, bool CanDelete);
@@ -81,6 +84,32 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
             .Select(m => new { Link = m, m.Media })
             .ToListAsync(ct);
         return rows.Select(r => ToView(r.Link, r.Media, r.Link.LegacyLikes, false, null)).ToList();
+    }
+
+    /// <summary>
+    /// Approved pictures placed within <paramref name="radiusMetres"/> of an incident, nearest first, leaving out the incident's own.
+    /// The database narrows them to a box round the incident (using the latitude and longitude index) and the distance is then measured
+    /// exactly. Null when there is no such incident.
+    /// </summary>
+    public async Task<List<NearbyPicture>?> NearbyAsync(int contactId, double radiusMetres, int limit, CancellationToken ct)
+    {
+        if (await contacts.GetAsync(contactId, ct) is not { } incident)
+        {
+            return null;
+        }
+
+        var (minLat, minLon, maxLat, maxLon) = Geo.Box(incident.Lat, incident.Lon, radiusMetres);
+        var rows = await db.IncidentMedia.AsNoTracking()
+            .Where(m => m.Media.Status == MediaStatus.Approved && m.Lat != null && m.Lon != null && m.Lat >= minLat && m.Lat <= maxLat && m.Lon >= minLon && m.Lon <= maxLon
+                        && (m.ContactId == null || m.ContactId != contactId))
+            .Select(m => new { m.Id, m.ContactId, m.Media.Sha256, m.Media.Caption, m.Media.Credit, Lat = m.Lat!.Value, Lon = m.Lon!.Value })
+            .ToListAsync(ct);
+        return [.. rows
+            .Select(r => (Row: r, Metres: Geo.DistanceMetres(incident.Lat, incident.Lon, r.Lat, r.Lon)))
+            .Where(x => x.Metres <= radiusMetres)
+            .OrderBy(x => x.Metres).ThenBy(x => x.Row.Id)
+            .Take(limit)
+            .Select(x => new NearbyPicture(x.Row.Id, x.Row.ContactId, $"/media/{x.Row.Sha256[..2]}/{x.Row.Sha256}-480.jpg", x.Row.Caption, x.Row.Credit, x.Row.Lat, x.Row.Lon, (int)Math.Round(x.Metres)))];
     }
 
     public async Task<CmsResult<IncidentMediaView>> UploadAsync(int contactId, Stream file, string? caption, string? credit, string? dateTaken, Person person, CancellationToken ct)

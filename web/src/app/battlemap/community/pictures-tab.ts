@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
-import { CommunityService, IncidentMediaView } from './community';
+import { CommunityService, IncidentMediaView, NearbyPicture } from './community';
 
 /** Pictures members have added to one incident, with likes, and a form to add another. */
 @Component({
@@ -33,6 +33,37 @@ import { CommunityService, IncidentMediaView } from './community';
     }
     .pic {
       margin: 0;
+    }
+    .nearby {
+      display: grid;
+      gap: 0.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+      list-style: none;
+      margin: 0.4rem 0;
+      padding: 0;
+    }
+    .nearby button {
+      display: block;
+      width: 100%;
+      padding: 0;
+      font: inherit;
+      color: var(--khaki);
+      text-align: left;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+    .nearby img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--olive-500);
+      border-radius: var(--radius);
+    }
+    .nearby span {
+      display: block;
+      font-size: 0.78rem;
     }
     .like[aria-pressed='true'] {
       background: var(--action);
@@ -86,6 +117,21 @@ import { CommunityService, IncidentMediaView } from './community';
       <p class="hint" role="status">Loading…</p>
     }
 
+    @if (nearby().length) {
+      <h3>Photos taken nearby</h3>
+      <ul class="nearby">
+        @for (n of nearby(); track n.id) {
+          <li>
+            <button type="button" (click)="openNearby.emit(n)">
+              <img [src]="n.thumbUrl" [alt]="n.caption || 'A photo taken near this incident'" loading="lazy" />
+              <span>{{ n.caption || 'Photo' }}</span>
+              <span class="meta">{{ distance(n.distanceMetres) }} away</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
     @if (auth.isAuthenticated()) {
       <h4>Add a picture</h4>
       <form (submit)="$event.preventDefault(); upload(file, caption, credit, taken)">
@@ -102,11 +148,14 @@ import { CommunityService, IncidentMediaView } from './community';
 export class PicturesTab {
   readonly contactId = input.required<number>();
   readonly counted = output<number>();
+  /** A photo taken near the incident was chosen; the map shows it. */
+  readonly openNearby = output<NearbyPicture>();
 
   protected readonly auth = inject(AuthService);
   private readonly api = inject(CommunityService);
 
   protected readonly pictures = signal<IncidentMediaView[] | null>(null);
+  protected readonly nearby = signal<NearbyPicture[]>([]);
   protected readonly message = signal('');
   protected readonly busy = signal(false);
 
@@ -116,8 +165,27 @@ export class PicturesTab {
     effect(() => {
       const id = this.contactId();
       this.pictures.set(null);
+      this.nearby.set([]);
       void this.load(id);
+      void this.loadNearby(id);
     });
+  }
+
+  /** "640 m" or "1.2 km". */
+  protected distance(metres: number): string {
+    return metres < 1000 ? `${Math.round(metres / 10) * 10} m` : `${(metres / 1000).toFixed(1)} km`;
+  }
+
+  /** Photos taken near the incident are an extra: if they cannot be found, the incident's own are still shown. */
+  private async loadNearby(id: number): Promise<void> {
+    try {
+      const list = await this.api.nearbyMedia(id);
+      if (id === this.contactId()) {
+        this.nearby.set(list);
+      }
+    } catch {
+      this.nearby.set([]);
+    }
   }
 
   protected isEditor(): boolean {

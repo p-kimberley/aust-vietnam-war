@@ -23,6 +23,7 @@ public static class CommunityEndpoints
 {
     public const string TributePolicy = "tribute";
     public const string WritePolicy = "community-write";
+    public const string CommunitySearchPolicy = "community-search";
 
     public static IServiceCollection AddAvwCommunity(this IServiceCollection services, IConfiguration config)
     {
@@ -36,6 +37,7 @@ public static class CommunityEndpoints
         services.AddScoped<IncidentMediaService>();
         services.AddScoped<TributeService>();
         services.AddScoped<CasualtyService>();
+        services.AddScoped<CommunitySearch>();
 
         var client = services.AddHttpClient<IHonourRollSource, ElasticsearchHonourRoll>(MapEndpoints.ConfigureElasticsearchClient(TimeSpan.FromSeconds(30)));
         client.ConfigurePrimaryHttpMessageHandler(MapEndpoints.ElasticsearchHandler);
@@ -45,6 +47,8 @@ public static class CommunityEndpoints
         services.AddRateLimiter(o =>
         {
             o.AddPolicy(TributePolicy, ctx => RateLimitPartition.GetFixedWindowLimiter(Who(ctx), _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromHours(1), QueueLimit = 0 }));
+            // Searching notes and pictures is MySQL, not Elasticsearch, so it has its own allowance rather than sharing the search one.
+            o.AddPolicy(CommunitySearchPolicy, ctx => RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
             o.AddPolicy(WritePolicy, ctx => RateLimitPartition.GetFixedWindowLimiter(Who(ctx), _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
         });
         return services;
@@ -149,6 +153,46 @@ public static class CommunityEndpoints
             })
             .WithName("ListIncidentMedia")
             .Produces<List<IncidentMediaView>>();
+
+        // Notes and pictures found by their words: what the public can see only (approved notes' approved text, approved pictures).
+        g.MapGet("/community-search", async (string? q, int? limit, CommunitySearch search, HttpContext ctx, CancellationToken ct) =>
+            {
+                var text = q?.Trim() ?? "";
+                if (text.Length < MapEndpoints.MinSearchLength || text.Length > MapEndpoints.MaxSearchLength)
+                {
+                    return Results.ValidationProblem(new Dictionary<string, string[]> { ["q"] = [$"Search text must be {MapEndpoints.MinSearchLength} to {MapEndpoints.MaxSearchLength} characters."] });
+                }
+
+                ctx.Response.Headers.CacheControl = "public, max-age=60";
+                return Results.Ok(await search.SearchAsync(text, limit ?? 5, ct));
+            })
+            .RequireRateLimiting(CommunitySearchPolicy)
+            .WithName("SearchCommunity")
+            .Produces<CommunitySearchResult>()
+            .ProducesValidationProblem()
+            .Produces(StatusCodes.Status429TooManyRequests);
+
+        // Pictures taken near an incident, nearest first, so a place can be explored beyond the incident's own pictures.
+        g.MapGet("/contacts/{id:int:min(1)}/nearby-media", async (int id, double? radiusKm, int? limit, IncidentMediaService media, HttpContext ctx, CancellationToken ct) =>
+            {
+                var km = radiusKm ?? 2;
+                if (km is < 0.1 or > 25)
+                {
+                    return Results.ValidationProblem(new Dictionary<string, string[]> { ["radiusKm"] = ["Give a distance from 0.1 to 25 kilometres."] });
+                }
+
+                if (await media.NearbyAsync(id, km * 1000, Math.Clamp(limit ?? 8, 1, 24), ct) is not { } near)
+                {
+                    return Results.NotFound();
+                }
+
+                ctx.Response.Headers.CacheControl = "public, max-age=60";
+                return Results.Ok(near);
+            })
+            .WithName("ListNearbyMedia")
+            .Produces<List<NearbyPicture>>()
+            .ProducesValidationProblem()
+            .Produces(StatusCodes.Status404NotFound);
 
         // Pictures placed on the map, for a picture layer. A small box only: at most 500 come back.
         g.MapGet("/community-media", async (double minLat, double minLon, double maxLat, double maxLon, IncidentMediaService media, HttpContext ctx, CancellationToken ct) =>

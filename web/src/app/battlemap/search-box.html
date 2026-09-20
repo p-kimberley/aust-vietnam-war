@@ -5,8 +5,8 @@
     role="combobox"
     autocomplete="off"
     maxlength="100"
-    placeholder="Search bases, people and reports"
-    aria-label="Search bases, people on the honour roll, and incident reports"
+    placeholder="Search bases, people, reports, notes and photos"
+    aria-label="Search bases, people on the honour roll, incident reports, notes and photos"
     aria-autocomplete="list"
     aria-controls="search-results"
     [attr.aria-expanded]="open() && (options().length > 0 || status() !== 'idle')"
@@ -38,6 +38,27 @@
               <span class="search__kind">Honour roll</span>
               <span class="search__title">{{ option.person.name }}</span>
               <span class="search__snippet">{{ option.person.rank }}{{ option.person.death ? ', died ' + option.person.death.slice(0, 4) : '' }}</span>
+            } @else if (option.kind === 'note') {
+              <span class="search__kind">Note</span>
+              <span class="search__title">{{ option.note.title }}</span>
+              <span class="search__snippet">
+                @for (part of option.note.snippet; track $index) {
+                  @if (part.match) {
+                    <mark>{{ part.text }}</mark>
+                  } @else {
+                    {{ part.text }}
+                  }
+                }
+              </span>
+            } @else if (option.kind === 'picture') {
+              <span class="search__kind">Photo</span>
+              <span class="search__photo">
+                <img class="search__thumb" [src]="option.picture.thumbUrl" alt="" width="48" height="36" loading="lazy" />
+                <span class="search__title">{{ option.picture.caption || 'Photo' }}</span>
+                @if (option.picture.credit) {
+                  <span class="search__snippet">{{ option.picture.credit }}</span>
+                }
+              </span>
             } @else {
               <span class="search__kind data">{{ formatDtg(option.hit.dtg) }}</span>
               <span class="search__snippet">

@@ -147,6 +147,9 @@ Restore test: restore MySQL and the media volume into a scratch namespace, run `
 
 - **Health.** `/api/health/live` (process is up), `/api/health/ready` (database and media storage are usable), `/healthz` on the web pods.
   Readiness fails if the media volume is read-only or the API cannot write to it.
+- **Search of notes and pictures** is MySQL full-text (indexes made by the migration `AddCommunitySearch`; creating them rebuilds two small tables, which takes
+  well under a second at today's size). It relies on MySQL's default full-text settings (`innodb_ft_min_token_size` 3 and the built-in stop word list). If a
+  search for a word that is plainly in a note finds nothing, check those two settings first. Adding a word to the search box needs no configuration.
 - **Worker.** Publishes scheduled articles every 30 seconds and, every 10 minutes, deletes files in `media/.incoming/` older than 6 hours
   (uploads that a dying pod left behind) and health markers older than 2 days (one per API pod name). Settings: `Media__IncomingMaxAgeMinutes`,
   `Media__HealthMarkerMaxAgeDays`. Never run two workers.

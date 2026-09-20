@@ -420,6 +420,48 @@ describe('PicturesTab', () => {
   });
 });
 
+describe('PicturesTab nearby photos', () => {
+  const nearby = (over: Record<string, unknown> = {}) => ({
+    id: 21, contactId: null, thumbUrl: '/media/bb/x-480.jpg', caption: 'A bunker by the road', credit: 'AWM', lat: 10.56, lon: 107.17, distanceMetres: 563, ...over,
+  });
+
+  it('shows photos taken near the incident, nearest first, with how far away each is', async () => {
+    const community = fakeCommunity({ nearbyMedia: vi.fn(() => Promise.resolve([nearby(), nearby({ id: 22, caption: null, distanceMetres: 1234 }), nearby({ id: 23, distanceMetres: 950 })])) });
+    const { fixture, el } = mount(PicturesTab, community, fakeAuth(), { contactId: 2 });
+    await settle(fixture);
+
+    expect(text(el.querySelector('h3'))).toBe('Photos taken nearby');
+    const items = [...el.querySelectorAll('.nearby li')].map((li) => [...li.querySelectorAll('span')].map((x) => text(x)));
+    expect(items).toEqual([['A bunker by the road', '560 m away'], ['Photo', '1.2 km away'], ['A bunker by the road', '950 m away']]);
+    expect(el.querySelector('.nearby img')?.getAttribute('src')).toBe('/media/bb/x-480.jpg');
+    expect(community['nearbyMedia']).toHaveBeenCalledWith(2);
+  });
+
+  it('tells the map which photo was chosen', async () => {
+    const community = fakeCommunity({ nearbyMedia: vi.fn(() => Promise.resolve([nearby()])) });
+    const { fixture, el } = mount(PicturesTab, community, fakeAuth(), { contactId: 2 });
+    const chosen: number[] = [];
+    fixture.componentInstance.openNearby.subscribe((n) => chosen.push(n.id));
+    await settle(fixture);
+
+    el.querySelector<HTMLButtonElement>('.nearby button')!.click();
+
+    expect(chosen).toEqual([21]);
+  });
+
+  it('shows nothing about nearby photos when there are none, or when they cannot be found', async () => {
+    const none = mount(PicturesTab, fakeCommunity({ media: vi.fn(() => Promise.resolve([picture()])) }), fakeAuth(), { contactId: 2 });
+    await settle(none.fixture);
+    expect(none.el.querySelector('.nearby')).toBeNull();
+    expect(text(none.el)).not.toContain('nearby');
+
+    const broken = mount(PicturesTab, fakeCommunity({ media: vi.fn(() => Promise.resolve([picture()])), nearbyMedia: vi.fn(() => Promise.reject(new Error('down'))) }), fakeAuth(), { contactId: 2 });
+    await settle(broken.fixture);
+    expect(broken.el.querySelector('.nearby')).toBeNull();
+    expect(broken.el.querySelector('figure')).not.toBeNull();                    // the incident's own pictures are unaffected
+  });
+});
+
 describe('PeopleTab', () => {
   const people = [{ serviceNumber: '5715978', name: 'James Mungo White', rank: 'Private', branch: 'Royal Australian Infantry Corps', birth: null, death: null, ageAtDeath: null, portraitUrl: null }];
 
