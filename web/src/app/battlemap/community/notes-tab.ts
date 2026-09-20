@@ -4,6 +4,9 @@ import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, NoteView, VersionView } from './community';
 
+/** The most a member may write in a new note (the server enforces the same). */
+const NOTE_BODY_LIMIT = 5000;
+
 /** Community notes about one incident: read them, add one, edit your own, comment, and (for editors) approve or reject. */
 @Component({
   selector: 'app-incident-notes',
@@ -36,7 +39,7 @@ import { CommunityService, NoteView, VersionView } from './community';
           @if (editing() === n.id) {
             <form (submit)="$event.preventDefault(); save(n, title.value, body.value)">
               <label>Title <input #title type="text" maxlength="200" required [value]="n.title" /></label>
-              <label>Note <textarea #body rows="6" maxlength="5000" required [value]="n.body"></textarea></label>
+              <label>Note <textarea #body rows="6" [attr.maxlength]="bodyLimit(n)" required [value]="n.body"></textarea></label>
               <div class="actions">
                 <button type="submit" class="primary" [disabled]="busy()">Save</button>
                 <button type="button" (click)="editing.set(null)">Cancel</button>
@@ -134,6 +137,11 @@ export class NotesTab {
       const id = this.contactId();
       void this.load(id, false);
     });
+  }
+
+  /** A note carried over from the old site can be longer than a new one may be; it can be edited, but not made longer. Mirrors the server. */
+  protected bodyLimit(n: NoteView): number {
+    return Math.max(NOTE_BODY_LIMIT, n.body.length);
   }
 
   protected isEditor(): boolean {

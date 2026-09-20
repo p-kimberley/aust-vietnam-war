@@ -154,7 +154,7 @@ import { CommunityService, HonourPerson, TributeView } from './community';
           }
           @for (t of items(); track t.id) {
             <article class="card">
-              <p class="body"><span class="poppy" aria-hidden="true"></span>{{ t.message }}</p>
+              <p class="body"><span class="poppy" aria-hidden="true"></span>{{ t.message || 'Laid a poppy.' }}</p>
               <p class="meta">{{ t.authorName }}, {{ t.createdUtc | date: 'd MMM y' }}</p>
               @if (t.canDelete) {
                 <button type="button" class="link" (click)="remove(t)" [disabled]="busy()">Remove</button>

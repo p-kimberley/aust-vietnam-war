@@ -106,13 +106,15 @@ public sealed class NoteService(AvwDbContext db, TimeProvider clock, INotifier n
             return CmsResult<NoteView>.Fail(CmsError.Forbidden, "Only the author or an editor can change a note.");
         }
 
-        var invalid = Validate(input, out var title, out var body);
+        // A note carried over from the old site may already be longer than a new one may be. Its author can still edit it, as long
+        // as they do not make it any longer.
+        var latest = note.Versions.First(v => v.VersionNo == note.LatestVersionNo);
+        var invalid = Validate(input, out var title, out var body, Math.Max(MaxBody, latest.Body.Length));
         if (invalid is not null)
         {
             return invalid;
         }
 
-        var latest = note.Versions.First(v => v.VersionNo == note.LatestVersionNo);
         if (latest.Title == title && latest.Body == body)
         {
             return await ViewAsync(id, person, ct);                    // nothing changed: no new version
@@ -302,7 +304,7 @@ public sealed class NoteService(AvwDbContext db, TimeProvider clock, INotifier n
             comments.Select(c => new CommentView(c.Id, c.AuthorName, c.Body, c.CreatedUtc, viewer is not null && c.AuthorId == viewer.Id, viewer is not null && (viewer.IsEditor || c.AuthorId == viewer.Id))).ToList());
     }
 
-    private static CmsResult<NoteView>? Validate(NoteInput input, out string title, out string body)
+    private static CmsResult<NoteView>? Validate(NoteInput input, out string title, out string body, int maxBody = MaxBody)
     {
         title = PlainText.Clean(input.Title).Replace('\n', ' ');
         body = PlainText.Clean(input.Body);
@@ -311,8 +313,9 @@ public sealed class NoteService(AvwDbContext db, TimeProvider clock, INotifier n
             return CmsResult<NoteView>.Invalid("title", $"Give the note a title of up to {MaxTitle} characters.");
         }
 
-        return body.Length is 0 or > MaxBody
-            ? CmsResult<NoteView>.Invalid("body", $"Write the note, up to {MaxBody} characters.")
+        // The column is a `text`: 65,535 bytes however many characters that is. (Only reachable when editing a very long migrated note.)
+        return body.Length is 0 || body.Length > maxBody || System.Text.Encoding.UTF8.GetByteCount(body) > 65_000
+            ? CmsResult<NoteView>.Invalid("body", $"Write the note, up to {maxBody} characters.")
             : null;
     }
 

@@ -387,6 +387,37 @@ public class NoteServiceTests
     }
 
     [Fact]
+    public async Task An_author_can_edit_a_long_migrated_note_without_making_it_longer_and_new_notes_stay_short()
+    {
+        var f = Make();
+        var note = await Create(f, Ann);
+        var long_ = new string('b', 20_000);
+        (await f.Db.NoteVersions.SingleAsync()).Body = long_;                                 // as carried over from the old site
+        await f.Db.SaveChangesAsync();
+
+        var shorter = await f.Svc.UpdateAsync(note.Id, Note("A detail", new string('c', 19_999)), Ann, default);
+        var same = await f.Svc.UpdateAsync(note.Id, Note("A detail", new string('d', 19_999)), Ann, default);
+        var longer = await f.Svc.UpdateAsync(note.Id, Note("A detail", new string('e', 20_001)), Ann, default);
+
+        Assert.True(shorter.Ok, shorter.Message);
+        Assert.True(same.Ok, same.Message);
+        Assert.Equal(("body", false), (longer.Field, longer.Ok));
+        Assert.Contains("19999", longer.Message);                                             // the limit is now what that version was
+        Assert.Equal("body", (await f.Svc.CreateAsync(2, Note("New", new string('n', NoteService.MaxBody + 1)), Ann, default)).Field);
+    }
+
+    [Fact]
+    public async Task A_note_is_still_limited_to_five_thousand_characters_when_edited_if_it_started_short()
+    {
+        var f = Make();
+        var note = await Create(f, Ann);
+
+        var tooLong = await f.Svc.UpdateAsync(note.Id, Note("A detail", new string('x', NoteService.MaxBody + 1)), Ann, default);
+
+        Assert.Equal("body", tooLong.Field);
+    }
+
+    [Fact]
     public async Task Links_migrated_pictures_to_the_person_with_the_same_verified_email()
     {
         var f = Make();

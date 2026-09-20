@@ -13,6 +13,7 @@ using Avw.Data.Entities;
 using ImageMagick;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
@@ -303,6 +304,31 @@ public sealed class CommunityEndpointTests : IDisposable
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AvwDbContext>();
         return (db.IncidentMedia.Single(m => m.LegacyLikes == 3).Id, db.IncidentMedia.Single(m => m.Media.Status == MediaStatus.Pending).Id);
+    }
+
+    [Fact]
+    public async Task Lists_poppies_with_words_first_then_wordless_ones_and_counts_them_all()
+    {
+        Seed();
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AvwDbContext>();
+            var when = new DateTime(2017, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            db.Tributes.AddRange(
+                new Tribute { ServiceNumber = "5715978", AuthorName = "Member", Message = "", CreatedUtc = when.AddDays(9) },
+                new Tribute { ServiceNumber = "5715978", AuthorName = "Old Digger", Message = "Rest easy.", CreatedUtc = when },
+                new Tribute { ServiceNumber = "5715978", AuthorName = "Member", Message = "", CreatedUtc = when.AddDays(5) },
+                new Tribute { ServiceNumber = "5715978", AuthorName = "Anne", Message = "Thank you.", CreatedUtc = when.AddDays(2) });
+            db.SaveChanges();
+        }
+
+        var page = await Read<TributePage>(await Anon("/api/honour-roll/5715978/tributes"));
+
+        Assert.Equal(4, page.Total);
+        Assert.Equal(["Thank you.", "Rest easy.", "", ""], page.Items.Select(t => t.Message));
+        Assert.Equal([On(9), On(5)], page.Items.Skip(2).Select(t => t.CreatedUtc));
+
+        static DateTime On(int days) => new DateTime(2017, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(days);
     }
 
     [Fact]
@@ -650,6 +676,45 @@ public class EmailNotifierTests
         var body = notifier.Render(new Notification("Subject", "Incident: {site}/battlemap?incident=2"));
 
         Assert.Equal("Incident: " + expected, body);
+    }
+
+    private sealed class ListLogger<T> : ILogger<T>
+    {
+        public List<string> Lines { get; } = [];
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            lock (Lines)
+            {
+                Lines.Add($"{logLevel}: {formatter(state, exception)}");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Says_at_start_up_whether_email_is_on_and_is_content_to_be_off()
+    {
+        var off = new ListLogger<EmailNotifier>();
+        var notifier = new EmailNotifier(Options.Create(new SmtpOptions()), Options.Create(new NotificationOptions()), off);
+        await notifier.StartAsync(default);
+        notifier.Notify(new Notification("Waiting", "Body"));
+        await Task.Delay(200);
+        await notifier.StopAsync(default);
+
+        Assert.Contains(off.Lines, l => l.StartsWith("Information: Email notifications are off") && l.Contains("Moderation page"));
+        Assert.Contains(off.Lines, l => l.Contains("Notification not emailed") && l.Contains("Waiting"));
+        Assert.DoesNotContain(off.Lines, l => l.StartsWith("Warning") || l.StartsWith("Error"));
+
+        var on = new ListLogger<EmailNotifier>();
+        var configured = new EmailNotifier(Options.Create(new SmtpOptions { Host = "smtp.test", From = "no-reply@example.com" }),
+            Options.Create(new NotificationOptions { EditorEmails = ["a@example.com", "b@example.com"] }), on);
+        await configured.StartAsync(default);
+        await Task.Delay(100);
+        await configured.StopAsync(default);
+
+        Assert.Contains(on.Lines, l => l == "Information: Email notifications are on: 2 editor address(es) will be told when something is waiting");
     }
 
     [Fact]

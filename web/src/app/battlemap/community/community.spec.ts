@@ -192,6 +192,30 @@ describe('NotesTab', () => {
     expect(editForm()).toBeNull();
   });
 
+  it('lets a note from the old site that is longer than a new one may be be edited, but not lengthened', async () => {
+    const old = 'x'.repeat(12_000);
+    const community = fakeCommunity({ notes: vi.fn(() => Promise.resolve([note({ body: old, mine: true, canEdit: true })])) });
+    const { fixture, el } = mount(NotesTab, community, fakeAuth({ authenticated: true, roles: ['member'] }), { contactId: 2 });
+    await settle(fixture);
+
+    button(el, 'Edit').click();
+    await settle(fixture);
+    const edit = el.querySelector<HTMLTextAreaElement>('article form textarea')!;
+    expect(edit.getAttribute('maxlength')).toBe('12000');
+    expect(edit.value).toHaveLength(12_000);
+  });
+
+  it('keeps the usual limit when editing a note that is not longer than that', async () => {
+    const community = fakeCommunity({ notes: vi.fn(() => Promise.resolve([note({ mine: true, canEdit: true })])) });
+    const { fixture, el } = mount(NotesTab, community, fakeAuth({ authenticated: true, roles: ['member'] }), { contactId: 2 });
+    await settle(fixture);
+
+    button(el, 'Edit').click();
+    await settle(fixture);
+
+    expect(el.querySelector('article form textarea')!.getAttribute('maxlength')).toBe('5000');
+  });
+
   it('deletes a note only after confirmation', async () => {
     const community = fakeCommunity({ notes: vi.fn(() => Promise.resolve([note({ mine: true, canEdit: true })])), deleteNote: vi.fn(() => Promise.resolve()) });
     const { fixture, el } = mount(NotesTab, community, fakeAuth({ authenticated: true, roles: ['member'] }), { contactId: 2 });
@@ -446,6 +470,21 @@ describe('HonourPanel', () => {
   function panel(community: ReturnType<typeof fakeCommunity>, auth = fakeAuth()) {
     return mount(HonourPanel, community, auth, { serviceNumber: '5715978' });
   }
+
+  it('shows a poppy laid without words as a poppy, and counts it', async () => {
+    const community = fakeCommunity({
+      person: vi.fn(() => Promise.resolve(person)),
+      tributes: vi.fn(() => Promise.resolve({ items: [tribute({ message: 'Thank you.' }), tribute({ id: 2, message: '', authorName: 'Member' })], total: 2, page: 1, pageSize: 20 })),
+    });
+    const { fixture, el } = panel(community);
+    await settle(fixture);
+
+    const cards = [...el.querySelectorAll('article.card')].map((c) => text(c));
+    expect(cards[0]).toContain('Thank you.');
+    expect(cards[1]).toContain('Laid a poppy.');
+    expect(cards[1]).toContain('Member');
+    expect(text(el)).toContain('Poppies (2)');
+  });
 
   it('shows who the person was, their service, incidents and poppies', async () => {
     const community = fakeCommunity({

@@ -40,9 +40,34 @@ public static class CommunityImporter
 
     /// <summary>
     /// Migrated notes may be longer than what a member can write today (<see cref="CommunityLimits.MaxBody"/>), because cutting an old note
-    /// short loses the author's work. The database column holds about 64 KB, so this is where a note is finally cut.
+    /// short loses the author's work. The database column is a <c>text</c> (65,535 bytes, whatever the characters), so this is where a note
+    /// is finally cut, measured in bytes. The longest legacy note is about 56,000 characters, so in practice nothing is cut.
     /// </summary>
-    public const int MaxLegacyBody = 16000;
+    public const int MaxLegacyBodyBytes = 65_000;
+
+    /// <summary>The longest start of <paramref name="text"/> that fits in <paramref name="maxBytes"/> bytes of UTF-8, never splitting a character.</summary>
+    public static string CutToBytes(string text, int maxBytes)
+    {
+        if (System.Text.Encoding.UTF8.GetByteCount(text) <= maxBytes)
+        {
+            return text;
+        }
+
+        var bytes = 0;
+        var end = 0;
+        foreach (var rune in text.EnumerateRunes())
+        {
+            bytes += rune.Utf8SequenceLength;
+            if (bytes > maxBytes)
+            {
+                break;
+            }
+
+            end += rune.Utf16SequenceLength;
+        }
+
+        return text[..end];
+    }
 
     /// <summary>The name shown and the email hash for an author of legacy content. An author with no matching user is anonymous.</summary>
     public sealed class Authors(IEnumerable<LegacyUser> users)
@@ -115,9 +140,10 @@ public static class CommunityImporter
             foreach (var v in history)
             {
                 var body = Text(v.Body);
-                if (body.Length > MaxLegacyBody)
+                var fitted = CutToBytes(body, MaxLegacyBodyBytes);
+                if (fitted.Length < body.Length)
                 {
-                    body = body[..MaxLegacyBody];
+                    body = fitted;
                     report.Skip("versions cut at the column limit");
                 }
 
@@ -200,11 +226,12 @@ public static class CommunityImporter
                 continue;
             }
 
+            // Most old poppies were laid with one click and no words. They are kept, as poppies with no message, so the count is right.
             var message = Text(row.Comment).Replace('\n', ' ');
             var serviceNumber = row.ServiceNumber.Trim();
-            if (message.Length == 0 || serviceNumber.Length == 0 || serviceNumber.Length > 32)
+            if (serviceNumber.Length == 0 || serviceNumber.Length > 32)
             {
-                report.Skip("without a message or service number");
+                report.Skip("without a usable service number");
                 continue;
             }
 

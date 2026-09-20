@@ -56,6 +56,16 @@ public sealed class EmailNotifier(IOptions<SmtpOptions> smtp, IOptions<Notificat
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        // Email is optional. Without it nothing is lost: editors see what is waiting on the Studio's Moderation page.
+        if (CanSend)
+        {
+            logger.LogInformation("Email notifications are on: {Count} editor address(es) will be told when something is waiting", recipients.Value.EditorEmails.Length);
+        }
+        else
+        {
+            logger.LogInformation("Email notifications are off (Smtp:Host, Smtp:From and Notifications:EditorEmails are not all set). Editors see what is waiting on the Studio's Moderation page");
+        }
+
         await foreach (var n in _queue.Reader.ReadAllAsync(stoppingToken))
         {
             if (!CanSend)

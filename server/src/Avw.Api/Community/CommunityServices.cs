@@ -198,7 +198,8 @@ public sealed class TributeService(AvwDbContext db, IHonourRollSource roll, Time
         page = Math.Max(1, page);
         var q = db.Tributes.AsNoTracking().Where(t => t.ServiceNumber == serviceNumber);
         var total = await q.CountAsync(ct);
-        var items = await q.OrderByDescending(t => t.CreatedUtc).ThenByDescending(t => t.Id).Skip((page - 1) * PageSize).Take(PageSize).ToListAsync(ct);
+        // Poppies with words first (they say more), then the wordless ones, each newest first.
+        var items = await q.OrderByDescending(t => t.Message != "").ThenByDescending(t => t.CreatedUtc).ThenByDescending(t => t.Id).Skip((page - 1) * PageSize).Take(PageSize).ToListAsync(ct);
         return new TributePage(items.Select(t => new TributeView(t.Id, t.AuthorName, t.Message, t.CreatedUtc, viewer is not null && t.AuthorId == viewer.Id, viewer is not null && (viewer.IsEditor || t.AuthorId == viewer.Id))).ToList(), total, page, PageSize);
     }
 

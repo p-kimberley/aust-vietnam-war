@@ -129,35 +129,60 @@ public sealed class CommunityImporterTests : IDisposable
     [Fact]
     public async Task Very_long_versions_are_cut_only_at_the_column_limit_and_titles_are_never_blank()
     {
-        var report = await CommunityImporter.ImportNotesAsync([Note()], [Version(1, 1, "", new string('x', CommunityImporter.MaxLegacyBody + 500))], [], Authors, _db, false);
+        var report = await CommunityImporter.ImportNotesAsync([Note()], [Version(1, 1, "", new string('x', CommunityImporter.MaxLegacyBodyBytes + 500))], [], Authors, _db, false);
 
         var v = (await _db.Notes.Include(n => n.Versions).SingleAsync()).Versions.Single();
         Assert.Equal("Note", v.Title);
-        Assert.Equal(CommunityImporter.MaxLegacyBody, v.Body.Length);
+        Assert.Equal(CommunityImporter.MaxLegacyBodyBytes, v.Body.Length);
         Assert.Equal(1, report.Skipped["versions cut at the column limit"]);
     }
+
+    [Fact]
+    public async Task A_long_note_of_the_size_found_in_the_old_site_is_kept_whole()
+    {
+        var body = string.Join(' ', Enumerable.Repeat("The platoon moved along the track at first light.", 1150));      // about 55,000 characters
+        Assert.InRange(body.Length, 50_000, 60_000);
+
+        var report = await CommunityImporter.ImportNotesAsync([Note()], [Version(1, 1, "Long", $"<p>{body}</p>")], [], Authors, _db, false);
+
+        Assert.Empty(report.Skipped);
+        Assert.Equal(body, (await _db.Notes.Include(n => n.Versions).SingleAsync()).Versions.Single().Body);
+    }
+
+    [Theory]
+    [InlineData("abcdef", 10, "abcdef")]
+    [InlineData("abcdef", 4, "abcd")]
+    [InlineData("añb", 2, "a")]                     // ñ takes two bytes and would not fit
+    [InlineData("añb", 3, "añ")]
+    [InlineData("a😀b", 4, "a")]                    // an emoji is four bytes and two UTF-16 units: never cut in half
+    [InlineData("a😀b", 5, "a😀")]
+    public void Cuts_by_bytes_without_splitting_a_character(string text, int maxBytes, string expected) =>
+        Assert.Equal(expected, CommunityImporter.CutToBytes(text, maxBytes));
 
     // ---------------------------------------------------------------- tributes and casualties
 
     [Fact]
-    public async Task Imports_tributes_once_with_the_author_hashed_and_skips_empty_ones()
+    public async Task Imports_tributes_once_with_the_author_hashed_and_keeps_wordless_poppies()
     {
         LegacyTribute[] rows =
         [
             new(1, "3400456", "<p>Rest easy, Dad.</p>", 5, "Ignored", T),
-            new(2, "3400456", "  ", 5, null, T),
+            new(2, "3400456", "  ", 0, null, T),
             new(3, "3400789", "Thank you.", 99, "Anne", T),
+            new(4, "", "No one to lay it for", 5, null, T),
+            new(5, new string('9', 40), null, 5, null, T),
         ];
 
         var first = await CommunityImporter.ImportTributesAsync(rows, Authors, _db, false);
         var again = await CommunityImporter.ImportTributesAsync(rows, Authors, _db, false);
 
-        Assert.Equal((2, 1), (first.Added, first.Skipped["without a message or service number"]));
-        Assert.Equal((0, 2), (again.Added, again.Unchanged));
+        Assert.Equal((3, 2), (first.Added, first.Skipped["without a usable service number"]));
+        Assert.Equal((0, 3), (again.Added, again.Unchanged));
         var tributes = await _db.Tributes.OrderBy(t => t.LegacyId).ToListAsync();
         Assert.Equal(("Old Digger", "Rest easy, Dad."), (tributes[0].AuthorName, tributes[0].Message));
         Assert.NotNull(tributes[0].AuthorEmailHash);
-        Assert.Equal(("Anne", null), (tributes[1].AuthorName, tributes[1].AuthorEmailHash));
+        Assert.Equal(("Member", "", null), (tributes[1].AuthorName, tributes[1].Message, tributes[1].AuthorEmailHash));      // a poppy with no words, from no one in particular
+        Assert.Equal(("Anne", null), (tributes[2].AuthorName, tributes[2].AuthorEmailHash));
     }
 
     [Fact]
