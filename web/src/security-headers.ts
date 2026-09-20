@@ -67,9 +67,9 @@ export function contentSecurityPolicy(o: CspOptions): string {
     'script-src': ["'self'", ...o.scriptHashes.map((h) => `'sha256-${h}'`)],
     // Inline handlers are refused unless they are exactly one of the handlers measured from the page.
     'script-src-attr': o.handlerHashes?.length ? ["'unsafe-hashes'", ...o.handlerHashes.map((h) => `'sha256-${h}'`)] : ["'none'"],
-    // Angular writes its component styles inline.
-    'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-    'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:', ...(extra ? [extra] : [])],
+    // Angular writes its component styles inline. The site's fonts are its own files, so no font host is allowed.
+    'style-src': ["'self'", "'unsafe-inline'"],
+    'font-src': ["'self'", 'data:', ...(extra ? [extra] : [])],
     // Pictures can come from an article or a map tile server, so any https origin, but never plain http.
     'img-src': ["'self'", 'data:', 'blob:', 'https:'],
     'connect-src': ["'self'", ...(extra ? [extra] : [])],

@@ -68,6 +68,13 @@ describe('contentSecurityPolicy', () => {
     expect(directive('report-uri')).toBe('report-uri /api/csp-report');
   });
 
+  it('serves fonts and styles from the site only: no font host is allowed', () => {
+    expect(directive('font-src')).toBe("font-src 'self' data: https://tiles.example.com");
+    expect(directive('style-src')).toBe("style-src 'self' 'unsafe-inline'");
+    expect(policy).not.toContain('googleapis');
+    expect(policy).not.toContain('gstatic');
+  });
+
   it('leaves the extra origins out when there are none', () => {
     const bare = contentSecurityPolicy({ scriptHashes: [], extraOrigins: [] });
     expect(bare).toContain("connect-src 'self';");
