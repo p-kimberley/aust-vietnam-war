@@ -38,6 +38,16 @@ public sealed class FakeContactSource : IContactSource
     public Task<ContactDetail?> GetAsync(int id, CancellationToken ct) =>
         Task.FromResult(Details.GetValueOrDefault(id));
 
+    public int? LastFindLimit;
+
+    public Task<FindResult> FindAsync(string text, int limit, CancellationToken ct)
+    {
+        LastSearch = text;
+        LastFindLimit = limit;
+        return Task.FromResult(new FindResult(
+            [new ContactHit(2, "1966-03-03T19:50:00", [new SnippetPart("contacted ", false), new SnippetPart(text, true), new SnippetPart(" moving south", false)])], 327));
+    }
+
     public Task<int[]> SearchAsync(string text, CancellationToken ct)
     {
         LastSearch = text;

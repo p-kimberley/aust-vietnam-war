@@ -10,4 +10,7 @@ public interface IContactSource
 
     /// <summary>Ids of the contacts whose incident report contains every word of <paramref name="text"/>.</summary>
     Task<int[]> SearchAsync(string text, CancellationToken ct);
+
+    /// <summary>The best few matches for <paramref name="text"/>, most relevant first, each with an excerpt.</summary>
+    Task<FindResult> FindAsync(string text, int limit, CancellationToken ct);
 }

@@ -99,6 +99,116 @@ public sealed class ElasticsearchContactSource(
         return page.Hits.Hits.Select(h => int.TryParse(h.Id, out var id) ? id : 0).Where(id => id > 0).ToArray();
     }
 
+    // Highlight markers are control characters that cannot occur in a report, so the excerpt can be split on them safely
+    // and no markup ever reaches the client.
+    private const char MatchStart = '';
+    private const char MatchEnd = '';
+    private const int ExcerptLength = 140;
+
+    public async Task<FindResult> FindAsync(string text, int limit, CancellationToken ct)
+    {
+        var o = options.Value;
+        var body = new
+        {
+            size = limit,
+            track_total_hits = true,
+            _source = new[] { "DTG", "Description_of_Incident" },
+            query = new
+            {
+                @bool = new
+                {
+                    must = new { match = new { Description_of_Incident = new { query = text, @operator = "and" } } },
+                    filter = new { exists = new { field = "Location" } },
+                },
+            },
+            highlight = new
+            {
+                fields = new
+                {
+                    Description_of_Incident = new
+                    {
+                        fragment_size = ExcerptLength,
+                        number_of_fragments = 1,
+                        pre_tags = new[] { MatchStart.ToString() },
+                        post_tags = new[] { MatchEnd.ToString() },
+                    },
+                },
+            },
+        };
+
+        using var res = await http.PostAsJsonAsync($"{Uri.EscapeDataString(o.ContactsIndex)}/_search", body, RequestJson, ct);
+        await EnsureSuccessAsync(res, ct);
+        var page = await res.Content.ReadFromJsonAsync<FindResponse>(ct)
+                   ?? throw new InvalidOperationException("Elasticsearch returned an empty response.");
+
+        var hits = new List<ContactHit>();
+        foreach (var h in page.Hits.Hits)
+        {
+            if (!int.TryParse(h.Id, out var id) || h.Source?.Dtg is null)
+            {
+                continue;
+            }
+
+            var fragment = h.Highlight?.Description?.FirstOrDefault();
+            var snippet = fragment is not null
+                ? SplitSnippet(fragment)
+                : [new SnippetPart(Excerpt(h.Source.Description), false)];
+            hits.Add(new ContactHit(id, h.Source.Dtg, snippet));
+        }
+
+        return new FindResult([.. hits], page.Hits.Total.Value);
+    }
+
+    private static string Excerpt(string? text)
+    {
+        var t = text?.Trim() ?? "";
+        return t.Length <= ExcerptLength ? t : t[..ExcerptLength] + "…";
+    }
+
+    /// <summary>Splits an excerpt on the highlight markers into plain and matched parts.</summary>
+    internal static SnippetPart[] SplitSnippet(string fragment)
+    {
+        var parts = new List<SnippetPart>();
+        var match = false;
+        var start = 0;
+        for (var i = 0; i <= fragment.Length; i++)
+        {
+            if (i < fragment.Length && fragment[i] != MatchStart && fragment[i] != MatchEnd)
+            {
+                continue;
+            }
+
+            if (i > start)
+            {
+                parts.Add(new SnippetPart(fragment[start..i], match));
+            }
+
+            if (i < fragment.Length)
+            {
+                match = fragment[i] == MatchStart;
+            }
+
+            start = i + 1;
+        }
+
+        return [.. parts];
+    }
+
+    private sealed record FindResponse(FindHits Hits);
+
+    private sealed record FindHits(Total Total, List<FindHit> Hits);
+
+    private sealed record FindHit(
+        [property: JsonPropertyName("_id")] string Id,
+        [property: JsonPropertyName("_source")] FindSource? Source,
+        [property: JsonPropertyName("highlight")] FindHighlight? Highlight);
+
+    private sealed record FindSource(
+        [property: JsonPropertyName("DTG")] string? Dtg,
+        [property: JsonPropertyName("Description_of_Incident")] string? Description);
+
+    private sealed record FindHighlight([property: JsonPropertyName("Description_of_Incident")] List<string>? Description);
+
     private static readonly string[] DetailFields =
     [
         "DTG", "Location", "Grid_Ref", "Operation", "Unit_Task", "Fr_Units", "Fr_Force_Present", "En_Force",

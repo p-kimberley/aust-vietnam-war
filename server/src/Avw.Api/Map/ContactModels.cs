@@ -53,5 +53,14 @@ public sealed record FilterCatalogue(
     NamedCount[] Tasks,
     UnitNode[] Units);
 
+/// <summary>One piece of a search snippet; <see cref="Match"/> marks the words that matched.</summary>
+public sealed record SnippetPart(string Text, bool Match);
+
+/// <summary>A contact that matched a search, with a short excerpt of its report around the match.</summary>
+public sealed record ContactHit(int Id, string Dtg, SnippetPart[] Snippet);
+
+/// <summary>The best matches and how many contacts matched in all.</summary>
+public sealed record FindResult(ContactHit[] Hits, long Total);
+
 /// <summary>The contact ids that match a text search.</summary>
 public sealed record SearchResult(int[] Ids);

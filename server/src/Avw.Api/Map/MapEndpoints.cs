@@ -106,6 +106,26 @@ public static class MapEndpoints
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status429TooManyRequests);
 
+        g.MapGet("/contacts/find", async (string? q, int? limit, IContactSource source, HttpContext ctx, CancellationToken ct) =>
+            {
+                var text = q?.Trim() ?? "";
+                if (text.Length < MinSearchLength || text.Length > MaxSearchLength)
+                {
+                    return Results.ValidationProblem(new Dictionary<string, string[]>
+                    {
+                        ["q"] = [$"Search text must be {MinSearchLength} to {MaxSearchLength} characters."],
+                    });
+                }
+
+                ctx.Response.Headers.CacheControl = "public, max-age=60";
+                return Results.Ok(await source.FindAsync(text, Math.Clamp(limit ?? 8, 1, 20), ct));
+            })
+            .RequireRateLimiting(SearchPolicy)
+            .WithName("FindContacts")
+            .Produces<FindResult>()
+            .ProducesValidationProblem()
+            .Produces(StatusCodes.Status429TooManyRequests);
+
         // The int constraint keeps anything but a plain number out of the Elasticsearch URL.
         g.MapGet("/contacts/{id:int:min(1)}", async (int id, IContactSource source, HttpContext ctx, CancellationToken ct) =>
             {
