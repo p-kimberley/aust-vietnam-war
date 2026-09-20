@@ -33,12 +33,26 @@ spec:
           command: ["dotnet", "/app/worker/Avw.Worker.dll"]
           env:
             {{- include "avw-api.env" . | nindent 12 }}
+            {{- include "avw-api.workerEnv" . | nindent 12 }}
           volumeMounts:
             {{- include "avw-api.volumeMounts" . | nindent 12 }}
+            {{- if and .Values.indexing.enabled .Values.elasticsearch.caSecret }}
+            - name: es-ca
+              mountPath: /etc/avw/es-ca
+              readOnly: true
+            {{- end }}
           resources: {{ toYaml .Values.worker.resources | nindent 12 }}
           securityContext: {{ include "avw-api.containerSecurity" . | nindent 12 }}
       volumes:
         {{- include "avw-api.volumes" . | nindent 8 }}
+        {{- if and .Values.indexing.enabled .Values.elasticsearch.caSecret }}
+        - name: es-ca
+          secret:
+            secretName: {{ .Values.elasticsearch.caSecret }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

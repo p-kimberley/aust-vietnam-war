@@ -54,6 +54,15 @@ map:
   #     exaggeration: 1.5
   terrain: null
 
+# Keeps the Elasticsearch indexes for notes and pictures in step with the database (see docs/runbook.md, section 7). OFF by default:
+# it needs a key that may write to those two indexes, which the read-only key the site reads with cannot. Put that key in the secret as
+# Indexing__ApiKey. While it is off nothing is queued or sent; after switching it on, run `Avw.Migrator reindex` once to catch up.
+indexing:
+  enabled: false
+  url: ""                       # where to write; empty means the address in `elasticsearch.url`
+  notesIndex: avw_incident_notes
+  mediaIndex: avw_incident_media
+
 # Email to the editors when a member adds a note or picture, or sends casualty information. OPTIONAL and off by default: while
 # `smtp.host`, `smtp.from` or `notifications.editorEmails` is empty nothing is sent, the API says so at start-up and logs each item
 # that is waiting, and editors see everything on the Studio's Moderation page. To turn it on, set all three. If the server needs a

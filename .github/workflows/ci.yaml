@@ -58,6 +58,10 @@ jobs:
           done
       - name: Render with the media and scratch volumes enabled
         run: helm template avw deploy/helm/avw-api --set media.enabled=true --set scratch.enabled=true > /dev/null
+      - name: Render with search indexing on, with and without a private CA for Elasticsearch
+        run: |
+          helm template avw deploy/helm/avw-api --set indexing.enabled=true > /dev/null
+          helm template avw deploy/helm/avw-api --set indexing.enabled=true --set elasticsearch.caSecret=es-ca --set indexing.url=https://es-write.example > /dev/null
       - name: Render the one-off import job, both ways
         run: |
           helm template avw deploy/helm/avw-api --set import.enabled=true > /dev/null

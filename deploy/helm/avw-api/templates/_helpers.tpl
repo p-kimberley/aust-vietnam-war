@@ -35,6 +35,43 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     secretKeyRef:
       name: {{ include "avw-api.secretName" . }}
       key: ConnectionStrings__Default
+# The API queues changes to notes and pictures for the search index only while this is on; the worker sends them.
+- name: Indexing__Enabled
+  value: {{ .Values.indexing.enabled | quote }}
+{{- end -}}
+
+{{/* Worker-only settings for the search indexer: where to write (with its own key) and the read-only settings for finding where an incident is. */}}
+{{- define "avw-api.workerEnv" -}}
+{{- if .Values.indexing.enabled }}
+- name: Indexing__NotesIndex
+  value: {{ .Values.indexing.notesIndex | quote }}
+- name: Indexing__MediaIndex
+  value: {{ .Values.indexing.mediaIndex | quote }}
+{{- with .Values.indexing.url }}
+- name: Indexing__Url
+  value: {{ . | quote }}
+{{- end }}
+- name: Indexing__ApiKey
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "avw-api.secretName" . }}
+      key: Indexing__ApiKey
+      optional: true
+- name: Elasticsearch__Url
+  value: {{ .Values.elasticsearch.url | quote }}
+- name: Elasticsearch__ContactsIndex
+  value: {{ .Values.elasticsearch.contactsIndex | quote }}
+{{- if .Values.elasticsearch.caSecret }}
+- name: Elasticsearch__CaCertificatePath
+  value: /etc/avw/es-ca/ca.crt
+{{- end }}
+- name: Elasticsearch__ApiKey
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "avw-api.secretName" . }}
+      key: Elasticsearch__ApiKey
+      optional: true
+{{- end }}
 {{- end -}}
 
 {{/* API-only settings. */}}

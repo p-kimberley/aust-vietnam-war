@@ -1,0 +1,133 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "string_fields": {
+          "match": "*",
+          "match_mapping_type": "string",
+          "mapping": {
+            "fielddata": true,
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          }
+        }
+      }
+    ],
+    "properties": {
+      "Attribution": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "fielddata": true
+      },
+      "Author": {
+        "properties": {
+          "Id": {
+            "type": "long"
+          },
+          "Login": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            },
+            "fielddata": true
+          },
+          "Name": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            },
+            "fielddata": true
+          }
+        }
+      },
+      "Created": {
+        "type": "date"
+      },
+      "DateTaken": {
+        "type": "date"
+      },
+      "Description": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "fielddata": true
+      },
+      "FeatureId": {
+        "type": "long"
+      },
+      "FileExtension": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "fielddata": true
+      },
+      "FileName": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "fielddata": true
+      },
+      "Location": {
+        "type": "geo_point"
+      },
+      "MimeType": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "fielddata": true
+      },
+      "Modified": {
+        "type": "date"
+      },
+      "Path": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "fielddata": true
+      },
+      "Size": {
+        "type": "long"
+      },
+      "Tags": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "fielddata": true
+      }
+    }
+  }
+}
