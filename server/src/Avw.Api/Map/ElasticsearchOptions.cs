@@ -20,6 +20,9 @@ public sealed class ElasticsearchOptions
 
     public string ContactsIndex { get; set; } = "avw_contacts";
 
+    /// <summary>The nominal roll, read for the personnel charts.</summary>
+    public string PersonnelIndex { get; set; } = "avw_nomroll";
+
     /// <summary>Elasticsearch's default result window; the whole dataset (about 6,200 contacts) fits in one request.</summary>
     [Range(1, 10_000)]
     public int MaxContacts { get; set; } = 10_000;

@@ -22,29 +22,8 @@ public static class MapEndpoints
             .Bind(config.GetSection(MapOptions.Section))
             .ValidateOnStart();
 
-        var client = services.AddHttpClient<IContactSource, ElasticsearchContactSource>((sp, http) =>
-        {
-            var o = sp.GetRequiredService<IOptions<ElasticsearchOptions>>().Value;
-            http.BaseAddress = new Uri(o.Url.TrimEnd('/') + "/");
-            http.Timeout = TimeSpan.FromSeconds(30);
-            if (!string.IsNullOrWhiteSpace(o.ApiKey))
-            {
-                http.DefaultRequestHeaders.Authorization = new("ApiKey", o.ApiKey);
-            }
-        });
-        client.ConfigurePrimaryHttpMessageHandler(sp =>
-        {
-            var handler = new SocketsHttpHandler();
-            var ca = sp.GetRequiredService<IOptions<ElasticsearchOptions>>().Value.CaCertificatePath;
-            if (!string.IsNullOrWhiteSpace(ca))
-            {
-                var validation = PrivateCaValidation.FromFile(ca);
-                handler.SslOptions.RemoteCertificateValidationCallback =
-                    (_, cert, chain, errors) => validation.Validate(cert, chain, errors);
-            }
-
-            return handler;
-        });
+        var client = services.AddHttpClient<IContactSource, ElasticsearchContactSource>(ConfigureElasticsearchClient(TimeSpan.FromSeconds(30)));
+        client.ConfigurePrimaryHttpMessageHandler(ElasticsearchHandler);
         services.AddSingleton<ContactCatalogue>();
 
         // Text search reaches Elasticsearch on every call, so it is limited per client address. The address is the real
@@ -58,6 +37,32 @@ public static class MapEndpoints
                 _ => new FixedWindowRateLimiterOptions { PermitLimit = permits, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
         });
         return services;
+    }
+
+    /// <summary>Points an HTTP client at the Elasticsearch cluster, with its API key. Shared by everything that reads from it.</summary>
+    public static Action<IServiceProvider, HttpClient> ConfigureElasticsearchClient(TimeSpan timeout) => (sp, http) =>
+    {
+        var o = sp.GetRequiredService<IOptions<ElasticsearchOptions>>().Value;
+        http.BaseAddress = new Uri(o.Url.TrimEnd('/') + "/");
+        http.Timeout = timeout;
+        if (!string.IsNullOrWhiteSpace(o.ApiKey))
+        {
+            http.DefaultRequestHeaders.Authorization = new("ApiKey", o.ApiKey);
+        }
+    };
+
+    /// <summary>Trusts only the private CA the cluster's certificate chains to, when one is configured.</summary>
+    public static HttpMessageHandler ElasticsearchHandler(IServiceProvider sp)
+    {
+        var handler = new SocketsHttpHandler();
+        var ca = sp.GetRequiredService<IOptions<ElasticsearchOptions>>().Value.CaCertificatePath;
+        if (!string.IsNullOrWhiteSpace(ca))
+        {
+            var validation = PrivateCaValidation.FromFile(ca);
+            handler.SslOptions.RemoteCertificateValidationCallback = (_, cert, chain, errors) => validation.Validate(cert, chain, errors);
+        }
+
+        return handler;
     }
 
     public static void MapMapEndpoints(this IEndpointRouteBuilder api)

@@ -1,5 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Serialization;
+using Avw.Api.Analytics;
 using Avw.Api.Auth;
 using Avw.Api.Cms;
 using Avw.Api.Map;
@@ -47,6 +48,7 @@ else if (!builder.Configuration.GetValue<bool>("DataProtection:AllowUnencryptedK
 
 services.AddSingleton(TimeProvider.System);
 services.AddAvwMap(builder.Configuration);
+services.AddAvwAnalytics();
 services.AddAvwAuth(builder.Environment);
 services.AddAvwCms();
 services.AddAvwFeedback(builder.Configuration);
@@ -89,6 +91,7 @@ var api = app.MapGroup("/api");
 api.MapAuthEndpoints();
 api.MapMapEndpoints();
 api.MapPoiEndpoints();
+api.MapAnalyticsEndpoints();
 api.MapCmsEndpoints(builder.Configuration);
 api.MapMediaEndpoints();
 api.MapFeedbackEndpoints();

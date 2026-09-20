@@ -30,6 +30,9 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     /// <summary>Extra settings for a test that needs a different limit, applied on top of the defaults.</summary>
     public Dictionary<string, string?> Extra { get; } = [];
 
+    /// <summary>Lets a test replace services (for example a data source) after the defaults are in place.</summary>
+    public Action<IServiceCollection>? Configure { get; init; }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -77,6 +80,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             services.AddSingleton<FakeContactSource>();
             services.AddSingleton<IContactSource>(sp => sp.GetRequiredService<FakeContactSource>());
             services.AddDbContext<AvwDbContext>(o => o.UseInMemoryDatabase(_dbName));
+            Configure?.Invoke(services);
 
             // No network: give the OIDC handler a fixed discovery document.
             services.PostConfigure<OpenIdConnectOptions>(AuthSetupSchemes.Oidc, o =>
