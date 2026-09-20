@@ -28,4 +28,11 @@ spec:
                 name: {{ include "avw-api.name" . }}
                 port:
                   name: http
+          - path: /media
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "avw-api.name" . }}
+                port:
+                  name: http
 {{- end }}
