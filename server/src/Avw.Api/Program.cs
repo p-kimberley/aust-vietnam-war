@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Avw.Api.Analytics;
 using Avw.Api.Auth;
 using Avw.Api.Cms;
+using Avw.Api.Community;
 using Avw.Api.Map;
 using Avw.Api.Media;
 using Avw.Data;
@@ -52,6 +53,7 @@ services.AddAvwAnalytics();
 services.AddAvwAuth(builder.Environment);
 services.AddAvwCms();
 services.AddAvwFeedback(builder.Configuration);
+services.AddAvwCommunity(builder.Configuration);
 services.AddAvwMedia(builder.Configuration);
 
 services.AddHealthChecks()
@@ -81,10 +83,12 @@ app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.UseAvwMedia();
-app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// After authentication, so limits that are per person (uploads, tributes, notes) can tell who is asking.
+app.UseRateLimiter();
 app.UseMiddleware<CsrfHeaderMiddleware>();
 
 var api = app.MapGroup("/api");
@@ -95,6 +99,7 @@ api.MapAnalyticsEndpoints();
 api.MapCmsEndpoints(builder.Configuration);
 api.MapMediaEndpoints();
 api.MapFeedbackEndpoints();
+api.MapCommunityEndpoints();
 api.MapOpenApi("/openapi/{documentName}.json");
 
 api.MapHealthChecks("/health/live", new() { Predicate = _ => false });

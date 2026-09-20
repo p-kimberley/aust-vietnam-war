@@ -15,6 +15,14 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
     public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
     public DbSet<Poi> Pois => Set<Poi>();
     public DbSet<FeedbackMessage> Feedback => Set<FeedbackMessage>();
+    public DbSet<IncidentNote> Notes => Set<IncidentNote>();
+    public DbSet<IncidentNoteVersion> NoteVersions => Set<IncidentNoteVersion>();
+    public DbSet<NoteComment> NoteComments => Set<NoteComment>();
+    public DbSet<IncidentMedia> IncidentMedia => Set<IncidentMedia>();
+    public DbSet<MediaLike> MediaLikes => Set<MediaLike>();
+    public DbSet<Tribute> Tributes => Set<Tribute>();
+    public DbSet<CasualtySubmission> CasualtySubmissions => Set<CasualtySubmission>();
+    public DbSet<CasualtyLink> CasualtyLinks => Set<CasualtyLink>();
 
     /// <summary>Shared ASP.NET Data Protection keys, so every API replica can read the auth cookie.</summary>
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -60,6 +68,85 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.Email).HasMaxLength(200);
             e.Property(x => x.Message).HasMaxLength(2000);
             e.HasIndex(x => new { x.Handled, x.CreatedUtc });
+        });
+
+        b.Entity<IncidentNote>(e =>
+        {
+            e.ToTable("incident_notes");
+            e.Property(x => x.AuthorName).HasMaxLength(200);
+            e.Property(x => x.AuthorEmailHash).HasMaxLength(64).IsFixedLength();
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
+            e.HasIndex(x => new { x.ContactId, x.Status });
+            e.HasIndex(x => x.AuthorEmailHash);
+            e.HasIndex(x => x.Status);
+            e.HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        b.Entity<IncidentNoteVersion>(e =>
+        {
+            e.ToTable("incident_note_versions");
+            e.Property(x => x.Title).HasMaxLength(200);
+            e.Property(x => x.Body).HasColumnType("text");
+            e.Property(x => x.EditedByName).HasMaxLength(200);
+            e.HasIndex(x => new { x.NoteId, x.VersionNo }).IsUnique();
+            e.HasOne(x => x.Note).WithMany(n => n.Versions).HasForeignKey(x => x.NoteId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<NoteComment>(e =>
+        {
+            e.ToTable("note_comments");
+            e.Property(x => x.AuthorName).HasMaxLength(200);
+            e.Property(x => x.AuthorEmailHash).HasMaxLength(64).IsFixedLength();
+            e.Property(x => x.Body).HasMaxLength(2000);
+            e.HasIndex(x => new { x.NoteId, x.CreatedUtc });
+            e.HasIndex(x => x.AuthorEmailHash);
+            e.HasOne(x => x.Note).WithMany(n => n.Comments).HasForeignKey(x => x.NoteId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<IncidentMedia>(e =>
+        {
+            e.ToTable("incident_media");
+            e.HasIndex(x => x.ContactId);
+            e.HasIndex(x => new { x.ContactId, x.MediaId }).IsUnique();
+            e.HasOne(x => x.Media).WithMany().HasForeignKey(x => x.MediaId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<MediaLike>(e =>
+        {
+            e.ToTable("media_likes");
+            e.HasKey(x => new { x.MediaId, x.UserId });
+            e.HasOne(x => x.Media).WithMany().HasForeignKey(x => x.MediaId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<Tribute>(e =>
+        {
+            e.ToTable("tributes");
+            e.Property(x => x.ServiceNumber).HasMaxLength(32);
+            e.Property(x => x.AuthorName).HasMaxLength(200);
+            e.Property(x => x.AuthorEmailHash).HasMaxLength(64).IsFixedLength();
+            e.Property(x => x.Message).HasMaxLength(1000);
+            e.HasIndex(x => new { x.ServiceNumber, x.CreatedUtc });
+            e.HasIndex(x => x.AuthorEmailHash);
+        });
+
+        b.Entity<CasualtySubmission>(e =>
+        {
+            e.ToTable("casualty_submissions");
+            e.Property(x => x.ServiceNumber).HasMaxLength(32);
+            e.Property(x => x.CasualtyType).HasMaxLength(60);
+            e.Property(x => x.Comment).HasMaxLength(4000);
+            e.Property(x => x.SubmittedByName).HasMaxLength(200);
+            e.HasIndex(x => new { x.Handled, x.CreatedUtc });
+            e.HasIndex(x => x.ContactId);
+        });
+
+        b.Entity<CasualtyLink>(e =>
+        {
+            e.ToTable("casualty_links");
+            e.Property(x => x.ServiceNumber).HasMaxLength(32);
+            e.HasKey(x => new { x.ServiceNumber, x.ContactId });
+            e.HasIndex(x => x.ContactId);
         });
 
         b.Entity<Category>(e =>

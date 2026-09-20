@@ -79,6 +79,8 @@ public static class AuthSetup
                     var clock = ctx.HttpContext.RequestServices.GetRequiredService<TimeProvider>();
                     var user = await UserSync.UpsertAsync(db, ctx.Principal!, clock, ctx.HttpContext.RequestAborted);
                     ((ClaimsIdentity)ctx.Principal!.Identity!).AddClaim(new Claim(UserSync.LocalIdClaim, user.Id.ToString()));
+                    // Content migrated from the legacy site belongs to whoever proves (by verified email) that it was theirs.
+                    await Avw.Api.Community.LegacyContentLinker.LinkAsync(db, user, ctx.HttpContext.RequestAborted);
                 };
             });
 
