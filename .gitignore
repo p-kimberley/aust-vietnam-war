@@ -42,3 +42,9 @@ wp-content/plugins/hello.php
 /js/bm/minified/
 /.samples/
 /.ai/
+
+# Emitted by the IDE's SCSS watcher next to styles.scss (the Angular build compiles SCSS itself)
+web/src/styles.css
+web/src/styles.css.map
+web/src/app/app.css
+web/src/app/app.css.map
