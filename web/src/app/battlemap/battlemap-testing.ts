@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { AnalyticsService, ChartInfo, ChartResult } from './analytics/analytics';
 import { stubEchartIn } from './analytics/echart-stub';
+import { communityProviders, fakeAuth, fakeCommunity } from './community/community-testing';
 import { Timeline } from './analytics/timeline';
 import { BasemapService, MapHooks } from './basemap.service';
 import { Battlemap } from './battlemap';
@@ -111,6 +112,10 @@ export interface RenderOptions {
   inputs?: Record<string, string>;
   /** Points of interest; an `Error` makes loading fail, and the map should carry on without them. */
   pois?: Poi[] | Error;
+  /** Overrides for the community API (notes, pictures, honour roll) the incident and honour panels talk to. */
+  community?: Record<string, unknown>;
+  /** Who is signed in; nobody by default. */
+  user?: Parameters<typeof fakeAuth>[0];
   /** The raw query parameters the filters are read from. */
   queryParams?: Record<string, string | string[]>;
 }
@@ -168,7 +173,9 @@ export async function render(opts: RenderOptions = {}) {
     charts: vi.fn(() => Promise.resolve(CHARTS)),
     draw: vi.fn((id: string, _ids: readonly number[] | null) => Promise.resolve({ ...CHART, id })),
   };
-  TestBed.configureTestingModule({ providers: [{ provide: AnalyticsService, useValue: analytics }] });
+  const community = fakeCommunity(opts.community);
+  const auth = fakeAuth(opts.user);
+  TestBed.configureTestingModule({ providers: [{ provide: AnalyticsService, useValue: analytics }, ...communityProviders(community, auth)] });
   stubEchartIn(Timeline);
   stubEchartIn(AnalyticsPanel);
   TestBed.overrideComponent(Battlemap, { set: { providers: [{ provide: BasemapService, useValue: basemaps }] } });
@@ -180,7 +187,7 @@ export async function render(opts: RenderOptions = {}) {
   await fixture.whenStable();
   await new Promise((r) => setTimeout(r));
   fixture.detectChanges();
-  return { fixture, basemaps, filterService, poiService, analytics, el: fixture.nativeElement as HTMLElement };
+  return { fixture, basemaps, filterService, poiService, analytics, community, auth, el: fixture.nativeElement as HTMLElement };
 }
 
 /** Lets pending promises and a change-detection pass settle. */

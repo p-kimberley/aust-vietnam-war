@@ -5,7 +5,7 @@
     <a class="bm__back" routerLink="/">← Australia's Vietnam War</a>
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
-      <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" />
+      <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" (pickPerson)="openPerson($event)" />
       <button type="button" class="bm__charts" [attr.aria-pressed]="chartsOpen()" (click)="setChartsOpen(!chartsOpen())">Charts</button>
       <span class="bm__count data">
         @if (activeCount()) {
@@ -38,7 +38,11 @@
 
   @if (status() === 'ready' && selectedId(); as id) {
     <div class="bm__incident">
-      <app-incident-panel [contactId]="id" (closed)="select(null)" />
+      <app-incident-panel [contactId]="id" (closed)="select(null)" (openPerson)="openPerson($event)" />
+    </div>
+  } @else if (status() === 'ready' && selectedPerson(); as serviceNumber) {
+    <div class="bm__incident">
+      <app-honour-panel [serviceNumber]="serviceNumber" (closed)="openPerson(null)" (openIncident)="openContact($event)" />
     </div>
   } @else if (status() === 'ready' && selectedPoiId(); as poiId) {
     <div class="bm__incident">
@@ -51,7 +55,7 @@
       class="panel"
       [class.panel--wide]="tab() === 'filters'"
       [class.panel--closed]="!panelOpen()"
-      [class.panel--shifted]="selectedId() !== null || selectedPoiId() !== null"
+      [class.panel--shifted]="selectedId() !== null || selectedPoiId() !== null || selectedPerson() !== null"
       aria-label="Map controls"
     >
       <div class="panel__head">

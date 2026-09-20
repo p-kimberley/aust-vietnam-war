@@ -5,8 +5,8 @@
     role="combobox"
     autocomplete="off"
     maxlength="100"
-    placeholder="Search bases and reports"
-    aria-label="Search bases and incident reports"
+    placeholder="Search bases, people and reports"
+    aria-label="Search bases, people on the honour roll, and incident reports"
     aria-autocomplete="list"
     aria-controls="search-results"
     [attr.aria-expanded]="open() && (options().length > 0 || status() !== 'idle')"
@@ -34,6 +34,10 @@
             @if (option.kind === 'poi') {
               <span class="search__kind">{{ typeName(option.poi.type) }}</span>
               <span class="search__title">{{ option.poi.name }}</span>
+            } @else if (option.kind === 'person') {
+              <span class="search__kind">Honour roll</span>
+              <span class="search__title">{{ option.person.name }}</span>
+              <span class="search__snippet">{{ option.person.rank }}{{ option.person.death ? ', died ' + option.person.death.slice(0, 4) : '' }}</span>
             } @else {
               <span class="search__kind data">{{ formatDtg(option.hit.dtg) }}</span>
               <span class="search__snippet">

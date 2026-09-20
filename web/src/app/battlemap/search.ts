@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { HonourSummary } from './community/community';
 import { Poi, poiLabel } from './poi';
 
 /** A piece of a search excerpt; `match` marks the words that were searched for. */
@@ -33,6 +34,13 @@ export class SearchService {
   find(text: string, limit = 8): Promise<FindResult> {
     const params = new HttpParams().set('q', text).set('limit', limit);
     return firstValueFrom(this.http.get<FindResult>('/api/contacts/find', { params }));
+  }
+
+  /** The best few people on the honour roll whose name or service number matches every word of `text`. */
+  async people(text: string, limit = 5): Promise<{ items: HonourSummary[]; total: number }> {
+    const params = new HttpParams().set('q', text).set('pageSize', limit);
+    const page = await firstValueFrom(this.http.get<{ items: HonourSummary[]; total: number }>('/api/honour-roll', { params }));
+    return { items: page.items, total: page.total };
   }
 }
 

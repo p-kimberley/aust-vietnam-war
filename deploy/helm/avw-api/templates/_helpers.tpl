@@ -56,6 +56,36 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 - name: Elasticsearch__CaCertificatePath
   value: /etc/avw/es-ca/ca.crt
 {{- end }}
+- name: Elasticsearch__PersonnelIndex
+  value: {{ .Values.elasticsearch.personnelIndex | quote }}
+{{- if .Values.smtp.host }}
+- name: Smtp__Host
+  value: {{ .Values.smtp.host | quote }}
+- name: Smtp__Port
+  value: {{ .Values.smtp.port | quote }}
+- name: Smtp__UseSsl
+  value: {{ .Values.smtp.useSsl | quote }}
+- name: Smtp__From
+  value: {{ .Values.smtp.from | quote }}
+{{- if .Values.smtp.user }}
+- name: Smtp__User
+  value: {{ .Values.smtp.user | quote }}
+- name: Smtp__Password
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "avw-api.secretName" . }}
+      key: Smtp__Password
+      optional: true
+{{- end }}
+{{- end }}
+{{- range $i, $email := .Values.notifications.editorEmails }}
+- name: {{ printf "Notifications__EditorEmails__%d" $i }}
+  value: {{ $email | quote }}
+{{- end }}
+{{- if .Values.notifications.siteUrl }}
+- name: Notifications__SiteUrl
+  value: {{ .Values.notifications.siteUrl | quote }}
+{{- end }}
 - name: Elasticsearch__ApiKey
   valueFrom:
     secretKeyRef:

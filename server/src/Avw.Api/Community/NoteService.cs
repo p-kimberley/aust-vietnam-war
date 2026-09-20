@@ -342,5 +342,5 @@ public sealed class NoteService(AvwDbContext db, TimeProvider clock, INotifier n
             : null;
     }
 
-    private void Tell(string subject, string text, int contactId) => notifier.Notify(new Notification(subject, text + $"\n\nIncident: /battlemap?incident={contactId}\nModerate it in the Studio: /studio/moderation"));
+    private void Tell(string subject, string text, int contactId) => notifier.Notify(new Notification(subject, text + $"\n\nIncident: {{site}}/battlemap?incident={contactId}\nModerate it in the Studio: {{site}}/studio/moderation"));
 }

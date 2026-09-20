@@ -16,6 +16,8 @@ auth:
 elasticsearch:
   url: https://elasticsearch.example.internal:9200
   contactsIndex: avw_contacts
+  # The nominal roll, read for the honour roll and the personnel charts.
+  personnelIndex: avw_nomroll
   # Secret holding the private CA (key ca.crt) that signed the cluster's certificate, for example the public certs
   # secret the Elasticsearch operator publishes. Leave empty when the certificate is publicly trusted.
   caSecret: ""
@@ -49,10 +51,23 @@ map:
   #     exaggeration: 1.5
   terrain: null
 
+# Email to the editors when a member adds a note or picture, or sends casualty information. Leave `smtp.host` empty to send
+# nothing (the API then only logs that something is waiting). The SMTP password goes in the secret as Smtp__Password.
+smtp:
+  host: ""
+  port: 587
+  useSsl: true
+  user: ""
+  from: ""                      # for example no-reply@vietnam-war.au
+notifications:
+  editorEmails: []              # who is told; blind-copied so they cannot see each other
+  siteUrl: ""                   # the public address, for links in the email
+
 # Secret holding the sensitive settings, as environment-style keys:
 #   ConnectionStrings__Default          e.g. Server=mysql-router;Port=6446;Database=avw;User=avw;Password=...
 #   Elasticsearch__ApiKey              optional: base64 API key with read access to the contacts index
 #   Auth__ClientSecret                  the avw-api client secret set in Keycloak
+#   Smtp__Password                     optional: the password for smtp.user
 #   DataProtection__CertificatePassword password of the key-protection certificate
 # Create it out of band (sealed-secrets, external-secrets, ...). `create` exists for local clusters only.
 secrets:

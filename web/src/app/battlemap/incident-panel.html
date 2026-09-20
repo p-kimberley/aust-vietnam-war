@@ -4,7 +4,21 @@
     <button type="button" class="incident__close" aria-label="Close incident panel" (click)="closed.emit()">×</button>
   </header>
 
-  <div class="incident__body">
+  <div class="incident__tabs" role="tablist" aria-label="About this incident">
+    <button type="button" role="tab" class="incident__tab" [attr.aria-selected]="tab() === 'details'" [class.is-on]="tab() === 'details'" (click)="tab.set('details')">Details</button>
+    <button type="button" role="tab" class="incident__tab" [attr.aria-selected]="tab() === 'notes'" [class.is-on]="tab() === 'notes'" (click)="tab.set('notes')">
+      Notes @if (notesCount() !== null) { <span class="incident__count">{{ notesCount() }}</span> }
+    </button>
+    <button type="button" role="tab" class="incident__tab" [attr.aria-selected]="tab() === 'pictures'" [class.is-on]="tab() === 'pictures'" (click)="tab.set('pictures')">
+      Pictures @if (picturesCount() !== null) { <span class="incident__count">{{ picturesCount() }}</span> }
+    </button>
+    <button type="button" role="tab" class="incident__tab" [attr.aria-selected]="tab() === 'people'" [class.is-on]="tab() === 'people'" (click)="tab.set('people')">
+      Honour roll @if (peopleCount() !== null) { <span class="incident__count">{{ peopleCount() }}</span> }
+    </button>
+  </div>
+
+  <div class="incident__body" role="tabpanel">
+    <div [hidden]="tab() !== 'details'">
     @if (incident.isLoading()) {
       <p role="status">Loading…</p>
     } @else if (incident.error()) {
@@ -74,5 +88,11 @@
     } @else {
       <p role="status">This incident was not found.</p>
     }
+    </div>
+
+    <!-- The community tabs stay in the page while hidden, so their counts are ready when the tab bar is looked at. -->
+    <div [hidden]="tab() !== 'notes'"><app-incident-notes [contactId]="contactId()" (counted)="notesCount.set($event)" /></div>
+    <div [hidden]="tab() !== 'pictures'"><app-incident-pictures [contactId]="contactId()" (counted)="picturesCount.set($event)" /></div>
+    <div [hidden]="tab() !== 'people'"><app-incident-people [contactId]="contactId()" (counted)="peopleCount.set($event)" (open)="openPerson.emit($event)" /></div>
   </div>
 </section>

@@ -4,6 +4,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, expect, it, vi } from 'vitest';
 import { POIS, render, settle } from './battlemap-testing';
+import { HonourSummary } from './community/community';
 import { Poi } from './poi';
 import { FindResult, SearchService, matchPois } from './search';
 import { SearchBox } from './search-box';
@@ -43,6 +44,73 @@ describe('matchPois', () => {
   });
 });
 
+const WHITE: HonourSummary = { serviceNumber: '5715978', name: 'James Mungo White', rank: 'Private', branch: 'Army', birth: null, death: '1969-04-04', ageAtDeath: null, portraitUrl: null };
+
+describe('SearchBox honour roll', () => {
+  function withPeople(people: (q: string) => Promise<{ items: HonourSummary[]; total: number }>) {
+    TestBed.resetTestingModule();
+    const service = { find: vi.fn(() => Promise.resolve(FOUND)), people: vi.fn(people) };
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), { provide: SearchService, useValue: service }] });
+    const fixture: ComponentFixture<SearchBox> = TestBed.createComponent(SearchBox);
+    fixture.componentRef.setInput('pois', BASES);
+    fixture.detectChanges();
+    const picked: string[] = [];
+    fixture.componentInstance.pickPerson.subscribe((s) => picked.push(s));
+    const el = fixture.nativeElement as HTMLElement;
+    const run = async (value: string) => {
+      const input = el.querySelector<HTMLInputElement>('input')!;
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await wait(DEBOUNCE);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+    };
+    return { el, service, picked, run };
+  }
+
+  it('lists people on the honour roll between the bases and the incidents, and opens one', async () => {
+    const { el, service, picked, run } = withPeople(() => Promise.resolve({ items: [WHITE], total: 1 }));
+
+    await run('coral');
+
+    expect(service.people).toHaveBeenCalledWith('coral');
+    const kinds = [...el.querySelectorAll('[role=option]')].map((o) => text(o.querySelector('.search__kind')));
+    expect(kinds.slice(0, 3)).toEqual(['Fire Support Base', 'Fire Support Patrol Base', 'Fire Support Base']);
+    expect(kinds).toContain('Honour roll');
+    expect(kinds.indexOf('Honour roll')).toBeLessThan(kinds.findIndex((k) => !!k?.includes('1966')));
+    const person = [...el.querySelectorAll<HTMLElement>('[role=option]')].find((o) => !!text(o)?.includes('James Mungo White'))!;
+    expect(text(person)).toContain('Private, died 1969');
+
+    person.click();
+    expect(picked).toEqual(['5715978']);
+  });
+
+  it('carries on with bases and incidents when the honour roll cannot be searched', async () => {
+    const { el, run } = withPeople(() => Promise.reject(new Error('down')));
+
+    await run('claymore');
+
+    expect(el.querySelectorAll('[role=option]').length).toBeGreaterThan(0);
+    expect(text(el.querySelector('.search__note'))).not.toContain('failed');
+  });
+});
+
+describe('SearchService', () => {
+  it('asks the honour roll for a few people at a time', async () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()] });
+    const ctl = TestBed.inject(HttpTestingController);
+
+    const result = TestBed.inject(SearchService).people('white', 3);
+    const req = ctl.expectOne((r) => r.url === '/api/honour-roll');
+    expect([req.request.params.get('q'), req.request.params.get('pageSize')]).toEqual(['white', '3']);
+    req.flush({ items: [WHITE], total: 1, page: 1, pageSize: 3 });
+
+    expect(await result).toEqual({ items: [WHITE], total: 1 });
+  });
+});
+
 describe('SearchService', () => {
   it('asks for the words and a limit', () => {
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()] });
@@ -57,9 +125,9 @@ describe('SearchService', () => {
 });
 
 describe('SearchBox', () => {
-  function box(find: (q: string) => Promise<FindResult> = () => Promise.resolve(FOUND)) {
+  function box(find: (q: string) => Promise<FindResult> = () => Promise.resolve(FOUND), people: (q: string) => Promise<{ items: HonourSummary[]; total: number }> = () => Promise.resolve({ items: [], total: 0 })) {
     TestBed.resetTestingModule();
-    const service = { find: vi.fn(find) };
+    const service = { find: vi.fn(find), people: vi.fn(people) };
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), { provide: SearchService, useValue: service }] });
     const fixture: ComponentFixture<SearchBox> = TestBed.createComponent(SearchBox);
     fixture.componentRef.setInput('pois', BASES);

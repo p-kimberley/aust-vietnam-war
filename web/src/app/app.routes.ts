@@ -25,6 +25,7 @@ export const routes: Routes = [
       { path: 'articles', pathMatch: 'full', loadComponent: () => import('./studio/studio-articles').then((m) => m.StudioArticles) },
       { path: 'articles/:id', loadComponent: () => import('./studio/article-editor').then((m) => m.ArticleEditor) },
       { path: 'media', loadComponent: () => import('./studio/studio-media').then((m) => m.StudioMedia) },
+      { path: 'moderation', canActivate: [roleGuard('editor')], loadComponent: () => import('./studio/studio-moderation').then((m) => m.StudioModeration) },
       { path: 'feedback', canActivate: [roleGuard('editor')], loadComponent: () => import('./studio/studio-feedback').then((m) => m.StudioFeedback) },
     ],
   },

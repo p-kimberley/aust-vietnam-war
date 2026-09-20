@@ -5,6 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
 import { ContactDetail } from './contacts';
 import { ContactsService } from './contacts.service';
+import { communityProviders } from './community/community-testing';
 import { IncidentPanel } from './incident-panel';
 
 const detail: ContactDetail = {
@@ -19,7 +20,7 @@ const detail: ContactDetail = {
 
 function setup() {
   TestBed.configureTestingModule({
-    providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
+    providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting(), ...communityProviders()],
   });
   return { ctl: TestBed.inject(HttpTestingController), service: TestBed.inject(ContactsService) };
 }

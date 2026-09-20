@@ -517,6 +517,19 @@ public class EmailNotifierTests
         Assert.True(Notifier(full, to).CanSend);
     }
 
+    [Theory]
+    [InlineData("https://vietnam-war.au", "https://vietnam-war.au/battlemap?incident=2")]
+    [InlineData("https://vietnam-war.au/", "https://vietnam-war.au/battlemap?incident=2")]
+    [InlineData(null, "/battlemap?incident=2")]
+    public void Turns_links_in_a_message_into_full_addresses_when_the_site_address_is_known(string? site, string expected)
+    {
+        var notifier = Notifier(recipients: new NotificationOptions { SiteUrl = site });
+
+        var body = notifier.Render(new Notification("Subject", "Incident: {site}/battlemap?incident=2"));
+
+        Assert.Equal("Incident: " + expected, body);
+    }
+
     [Fact]
     public async Task Never_fails_the_caller_and_drains_its_queue_even_when_nothing_can_be_sent()
     {

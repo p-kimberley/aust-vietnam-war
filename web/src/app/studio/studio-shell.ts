@@ -14,6 +14,7 @@ import { AuthService } from '../core/auth.service';
         <a routerLink="/studio/articles" routerLinkActive="is-active">{{ auth.hasRole('editor') ? 'Articles and pages' : 'Your articles' }}</a>
         <a routerLink="/studio/media" routerLinkActive="is-active">Pictures</a>
         @if (auth.hasRole('editor')) {
+          <a routerLink="/studio/moderation" routerLinkActive="is-active">Moderation</a>
           <a routerLink="/studio/feedback" routerLinkActive="is-active">Feedback</a>
         }
       </nav>

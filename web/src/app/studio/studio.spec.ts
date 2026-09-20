@@ -636,3 +636,89 @@ describe('StudioFeedback', () => {
     expect(el.textContent).toContain('Mark as not done');
   });
 });
+
+describe('StudioModeration', () => {
+  const queue = {
+    notes: [{ id: 1, contactId: 2, title: 'Ambush site', body: 'Claymores along the track.', authorName: 'Ann Member', updatedUtc: '2026-03-01T00:00:00Z', isChange: false }, { id: 2, contactId: 9, title: 'Changed', body: 'Better.', authorName: 'Bo Member', updatedUtc: '2026-03-02T00:00:00Z', isChange: true }],
+    pictures: [{ incidentMediaId: 10, mediaId: 5, contactId: 2, url: '/media/aa/f.jpg', thumbUrl: '/media/aa/f-480.jpg', caption: 'A patrol', credit: 'AWM', uploadedByName: 'Ann Member' }],
+    casualties: [{ id: 4, contactId: 2, serviceNumber: '5715978', casualtyType: 'Killed in action', comment: 'See the unit diary.', submittedByName: 'Ann Member', createdUtc: '2026-03-01T00:00:00Z', handled: false }],
+  };
+
+  async function open(load: () => Promise<unknown>) {
+    TestBed.resetTestingModule();
+    const api = {
+      queue: vi.fn(load),
+      moderateNote: vi.fn(() => Promise.resolve({})),
+      setPictureStatus: vi.fn(() => Promise.resolve({})),
+      markCasualty: vi.fn(() => Promise.resolve({})),
+    };
+    const { CommunityService } = await import('../battlemap/community/community');
+    const { StudioModeration } = await import('./studio-moderation');
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), { provide: CommunityService, useValue: api }] });
+    const fixture = TestBed.createComponent(StudioModeration);
+    const el = fixture.nativeElement as HTMLElement;
+    const settle = async () => {
+      await wait();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+    };
+    await settle();
+    return { api, el, settle };
+  }
+
+  const buttons = (el: HTMLElement, label: string) => [...el.querySelectorAll<HTMLButtonElement>('button')].filter((b) => b.textContent?.trim() === label);
+
+  it('lists what is waiting, oldest first, with a link to each incident', async () => {
+    const { el } = await open(() => Promise.resolve(structuredClone(queue)));
+
+    expect([...el.querySelectorAll('h2')].map((h) => h.textContent)).toEqual(['Notes (2)', 'Pictures (1)', 'Casualty information (1)']);
+    expect(el.textContent).toContain('A change to an approved note');
+    expect(el.querySelector('article a[href="/battlemap?incident=2"]')).not.toBeNull();
+    expect(el.querySelector('.pics img')?.getAttribute('src')).toBe('/media/aa/f-480.jpg');
+    expect(el.textContent).toContain('Killed in action, service number 5715978');
+  });
+
+  it('approves or rejects a note and takes it off the list', async () => {
+    const { api, el, settle } = await open(() => Promise.resolve(structuredClone(queue)));
+
+    buttons(el, 'Approve')[0].click();
+    await settle();
+    buttons(el, 'Reject')[0].click();
+    await settle();
+
+    expect(api.moderateNote).toHaveBeenNthCalledWith(1, 1, 'Approved');
+    expect(api.moderateNote).toHaveBeenNthCalledWith(2, 2, 'Rejected');
+    expect(el.querySelector('h2')?.textContent).toBe('Pictures (1)');                         // both notes are gone
+  });
+
+  it('approves a picture through its file, and marks casualty information as dealt with', async () => {
+    const { api, el, settle } = await open(() => Promise.resolve({ ...structuredClone(queue), notes: [] }));
+
+    buttons(el, 'Approve')[0].click();
+    await settle();
+    buttons(el, 'Mark as dealt with')[0].click();
+    await settle();
+
+    expect(api.setPictureStatus).toHaveBeenCalledWith(5, 'Approved');
+    expect(api.markCasualty).toHaveBeenCalledWith(4, true);
+    expect(el.textContent).toContain('Nothing is waiting.');
+  });
+
+  it('keeps the item and says why when an action fails', async () => {
+    const { api, el, settle } = await open(() => Promise.resolve(structuredClone(queue)));
+    api.moderateNote.mockRejectedValueOnce(problem(403, 'Only editors can approve or reject notes.'));
+
+    buttons(el, 'Approve')[0].click();
+    await settle();
+
+    expect(el.querySelector('[role=alert]')?.textContent).toContain('Only editors');
+    expect(el.querySelector('h2')?.textContent).toBe('Notes (2)');
+  });
+
+  it('says so when the queue cannot be loaded', async () => {
+    const { el } = await open(() => Promise.reject(new Error('down')));
+
+    expect(el.querySelector('[role=alert]')?.textContent).toContain('could not be loaded');
+  });
+});

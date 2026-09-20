@@ -1,0 +1,164 @@
+:host {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--paper);
+}
+
+h4 {
+  margin: 0 0 0.15rem;
+  font-size: 1rem;
+  color: var(--paper);
+}
+
+p {
+  margin: 0.25rem 0;
+}
+
+a {
+  color: var(--smoke-yellow);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 2px;
+}
+
+.hint,
+.meta,
+.empty {
+  color: var(--khaki);
+  font-size: 0.85rem;
+}
+
+.error {
+  color: var(--contact-red-bright);
+}
+
+.ok {
+  color: #b5e48c;
+}
+
+.card {
+  margin: 0.6rem 0;
+  padding: 0.6rem 0.75rem;
+  background: rgb(53 61 34 / 0.55);
+  border: 1px solid var(--olive-500);
+  border-left: 3px solid var(--brass);
+  border-radius: var(--radius);
+}
+
+.card--pending {
+  border-left-color: var(--contact-red-bright);
+}
+
+.body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--brass);
+  color: var(--ink);
+  font-size: 0.7rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.badge--rejected {
+  background: var(--contact-red);
+  color: var(--paper);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+button {
+  font: inherit;
+  padding: 0.2rem 0.6rem;
+  color: var(--paper);
+  background: var(--olive-700);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+button.danger {
+  border-color: var(--contact-red);
+  color: var(--contact-red-bright);
+}
+
+button.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--smoke-yellow);
+  text-decoration: underline;
+}
+
+form {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+label {
+  display: grid;
+  gap: 0.15rem;
+  color: var(--khaki);
+  font-size: 0.8rem;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  padding: 0.3rem 0.4rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  width: 100%;
+}
+
+.comments {
+  margin: 0.5rem 0 0;
+  padding: 0.4rem 0 0 0.75rem;
+  border-top: 1px solid var(--olive-700);
+  list-style: none;
+}
+
+.comments li {
+  margin: 0.3rem 0;
+}
+
+.history {
+  margin: 0.4rem 0 0;
+  padding-left: 1rem;
+  font-size: 0.8rem;
+  color: var(--khaki);
+}

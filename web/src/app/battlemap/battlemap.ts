@@ -17,6 +17,7 @@ import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
 import { POI_POINTS, addPoiLayers, setPoiVisibility, setSelectedPoi } from './poi-layers';
+import { HonourPanel } from './community/honour-panel';
 import { PoiPanel } from './poi-panel';
 import { SearchBox } from './search-box';
 import {
@@ -53,7 +54,7 @@ const SEARCH_DELAY_MS = 400;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, IncidentPanel, PoiPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, IncidentPanel, PoiPanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -70,6 +71,7 @@ export class Battlemap {
   readonly poi = input<string>();
   readonly charts = input<string>();
   readonly track = input<string>();
+  readonly person = input<string>();
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -91,6 +93,8 @@ export class Battlemap {
   protected readonly config = signal<MapConfig | null>(null);
   protected readonly selectedId = signal<number | null>(null);
   protected readonly selectedPoiId = signal<number | null>(null);
+  /** The service number of the person on the honour roll whose panel is open. */
+  protected readonly selectedPerson = signal<string | null>(null);
   protected readonly pois = signal<readonly Poi[]>([]);
   protected readonly showPois = signal(true);
   protected readonly tab = signal<Tab>('layers');
@@ -137,7 +141,10 @@ export class Battlemap {
   /** Opens the incident panel for a contact (or closes it), ringing the marker and keeping the URL in step. */
   protected select(id: number | null): void {
     this.selectedId.set(id);
-    if (id !== null) this.selectedPoiId.set(null);
+    if (id !== null) {
+      this.selectedPoiId.set(null);
+      this.selectedPerson.set(null);
+    }
     if (this.map) {
       setSelectedContact(this.map, id);
       if (id !== null) setSelectedPoi(this.map, null);
@@ -148,10 +155,27 @@ export class Battlemap {
   /** Opens the panel for a point of interest (or closes it). One panel is open at a time, so this closes the incident panel. */
   protected selectPoi(id: number | null): void {
     this.selectedPoiId.set(id);
-    if (id !== null) this.selectedId.set(null);
+    if (id !== null) {
+      this.selectedId.set(null);
+      this.selectedPerson.set(null);
+    }
     if (this.map) {
       setSelectedPoi(this.map, id);
       if (id !== null) setSelectedContact(this.map, null);
+    }
+    this.syncUrl();
+  }
+
+  /** Opens a person's page on the honour roll (or closes it), in place of whatever else is open. */
+  protected openPerson(serviceNumber: string | null): void {
+    this.selectedPerson.set(serviceNumber);
+    if (serviceNumber !== null) {
+      this.selectedId.set(null);
+      this.selectedPoiId.set(null);
+      if (this.map) {
+        setSelectedContact(this.map, null);
+        setSelectedPoi(this.map, null);
+      }
     }
     this.syncUrl();
   }
@@ -282,6 +306,11 @@ export class Battlemap {
         if (this.activeCount() > 0) {
           this.tab.set('filters');
         }
+      }
+
+      // A link may open onto a person on the honour roll, unless it already names an incident or a base.
+      if (this.person() && !this.incident() && !this.poi()) {
+        this.selectedPerson.set(this.person()!);
       }
 
       this.chartsOpen.set(this.charts() === '1');
@@ -423,6 +452,7 @@ export class Battlemap {
           overlays: this.basemaps.overlayIds().join(',') || null,
           incident: this.selectedId(),
           poi: this.selectedPoiId(),
+          person: this.selectedPerson(),
           charts: this.chartsOpen() ? '1' : null,
           track: this.showTrack() ? '1' : null,
           ...(tree ? toParams(this.filters(), tree) : {}),

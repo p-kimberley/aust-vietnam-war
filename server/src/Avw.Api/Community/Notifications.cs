@@ -75,6 +75,9 @@ public sealed class EmailNotifier(IOptions<SmtpOptions> smtp, IOptions<Notificat
         }
     }
 
+    /// <summary>The message text, with <c>{site}</c> replaced by the public address so its links can be followed from an inbox.</summary>
+    internal string Render(Notification n) => n.Body.Replace("{site}", (recipients.Value.SiteUrl ?? "").TrimEnd('/'));
+
     private async Task SendAsync(Notification n, CancellationToken ct)
     {
         var o = smtp.Value;
@@ -84,7 +87,7 @@ public sealed class EmailNotifier(IOptions<SmtpOptions> smtp, IOptions<Notificat
             client.Credentials = new NetworkCredential(o.User, o.Password);
         }
 
-        using var message = new MailMessage { From = new MailAddress(o.From), Subject = n.Subject, Body = n.Body };
+        using var message = new MailMessage { From = new MailAddress(o.From), Subject = n.Subject, Body = Render(n) };
         foreach (var to in recipients.Value.EditorEmails)
         {
             message.Bcc.Add(to);                              // Blind copies: editors do not need to see each other's addresses.

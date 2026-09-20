@@ -72,6 +72,24 @@ that is easy to flip.
 | 4.9 | **Charts are drawn with Apache ECharts**, loaded only when needed. Every chart has a "show the figures as a table" alternative (up to 400 rows). There is no chart export (image or CSV) yet. | As described. | n/a |
 | 4.10 | **Time of day** uses the hour in the contact's date-time as recorded (local time in Vietnam, stored without a zone). | As described. | n/a |
 
+## Phase 5: community features
+
+| # | Assumption / gap | Default taken | Change it by |
+|---|---|---|---|
+| 5.1 | **Rules for notes.** Editors' and admins' own notes and edits go live at once; everyone else's wait for approval. Until an editor approves a *change*, the public keeps seeing the last approved text (every save is a kept version). A rejected change leaves the old text up; a rejected first version never shows. Members may delete **their own** notes and comments (the plan says both "only privileged users may delete" and "so they can edit and delete their own notes"; I followed the second). | As described. | `NoteService`. |
+| 5.2 | **Note text is plain text** (blank lines make paragraphs; nothing is ever treated as markup), up to 5,000 characters, with a title of up to 200. Legacy note bodies will be reduced to plain text on import (as the points of interest were). | As described. | n/a |
+| 5.3 | **Comments** are shown at once (the legacy site had no approval for them), can be removed by their author or an editor, and can be closed per note by an editor. | As described. | n/a |
+| 5.4 | **Pictures on incidents** use the Studio's upload pipeline and approval (editors' uploads go live, others wait). Views are **not** counted (the legacy `record-user-media-view` is dropped); likes are kept, one per person per picture, on approved pictures only. The picture's place and "location taken" (`Lat`/`Lon` in the legacy table) are not kept, only an optional date taken. | As described. | `IncidentMediaService`. |
+| 5.5 | **Poppies (tributes)** are shown at once with no approval (the legacy table had none), limited to 10 an hour per person and 500 characters, and removable by the author or an editor. Old tributes had a host address stored; it is **not** migrated. | As described. | Add a moderation step if abuse appears. |
+| 5.6 | **Casualty information** from members is stored for editors to read in the Studio (Moderation page) and act on by hand; nothing updates the honour roll automatically. Types: killed in action, died of wounds, wounded in action, missing, other. | As described. | `CasualtyService.Types`. |
+| 5.7 | **Honour roll** = people on the nominal roll (`avw_nomroll`) with a date of death: 522 of 60,799. Names are shown as "First Second Third Surname". The roll has no link to incidents, so incident links live in a MySQL table (`casualty_links`, filled by the legacy `nomroll_contacts` import in Phase 6). Until then every incident shows an empty honour roll. Honours and the legacy extra fields (`nomroll_honours`, `nomroll_extra_fields`) are not shown. | As described. | n/a |
+| 5.8 | **Portraits** are shown when a file `portraits/<service number>.jpg` exists in the media folder (put there by you: the legacy `honour-roll/` files). The roll's external `nomroll_personnel_media.ImageUrl` links are not used. | As described. | `ElasticsearchHonourRoll.PortraitFor`. |
+| 5.9 | **Email to editors** (new note, changed note, new picture, casualty information) goes over SMTP from a queue, blind-copied to `Notifications:EditorEmails`. The plan reads the recipients from Keycloak role membership; that needs a service account and an admin API call, so a plain list is used for now. **No SMTP server was given**, so nothing is sent until `smtp.host`, `smtp.from` and `notifications.editorEmails` are set in the Helm values (and `Smtp__Password` in the secret). Meanwhile the API only logs that something is waiting. Uses .NET's built-in `SmtpClient` (no extra package). | As described. | Give me the SMTP details and recipients, or the Keycloak service-account details. |
+| 5.10 | **Old content is claimed by verified email**: when someone signs in with a verified email whose hash matches, their migrated notes, comments and tributes become theirs. The importer (Phase 6) must store only the hash. | As described. | `LegacyContentLinker`. |
+| 5.11 | **The rate limiter now runs after authentication**, so limits that are per person (uploads, tributes, writes) really are. Before this, per-person limits were per network address. | Fixed. | n/a |
+| 5.12 | **Search** now also finds people on the honour roll by name or service number (up to 5), shown between bases and incidents. | As described. | n/a |
+| 5.13 | **Not built:** a member's own profile page, a "my contributions" list, subscription or reply notifications to members, and a public author page. | Left out. | Say which you want. |
+
 ## Later phases
 
 Added as the work proceeds.

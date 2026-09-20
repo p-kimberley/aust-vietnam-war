@@ -87,7 +87,7 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
             await db.SaveChangesAsync(ct);
             if (uploaded.Value.Status == MediaStatus.Pending)
             {
-                notifier.Notify(new Notification($"A picture is waiting for approval (incident {contactId})", $"{person.Name} added a picture to incident {contactId}.\n\nIncident: /battlemap?incident={contactId}\nModerate it in the Studio: /studio/moderation"));
+                notifier.Notify(new Notification($"A picture is waiting for approval (incident {contactId})", $"{person.Name} added a picture to incident {contactId}.\n\nIncident: {{site}}/battlemap?incident={contactId}\nModerate it in the Studio: {{site}}/studio/moderation"));
             }
         }
 
@@ -260,7 +260,7 @@ public sealed class CasualtyService(AvwDbContext db, IContactSource contacts, IH
         };
         db.CasualtySubmissions.Add(row);
         await db.SaveChangesAsync(ct);
-        notifier.Notify(new Notification($"Casualty information received (incident {contactId})", $"{person.Name} sent information about a casualty ({type}) on incident {contactId}.\n\nIncident: /battlemap?incident={contactId}\nRead it in the Studio: /studio/moderation"));
+        notifier.Notify(new Notification($"Casualty information received (incident {contactId})", $"{person.Name} sent information about a casualty ({type}) on incident {contactId}.\n\nIncident: {{site}}/battlemap?incident={contactId}\nRead it in the Studio: {{site}}/studio/moderation"));
         return CmsResult<CasualtyRow>.Success(ToRow(row));
     }
 
