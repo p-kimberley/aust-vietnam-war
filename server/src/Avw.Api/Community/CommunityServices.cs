@@ -56,12 +56,28 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
         return rows.Select(r => ToView(r.Link, r.Media, likes.Count(l => l.MediaId == r.Media.Id) + r.Link.LegacyLikes, viewer is not null && likes.Any(l => l.MediaId == r.Media.Id && l.UserId == viewer.Id), viewer)).ToList();
     }
 
-    /// <summary>Approved pictures whose place falls inside a box, newest first. For the map's picture layer.</summary>
+    /// <summary>The most pictures one box returns. The migrated set is about 330, so the whole map fits; a larger set would need the box to be smaller.</summary>
+    public const int MaxInArea = 500;
+
+    /// <summary>One picture as one viewer sees it (their like, whether they can remove it). Pictures nobody but the uploader or an editor may see are not found.</summary>
+    public async Task<IncidentMediaView?> GetAsync(long id, Person? viewer, CancellationToken ct)
+    {
+        var link = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).FirstOrDefaultAsync(m => m.Id == id, ct);
+        if (link is null || link.Media.Status != MediaStatus.Approved && !(viewer is not null && (viewer.IsEditor || link.Media.UploadedById == viewer.Id)))
+        {
+            return null;
+        }
+
+        var likes = await db.MediaLikes.AsNoTracking().Where(l => l.MediaId == link.MediaId).Select(l => l.UserId).ToListAsync(ct);
+        return ToView(link, link.Media, likes.Count + link.LegacyLikes, viewer is not null && likes.Contains(viewer.Id), viewer);
+    }
+
+    /// <summary>Approved pictures whose place falls inside a box, newest first (at most <see cref="MaxInArea"/>). For the map's picture layer.</summary>
     public async Task<List<IncidentMediaView>> InAreaAsync(double minLat, double minLon, double maxLat, double maxLon, CancellationToken ct)
     {
         var rows = await db.IncidentMedia.AsNoTracking()
             .Where(m => m.Media.Status == MediaStatus.Approved && m.Lat != null && m.Lon != null && m.Lat >= minLat && m.Lat <= maxLat && m.Lon >= minLon && m.Lon <= maxLon)
-            .OrderByDescending(m => m.CreatedUtc).ThenByDescending(m => m.Id).Take(200)
+            .OrderByDescending(m => m.CreatedUtc).ThenByDescending(m => m.Id).Take(MaxInArea)
             .Select(m => new { Link = m, m.Media })
             .ToListAsync(ct);
         return rows.Select(r => ToView(r.Link, r.Media, r.Link.LegacyLikes, false, null)).ToList();

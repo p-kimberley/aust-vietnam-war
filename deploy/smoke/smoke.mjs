@@ -162,10 +162,20 @@ await check('api: published articles list', async () => {
   assert(res.status === 200, `status ${res.status}`);
 });
 
-await check('api: community pictures in a box come back as a list', async () => {
-  const res = await get(`${api}/api/community-media?minLat=10&minLon=106&maxLat=11&maxLon=108`);
+await check('api: pictures on the map come back, and one opens with its image', async () => {
+  const res = await get(`${api}/api/community-media?minLat=-90&minLon=-180&maxLat=90&maxLon=180`);
   assert(res.status === 200, `status ${res.status}`);
-  assert(Array.isArray(await res.json()), 'not a list');
+  const pictures = await res.json();
+  assert(Array.isArray(pictures), 'not a list');
+  if (pictures.length === 0) {
+    return 'none yet';
+  }
+  const detail = await get(`${api}/api/incident-media/${pictures[0].id}`);
+  assert(detail.status === 200 && (await detail.json()).id === pictures[0].id, `detail ${detail.status}`);
+  assert(detail.headers.get('cache-control')?.includes('no-store'), 'a per-person answer is cacheable');
+  const image = await get(`${api}${pictures[0].thumbUrl}`);
+  assert(image.status === 200 && (image.headers.get('content-type') ?? '').startsWith('image/'), `image ${image.status}`);
+  return `${pictures.length} pictures`;
 });
 
 await check('api: nobody is signed in, and the Studio is closed to them', async () => {

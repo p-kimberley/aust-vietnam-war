@@ -97,8 +97,13 @@ export class FakeBasemapService {
   setTerrain = vi.fn();
   setOverlay = vi.fn();
   flyTo = vi.fn();
-  clickHandler?: (p: Record<string, unknown>) => void;
-  bindClick = vi.fn((_layer: string, handler: (p: Record<string, unknown>) => void) => (this.clickHandler = handler));
+  clickHandler?: (p: Record<string, unknown>, at?: { lon: number; lat: number }) => void;
+  /** The handler for every layer that was bound, by layer id. `clickHandler` is the one for the incident markers. */
+  readonly handlers = new Map<string, (p: Record<string, unknown>, at?: { lon: number; lat: number }) => void>();
+  bindClick = vi.fn((layer: string, handler: (p: Record<string, unknown>, at?: { lon: number; lat: number }) => void) => {
+    this.handlers.set(layer, handler);
+    if (layer === 'avw-contacts-points') this.clickHandler = handler;
+  });
 }
 
 export interface RenderOptions {

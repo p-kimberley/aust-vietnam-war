@@ -124,8 +124,8 @@ export class BasemapService implements OnDestroy {
     this.applyOverlays(map);
   }
 
-  /** Calls `handler` with a feature's properties when it is clicked on `layerId`. Survives style changes. */
-  bindClick(layerId: string, handler: (properties: Record<string, unknown>) => void): void {
+  /** Calls `handler` with a feature's properties, and where it was clicked, when it is clicked on `layerId`. Survives style changes. */
+  bindClick(layerId: string, handler: (properties: Record<string, unknown>, at: { lon: number; lat: number }) => void): void {
     const map = this.map;
     if (!map) {
       return;
@@ -133,7 +133,7 @@ export class BasemapService implements OnDestroy {
     map.on('click', layerId, (e) => {
       const properties = e.features?.[0]?.properties;
       if (properties) {
-        handler(properties);
+        handler(properties, { lon: e.lngLat.lng, lat: e.lngLat.lat });
       }
     });
     map.on('mouseenter', layerId, () => (map.getCanvas().style.cursor = 'pointer'));

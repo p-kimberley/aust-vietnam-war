@@ -48,6 +48,10 @@
     <div class="bm__incident">
       <app-poi-panel [poiId]="poiId" (closed)="selectPoi(null)" />
     </div>
+  } @else if (status() === 'ready' && selectedPictureId(); as pictureId) {
+    <div class="bm__incident">
+      <app-picture-panel [pictureId]="pictureId" (closed)="selectPicture(null)" (openIncident)="openContact($event)" />
+    </div>
   }
 
   @if (status() === 'ready' && config(); as cfg) {
@@ -55,7 +59,7 @@
       class="panel"
       [class.panel--wide]="tab() === 'filters'"
       [class.panel--closed]="!panelOpen()"
-      [class.panel--shifted]="selectedId() !== null || selectedPoiId() !== null || selectedPerson() !== null"
+      [class.panel--shifted]="selectedId() !== null || selectedPoiId() !== null || selectedPictureId() !== null || selectedPerson() !== null"
       aria-label="Map controls"
     >
       <div class="panel__head">
@@ -146,6 +150,16 @@
               <label>
                 <input type="checkbox" [checked]="showPois()" (change)="setPoisVisible($any($event.target).checked)" />
                 Bases and landing zones
+              </label>
+            </fieldset>
+          }
+
+          @if (pictures().length) {
+            <fieldset>
+              <legend>Photos</legend>
+              <label>
+                <input type="checkbox" [checked]="showPhotos()" (change)="setPhotosVisible($any($event.target).checked)" />
+                Community photos ({{ pictures().length }})
               </label>
             </fieldset>
           }

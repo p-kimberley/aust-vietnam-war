@@ -150,7 +150,7 @@ public static class CommunityEndpoints
             .WithName("ListIncidentMedia")
             .Produces<List<IncidentMediaView>>();
 
-        // Pictures placed on the map, for a picture layer. A small box only: at most 200 come back.
+        // Pictures placed on the map, for a picture layer. A small box only: at most 500 come back.
         g.MapGet("/community-media", async (double minLat, double minLon, double maxLat, double maxLon, IncidentMediaService media, HttpContext ctx, CancellationToken ct) =>
             {
                 if (minLat > maxLat || minLon > maxLon || minLat < -90 || maxLat > 90 || minLon < -180 || maxLon > 180)
@@ -198,6 +198,16 @@ public static class CommunityEndpoints
             .DisableAntiforgery()
             .RequireAuthorization(Policies.Member).RequireRateLimiting(MediaEndpoints.UploadPolicy)
             .WithName("AddIncidentMedia").Accepts<IFormFile>("multipart/form-data").Produces<IncidentMediaView>(StatusCodes.Status201Created);
+
+        // One picture as the viewer sees it, for the map's picture panel. Per person (their like), so never cached.
+        g.MapGet("/incident-media/{id:long}", async (long id, IncidentMediaService media, ClaimsPrincipal user, HttpContext ctx, CancellationToken ct) =>
+            {
+                ctx.Response.Headers.CacheControl = "no-store";
+                return await media.GetAsync(id, Person.From(user), ct) is { } view ? Results.Ok(view) : Results.NotFound();
+            })
+            .WithName("GetIncidentMedia")
+            .Produces<IncidentMediaView>()
+            .Produces(StatusCodes.Status404NotFound);
 
         g.MapDelete("/incident-media/{id:long}", async (long id, IncidentMediaService media, ClaimsPrincipal user, CancellationToken ct) =>
             {

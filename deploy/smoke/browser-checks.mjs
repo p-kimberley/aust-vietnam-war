@@ -34,6 +34,7 @@ const pages = [
   { name: 'not found', url: '/no-such-page' },
   { name: 'battle map', url: '/battlemap?at=10.6,107.2,10', map: true },
   { name: 'battle map with an incident and the charts', url: '/battlemap?at=10.6,107.2,10&incident=1000&charts=1', map: true },
+  { name: 'battle map over the area where most photos are', url: '/battlemap?at=10.6,107.25,9', map: true },
 ];
 
 const browser = await puppeteer.launch({
@@ -63,7 +64,7 @@ for (const { name, url, map } of pages) {
     await page.setRequestInterception(true);
     page.on('request', (req) => {
       const u = new URL(req.url());
-      return u.origin === new URL(site).origin && u.pathname.startsWith('/api/') ? req.continue({ url: apiProxy + u.pathname + u.search }) : req.continue();
+      return u.origin === new URL(site).origin && (u.pathname.startsWith('/api/') || u.pathname.startsWith('/media/')) ? req.continue({ url: apiProxy + u.pathname + u.search }) : req.continue();
     });
   }
   await page.goto(site + url, { waitUntil: 'networkidle2', timeout: 60_000 });

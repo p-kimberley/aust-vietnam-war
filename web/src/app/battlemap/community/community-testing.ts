@@ -8,6 +8,8 @@ export function fakeCommunity(over: Record<string, unknown> = {}): Record<string
   return {
     notes: vi.fn(() => Promise.resolve([])),
     media: vi.fn(() => Promise.resolve([])),
+    mediaOnMap: vi.fn(() => Promise.resolve([])),
+    mediaDetail: vi.fn(() => Promise.reject(new Error('no such picture'))),
     casualties: vi.fn(() => Promise.resolve([])),
     person: vi.fn(() => Promise.reject(new Error('no such person'))),
     tributes: vi.fn(() => Promise.resolve({ items: [], total: 0, page: 1, pageSize: 20 })),

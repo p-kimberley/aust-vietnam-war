@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -214,6 +214,22 @@ export class CommunityService {
   // ---- pictures
   media(contactId: number): Promise<IncidentMediaView[]> {
     return firstValueFrom(this.http.get<IncidentMediaView[]>(`/api/contacts/${contactId}/media`));
+  }
+
+  /** Every approved picture with a place on the map, newest first (the server sends at most 500). */
+  mediaOnMap(): Promise<IncidentMediaView[]> {
+    const params = new HttpParams().set('minLat', -90).set('minLon', -180).set('maxLat', 90).set('maxLon', 180);
+    return firstValueFrom(this.http.get<IncidentMediaView[]>('/api/community-media', { params }));
+  }
+
+  /** One picture as this viewer sees it (their own like, whether they can remove it), or `null` when there is no such picture for them. */
+  mediaDetail(id: number): Promise<IncidentMediaView | null> {
+    return firstValueFrom(this.http.get<IncidentMediaView>(`/api/incident-media/${id}`)).catch((e) => {
+      if (e instanceof HttpErrorResponse && e.status === 404) {
+        return null;
+      }
+      throw e;
+    });
   }
 
   addMedia(contactId: number, file: File, caption: string, credit: string, dateTaken: string): Promise<IncidentMediaView> {

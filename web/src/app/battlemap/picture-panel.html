@@ -1,0 +1,48 @@
+<section class="pic" aria-labelledby="pic-title">
+  <header class="pic__head">
+    <h2 id="pic-title" #heading tabindex="-1">Photo</h2>
+    <button type="button" class="pic__close" aria-label="Close panel" (click)="closed.emit()">×</button>
+  </header>
+
+  <div class="pic__body">
+    @if (picture.isLoading()) {
+      <p role="status">Loading…</p>
+    } @else if (picture.error()) {
+      <p role="alert">This photo could not be loaded.</p>
+      <button type="button" class="pic__button" (click)="picture.reload()">Try again</button>
+    } @else if (picture.value(); as p) {
+      <a [href]="p.url" target="_blank" rel="noopener" class="pic__link">
+        <img class="pic__img" [src]="p.thumbUrl" [width]="480" [height]="p.width ? (480 * p.height) / p.width : 360" [alt]="p.caption || 'A photo placed on the map'" />
+        <span class="pic__hint">Open full size</span>
+      </a>
+      @if (p.caption) {
+        <p class="pic__caption">{{ p.caption }}</p>
+      }
+      @if (p.credit) {
+        <p class="pic__line"><strong>Credit</strong> {{ p.credit }}</p>
+      }
+      @if (p.dateTaken) {
+        <p class="pic__line"><strong>Taken</strong> <span class="data">{{ p.dateTaken | date: 'd MMM y' }}</span></p>
+      }
+      <p class="pic__line"><strong>Likes</strong> <span class="data">{{ likes(p) }}</span></p>
+
+      @if (message()) {
+        <p class="pic__error" role="alert">{{ message() }}</p>
+      }
+      <div class="pic__actions">
+        @if (auth.isAuthenticated()) {
+          <button type="button" class="pic__button" [attr.aria-pressed]="liked(p)" (click)="like(p)">
+            {{ liked(p) ? '♥ Liked' : '♡ Like this photo' }}
+          </button>
+        } @else {
+          <p class="pic__hint"><button type="button" class="pic__link-button" (click)="auth.login()">Sign in</button> to like a photo.</p>
+        }
+        @if (p.contactId !== null) {
+          <button type="button" class="pic__button" (click)="openIncident.emit(p.contactId)">Open the incident</button>
+        }
+      </div>
+    } @else {
+      <p role="status">This photo was not found.</p>
+    }
+  </div>
+</section>

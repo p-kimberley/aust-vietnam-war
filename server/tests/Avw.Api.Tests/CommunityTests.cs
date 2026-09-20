@@ -298,6 +298,70 @@ public sealed class CommunityEndpointTests : IDisposable
     public async Task Refuses_an_upside_down_or_out_of_range_picture_box(string box) =>
         Assert.Equal(HttpStatusCode.BadRequest, (await Anon("/api/community-media?" + box)).StatusCode);
 
+    private (long Approved, long Pending) PlacedPictureIds()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AvwDbContext>();
+        return (db.IncidentMedia.Single(m => m.LegacyLikes == 3).Id, db.IncidentMedia.Single(m => m.Media.Status == MediaStatus.Pending).Id);
+    }
+
+    [Fact]
+    public async Task Gives_one_picture_to_the_map_panel_with_the_viewers_own_like_and_never_caches_it()
+    {
+        SeedPlacedPictures();
+        var (approved, _) = PlacedPictureIds();
+
+        var anon = await Anon($"/api/incident-media/{approved}");
+        var seen = await Read<IncidentMediaView>(anon);
+        Assert.Equal(("On the track", 3, false, false), (seen.Caption, seen.Likes, seen.LikedByMe, seen.Mine));
+        Assert.Contains("no-store", anon.Headers.CacheControl!.ToString());
+
+        await As(2, HttpMethod.Post, $"/api/incident-media/{approved}/like");
+        var bo = await Read<IncidentMediaView>(await As(2, HttpMethod.Get, $"/api/incident-media/{approved}"));
+        Assert.Equal((4, true), (bo.Likes, bo.LikedByMe));
+        Assert.False((await Read<IncidentMediaView>(await As(1, HttpMethod.Get, $"/api/incident-media/{approved}"))).LikedByMe);
+    }
+
+    [Fact]
+    public async Task A_picture_that_is_not_approved_is_found_only_by_its_uploader_and_editors()
+    {
+        SeedPlacedPictures();
+        var (_, pending) = PlacedPictureIds();
+
+        Assert.Equal(HttpStatusCode.NotFound, (await Anon($"/api/incident-media/{pending}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await As(2, HttpMethod.Get, $"/api/incident-media/{pending}")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await As(1, HttpMethod.Get, $"/api/incident-media/{pending}")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await As(3, HttpMethod.Get, $"/api/incident-media/{pending}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await Anon("/api/incident-media/999999")).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_box_returns_at_most_the_newest_five_hundred_pictures()
+    {
+        Seed();
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AvwDbContext>();
+            var when = new DateTime(2012, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            for (var i = 0; i < IncidentMediaService.MaxInArea + 1; i++)
+            {
+                db.IncidentMedia.Add(new IncidentMedia
+                {
+                    Media = new MediaAsset { Sha256 = i.ToString("x").PadRight(64, '0'), Width = 1, Height = 1, ByteSize = 1, Status = MediaStatus.Approved, UploadedById = 1, CreatedUtc = when, Caption = $"n{i}" },
+                    Lat = 10.5, Lon = 107.2, CreatedUtc = when.AddMinutes(i),
+                });
+            }
+
+            db.SaveChanges();
+        }
+
+        var shown = await Read<List<IncidentMediaView>>(await Anon("/api/community-media?minLat=-90&minLon=-180&maxLat=90&maxLon=180"));
+
+        Assert.Equal(IncidentMediaService.MaxInArea, shown.Count);
+        Assert.Equal($"n{IncidentMediaService.MaxInArea}", shown[0].Caption);     // newest first
+        Assert.DoesNotContain(shown, m => m.Caption == "n0");                      // the oldest one is the one left out
+    }
+
     [Fact]
     public async Task Counts_likes_carried_over_from_the_legacy_site_and_adds_new_ones_to_them()
     {

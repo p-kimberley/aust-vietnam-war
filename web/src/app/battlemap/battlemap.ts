@@ -17,7 +17,10 @@ import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
 import { POI_POINTS, addPoiLayers, setPoiVisibility, setSelectedPoi } from './poi-layers';
+import { CommunityService, IncidentMediaView } from './community/community';
 import { HonourPanel } from './community/honour-panel';
+import { PHOTO_CLUSTERS, PHOTO_POINTS, addPhotoLayers, setPhotoVisibility, setSelectedPhoto, zoomIntoCluster } from './photo-layers';
+import { PicturePanel } from './picture-panel';
 import { PoiPanel } from './poi-panel';
 import { SearchBox } from './search-box';
 import {
@@ -49,12 +52,12 @@ const SEARCH_DELAY_MS = 400;
  * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
  * draws a heatmap and incident markers on a MapLibre GL map. Filters run in the browser over the loaded contacts (the
  * dataset is small); only the incident-report word search goes to the server. The view is kept in the URL (`?at=`,
- * `?basemap=`, `?terrain=`, `?field=`, `?overlays=`, `?incident=`, `?poi=` and the filter parameters described in
+ * `?basemap=`, `?terrain=`, `?field=`, `?overlays=`, `?incident=`, `?poi=`, `?picture=` and the filter parameters described in
  * `filters.ts`) so a link reproduces what the sender was looking at.
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, IncidentPanel, PoiPanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -69,6 +72,7 @@ export class Battlemap {
   readonly overlays = input<string>();
   readonly incident = input<string>();
   readonly poi = input<string>();
+  readonly picture = input<string>();
   readonly charts = input<string>();
   readonly track = input<string>();
   readonly person = input<string>();
@@ -79,6 +83,7 @@ export class Battlemap {
   private readonly contactsService = inject(ContactsService);
   private readonly filterService = inject(FilterCatalogueService);
   private readonly poiService = inject(PoiService);
+  private readonly community = inject(CommunityService);
   protected readonly basemaps = inject(BasemapService);
   private readonly canvas = viewChild.required<ElementRef<HTMLElement>>('canvas');
 
@@ -97,6 +102,10 @@ export class Battlemap {
   protected readonly selectedPerson = signal<string | null>(null);
   protected readonly pois = signal<readonly Poi[]>([]);
   protected readonly showPois = signal(true);
+  /** Community pictures that have a place on the map. */
+  protected readonly pictures = signal<readonly IncidentMediaView[]>([]);
+  protected readonly showPhotos = signal(true);
+  protected readonly selectedPictureId = signal<number | null>(null);
   protected readonly tab = signal<Tab>('layers');
   protected readonly panelOpen = signal(true);
   protected readonly showHeatmap = signal(true);
@@ -144,10 +153,14 @@ export class Battlemap {
     if (id !== null) {
       this.selectedPoiId.set(null);
       this.selectedPerson.set(null);
+      this.selectedPictureId.set(null);
     }
     if (this.map) {
       setSelectedContact(this.map, id);
-      if (id !== null) setSelectedPoi(this.map, null);
+      if (id !== null) {
+        setSelectedPoi(this.map, null);
+        setSelectedPhoto(this.map, null);
+      }
     }
     this.syncUrl();
   }
@@ -158,10 +171,32 @@ export class Battlemap {
     if (id !== null) {
       this.selectedId.set(null);
       this.selectedPerson.set(null);
+      this.selectedPictureId.set(null);
     }
     if (this.map) {
       setSelectedPoi(this.map, id);
-      if (id !== null) setSelectedContact(this.map, null);
+      if (id !== null) {
+        setSelectedContact(this.map, null);
+        setSelectedPhoto(this.map, null);
+      }
+    }
+    this.syncUrl();
+  }
+
+  /** Opens the panel for a community picture (or closes it), in place of whatever else is open. */
+  protected selectPicture(id: number | null): void {
+    this.selectedPictureId.set(id);
+    if (id !== null) {
+      this.selectedId.set(null);
+      this.selectedPoiId.set(null);
+      this.selectedPerson.set(null);
+    }
+    if (this.map) {
+      setSelectedPhoto(this.map, id);
+      if (id !== null) {
+        setSelectedContact(this.map, null);
+        setSelectedPoi(this.map, null);
+      }
     }
     this.syncUrl();
   }
@@ -172,9 +207,11 @@ export class Battlemap {
     if (serviceNumber !== null) {
       this.selectedId.set(null);
       this.selectedPoiId.set(null);
+      this.selectedPictureId.set(null);
       if (this.map) {
         setSelectedContact(this.map, null);
         setSelectedPoi(this.map, null);
+        setSelectedPhoto(this.map, null);
       }
     }
     this.syncUrl();
@@ -192,6 +229,11 @@ export class Battlemap {
     const poi = this.pois().find((p) => p.id === id);
     this.selectPoi(id);
     if (poi) this.basemaps.flyTo(poi.lat, poi.lon, 13);
+  }
+
+  protected setPhotosVisible(visible: boolean): void {
+    this.showPhotos.set(visible);
+    if (this.map) setPhotoVisibility(this.map, visible);
   }
 
   protected setPoisVisible(visible: boolean): void {
@@ -279,7 +321,7 @@ export class Battlemap {
 
   private async start(): Promise<void> {
     try {
-      const [config, contacts, catalogue, pois] = await Promise.all([
+      const [config, contacts, catalogue, pois, pictures] = await Promise.all([
         this.configService.load(),
         this.contactsService.load(),
         // Without the catalogue the map still works, just without filters.
@@ -292,8 +334,14 @@ export class Battlemap {
           console.warn('The points of interest could not be loaded', e);
           return [] as Poi[];
         }),
+        // So are the community pictures.
+        this.community.mediaOnMap().catch((e) => {
+          console.warn('The community pictures could not be loaded', e);
+          return [] as IncidentMediaView[];
+        }),
       ]);
       this.pois.set(pois);
+      this.pictures.set(pictures.filter((p) => p.lat !== null && p.lon !== null));
       this.config.set(config);
       this.allContacts.set(contacts);
 
@@ -309,7 +357,7 @@ export class Battlemap {
       }
 
       // A link may open onto a person on the honour roll, unless it already names an incident or a base.
-      if (this.person() && !this.incident() && !this.poi()) {
+      if (this.person() && !this.incident() && !this.poi() && !this.picture()) {
         this.selectedPerson.set(this.person()!);
       }
 
@@ -335,6 +383,14 @@ export class Battlemap {
         this.selectedPoiId.set(openedPoi.id);
       }
 
+      // A link may open onto a picture on the map, unless it already names an incident or a base.
+      const requestedPicture = Number(this.picture());
+      const openedPicture =
+        !opened && !openedPoi && Number.isInteger(requestedPicture) ? this.pictures().find((p) => p.id === requestedPicture) : undefined;
+      if (openedPicture) {
+        this.selectedPictureId.set(openedPicture.id);
+      }
+
       let firstStyle = true;
       this.map = await this.basemaps.create(
         this.canvas().nativeElement,
@@ -356,11 +412,16 @@ export class Battlemap {
               selectedId: this.selectedId(),
             });
             addTrackLayers(map, this.tracks(), this.showTrack());
+            // Pictures last, so they draw over the contacts.
+            addPhotoLayers(map, this.pictures(), { visible: this.showPhotos(), selectedId: this.selectedPictureId() });
             if (firstStyle) {
               firstStyle = false;
               // Registered in this order so that, where a contact sits on a base, the contact (drawn on top) wins.
               this.basemaps.bindClick(POI_POINTS, (p) => this.selectPoi(Number(p['id'])));
               this.basemaps.bindClick(POINT_LAYER, (p) => this.select(Number(p['id'])));
+              // Pictures are drawn on top, so they are registered last and win where they overlap a contact.
+              this.basemaps.bindClick(PHOTO_POINTS, (p) => this.selectPicture(Number(p['id'])));
+              this.basemaps.bindClick(PHOTO_CLUSTERS, (p, at) => void zoomIntoCluster(map, Number(p['cluster_id']), at));
               this.status.set('ready');
             }
           },
@@ -370,9 +431,9 @@ export class Battlemap {
       );
 
       // With no explicit view in the link, bring the incident into frame.
-      const target = opened ?? openedPoi;
+      const target = opened ?? openedPoi ?? openedPicture;
       if (target && !parseAt(this.at())) {
-        this.basemaps.flyTo(target.lat, target.lon, 11);
+        this.basemaps.flyTo(target.lat!, target.lon!, 11);
       }
     } catch (e) {
       console.error('Battle Map failed to start', e);
@@ -452,6 +513,7 @@ export class Battlemap {
           overlays: this.basemaps.overlayIds().join(',') || null,
           incident: this.selectedId(),
           poi: this.selectedPoiId(),
+          picture: this.selectedPictureId(),
           person: this.selectedPerson(),
           charts: this.chartsOpen() ? '1' : null,
           track: this.showTrack() ? '1' : null,
