@@ -234,7 +234,7 @@ public sealed class TributeService(AvwDbContext db, IHonourRollSource roll, Time
 /// <summary>Members telling us about a casualty in an incident. Editors read these in the Studio and act on them by hand.</summary>
 public sealed class CasualtyService(AvwDbContext db, IContactSource contacts, IHonourRollSource roll, TimeProvider clock, INotifier notifier)
 {
-    public static readonly string[] Types = ["Killed in action", "Died of wounds", "Wounded in action", "Missing", "Other"];
+    public static readonly string[] Types = CommunityLimits.CasualtyTypes;
 
     public async Task<CmsResult<CasualtyRow>> SubmitAsync(int contactId, CasualtyInput input, Person person, CancellationToken ct)
     {

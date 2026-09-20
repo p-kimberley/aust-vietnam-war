@@ -58,6 +58,5 @@ public static class UserSync
         return verified && !string.IsNullOrWhiteSpace(email) ? HashEmail(email) : null;
     }
 
-    public static string HashEmail(string email) =>
-        Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(email.Trim().ToLowerInvariant())));
+    public static string HashEmail(string email) => Community.EmailHash.Of(email);
 }

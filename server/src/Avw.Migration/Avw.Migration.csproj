@@ -3,7 +3,7 @@
   <ItemGroup>
     <PackageReference Include="MySql.Data" />
     <ProjectReference Include="..\Avw.Data\Avw.Data.csproj" />
-    <ProjectReference Include="..\Avw.Api\Avw.Api.csproj" />
+    <ProjectReference Include="..\Avw.Core\Avw.Core.csproj" />
   </ItemGroup>
 
 </Project>

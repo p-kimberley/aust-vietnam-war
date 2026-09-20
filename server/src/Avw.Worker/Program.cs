@@ -9,5 +9,6 @@ builder.Services.AddDbContext<AvwDbContext>(o => o.UseMySQL(
     ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.")));
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<MediaSweepService>();
 
 builder.Build().Run();

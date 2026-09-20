@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Avw.Api.Cms;
 using Avw.Data;
 using Avw.Data.Entities;
@@ -36,40 +35,15 @@ public sealed record ModerationRequest(ModerationStatus Status);
 
 public sealed record CommentsOpenRequest(bool Open);
 
-/// <summary>Cleans text typed by a member into safe plain text. Nothing here is ever markup.</summary>
-public static partial class PlainText
-{
-    [GeneratedRegex(@"[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F​-‏‪-‮⁦-⁩]")]
-    private static partial Regex Unwanted();
-
-    [GeneratedRegex(@"\n{3,}")]
-    private static partial Regex Blanks();
-
-    [GeneratedRegex(@"[ \t]+\n")]
-    private static partial Regex TrailingSpaces();
-
-    /// <summary>Normalises line breaks, removes control and direction-changing characters, and tidies blank lines. Returns "" for null.</summary>
-    public static string Clean(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return "";
-        }
-
-        var s = Unwanted().Replace(text.Replace("\r\n", "\n").Replace('\r', '\n'), "");
-        return Blanks().Replace(TrailingSpaces().Replace(s, "\n"), "\n\n").Trim();
-    }
-}
-
 /// <summary>
 /// Community notes about incidents, with their edit history, comments and moderation. Members write; an editor's own notes and
 /// edits go live at once, anyone else's wait for approval, and until then the public keeps seeing the last approved text.
 /// </summary>
 public sealed class NoteService(AvwDbContext db, TimeProvider clock, INotifier notifier)
 {
-    public const int MaxTitle = 200;
-    public const int MaxBody = 5000;
-    public const int MaxComment = 1000;
+    public const int MaxTitle = CommunityLimits.MaxTitle;
+    public const int MaxBody = CommunityLimits.MaxBody;
+    public const int MaxComment = CommunityLimits.MaxComment;
 
     private IQueryable<IncidentNote> Visible(Person? viewer) =>
         db.Notes.Where(n => n.ApprovedVersionNo != null || viewer != null && (viewer.IsEditor || n.AuthorId == viewer.Id));

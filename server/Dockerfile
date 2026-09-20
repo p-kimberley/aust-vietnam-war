@@ -5,17 +5,26 @@ WORKDIR /src
 
 # Restore first, against project files only, so dependency layers cache.
 COPY global.json Directory.Build.props Directory.Packages.props Avw.slnx ./
+COPY src/Avw.Core/Avw.Core.csproj src/Avw.Core/
 COPY src/Avw.Data/Avw.Data.csproj src/Avw.Data/
 COPY src/Avw.Api/Avw.Api.csproj src/Avw.Api/
 COPY src/Avw.Worker/Avw.Worker.csproj src/Avw.Worker/
+COPY src/Avw.Migration/Avw.Migration.csproj src/Avw.Migration/
 COPY src/Avw.Migrator/Avw.Migrator.csproj src/Avw.Migrator/
 COPY tests/Avw.Api.Tests/Avw.Api.Tests.csproj tests/Avw.Api.Tests/
-RUN dotnet restore Avw.slnx
+# Publish for the one platform being built. Without a runtime identifier every native library for every platform
+# (Magick.NET alone is about 200 MB) ends up in the image.
+ARG TARGETARCH
+RUN case "$TARGETARCH" in arm64) echo linux-arm64 > /rid ;; *) echo linux-x64 > /rid ;; esac
+RUN dotnet restore Avw.slnx -r "$(cat /rid)"
 
 COPY . .
-RUN dotnet publish src/Avw.Api -c Release --no-restore -o /out/api \
- && dotnet publish src/Avw.Worker -c Release --no-restore -o /out/worker \
- && dotnet publish src/Avw.Migrator -c Release --no-restore -o /out/migrator
+# The migrator refers to the API project (for the picture pipeline), so it is published first: publishing the API before it
+# leaves two builds of the API for the migrator's publish to trip over.
+RUN RID="$(cat /rid)" \
+ && dotnet publish src/Avw.Migrator -c Release -r "$RID" --no-self-contained --no-restore -o /out/migrator \
+ && dotnet publish src/Avw.Worker -c Release -r "$RID" --no-self-contained --no-restore -o /out/worker \
+ && dotnet publish src/Avw.Api -c Release -r "$RID" --no-self-contained --no-restore -o /out/api
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app

@@ -3,8 +3,7 @@ using Avw.Data;
 namespace Avw.Worker;
 
 /// <summary>
-/// Single-replica background jobs. Today: scheduled publishing. Search sync and orphan-media sweeps
-/// join here in later phases.
+/// Single-replica background jobs. Today: scheduled publishing. The media-folder sweep is in <see cref="MediaSweepService"/>.
 /// </summary>
 public sealed class Worker(IServiceScopeFactory scopes, TimeProvider clock, ILogger<Worker> logger) : BackgroundService
 {

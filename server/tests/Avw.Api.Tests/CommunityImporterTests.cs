@@ -165,7 +165,7 @@ public sealed class CommunityImporterTests : IDisposable
     {
         LegacyCasualtySubmission[] rows =
         [
-            new(1, "3400456", 100, CasualtyService.Types[0].ToUpperInvariant(), "<p>He was wounded here.</p>", 5, T),
+            new(1, "3400456", 100, CommunityLimits.CasualtyTypes[0].ToUpperInvariant(), "<p>He was wounded here.</p>", 5, T),
             new(2, null, 100, "Something odd", "Text", 5, T),
             new(3, "1", 100, null, " ", 5, T),
             new(4, null, 100, null, " ", 5, T),
@@ -177,7 +177,7 @@ public sealed class CommunityImporterTests : IDisposable
         Assert.Equal((3, 1), (report.Added, report.Skipped["with nothing to review"]));
         var saved = await _db.CasualtySubmissions.OrderBy(c => c.LegacyId).ToListAsync();
         Assert.Equal(3, saved.Count);
-        Assert.Equal((CasualtyService.Types[0], "3400456", "He was wounded here."), (saved[0].CasualtyType, saved[0].ServiceNumber, saved[0].Comment));
+        Assert.Equal((CommunityLimits.CasualtyTypes[0], "3400456", "He was wounded here."), (saved[0].CasualtyType, saved[0].ServiceNumber, saved[0].Comment));
         Assert.Equal(("Other", null), (saved[1].CasualtyType, saved[1].ServiceNumber));
         Assert.Equal(("Other", "1", CommunityImporter.NoDetails), (saved[2].CasualtyType, saved[2].ServiceNumber, saved[2].Comment));      // no words, but it still says who and where
     }

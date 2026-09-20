@@ -1,4 +1,3 @@
-using Avw.Api.Auth;
 using Avw.Api.Community;
 using Avw.Api.Media;
 using Avw.Data;
@@ -40,7 +39,7 @@ public static class CommunityImporter
     public const string LegacyUserSubject = "legacy-import";
 
     /// <summary>
-    /// Migrated notes may be longer than what a member can write today (<see cref="NoteService.MaxBody"/>), because cutting an old note
+    /// Migrated notes may be longer than what a member can write today (<see cref="CommunityLimits.MaxBody"/>), because cutting an old note
     /// short loses the author's work. The database column holds about 64 KB, so this is where a note is finally cut.
     /// </summary>
     public const int MaxLegacyBody = 16000;
@@ -55,11 +54,11 @@ public static class CommunityImporter
             if (_byId.TryGetValue(id, out var u))
             {
                 var email = u.Email?.Trim();
-                var name = Clean(u.DisplayName) ?? Clean(fallbackName) ?? Person.DefaultName;
-                return (Cut(name, 200), string.IsNullOrEmpty(email) ? null : UserSync.HashEmail(email));
+                var name = Clean(u.DisplayName) ?? Clean(fallbackName) ?? CommunityLimits.DefaultAuthorName;
+                return (Cut(name, 200), string.IsNullOrEmpty(email) ? null : EmailHash.Of(email));
             }
 
-            return (Cut(Clean(fallbackName) ?? Person.DefaultName, 200), null);
+            return (Cut(Clean(fallbackName) ?? CommunityLimits.DefaultAuthorName, 200), null);
         }
     }
 
@@ -122,7 +121,7 @@ public static class CommunityImporter
                     report.Skip("versions cut at the column limit");
                 }
 
-                var title = Cut(Text(v.Title).Replace('\n', ' '), NoteService.MaxTitle);
+                var title = Cut(Text(v.Title).Replace('\n', ' '), CommunityLimits.MaxTitle);
                 note.Versions.Add(new IncidentNoteVersion
                 {
                     VersionNo = ++number,
@@ -267,7 +266,7 @@ public static class CommunityImporter
                 {
                     ContactId = row.IncidentId,
                     ServiceNumber = string.IsNullOrWhiteSpace(row.ServiceNo) ? null : Cut(row.ServiceNo.Trim(), 32),
-                    CasualtyType = CasualtyService.Types.FirstOrDefault(t => string.Equals(t, type, StringComparison.OrdinalIgnoreCase)) ?? "Other",
+                    CasualtyType = CommunityLimits.CasualtyTypes.FirstOrDefault(t => string.Equals(t, type, StringComparison.OrdinalIgnoreCase)) ?? "Other",
                     Comment = Cut(comment, 4000),
                     SubmittedByName = name,
                     CreatedUtc = Utc(row.Created),

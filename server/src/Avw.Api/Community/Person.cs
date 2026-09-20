@@ -9,7 +9,7 @@ namespace Avw.Api.Community;
 /// <summary>Who is acting on community content, as the API sees them. Editors and admins may do what members cannot.</summary>
 public sealed record Person(long Id, string Name, bool IsEditor)
 {
-    public const string DefaultName = "Member";
+    public const string DefaultName = CommunityLimits.DefaultAuthorName;
 
     public static Person? From(ClaimsPrincipal user)
     {
