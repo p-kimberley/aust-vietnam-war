@@ -17,7 +17,7 @@
     </button>
   </div>
 
-  <div class="incident__body" role="tabpanel">
+  <div class="incident__body" role="tabpanel" tabindex="0">
     <div [hidden]="tab() !== 'details'">
     @if (incident.isLoading()) {
       <p role="status">Loading…</p>

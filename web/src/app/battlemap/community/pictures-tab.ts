@@ -35,8 +35,8 @@ import { CommunityService, IncidentMediaView } from './community';
       margin: 0;
     }
     .like[aria-pressed='true'] {
-      background: var(--contact-red);
-      border-color: var(--contact-red);
+      background: var(--action);
+      border-color: var(--action);
     }
   `,
   template: `

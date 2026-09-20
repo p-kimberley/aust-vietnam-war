@@ -35,6 +35,7 @@ const PAGE_SIZE = 12;
         <p role="alert">The stories could not be loaded. Please try again shortly.</p>
       } @else if (articles.hasValue()) {
         @if (articles.value().items.length) {
+          <h2 class="visually-hidden">{{ category() ? 'Stories in this category' : 'All stories' }}</h2>
           <div class="grid">
             @for (a of articles.value().items; track a.slug) {
               <app-article-card [article]="a" />

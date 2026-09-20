@@ -13,6 +13,9 @@
   --smoke-yellow: #e3b92e;
   --contact-red: #c23a26;
   --contact-red-bright: #e0553b;
+  /* Buttons carry paper-coloured text, which needs a darker red than the one used for contacts on the map (4.9:1 against 4.3:1). */
+  --action: #b5331f;
+  --action-hover: #8f2818;
   --friendly-blue: #2f5f86;
   --enemy-rust: #8f3420;
   --unit-track: #d9822b;
@@ -110,7 +113,7 @@ a:hover {
   padding: 0.6em 1.2em;
   border: 2px solid var(--olive-900);
   border-radius: var(--radius);
-  background: var(--contact-red);
+  background: var(--action);
   color: var(--paper);
   font-family: var(--font-display);
   font-size: 1rem;
@@ -121,7 +124,7 @@ a:hover {
 }
 
 .btn:hover {
-  background: var(--contact-red-bright);
+  background: var(--action-hover);
   color: var(--paper);
 }
 

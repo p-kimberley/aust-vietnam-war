@@ -74,7 +74,7 @@ select:focus-visible {
 }
 
 .badge--rejected {
-  background: var(--contact-red);
+  background: var(--action);
   color: var(--paper);
 }
 

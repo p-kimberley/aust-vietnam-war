@@ -58,6 +58,7 @@ h2:focus {
 
 .incident__close:focus-visible,
 .incident__retry:focus-visible,
+.incident__body:focus-visible,
 a:focus-visible {
   outline: 2px solid var(--smoke-yellow);
   outline-offset: 2px;
