@@ -41,7 +41,9 @@ import { problemMessage } from './studio-api';
             <article class="card">
               <a [href]="p.url" target="_blank" rel="noopener"><img [src]="p.thumbUrl" [alt]="p.caption || 'Picture waiting for approval'" loading="lazy" /></a>
               <p class="text">{{ p.caption }}</p>
-              <p class="meta data">{{ p.credit }} · added by {{ p.uploadedByName }} · <a [href]="'/battlemap?incident=' + p.contactId" target="_blank" rel="noopener">Incident {{ p.contactId }}</a></p>
+              <p class="meta data">{{ p.credit }} · added by {{ p.uploadedByName }} @if (p.contactId !== null) {
+                · <a [href]="'/battlemap?incident=' + p.contactId" target="_blank" rel="noopener">Incident {{ p.contactId }}</a>
+              }</p>
               <div class="actions">
                 <button type="button" class="btn" (click)="pictureAction(p, 'Approved')" [disabled]="busy()">Approve</button>
                 <button type="button" class="btn btn--quiet" (click)="pictureAction(p, 'Rejected')" [disabled]="busy()">Reject</button>

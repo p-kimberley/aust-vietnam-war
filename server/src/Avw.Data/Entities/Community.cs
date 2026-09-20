@@ -28,6 +28,9 @@ public class IncidentNote
     /// <summary>Hash of the legacy author's verified email, so their old notes can be claimed when they register (see <see cref="AppUser.EmailHash"/>).</summary>
     public string? AuthorEmailHash { get; set; }
 
+    /// <summary>The id of this note in the legacy database, so an import can be repeated without duplicating it.</summary>
+    public int? LegacyId { get; set; }
+
     /// <summary>The state of the <em>latest</em> version. An earlier approved version may still be showing.</summary>
     public ModerationStatus Status { get; set; }
 
@@ -67,20 +70,42 @@ public class NoteComment
     public long? AuthorId { get; set; }
     public string AuthorName { get; set; } = "";
     public string? AuthorEmailHash { get; set; }
+    public int? LegacyId { get; set; }
     public string Body { get; set; } = "";
     public DateTime CreatedUtc { get; set; }
 }
 
-/// <summary>A picture attached to an incident. The file, caption, credit and approval state belong to the <see cref="MediaAsset"/>.</summary>
+/// <summary>
+/// A picture from the community, attached to an incident and/or placed on the map. The file, caption, credit and approval
+/// state belong to the <see cref="MediaAsset"/>.
+/// </summary>
 public class IncidentMedia
 {
     public long Id { get; set; }
-    public int ContactId { get; set; }
+
+    /// <summary>The incident it belongs to. Null for a migrated picture that was only placed on the map.</summary>
+    public int? ContactId { get; set; }
+
     public long MediaId { get; set; }
     public MediaAsset Media { get; set; } = null!;
     public long? AttachedById { get; set; }
+
+    /// <summary>The name shown for whoever added it, kept for migrated pictures whose author has not registered.</summary>
+    public string? AuthorName { get; set; }
+
+    public string? AuthorEmailHash { get; set; }
+
+    /// <summary>Where the picture was taken, when known.</summary>
+    public double? Lat { get; set; }
+
+    public double? Lon { get; set; }
     public DateOnly? DateTaken { get; set; }
     public DateTime CreatedUtc { get; set; }
+
+    /// <summary>Likes given on the legacy site, whose givers have no account here yet. Added to the likes given since.</summary>
+    public int LegacyLikes { get; set; }
+
+    public int? LegacyId { get; set; }
 }
 
 public class MediaLike
@@ -103,6 +128,7 @@ public class Tribute
     public long? AuthorId { get; set; }
     public string AuthorName { get; set; } = "";
     public string? AuthorEmailHash { get; set; }
+    public int? LegacyId { get; set; }
     public string Message { get; set; } = "";
     public DateTime CreatedUtc { get; set; }
 }
@@ -123,6 +149,7 @@ public class CasualtySubmission
     public DateTime CreatedUtc { get; set; }
     public bool Handled { get; set; }
     public DateTime? HandledUtc { get; set; }
+    public int? LegacyId { get; set; }
 }
 
 /// <summary>Links a person on the honour roll to the incident where they became a casualty.</summary>

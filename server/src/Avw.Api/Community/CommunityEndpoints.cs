@@ -14,7 +14,7 @@ namespace Avw.Api.Community;
 
 public sealed record PendingNote(long Id, int ContactId, string Title, string Body, string AuthorName, DateTime UpdatedUtc, bool IsChange);
 
-public sealed record PendingPicture(long IncidentMediaId, long MediaId, int ContactId, string Url, string ThumbUrl, string? Caption, string? Credit, string UploadedByName);
+public sealed record PendingPicture(long IncidentMediaId, long MediaId, int? ContactId, string Url, string ThumbUrl, string? Caption, string? Credit, string UploadedByName);
 
 /// <summary>Everything an editor has to look at: notes and pictures waiting for approval, and casualty information not yet dealt with.</summary>
 public sealed record ModerationQueue(IReadOnlyList<PendingNote> Notes, IReadOnlyList<PendingPicture> Pictures, IReadOnlyList<CasualtyRow> Casualties);
@@ -149,6 +149,21 @@ public static class CommunityEndpoints
             })
             .WithName("ListIncidentMedia")
             .Produces<List<IncidentMediaView>>();
+
+        // Pictures placed on the map, for a picture layer. A small box only: at most 200 come back.
+        g.MapGet("/community-media", async (double minLat, double minLon, double maxLat, double maxLon, IncidentMediaService media, HttpContext ctx, CancellationToken ct) =>
+            {
+                if (minLat > maxLat || minLon > maxLon || minLat < -90 || maxLat > 90 || minLon < -180 || maxLon > 180)
+                {
+                    return Results.ValidationProblem(new Dictionary<string, string[]> { ["box"] = ["Give a box as minLat, minLon, maxLat, maxLon in degrees."] });
+                }
+
+                ctx.Response.Headers.CacheControl = "public, max-age=60";
+                return Results.Ok(await media.InAreaAsync(minLat, minLon, maxLat, maxLon, ct));
+            })
+            .WithName("ListCommunityMediaInArea")
+            .Produces<List<IncidentMediaView>>()
+            .ProducesValidationProblem();
 
         g.MapPost("/contacts/{id:int:min(1)}/media", async (int id, HttpContext ctx, IncidentMediaService media, ClaimsPrincipal user, CancellationToken ct) =>
             {

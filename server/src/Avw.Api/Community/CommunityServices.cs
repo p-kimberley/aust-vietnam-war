@@ -10,7 +10,7 @@ namespace Avw.Api.Community;
 public sealed record IncidentMediaView(
     long Id,
     long MediaId,
-    int ContactId,
+    int? ContactId,
     string Url,
     string ThumbUrl,
     int Width,
@@ -18,6 +18,8 @@ public sealed record IncidentMediaView(
     string? Caption,
     string? Credit,
     DateOnly? DateTaken,
+    double? Lat,
+    double? Lon,
     MediaStatus Status,
     int Likes,
     bool LikedByMe,
@@ -51,7 +53,18 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
             .ToListAsync(ct);
         var ids = rows.Select(r => r.Media.Id).ToList();
         var likes = await db.MediaLikes.AsNoTracking().Where(l => ids.Contains(l.MediaId)).Select(l => new { l.MediaId, l.UserId }).ToListAsync(ct);
-        return rows.Select(r => ToView(r.Link, r.Media, likes.Count(l => l.MediaId == r.Media.Id), viewer is not null && likes.Any(l => l.MediaId == r.Media.Id && l.UserId == viewer.Id), viewer)).ToList();
+        return rows.Select(r => ToView(r.Link, r.Media, likes.Count(l => l.MediaId == r.Media.Id) + r.Link.LegacyLikes, viewer is not null && likes.Any(l => l.MediaId == r.Media.Id && l.UserId == viewer.Id), viewer)).ToList();
+    }
+
+    /// <summary>Approved pictures whose place falls inside a box, newest first. For the map's picture layer.</summary>
+    public async Task<List<IncidentMediaView>> InAreaAsync(double minLat, double minLon, double maxLat, double maxLon, CancellationToken ct)
+    {
+        var rows = await db.IncidentMedia.AsNoTracking()
+            .Where(m => m.Media.Status == MediaStatus.Approved && m.Lat != null && m.Lon != null && m.Lat >= minLat && m.Lat <= maxLat && m.Lon >= minLon && m.Lon <= maxLon)
+            .OrderByDescending(m => m.CreatedUtc).ThenByDescending(m => m.Id).Take(200)
+            .Select(m => new { Link = m, m.Media })
+            .ToListAsync(ct);
+        return rows.Select(r => ToView(r.Link, r.Media, r.Link.LegacyLikes, false, null)).ToList();
     }
 
     public async Task<CmsResult<IncidentMediaView>> UploadAsync(int contactId, Stream file, string? caption, string? credit, string? dateTaken, Person person, CancellationToken ct)
@@ -142,19 +155,19 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
             db.ChangeTracker.Clear();
         }
 
-        return CmsResult<LikeResult>.Success(new LikeResult(await db.MediaLikes.CountAsync(l => l.MediaId == link.MediaId, ct), existing is null));
+        return CmsResult<LikeResult>.Success(new LikeResult(await db.MediaLikes.CountAsync(l => l.MediaId == link.MediaId, ct) + link.LegacyLikes, existing is null));
     }
 
     private async Task<CmsResult<IncidentMediaView>> ViewAsync(long id, Person person, CancellationToken ct)
     {
         var link = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).FirstAsync(m => m.Id == id, ct);
         var likes = await db.MediaLikes.AsNoTracking().Where(l => l.MediaId == link.MediaId).Select(l => l.UserId).ToListAsync(ct);
-        return CmsResult<IncidentMediaView>.Success(ToView(link, link.Media, likes.Count, likes.Contains(person.Id), person));
+        return CmsResult<IncidentMediaView>.Success(ToView(link, link.Media, likes.Count + link.LegacyLikes, likes.Contains(person.Id), person));
     }
 
     private static IncidentMediaView ToView(IncidentMedia link, MediaAsset m, int likes, bool liked, Person? viewer) => new(
         link.Id, m.Id, link.ContactId, PublicContent.MediaUrl(m.Sha256), $"/media/{m.Sha256[..2]}/{m.Sha256}-480.jpg", m.Width, m.Height,
-        m.Caption, m.Credit, link.DateTaken, m.Status, likes, liked,
+        m.Caption, m.Credit, link.DateTaken, link.Lat, link.Lon, m.Status, likes, liked,
         viewer is not null && m.UploadedById == viewer.Id, viewer is not null && (viewer.IsEditor || link.AttachedById == viewer.Id));
 }
 

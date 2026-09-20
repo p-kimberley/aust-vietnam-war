@@ -679,6 +679,14 @@ describe('StudioModeration', () => {
     expect(el.textContent).toContain('Killed in action, service number 5715978');
   });
 
+  it('shows a picture carried over from the old site without an incident link when it has no incident', async () => {
+    const { el } = await open(() => Promise.resolve({ ...structuredClone(queue), pictures: [{ ...structuredClone(queue).pictures[0], contactId: null }] }));
+
+    expect(el.querySelector('.pics img')).not.toBeNull();
+    expect(el.querySelector('.pics a[href^="/battlemap?incident="]')).toBeNull();
+    expect(el.querySelector('.pics')?.textContent).not.toContain('Incident');
+  });
+
   it('approves or rejects a note and takes it off the list', async () => {
     const { api, el, settle } = await open(() => Promise.resolve(structuredClone(queue)));
 

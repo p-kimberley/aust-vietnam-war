@@ -25,7 +25,7 @@ public sealed record Person(long Id, string Name, bool IsEditor)
 
 /// <summary>
 /// Content migrated from the legacy site keeps only a hash of its author's email. When someone signs in with a <em>verified</em>
-/// email that hashes the same, the old notes, comments and tributes become theirs, so they can edit or delete them.
+/// email that hashes the same, the old notes, comments, tributes and pictures become theirs, so they can edit or delete them.
 /// </summary>
 public static class LegacyContentLinker
 {
@@ -54,6 +54,12 @@ public static class LegacyContentLinker
         foreach (var tribute in await db.Tributes.Where(t => t.AuthorId == null && t.AuthorEmailHash == hash).ToListAsync(ct))
         {
             tribute.AuthorId = user.Id;
+            linked++;
+        }
+
+        foreach (var picture in await db.IncidentMedia.Where(m => m.AttachedById == null && m.AuthorEmailHash == hash).ToListAsync(ct))
+        {
+            picture.AttachedById = user.Id;
             linked++;
         }
 

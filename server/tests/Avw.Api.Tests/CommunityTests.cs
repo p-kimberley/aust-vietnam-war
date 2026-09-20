@@ -257,6 +257,64 @@ public sealed class CommunityEndpointTests : IDisposable
         Assert.NotEqual(HttpStatusCode.Created, anonymous.StatusCode);
     }
 
+    private void SeedPlacedPictures()
+    {
+        Seed();
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AvwDbContext>();
+        var when = new DateTime(2012, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        MediaAsset Asset(string sha, MediaStatus status, string? caption = null) =>
+            new() { Sha256 = sha.PadRight(64, '0'), Width = 800, Height = 600, ByteSize = 1000, Status = status, UploadedById = 1, CreatedUtc = when, Caption = caption };
+
+        db.IncidentMedia.AddRange(
+            new IncidentMedia { ContactId = 2, Media = Asset("aa", MediaStatus.Approved, "On the track"), Lat = -10.5, Lon = 107.2, CreatedUtc = when, LegacyLikes = 3, AuthorName = "Old Digger" },
+            new IncidentMedia { ContactId = null, Media = Asset("bb", MediaStatus.Approved, "No incident"), Lat = -10.6, Lon = 107.3, CreatedUtc = when.AddDays(1) },
+            new IncidentMedia { ContactId = 2, Media = Asset("cc", MediaStatus.Pending), Lat = -10.5, Lon = 107.2, CreatedUtc = when },
+            new IncidentMedia { ContactId = 2, Media = Asset("dd", MediaStatus.Approved), Lat = 20, Lon = 20, CreatedUtc = when },
+            new IncidentMedia { ContactId = 2, Media = Asset("ee", MediaStatus.Approved), CreatedUtc = when });
+        db.SaveChanges();
+    }
+
+    [Fact]
+    public async Task Lists_approved_pictures_placed_inside_a_box_newest_first_for_the_map()
+    {
+        SeedPlacedPictures();
+
+        var res = await Anon("/api/community-media?minLat=-11&minLon=107&maxLat=-10&maxLon=108");
+        var shown = await Read<List<IncidentMediaView>>(res);
+
+        Assert.Equal(["No incident", "On the track"], shown.Select(m => m.Caption));
+        Assert.Null(shown[0].ContactId);
+        Assert.Equal((-10.5, 107.2, 3), (shown[1].Lat, shown[1].Lon, shown[1].Likes));
+        Assert.All(shown, m => Assert.EndsWith("-480.jpg", m.ThumbUrl));
+        Assert.Contains("max-age=60", res.Headers.CacheControl!.ToString());
+    }
+
+    [Theory]
+    [InlineData("minLat=-10&minLon=107&maxLat=-11&maxLon=108")]
+    [InlineData("minLat=-11&minLon=108&maxLat=-10&maxLon=107")]
+    [InlineData("minLat=-95&minLon=107&maxLat=-10&maxLon=108")]
+    [InlineData("minLat=-11&minLon=107&maxLat=-10&maxLon=181")]
+    public async Task Refuses_an_upside_down_or_out_of_range_picture_box(string box) =>
+        Assert.Equal(HttpStatusCode.BadRequest, (await Anon("/api/community-media?" + box)).StatusCode);
+
+    [Fact]
+    public async Task Counts_likes_carried_over_from_the_legacy_site_and_adds_new_ones_to_them()
+    {
+        SeedPlacedPictures();
+        long id;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            id = scope.ServiceProvider.GetRequiredService<AvwDbContext>().IncidentMedia.Single(m => m.LegacyLikes == 3).Id;
+        }
+
+        Assert.Equal(3, (await Read<List<IncidentMediaView>>(await Anon("/api/contacts/2/media"))).Single(m => m.Id == id).Likes);
+        var liked = await Read<LikeResult>(await As(1, HttpMethod.Post, $"/api/incident-media/{id}/like"));
+        Assert.Equal((4, true), (liked.Likes, liked.Liked));
+        var unliked = await Read<LikeResult>(await As(1, HttpMethod.Post, $"/api/incident-media/{id}/like"));
+        Assert.Equal((3, false), (unliked.Likes, unliked.Liked));
+    }
+
     // ------------------------------------------------------------ honour roll and tributes
 
     [Fact]

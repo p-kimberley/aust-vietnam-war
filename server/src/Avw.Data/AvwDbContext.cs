@@ -79,6 +79,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.HasIndex(x => new { x.ContactId, x.Status });
             e.HasIndex(x => x.AuthorEmailHash);
             e.HasIndex(x => x.Status);
+            e.HasIndex(x => x.LegacyId);
             e.HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.SetNull);
         });
 
@@ -100,14 +101,20 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.Body).HasMaxLength(2000);
             e.HasIndex(x => new { x.NoteId, x.CreatedUtc });
             e.HasIndex(x => x.AuthorEmailHash);
+            e.HasIndex(x => x.LegacyId);
             e.HasOne(x => x.Note).WithMany(n => n.Comments).HasForeignKey(x => x.NoteId).OnDelete(DeleteBehavior.Cascade);
         });
 
         b.Entity<IncidentMedia>(e =>
         {
             e.ToTable("incident_media");
+            e.Property(x => x.AuthorName).HasMaxLength(200);
+            e.Property(x => x.AuthorEmailHash).HasMaxLength(64).IsFixedLength();
             e.HasIndex(x => x.ContactId);
             e.HasIndex(x => new { x.ContactId, x.MediaId }).IsUnique();
+            e.HasIndex(x => x.AuthorEmailHash);
+            e.HasIndex(x => x.LegacyId);
+            e.HasIndex(x => new { x.Lat, x.Lon });
             e.HasOne(x => x.Media).WithMany().HasForeignKey(x => x.MediaId).OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -128,6 +135,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.Message).HasMaxLength(1000);
             e.HasIndex(x => new { x.ServiceNumber, x.CreatedUtc });
             e.HasIndex(x => x.AuthorEmailHash);
+            e.HasIndex(x => x.LegacyId);
         });
 
         b.Entity<CasualtySubmission>(e =>
@@ -139,6 +147,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.SubmittedByName).HasMaxLength(200);
             e.HasIndex(x => new { x.Handled, x.CreatedUtc });
             e.HasIndex(x => x.ContactId);
+            e.HasIndex(x => x.LegacyId);
         });
 
         b.Entity<CasualtyLink>(e =>

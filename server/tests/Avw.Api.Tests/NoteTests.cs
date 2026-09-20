@@ -387,6 +387,24 @@ public class NoteServiceTests
     }
 
     [Fact]
+    public async Task Links_migrated_pictures_to_the_person_with_the_same_verified_email()
+    {
+        var f = Make();
+        var hash = UserSyncHash("old@example.com");
+        f.Db.Users.Add(new AppUser { Id = 7, Subject = "s7", DisplayName = "Returning", EmailHash = hash });
+        MediaAsset Asset(string sha) => new() { Sha256 = sha.PadRight(64, '0'), Width = 1, Height = 1, ByteSize = 1, Status = MediaStatus.Approved, UploadedById = 1, CreatedUtc = T0 };
+        f.Db.IncidentMedia.AddRange(
+            new IncidentMedia { ContactId = 2, Media = Asset("a1"), AuthorEmailHash = hash, CreatedUtc = T0 },
+            new IncidentMedia { ContactId = null, Media = Asset("a2"), AuthorEmailHash = hash, Lat = -10, Lon = 107, CreatedUtc = T0 },
+            new IncidentMedia { ContactId = 2, Media = Asset("a3"), AuthorEmailHash = UserSyncHash("else@example.com"), CreatedUtc = T0 });
+        await f.Db.SaveChangesAsync();
+
+        Assert.Equal(2, await LegacyContentLinker.LinkAsync(f.Db, await f.Db.Users.FindAsync(7L) ?? throw new InvalidOperationException(), default));
+
+        Assert.Equal([7L, 7L, null], f.Db.IncidentMedia.OrderBy(m => m.Id).Select(m => m.AttachedById));
+    }
+
+    [Fact]
     public async Task Links_nothing_for_someone_with_no_verified_email()
     {
         var f = Make();

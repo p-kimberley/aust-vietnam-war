@@ -49,7 +49,8 @@ export interface VersionView {
 export interface IncidentMediaView {
   id: number;
   mediaId: number;
-  contactId: number;
+  /** The incident it belongs to. Pictures carried over from the old site may have none and be placed on the map only. */
+  contactId: number | null;
   url: string;
   thumbUrl: string;
   width: number;
@@ -57,6 +58,8 @@ export interface IncidentMediaView {
   caption: string | null;
   credit: string | null;
   dateTaken: string | null;
+  lat: number | null;
+  lon: number | null;
   status: MediaStatus;
   likes: number;
   likedByMe: boolean;
@@ -149,7 +152,7 @@ export interface PendingNote {
 export interface PendingPicture {
   incidentMediaId: number;
   mediaId: number;
-  contactId: number;
+  contactId: number | null;
   url: string;
   thumbUrl: string;
   caption: string | null;

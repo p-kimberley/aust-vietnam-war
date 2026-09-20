@@ -45,6 +45,8 @@ const picture = (over: Partial<IncidentMediaView> = {}): IncidentMediaView => ({
   caption: 'A patrol',
   credit: 'AWM',
   dateTaken: '1966-08-18',
+  lat: null,
+  lon: null,
   status: 'Approved',
   likes: 3,
   likedByMe: false,
