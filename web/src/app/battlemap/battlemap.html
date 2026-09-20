@@ -5,6 +5,7 @@
     <a class="bm__back" routerLink="/">← Australia's Vietnam War</a>
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
+      <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" />
       <span class="bm__count data">
         @if (activeCount()) {
           {{ visible().length }} of {{ allContacts().length }} contacts

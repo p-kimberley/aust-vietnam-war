@@ -1,0 +1,68 @@
+<div class="search" #root (focusout)="onBlur($event, root)">
+  <input
+    type="search"
+    class="search__input"
+    role="combobox"
+    autocomplete="off"
+    maxlength="100"
+    placeholder="Search bases and reports"
+    aria-label="Search bases and incident reports"
+    aria-autocomplete="list"
+    aria-controls="search-results"
+    [attr.aria-expanded]="open() && (options().length > 0 || status() !== 'idle')"
+    [attr.aria-activedescendant]="active() >= 0 ? optionId(active()) : null"
+    [value]="query()"
+    (input)="onInput($any($event.target).value)"
+    (keydown)="onKeydown($event)"
+    (focus)="open.set(true)"
+  />
+
+  @if (open() && query().trim().length >= minLength) {
+    <div class="search__popup">
+      <ul id="search-results" class="search__list" role="listbox" aria-label="Search results">
+        @for (option of options(); track option.kind + option.id; let i = $index) {
+          <li
+            role="option"
+            class="search__option"
+            tabindex="-1"
+            [id]="optionId(i)"
+            [class.search__option--active]="i === active()"
+            [attr.aria-selected]="i === active()"
+            (mousedown)="$event.preventDefault()"
+            (click)="choose(option)"
+          >
+            @if (option.kind === 'poi') {
+              <span class="search__kind">{{ typeName(option.poi.type) }}</span>
+              <span class="search__title">{{ option.poi.name }}</span>
+            } @else {
+              <span class="search__kind data">{{ formatDtg(option.hit.dtg) }}</span>
+              <span class="search__snippet">
+                @for (part of option.hit.snippet; track $index) {
+                  @if (part.match) {
+                    <mark>{{ part.text }}</mark>
+                  } @else {
+                    {{ part.text }}
+                  }
+                }
+              </span>
+            }
+          </li>
+        }
+      </ul>
+
+      <p class="search__note" role="status" aria-live="polite">
+        @switch (status()) {
+          @case ('searching') { Searching reports… }
+          @case ('error') { The search failed. Try again in a moment. }
+          @default {
+            @if (nothingFound()) {
+              Nothing matches.
+            } @else if (total() > hits().length) {
+              Showing the best {{ hits().length }} of {{ total() }} incidents. Use Filters to narrow them all.
+            }
+          }
+        }
+      </p>
+    </div>
+  }
+</div>

@@ -16,6 +16,7 @@ import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
 import { POI_POINTS, addPoiLayers, setPoiVisibility, setSelectedPoi } from './poi-layers';
 import { PoiPanel } from './poi-panel';
+import { SearchBox } from './search-box';
 import {
   HEAT_LAYER,
   POINT_LAYER,
@@ -49,7 +50,7 @@ const SEARCH_DELAY_MS = 400;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, IncidentPanel, PoiPanel, FiltersPanel],
+  imports: [RouterLink, IncidentPanel, PoiPanel, FiltersPanel, SearchBox],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -138,6 +139,20 @@ export class Battlemap {
       if (id !== null) setSelectedContact(this.map, null);
     }
     this.syncUrl();
+  }
+
+  /** Opens the incident chosen from the search results and brings it into view. */
+  protected openContact(id: number): void {
+    const contact = this.allContacts().find((c) => c.id === id);
+    this.select(id);
+    if (contact) this.basemaps.flyTo(contact.lat, contact.lon, 13);
+  }
+
+  /** Opens the base chosen from the search results and brings it into view. */
+  protected openPoi(id: number): void {
+    const poi = this.pois().find((p) => p.id === id);
+    this.selectPoi(id);
+    if (poi) this.basemaps.flyTo(poi.lat, poi.lon, 13);
   }
 
   protected setPoisVisible(visible: boolean): void {

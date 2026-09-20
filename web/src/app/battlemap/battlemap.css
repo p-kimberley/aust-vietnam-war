@@ -105,6 +105,10 @@
     display: none;
   }
 
+  .bm__title {
+    display: none;
+  }
+
   .bm__incident {
     top: auto;
     left: 0.75rem;
