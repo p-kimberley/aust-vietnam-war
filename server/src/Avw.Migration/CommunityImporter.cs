@@ -89,6 +89,14 @@ public static class CommunityImporter
 
     public const string NoDetails = "No details were given.";
 
+    /// <summary>
+    /// The old site's moderation values, for notes and pictures alike (see <c>incident-note.js</c>, <c>upload-incident-media.php</c>):
+    /// 1 approved, 0 rejected by a moderator, -1 waiting for one. Anything else is treated as waiting.
+    /// </summary>
+    public static ModerationStatus NoteStatus(int legacy) => legacy switch { 1 => ModerationStatus.Approved, 0 => ModerationStatus.Rejected, _ => ModerationStatus.Pending };
+
+    public static MediaStatus PictureStatus(int legacy) => legacy switch { 1 => MediaStatus.Approved, 0 => MediaStatus.Rejected, _ => MediaStatus.Pending };
+
     private static string? Clean(string? s) => string.IsNullOrWhiteSpace(s) ? null : PlainText.Clean(HtmlText.ToPlain(s) ?? s).Replace('\n', ' ');
 
     private static string Cut(string s, int max) => s.Length <= max ? s : s[..max].TrimEnd();
@@ -158,7 +166,7 @@ public static class CommunityImporter
                 });
             }
 
-            note.Status = legacy.ApprovalStatus switch { 1 => ModerationStatus.Approved, < 0 => ModerationStatus.Rejected, _ => ModerationStatus.Pending };
+            note.Status = NoteStatus(legacy.ApprovalStatus);
             note.ApprovedVersionNo = note.Status == ModerationStatus.Approved ? note.LatestVersionNo : null;
             report.Added++;
             if (!dryRun)
@@ -367,6 +375,13 @@ public static class CommunityImporter
                 continue;
             }
 
+            // A moderator turned this picture down, so its file is not kept.
+            if (PictureStatus(row.ApprovalStatus) == MediaStatus.Rejected)
+            {
+                report.Skip("rejected by a moderator");
+                continue;
+            }
+
             if (string.IsNullOrWhiteSpace(row.Path))
             {
                 report.Skip("without a file name");
@@ -448,7 +463,7 @@ public static class CommunityImporter
             ByteSize = image.ByteSize,
             Caption = Cut(Text(row.Description).Replace('\n', ' '), 500) is { Length: > 0 } c ? c : null,
             Credit = Cut(Text(row.Attribution).Replace('\n', ' '), 200) is { Length: > 0 } a ? a : null,
-            Status = row.ApprovalStatus switch { 1 => MediaStatus.Approved, < 0 => MediaStatus.Rejected, _ => MediaStatus.Pending },
+            Status = PictureStatus(row.ApprovalStatus),
             UploadedById = uploader.Id,
             CreatedUtc = Utc(row.Created),
         };

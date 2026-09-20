@@ -77,8 +77,9 @@ public sealed class CommunityImporterTests : IDisposable
 
     [Theory]
     [InlineData(1, ModerationStatus.Approved, 1)]
-    [InlineData(0, ModerationStatus.Pending, null)]
-    [InlineData(-1, ModerationStatus.Rejected, null)]
+    [InlineData(0, ModerationStatus.Rejected, null)]                    // the old site: 0 is "rejected by a moderator"
+    [InlineData(-1, ModerationStatus.Pending, null)]                    // and -1 is "waiting for a moderator"
+    [InlineData(7, ModerationStatus.Pending, null)]
     public async Task Carries_the_legacy_approval_status_across(int legacy, ModerationStatus expected, int? approvedVersion)
     {
         await CommunityImporter.ImportNotesAsync([Note(approval: legacy)], [Version(1, 1, "T", "Body")], [], Authors, _db, false);
@@ -302,15 +303,18 @@ public sealed class CommunityImporterTests : IDisposable
     }
 
     [Fact]
-    public async Task Maps_legacy_approval_to_the_picture_status()
+    public async Task Keeps_approved_and_waiting_pictures_and_drops_those_a_moderator_rejected()
     {
         using var processor = Processor();
         var files = new Files(new() { ["a.jpg"] = TestImages.Jpeg(400, 300), ["b.jpg"] = TestImages.Jpeg(500, 300), ["c.jpg"] = TestImages.Jpeg(600, 300) });
 
-        await CommunityImporter.ImportMediaAsync(
+        var report = await CommunityImporter.ImportMediaAsync(
             [Pic(1, "a.jpg", approval: 1), Pic(2, "b.jpg", approval: 0), Pic(3, "c.jpg", approval: -1)], [], Authors, files, processor, _db, false, TimeProvider.System);
 
-        Assert.Equal([MediaStatus.Approved, MediaStatus.Pending, MediaStatus.Rejected], _db.IncidentMedia.OrderBy(m => m.LegacyId).Select(m => m.Media.Status));
+        // The old site: 1 approved, 0 rejected by a moderator, -1 waiting for one.
+        Assert.Equal((2, 1), (report.Added, report.Skipped["rejected by a moderator"]));
+        Assert.Equal([(1, MediaStatus.Approved), (3, MediaStatus.Pending)], _db.IncidentMedia.Include(m => m.Media).OrderBy(m => m.LegacyId).AsEnumerable().Select(m => (m.LegacyId!.Value, m.Media.Status)));
+        Assert.Equal(2, Directory.GetFiles(Path.Combine(_dir, "media"), "*.jpg", SearchOption.AllDirectories).Count(f => !f.EndsWith("-480.jpg")));      // the rejected file was never stored
     }
 
     [Fact]
@@ -321,7 +325,7 @@ public sealed class CommunityImporterTests : IDisposable
         var files = new Files(new() { ["a.jpg"] = bytes, ["b.jpg"] = bytes });
 
         var report = await CommunityImporter.ImportMediaAsync(
-            [Pic(1, "a.jpg", approval: 1), Pic(2, "b.jpg", feature: 200, approval: 0)], [], Authors, files, processor, _db, false, TimeProvider.System);
+            [Pic(1, "a.jpg", approval: 1), Pic(2, "b.jpg", feature: 200, approval: -1)], [], Authors, files, processor, _db, false, TimeProvider.System);
 
         Assert.Equal(1, report.Added);
         Assert.Equal(1, report.Skipped["not approved, and the same file is already approved elsewhere"]);

@@ -81,7 +81,8 @@ looks for accessibility problems, content-security-policy violations and script 
 Only the Battle Map's community content is migrated (WordPress posts, pages, comments and users are not). The old database is a
 MySQL 5.6 dump that contains personal data: keep it off shared machines and never print rows.
 
-1. Load the dump into a **scratch** MySQL (not the new database). It only needs to be readable by the import.
+1. Load a **current** dump into a **scratch** MySQL (not the new database). It only needs to be readable by the import. The June 2017 dump is
+   missing what was added since: at least 140 pictures from 2018 (assumptions 6.17).
 2. Give the API secret a `ConnectionStrings__Legacy` with read-only access to that scratch database. If it is an old MySQL
    (5.x) and the connection fails with "Cannot determine the frame size", add `;SslMode=Disabled` (the scratch server is inside the cluster).
 3. Points of interest: `import-poi`. Community content: `import-community`. Run each **as a dry run first** (the default in the chart):
@@ -96,14 +97,14 @@ MySQL 5.6 dump that contains personal data: keep it off shared machines and neve
 4. Run for real with `--set import.dryRun=false`. A second run must report **0 added** (everything "unchanged").
 5. Pictures: copy the old `incident-media/` folder onto a volume, name it in `import.legacyFiles`, and run again. Files that are
    missing are skipped and reported, so it can be repeated as more arrive. The dump lists 353 pictures. Each is checked, straightened,
-   resized to fit 1920x1080, stored as a JPEG under its content hash with a 480 px thumbnail. Expected: 352 added (one is the same
-   picture twice on an incident), 337 distinct files, about 42 MB. Most (329) have no incident and appear only on the map's
+   resized to fit 1920x1080, stored as a JPEG under its content hash with a 480 px thumbnail. Expected from the 2017 dump: 350 added (one is the same
+   picture twice on an incident, and 2 were rejected by a moderator and are left out), 337 distinct files, about 42 MB. Most (329) have no incident and appear only on the map's
    picture layer, once that is built.
 6. Portraits for the honour roll are separate: put `<service number>.jpg` files in `portraits/` inside the media volume.
 7. Authors are matched by a hash of their email. Nothing else about them is kept. When they sign in with the same **verified** email
    they see their old notes, comments, tributes and pictures as their own.
 
-After the real import the Studio's Moderation page shows what is waiting (9 notes and 2 pictures were pending in the old site).
+After the real import the Studio's Moderation page shows what is waiting (one note was waiting in the old site; 9 notes were rejected and stay visible only to their authors and editors).
 
 ## 5. Security
 
