@@ -3,6 +3,7 @@ using System;
 using Avw.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Avw.Data.Migrations
 {
     [DbContext(typeof(AvwDbContext))]
-    partial class AvwDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260920133402_AddIndexOutbox")]
+    partial class AddIndexOutbox
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

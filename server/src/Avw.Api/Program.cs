@@ -8,6 +8,7 @@ using Avw.Api.Map;
 using Avw.Api.Media;
 using Avw.Api.Security;
 using Avw.Data;
+using Avw.Data.Indexing;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -48,6 +49,8 @@ else if (!builder.Configuration.GetValue<bool>("DataProtection:AllowUnencryptedK
         "DataProtection:CertificatePath is required. Set DataProtection:AllowUnencryptedKeys=true only for local development.");
 }
 
+// Changes to notes and pictures are queued for the search index only when indexing is on (see docs/runbook.md, section 7).
+services.AddSingleton(new IndexingSwitch(builder.Configuration.GetValue<bool>("Indexing:Enabled")));
 services.AddSingleton(TimeProvider.System);
 services.AddAvwMap(builder.Configuration);
 services.AddAvwAnalytics();

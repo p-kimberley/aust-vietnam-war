@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Keeps the Elasticsearch indexes for notes and pictures in step with the database. Run by the worker. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Avw.Core\Avw.Core.csproj" />
+    <ProjectReference Include="..\Avw.Data\Avw.Data.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -7,6 +7,7 @@ WORKDIR /src
 COPY global.json Directory.Build.props Directory.Packages.props Avw.slnx ./
 COPY src/Avw.Core/Avw.Core.csproj src/Avw.Core/
 COPY src/Avw.Data/Avw.Data.csproj src/Avw.Data/
+COPY src/Avw.Indexing/Avw.Indexing.csproj src/Avw.Indexing/
 COPY src/Avw.Api/Avw.Api.csproj src/Avw.Api/
 COPY src/Avw.Worker/Avw.Worker.csproj src/Avw.Worker/
 COPY src/Avw.Migration/Avw.Migration.csproj src/Avw.Migration/
