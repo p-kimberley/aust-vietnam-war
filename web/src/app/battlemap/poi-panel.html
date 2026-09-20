@@ -1,0 +1,25 @@
+<section class="poi" aria-labelledby="poi-title">
+  <header class="poi__head">
+    <h2 id="poi-title" #heading tabindex="-1">About this point</h2>
+    <button type="button" class="poi__close" aria-label="Close panel" (click)="closed.emit()">×</button>
+  </header>
+
+  <div class="poi__body">
+    @if (poi.isLoading()) {
+      <p role="status">Loading…</p>
+    } @else if (poi.error()) {
+      <p role="alert">This point could not be loaded.</p>
+      <button type="button" class="poi__retry" (click)="poi.reload()">Try again</button>
+    } @else if (poi.value(); as p) {
+      <h3 class="poi__name">{{ p.name }}</h3>
+      <p class="poi__line"><strong>Type</strong> {{ typeName(p.type) }}</p>
+      @if (p.established) {
+        <p class="poi__line"><strong>Established</strong> <span class="data">{{ p.established }}</span></p>
+      }
+      <h3>History</h3>
+      <p class="poi__history">{{ p.details || 'No history is recorded.' }}</p>
+    } @else {
+      <p role="status">This point was not found.</p>
+    }
+  </div>
+</section>

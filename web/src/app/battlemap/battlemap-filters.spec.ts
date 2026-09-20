@@ -13,7 +13,7 @@ const countText = (el: HTMLElement) => text(el.querySelector('.bm__count'));
 /** The point features last given to the map: the first `addSource` call, then every `setData`. */
 function plotted(basemaps: Awaited<ReturnType<typeof render>>['basemaps']): number[] {
   const calls = basemaps.map.setData.mock.calls;
-  const data = calls.length ? calls[calls.length - 1][0] : (basemaps.map.addSource.mock.calls[0][1] as { data: unknown }).data;
+  const data = calls.length ? calls[calls.length - 1][0] : (basemaps.map.addSource.mock.calls.find((c) => c[0] === 'avw-contacts')![1] as { data: unknown }).data;
   return (data as { features: { id: number }[] }).features.map((f) => f.id);
 }
 
@@ -93,7 +93,8 @@ describe('Battle Map filters', () => {
     r.basemaps.map.addSource.mockClear();
     r.basemaps.hooks!.styleLoaded(r.basemaps.map as never);
 
-    expect((r.basemaps.map.addSource.mock.calls[0][1] as { data: { features: unknown[] } }).data.features).toHaveLength(1);
+    const contactSource = r.basemaps.map.addSource.mock.calls.find((c) => c[0] === 'avw-contacts')!;
+    expect((contactSource[1] as { data: { features: unknown[] } }).data.features).toHaveLength(1);
   });
 
   it('writes the filters into the URL', async () => {

@@ -26,6 +26,10 @@
     <div class="bm__incident">
       <app-incident-panel [contactId]="id" (closed)="select(null)" />
     </div>
+  } @else if (status() === 'ready' && selectedPoiId(); as poiId) {
+    <div class="bm__incident">
+      <app-poi-panel [poiId]="poiId" (closed)="selectPoi(null)" />
+    </div>
   }
 
   @if (status() === 'ready' && config(); as cfg) {
@@ -33,7 +37,7 @@
       class="panel"
       [class.panel--wide]="tab() === 'filters'"
       [class.panel--closed]="!panelOpen()"
-      [class.panel--shifted]="selectedId() !== null"
+      [class.panel--shifted]="selectedId() !== null || selectedPoiId() !== null"
       aria-label="Map controls"
     >
       <div class="panel__head">
@@ -115,6 +119,16 @@
                   {{ o.name }}
                 </label>
               }
+            </fieldset>
+          }
+
+          @if (pois().length) {
+            <fieldset>
+              <legend>Points of interest</legend>
+              <label>
+                <input type="checkbox" [checked]="showPois()" (change)="setPoisVisible($any($event.target).checked)" />
+                Bases and landing zones
+              </label>
             </fieldset>
           }
 

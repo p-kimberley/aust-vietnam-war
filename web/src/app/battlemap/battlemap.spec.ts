@@ -69,7 +69,7 @@ describe('Battlemap', () => {
   it('adds the contact layers and shows the layer panel once the map is ready', async () => {
     const { el, basemaps } = await render({});
 
-    expect(basemaps.map.layers).toEqual(new Set([HEAT_LAYER, POINT_LAYER, SELECTED_LAYER]));
+    expect([...basemaps.map.layers]).toEqual(expect.arrayContaining([HEAT_LAYER, POINT_LAYER, SELECTED_LAYER]));
     expect(el.querySelector('.bm__count')?.textContent).toContain('3 contacts');
     expect([...el.querySelectorAll('input[name=basemap]')]).toHaveLength(2);
     expect(el.textContent).toContain('3D terrain');

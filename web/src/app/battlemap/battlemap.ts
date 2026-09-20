@@ -13,6 +13,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
+import { Poi, PoiService } from './poi';
+import { POI_POINTS, addPoiLayers, setPoiVisibility, setSelectedPoi } from './poi-layers';
+import { PoiPanel } from './poi-panel';
 import {
   HEAT_LAYER,
   POINT_LAYER,
@@ -41,12 +44,12 @@ const SEARCH_DELAY_MS = 400;
  * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
  * draws a heatmap and incident markers on a MapLibre GL map. Filters run in the browser over the loaded contacts (the
  * dataset is small); only the incident-report word search goes to the server. The view is kept in the URL (`?at=`,
- * `?basemap=`, `?terrain=`, `?field=`, `?overlays=`, `?incident=` and the filter parameters described in
+ * `?basemap=`, `?terrain=`, `?field=`, `?overlays=`, `?incident=`, `?poi=` and the filter parameters described in
  * `filters.ts`) so a link reproduces what the sender was looking at.
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, IncidentPanel, FiltersPanel],
+  imports: [RouterLink, IncidentPanel, PoiPanel, FiltersPanel],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -60,12 +63,14 @@ export class Battlemap {
   readonly field = input<string>();
   readonly overlays = input<string>();
   readonly incident = input<string>();
+  readonly poi = input<string>();
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly configService = inject(MapConfigService);
   private readonly contactsService = inject(ContactsService);
   private readonly filterService = inject(FilterCatalogueService);
+  private readonly poiService = inject(PoiService);
   protected readonly basemaps = inject(BasemapService);
   private readonly canvas = viewChild.required<ElementRef<HTMLElement>>('canvas');
 
@@ -79,6 +84,9 @@ export class Battlemap {
   protected readonly message = signal('');
   protected readonly config = signal<MapConfig | null>(null);
   protected readonly selectedId = signal<number | null>(null);
+  protected readonly selectedPoiId = signal<number | null>(null);
+  protected readonly pois = signal<readonly Poi[]>([]);
+  protected readonly showPois = signal(true);
   protected readonly tab = signal<Tab>('layers');
   protected readonly panelOpen = signal(true);
   protected readonly showHeatmap = signal(true);
@@ -113,8 +121,28 @@ export class Battlemap {
   /** Opens the incident panel for a contact (or closes it), ringing the marker and keeping the URL in step. */
   protected select(id: number | null): void {
     this.selectedId.set(id);
-    if (this.map) setSelectedContact(this.map, id);
+    if (id !== null) this.selectedPoiId.set(null);
+    if (this.map) {
+      setSelectedContact(this.map, id);
+      if (id !== null) setSelectedPoi(this.map, null);
+    }
     this.syncUrl();
+  }
+
+  /** Opens the panel for a point of interest (or closes it). One panel is open at a time, so this closes the incident panel. */
+  protected selectPoi(id: number | null): void {
+    this.selectedPoiId.set(id);
+    if (id !== null) this.selectedId.set(null);
+    if (this.map) {
+      setSelectedPoi(this.map, id);
+      if (id !== null) setSelectedContact(this.map, null);
+    }
+    this.syncUrl();
+  }
+
+  protected setPoisVisible(visible: boolean): void {
+    this.showPois.set(visible);
+    if (this.map) setPoiVisibility(this.map, visible);
   }
 
   protected showTab(tab: Tab): void {
@@ -169,7 +197,7 @@ export class Battlemap {
 
   private async start(): Promise<void> {
     try {
-      const [config, contacts, catalogue] = await Promise.all([
+      const [config, contacts, catalogue, pois] = await Promise.all([
         this.configService.load(),
         this.contactsService.load(),
         // Without the catalogue the map still works, just without filters.
@@ -177,7 +205,13 @@ export class Battlemap {
           console.warn('The filter catalogue could not be loaded', e);
           return null;
         }),
+        // Points of interest are extra: the map is complete without them.
+        this.poiService.list().catch((e) => {
+          console.warn('The points of interest could not be loaded', e);
+          return [] as Poi[];
+        }),
       ]);
+      this.pois.set(pois);
       this.config.set(config);
       this.allContacts.set(contacts);
 
@@ -204,6 +238,13 @@ export class Battlemap {
         this.selectedId.set(opened.id);
       }
 
+      // A link may open onto a point of interest instead. Ignore ids that are not real points.
+      const requestedPoi = Number(this.poi());
+      const openedPoi = !opened && Number.isInteger(requestedPoi) ? pois.find((p) => p.id === requestedPoi) : undefined;
+      if (openedPoi) {
+        this.selectedPoiId.set(openedPoi.id);
+      }
+
       let firstStyle = true;
       this.map = await this.basemaps.create(
         this.canvas().nativeElement,
@@ -217,6 +258,8 @@ export class Battlemap {
         {
           styleLoaded: (map) => {
             const shown = this.visible();
+            // Points of interest first, so contacts draw over them.
+            addPoiLayers(map, this.pois(), { visible: this.showPois(), selectedId: this.selectedPoiId() });
             addContactLayers(map, shown, this.heatField(), fieldRange(shown, this.heatField()), {
               heatmap: this.showHeatmap(),
               markers: this.showMarkers(),
@@ -224,6 +267,8 @@ export class Battlemap {
             });
             if (firstStyle) {
               firstStyle = false;
+              // Registered in this order so that, where a contact sits on a base, the contact (drawn on top) wins.
+              this.basemaps.bindClick(POI_POINTS, (p) => this.selectPoi(Number(p['id'])));
               this.basemaps.bindClick(POINT_LAYER, (p) => this.select(Number(p['id'])));
               this.status.set('ready');
             }
@@ -234,8 +279,9 @@ export class Battlemap {
       );
 
       // With no explicit view in the link, bring the incident into frame.
-      if (opened && !parseAt(this.at())) {
-        this.basemaps.flyTo(opened.lat, opened.lon, 11);
+      const target = opened ?? openedPoi;
+      if (target && !parseAt(this.at())) {
+        this.basemaps.flyTo(target.lat, target.lon, 11);
       }
     } catch (e) {
       console.error('Battle Map failed to start', e);
@@ -313,6 +359,7 @@ export class Battlemap {
           field: this.heatField() !== DEFAULT_HEAT_FIELD ? this.heatField() : null,
           overlays: this.basemaps.overlayIds().join(',') || null,
           incident: this.selectedId(),
+          poi: this.selectedPoiId(),
           ...(tree ? toParams(this.filters(), tree) : {}),
         },
         queryParamsHandling: 'merge',

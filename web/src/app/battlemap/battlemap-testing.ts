@@ -9,6 +9,7 @@ import { ContactsService } from './contacts.service';
 import { CATALOGUE } from './filter-fixtures';
 import { FilterCatalogue, FilterCatalogueService } from './filter-catalogue';
 import { MapConfig, MapConfigService } from './map-config';
+import { Poi, PoiDetail, PoiService } from './poi';
 
 /** Fixtures and a harness shared by the Battle Map specs. The map itself is replaced by a recording stand-in. */
 
@@ -24,6 +25,13 @@ export const detail: ContactDetail = {
   frForce: 25, enForce: 5, frKia: 1, frWia: 2, enKia: 3, enWia: 4,
   description: 'AT LOC STATED.', archivalSource: 'Intel V-dat Base', sourceUrl: null,
 };
+
+export const POIS: Poi[] = [
+  { id: 1, type: 'FSB', name: 'Le Loi', established: 1970, lat: 10.63, lon: 107.24 },
+  { id: 2, type: 'LZ', name: 'Hawk', established: null, lat: 10.5, lon: 107.1 },
+];
+
+export const poiDetail: PoiDetail = { ...POIS[0], details: 'On Route 2, north of Nui Dat.' };
 
 export const config: MapConfig = {
   center: [107.17, 10.55],
@@ -53,6 +61,7 @@ export function fakeMap() {
     addLayer: vi.fn((l: { id: string }) => void layers.add(l.id)),
     setFilter: vi.fn(),
     setPaintProperty: vi.fn(),
+    setLayoutProperty: vi.fn(),
     getCenter: () => ({ lat: 10.55, lng: 107.17 }),
     getZoom: () => 8,
   };
@@ -88,6 +97,8 @@ export interface RenderOptions {
   search?: (text: string) => Promise<number[]>;
   /** Component inputs (the query parameters bound by the router). */
   inputs?: Record<string, string>;
+  /** Points of interest; an `Error` makes loading fail, and the map should carry on without them. */
+  pois?: Poi[] | Error;
   /** The raw query parameters the filters are read from. */
   queryParams?: Record<string, string | string[]>;
 }
@@ -98,6 +109,10 @@ export async function render(opts: RenderOptions = {}) {
   const filterService = {
     load: vi.fn(() => (opts.catalogue instanceof Error ? fail(opts.catalogue) : Promise.resolve(opts.catalogue ?? CATALOGUE))),
     search: vi.fn(opts.search ?? (() => Promise.resolve([] as number[]))),
+  };
+  const poiService = {
+    list: vi.fn(() => (opts.pois instanceof Error ? fail(opts.pois) : Promise.resolve(opts.pois ?? POIS))),
+    detail: vi.fn((id: number) => Promise.resolve({ ...poiDetail, id })),
   };
   TestBed.configureTestingModule({
     providers: [
@@ -116,6 +131,7 @@ export async function render(opts: RenderOptions = {}) {
         },
       },
       { provide: FilterCatalogueService, useValue: filterService },
+      { provide: PoiService, useValue: poiService },
     ],
   });
   TestBed.overrideComponent(Battlemap, { set: { providers: [{ provide: BasemapService, useValue: basemaps }] } });
@@ -127,7 +143,7 @@ export async function render(opts: RenderOptions = {}) {
   await fixture.whenStable();
   await new Promise((r) => setTimeout(r));
   fixture.detectChanges();
-  return { fixture, basemaps, filterService, el: fixture.nativeElement as HTMLElement };
+  return { fixture, basemaps, filterService, poiService, el: fixture.nativeElement as HTMLElement };
 }
 
 /** Lets pending promises and a change-detection pass settle. */
