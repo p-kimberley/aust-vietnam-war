@@ -48,3 +48,6 @@ web/src/styles.css
 web/src/styles.css.map
 web/src/app/app.css
 web/src/app/app.css.map
+
+# Media and scratch folders created when the API runs from its project folder
+server/src/*/data/

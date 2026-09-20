@@ -6,6 +6,7 @@ using Avw.Api.Cms;
 using Avw.Api.Community;
 using Avw.Api.Map;
 using Avw.Api.Media;
+using Avw.Api.Security;
 using Avw.Data;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -55,6 +56,7 @@ services.AddAvwCms();
 services.AddAvwFeedback(builder.Configuration);
 services.AddAvwCommunity(builder.Configuration);
 services.AddAvwMedia(builder.Configuration);
+services.AddAvwSecurity();
 
 services.AddHealthChecks()
     .AddDbContextCheck<AvwDbContext>("mysql", tags: ["ready"]);
@@ -78,6 +80,11 @@ services.Configure<ForwardedHeadersOptions>(o =>
 var app = builder.Build();
 
 app.UseForwardedHeaders();
+app.Use((ctx, next) =>
+{
+    SecurityHeaders.Apply(ctx);
+    return next(ctx);
+});
 app.UseResponseCompression();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
@@ -100,6 +107,7 @@ api.MapCmsEndpoints(builder.Configuration);
 api.MapMediaEndpoints();
 api.MapFeedbackEndpoints();
 api.MapCommunityEndpoints();
+api.MapSecurityEndpoints();
 api.MapOpenApi("/openapi/{documentName}.json");
 
 api.MapHealthChecks("/health/live", new() { Predicate = _ => false });

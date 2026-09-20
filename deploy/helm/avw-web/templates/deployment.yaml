@@ -36,6 +36,10 @@ spec:
             # Canonical links, Open Graph URLs, the feed and the sitemap use this address.
             - name: PUBLIC_URL
               value: {{ .Values.publicUrl | default (printf "https://%s" .Values.host) | quote }}
+            - name: CSP_MODE
+              value: {{ .Values.csp.mode | quote }}
+            - name: CSP_EXTRA_ORIGINS
+              value: {{ join " " .Values.csp.extraOrigins | quote }}
           # /healthz is answered before Angular's host check, so probes (which use the pod IP) succeed.
           startupProbe:
             httpGet: { path: /healthz, port: http }

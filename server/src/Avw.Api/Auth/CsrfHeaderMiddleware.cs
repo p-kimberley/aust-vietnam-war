@@ -17,7 +17,10 @@ public sealed class CsrfHeaderMiddleware(RequestDelegate next)
                              || HttpMethods.IsOptions(ctx.Request.Method)
                              || HttpMethods.IsTrace(ctx.Request.Method));
 
-        if (unsafeMethod && ctx.Request.Headers[HeaderName] != HeaderValue)
+        // Browsers post their own content-security-policy reports and cannot add headers to them. That endpoint takes no cookies and changes nothing.
+        var exempt = ctx.Request.Path.Equals("/api/csp-report", StringComparison.OrdinalIgnoreCase);
+
+        if (unsafeMethod && !exempt && ctx.Request.Headers[HeaderName] != HeaderValue)
         {
             return Results.Problem(
                     title: "Missing anti-forgery header",

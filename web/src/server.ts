@@ -6,11 +6,32 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join, sep } from 'node:path';
+import { cspHeader, cspMode, inlineHandlerHashes, inlineScriptHashes, parseOrigins, securityHeaders } from './security-headers';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+/**
+ * Security headers on every response. The content security policy starts in report-only mode (CSP_MODE=enforce turns blocking
+ * on, off turns it off): violations are posted to the API, which logs them, so a policy that is too tight is found in the logs
+ * and not by a reader with a blank map. CSP_EXTRA_ORIGINS lists the other hosts the map fetches from, such as the tile server.
+ * The policy itself is added to each page as it is rendered, because the inline scripts Angular writes differ from page to page.
+ */
+const mode = cspMode(process.env['CSP_MODE']);
+const cspBase = {
+  extraOrigins: parseOrigins(process.env['CSP_EXTRA_ORIGINS']),
+  reportUri: '/api/csp-report',
+};
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  const secure = req.headers['x-forwarded-proto'] === 'https';
+  for (const [name, value] of Object.entries(securityHeaders(secure))) {
+    res.setHeader(name, value);
+  }
+  next();
+});
 
 /**
  * Liveness/readiness probe. Registered before the Angular handler because kubelet probes arrive with the pod IP
@@ -95,9 +116,23 @@ app.use(
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .then(async (response) => {
+      if (!response) {
+        return next();
+      }
+      if (response.headers.get('content-type')?.includes('text/html')) {
+        const html = await response.clone().text();
+        const header = cspHeader(mode, {
+          ...cspBase,
+          scriptHashes: inlineScriptHashes(html),
+          handlerHashes: inlineHandlerHashes(html),
+        });
+        if (header) {
+          res.setHeader(header[0], header[1]);
+        }
+      }
+      return writeResponseToNodeResponse(response, res);
+    })
     .catch(next);
 });
 
