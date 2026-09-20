@@ -9,7 +9,7 @@ made without asking, see `assumptions-and-open-questions.md`.
 |---|---|---|
 | `avw-web` | Angular server-rendered site (Node, port 4000) | Helm chart `deploy/helm/avw-web`, 2 replicas |
 | `avw-api` | .NET API (port 8080): map data, articles, community, sign-in | `deploy/helm/avw-api`, 2 replicas |
-| `avw-api-worker` | Scheduled publishing, keeping the search indexes for notes and pictures up to date (when switched on), and clearing stale upload files | same chart, **exactly one** replica |
+| `avw-api-worker` | Scheduled publishing and clearing stale upload files | same chart, **exactly one** replica |
 | `avw-api-migrate` | Applies database migrations before every install and upgrade | same chart, a Helm hook Job |
 | MySQL 8.4 | Articles, notes, pictures (metadata), tributes, sign-in keys | external (InnoDB Cluster is fine: every table has a primary key) |
 | Elasticsearch 9 | Contacts and the nominal roll. **Read only.** Not written by this project | external |
@@ -49,7 +49,6 @@ scratch volume for uploads in progress.
    | `DataProtection__CertificatePassword` | the `.pfx` password |
    | `Elasticsearch__ApiKey` | the base64 key from step 3 |
    | `Smtp__Password` | optional: only when email is turned on and `smtp.user` is set |
-   | `Indexing__ApiKey` | optional: only when search indexing is turned on (section 7): a key that may write to the two indexes |
    | `ConnectionStrings__Legacy` | only for the one-off import (section 4) |
 
 6. **Values.** Copy the defaults and set at least: `host`, `auth.authority`, `elasticsearch.url`, `map.basemaps` (and `overlays`,
@@ -148,24 +147,6 @@ Restore test: restore MySQL and the media volume into a scratch namespace, run `
 
 - **Health.** `/api/health/live` (process is up), `/api/health/ready` (database and media storage are usable), `/healthz` on the web pods.
   Readiness fails if the media volume is read-only or the API cannot write to it.
-- **Search indexing (optional, off until you give it a key).** Notes and pictures are copied into Elasticsearch as they are added, changed
-  or removed, in the same shapes the old site kept (`avw_incident_notes`, `avw_incident_media`). The API writes a marker row for each change in the
-  same transaction as the change; the worker sends it on. Elasticsearch being down never affects members: the markers wait and are retried
-  (10 seconds, doubling to an hour, 12 tries).
-
-  To turn it on: (1) create a key that may write to just those two indexes (Kibana, or `POST /_security/api_key` with
-  `{"name":"avw-indexer","role_descriptors":{"indexer":{"indices":[{"names":["avw_incident_notes","avw_incident_media"],"privileges":["write"]}]}}}`),
-  and put its encoded value in the API secret as `Indexing__ApiKey`; (2) set `indexing.enabled: true` (and `indexing.url` if the write address differs
-  from `elasticsearch.url`) and upgrade the chart: the worker logs "Search indexing is on"; (3) if the site has been running with it off, catch up once with
-  `Avw.Migrator reindex` (add `--dry-run` to see the counts first; migrated content is left alone unless you add `--include-migrated`). The read-only key
-  is never used to write.
-
-  To watch it: the worker logs each pass ("Indexing: N document(s) written ..."). Rows still waiting: `select Kind, count(*), min(CreatedUtc) from index_outbox
-  where FailedUtc is null group by Kind;` A steadily growing count or an old `min` means it is not getting through. Rows set aside after failing:
-  `select Id, Kind, EntityId, Attempts, LastError from index_outbox where FailedUtc is not null;`. Once the cause is fixed, put them back with
-  `update index_outbox set FailedUtc = null, Attempts = 0, NextAttemptUtc = '1970-01-01' where FailedUtc is not null;`.
-
-  Not indexed: comments and poppies (an open decision, assumptions 8.1), likes, view counts. Pictures are indexed only once approved. Details: assumptions section 8.
 - **Worker.** Publishes scheduled articles every 30 seconds and, every 10 minutes, deletes files in `media/.incoming/` older than 6 hours
   (uploads that a dying pod left behind) and health markers older than 2 days (one per API pod name). Settings: `Media__IncomingMaxAgeMinutes`,
   `Media__HealthMarkerMaxAgeDays`. Never run two workers.

@@ -1,15 +1,11 @@
 using Avw.Data.Entities;
-using Avw.Data.Indexing;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Avw.Data;
 
-public class AvwDbContext(DbContextOptions<AvwDbContext> options, IndexingSwitch? indexing = null) : DbContext(options), IDataProtectionKeyContext
+public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(options), IDataProtectionKeyContext
 {
-    /// <summary>Changes to notes and pictures that the search index has yet to follow. See <see cref="IndexOutboxItem"/>.</summary>
-    public DbSet<IndexOutboxItem> IndexOutbox => Set<IndexOutboxItem>();
-
     public DbSet<AppUser> Users => Set<AppUser>();
     public DbSet<Article> Articles => Set<Article>();
     public DbSet<ArticleRevision> ArticleRevisions => Set<ArticleRevision>();
@@ -35,63 +31,6 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options, IndexingSwitch
     /// MySQL hands back timestamps with no time-zone kind. Everything stored is UTC, so say so on the way out: the JSON
     /// then ends in <c>Z</c> and a browser in any time zone reads the same moment.
     /// </summary>
-    // ---- search index outbox
-    //
-    // Every save that changes a note or a picture also records, in the same transaction, that the search index needs to follow. It is
-    // done here, below every service, so no code path can change one and forget the other.
-
-    public override int SaveChanges(bool acceptAllChangesOnSuccess)
-    {
-        var changes = CollectIndexChanges();
-        if (changes is null)
-        {
-            return base.SaveChanges(acceptAllChangesOnSuccess);
-        }
-
-        using var transaction = NewTransactionIfNeeded();
-        var saved = base.SaveChanges(acceptAllChangesOnSuccess);
-        IndexOutbox.AddRange(changes.Rows());
-        base.SaveChanges(acceptAllChangesOnSuccess);
-        transaction?.Commit();
-        return saved;
-    }
-
-    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-    {
-        var changes = CollectIndexChanges();
-        if (changes is null)
-        {
-            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        }
-
-        await using var transaction = NewTransactionIfNeeded();
-        var saved = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        IndexOutbox.AddRange(changes.Rows());
-        await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        if (transaction is not null)
-        {
-            await transaction.CommitAsync(cancellationToken);
-        }
-
-        return saved;
-    }
-
-    private IndexChangeCollector? CollectIndexChanges()
-    {
-        if (indexing is { Enabled: false })
-        {
-            return null;
-        }
-
-        ChangeTracker.DetectChanges();
-        var changes = IndexChangeCollector.From(ChangeTracker.Entries().Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted));
-        return changes.Any ? changes : null;
-    }
-
-    /// <summary>A transaction round the change and its outbox rows, unless the caller already has one (or the provider has none, as in tests).</summary>
-    private Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? NewTransactionIfNeeded() =>
-        Database.IsRelational() && Database.CurrentTransaction is null ? Database.BeginTransaction() : null;
-
     protected override void ConfigureConventions(ModelConfigurationBuilder configuration)
     {
         configuration.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
@@ -111,13 +50,6 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options, IndexingSwitch
 
     protected override void OnModelCreating(ModelBuilder b)
     {
-        b.Entity<IndexOutboxItem>(e =>
-        {
-            e.ToTable("index_outbox");
-            e.Property(x => x.LastError).HasMaxLength(1000);
-            e.HasIndex(x => new { x.FailedUtc, x.NextAttemptUtc });
-        });
-
         // Every table needs a primary key: InnoDB Cluster (Group Replication) rejects tables without one.
         b.Entity<AppUser>(e =>
         {

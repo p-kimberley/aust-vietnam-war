@@ -357,7 +357,7 @@ namespace Avw.Data.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime?>("DateTaken")
+                    b.Property<DateOnly?>("DateTaken")
                         .HasColumnType("date");
 
                     b.Property<double?>("Lat")
@@ -721,44 +721,6 @@ namespace Avw.Data.Migrations
                     b.HasIndex("ServiceNumber", "CreatedUtc");
 
                     b.ToTable("tributes", (string)null);
-                });
-
-            modelBuilder.Entity("Avw.Data.Indexing.IndexOutboxItem", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<long>("EntityId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("EsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("FailedUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Kind")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LastError")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<DateTime>("NextAttemptUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FailedUtc", "NextAttemptUtc");
-
-                    b.ToTable("index_outbox", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>

@@ -6,9 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Microsoft.Extensions.Http" />
     <ProjectReference Include="..\Avw.Data\Avw.Data.csproj" />
-    <ProjectReference Include="..\Avw.Indexing\Avw.Indexing.csproj" />
   </ItemGroup>
 
 </Project>

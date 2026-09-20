@@ -109,29 +109,6 @@ loaded in a scratch MySQL (`ConnectionStrings__Legacy`; add `;SslMode=Disabled` 
 the imported content again, delete rows with a `LegacyId` from `incident_notes`, `tributes`, `casualty_submissions` and `incident_media`
 (and everything in `casualty_links`).
 
-## Optional: try the search indexer locally
-
-Notes and pictures are copied into Elasticsearch when indexing is on (off by default; see `runbook.md` section 7). To see it work without touching the
-shared cluster, use the empty local Elasticsearch in the compose file:
-
-```
-docker compose -f deploy/dev/compose.yaml --profile search up -d
-bash deploy/dev/es-init.sh                 # creates avw_incident_notes and avw_incident_media with the live mappings
-```
-
-Then run the API **and the worker** with indexing on, the worker writing to the local cluster (an incident's place is still read from the shared one
-with the read-only key from step 4, so keep those variables set for the worker too):
-
-```
-# Git Bash, from the repo root, in two shells that both have the Elasticsearch__* variables from step 4 and:
-export Indexing__Enabled=true
-dotnet run --project server/src/Avw.Api
-ConnectionStrings__Default="Server=127.0.0.1;Port=3307;Database=avw;User=avw;Password=avw" Indexing__Url=http://localhost:9200 dotnet run --project server/src/Avw.Worker
-```
-
-Sign in, write a note or add a picture (as an editor or admin, so it is approved), and within a few seconds `curl http://localhost:9200/avw_incident_notes/_search`
-shows it. New notes and pictures are numbered from 100,000. Stop Elasticsearch (`docker stop`), make a change, and start it again to watch the retry.
-
 ## Tests
 
 No database, Keycloak or Elasticsearch is needed.

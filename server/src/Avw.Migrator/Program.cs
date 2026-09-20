@@ -1,7 +1,5 @@
 using Avw.Api.Media;
 using Avw.Data;
-using Avw.Data.Indexing;
-using Avw.Indexing;
 using Avw.Migration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,10 +15,6 @@ using MySql.Data.MySqlClient;
 //                                                  Pictures are read from --media-root (the legacy uploads folder), processed
 //                                                  like a new upload and written to Media__RootPath. Without --media-root,
 //                                                  or with --skip-media, only the text content is imported.
-//   Avw.Migrator reindex [--dry-run] [--include-migrated]
-//                                                  queue every note and picture for the search index (the worker then writes them).
-//                                                  For catching up after indexing was switched on, or repairing the index. Migrated
-//                                                  content is left out unless --include-migrated, because it already has documents.
 //
 // Import commands read the legacy database named by ConnectionStrings__Legacy, write to ConnectionStrings__Default, are
 // idempotent (safe to repeat) and honour --dry-run, which reports counts and changes nothing. Reports never print rows,
@@ -42,8 +36,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 var dryRun = args.Contains("--dry-run");
 var command = args.FirstOrDefault(a => !a.StartsWith("--") && a != ArgValue("--media-root"));
 
-// Nothing done here queues search index changes on its own: an import is of content whose documents already exist, and reindex queues its own.
-await using var db = new AvwDbContext(new DbContextOptionsBuilder<AvwDbContext>().UseMySQL(connectionString).Options, new IndexingSwitch(false));
+await using var db = new AvwDbContext(new DbContextOptionsBuilder<AvwDbContext>().UseMySQL(connectionString).Options);
 
 switch (command)
 {
@@ -119,15 +112,8 @@ switch (command)
         return 0;
     }
 
-    case "reindex":
-    {
-        var plan = await Reindex.QueueAsync(db, args.Contains("--include-migrated"), dryRun);
-        Console.WriteLine($"reindex{(dryRun ? " (dry run)" : "")}: {plan.Notes} notes and {plan.Media} pictures queued, {plan.AlreadyWaiting} already waiting.");
-        return 0;
-    }
-
     default:
-        Console.Error.WriteLine($"Unknown command '{command}'. Commands: import-poi, import-community, reindex.");
+        Console.Error.WriteLine($"Unknown command '{command}'. Commands: import-poi, import-community.");
         return 2;
 }
 

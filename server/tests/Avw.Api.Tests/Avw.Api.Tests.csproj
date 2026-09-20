@@ -12,7 +12,6 @@
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <ProjectReference Include="..\..\src\Avw.Api\Avw.Api.csproj" />
-    <ProjectReference Include="..\..\src\Avw.Indexing\Avw.Indexing.csproj" />
     <ProjectReference Include="..\..\src\Avw.Migration\Avw.Migration.csproj" />
   </ItemGroup>
 
