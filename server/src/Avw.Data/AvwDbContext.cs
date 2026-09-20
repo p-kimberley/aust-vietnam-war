@@ -13,6 +13,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
+    public DbSet<Poi> Pois => Set<Poi>();
 
     /// <summary>Shared ASP.NET Data Protection keys, so every API replica can read the auth cookie.</summary>
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -28,6 +29,16 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.EmailHash).HasMaxLength(64).IsFixedLength();
             e.HasIndex(x => x.Subject).IsUnique();
             e.HasIndex(x => x.EmailHash);
+        });
+
+        b.Entity<Poi>(e =>
+        {
+            e.ToTable("points_of_interest");
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Type).HasMaxLength(16);
+            e.Property(x => x.Name).HasMaxLength(100);
+            e.Property(x => x.Details).HasColumnType("text");
+            e.HasIndex(x => x.Visible);
         });
 
         b.Entity<Category>(e =>

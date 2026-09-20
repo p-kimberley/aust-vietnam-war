@@ -14,7 +14,7 @@ public class PrivateCaValidationTests
         req.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, false, 0, true));
         req.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.KeyCertSign, true));
         using var withKey = req.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(30));
-        return new X509Certificate2(withKey.Export(X509ContentType.Pfx));
+        return X509CertificateLoader.LoadPkcs12(withKey.Export(X509ContentType.Pfx), null);
     }
 
     private static X509Certificate2 NewLeaf(X509Certificate2 issuer, string host = "es.test")
@@ -25,7 +25,7 @@ public class PrivateCaValidationTests
         san.AddDnsName(host);
         req.CertificateExtensions.Add(san.Build());
         using var signed = req.Create(issuer, DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(10), RandomNumberGenerator.GetBytes(8));
-        return new X509Certificate2(signed.Export(X509ContentType.Cert));
+        return X509CertificateLoader.LoadCertificate(signed.Export(X509ContentType.Cert));
     }
 
     // What the TLS stack reports when the certificate is not in the machine store.

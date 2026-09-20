@@ -6,6 +6,7 @@
   <ItemGroup>
     <!-- Oracle's provider: Pomelo has no EF Core 10 release yet. See docs/rebuild-plan.md section 9. -->
     <PackageVersion Include="MySql.EntityFrameworkCore" Version="10.0.9" />
+    <PackageVersion Include="MySql.Data" Version="26.7.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="$(EfVersion)" />

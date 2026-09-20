@@ -82,6 +82,7 @@ app.UseMiddleware<CsrfHeaderMiddleware>();
 var api = app.MapGroup("/api");
 api.MapAuthEndpoints();
 api.MapMapEndpoints();
+api.MapPoiEndpoints();
 api.MapOpenApi("/openapi/{documentName}.json");
 
 api.MapHealthChecks("/health/live", new() { Predicate = _ => false });

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" />
+    <ProjectReference Include="..\Avw.Data\Avw.Data.csproj" />
+  </ItemGroup>
+
+</Project>

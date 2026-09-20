@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Avw.Api/Avw.Api.csproj" />
     <Project Path="src/Avw.Data/Avw.Data.csproj" />
+    <Project Path="src/Avw.Migration/Avw.Migration.csproj" />
     <Project Path="src/Avw.Migrator/Avw.Migrator.csproj" />
     <Project Path="src/Avw.Worker/Avw.Worker.csproj" />
   </Folder>
