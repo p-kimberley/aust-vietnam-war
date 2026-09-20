@@ -1,9 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { httpResource } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ArticleCardView } from '../content/article-card';
+import { ArticleCard, Paged } from '../content/content';
+import { SITE_NAME, Seo } from '../core/seo.service';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, ArticleCardView],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="hero">
@@ -30,10 +34,34 @@ import { RouterLink } from '@angular/router';
         <a routerLink="/battlemap">See the honour roll</a>
       </article>
       <article class="tile">
-        <h2>Latest news</h2>
-        <p class="data">No articles have been published yet.</p>
+        <h2>Stories</h2>
+        <p>Articles and research about the Australians who served, and the battles they fought.</p>
+        <a routerLink="/articles">Read the stories</a>
       </article>
     </section>
+
+    @if (featured.hasValue() && featured.value().items.length) {
+      <section class="wrap stories" aria-labelledby="featured-title">
+        <h2 id="featured-title">Featured</h2>
+        <div class="grid">
+          @for (a of featured.value().items; track a.slug) {
+            <app-article-card [article]="a" />
+          }
+        </div>
+      </section>
+    }
+
+    @if (latest.hasValue() && latest.value().items.length) {
+      <section class="wrap stories" aria-labelledby="latest-title">
+        <h2 id="latest-title">Latest stories</h2>
+        <div class="grid">
+          @for (a of latest.value().items; track a.slug) {
+            <app-article-card [article]="a" />
+          }
+        </div>
+        <p><a routerLink="/articles">All stories</a></p>
+      </section>
+    }
   `,
   styles: `
     .hero {
@@ -77,6 +105,29 @@ import { RouterLink } from '@angular/router';
     .tile p {
       margin-top: 0;
     }
+    .stories {
+      margin-top: 3rem;
+    }
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    }
   `,
 })
-export class Home {}
+export class Home {
+  protected readonly featured = httpResource<Paged<ArticleCard>>(() => ({
+    url: '/api/content/articles',
+    params: { featured: true, pageSize: 3 },
+  }));
+  protected readonly latest = httpResource<Paged<ArticleCard>>(() => ({ url: '/api/content/articles', params: { pageSize: 6 } }));
+
+  constructor() {
+    inject(Seo).set({
+      title: SITE_NAME,
+      description:
+        'More than six thousand recorded contacts of the Vietnam War on an interactive map, with the stories behind them and an honour roll of those who served.',
+      path: '/',
+    });
+  }
+}

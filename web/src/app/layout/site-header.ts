@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { SiteNav } from '../content/content';
 import { AuthService } from '../core/auth.service';
 
 @Component({
@@ -17,7 +18,10 @@ import { AuthService } from '../core/auth.service';
         <nav class="nav" aria-label="Main">
           <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
           <a routerLink="/battlemap" routerLinkActive="is-active">Battle Map</a>
-          <a routerLink="/about" routerLinkActive="is-active">About</a>
+          <a routerLink="/articles" routerLinkActive="is-active">Stories</a>
+          @for (page of nav.pages.value(); track page.path) {
+            <a [routerLink]="'/' + page.path" routerLinkActive="is-active">{{ page.title }}</a>
+          }
         </nav>
 
         <div class="account">
@@ -114,4 +118,5 @@ import { AuthService } from '../core/auth.service';
 })
 export class SiteHeader {
   protected readonly auth = inject(AuthService);
+  protected readonly nav = inject(SiteNav);
 }

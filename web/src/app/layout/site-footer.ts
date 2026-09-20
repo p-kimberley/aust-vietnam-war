@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SiteNav } from '../content/content';
 
 @Component({
   selector: 'app-site-footer',
@@ -12,8 +13,12 @@ import { RouterLink } from '@angular/router';
           Australia's Vietnam War · 1965–1971. A memorial record, kept in memory of those who served.
         </p>
         <nav aria-label="Footer">
-          <a routerLink="/about">About</a>
+          @for (page of nav.pages.value(); track page.path) {
+            <a [routerLink]="'/' + page.path">{{ page.title }}</a>
+          }
+          <a routerLink="/articles">Stories</a>
           <a routerLink="/battlemap">Battle Map</a>
+          <a href="/feed.xml">RSS</a>
         </nav>
       </div>
     </footer>
@@ -48,4 +53,6 @@ import { RouterLink } from '@angular/router';
     }
   `,
 })
-export class SiteFooter {}
+export class SiteFooter {
+  protected readonly nav = inject(SiteNav);
+}

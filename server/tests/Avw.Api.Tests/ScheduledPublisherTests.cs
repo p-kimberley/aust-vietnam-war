@@ -56,3 +56,25 @@ public class ScheduledPublisherTests
         Assert.Equal(0, second);
     }
 }
+
+public class UtcKindTests
+{
+    [Fact]
+    public async Task Timestamps_read_back_as_utc_so_json_carries_a_Z()
+    {
+        var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<Avw.Data.AvwDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        var stamp = new DateTime(2026, 9, 20, 1, 2, 3, DateTimeKind.Unspecified);
+        await using (var db = new Avw.Data.AvwDbContext(options))
+        {
+            db.Users.Add(new Avw.Data.Entities.AppUser { Subject = "s", DisplayName = "n", CreatedUtc = stamp, LastSeenUtc = stamp });
+            await db.SaveChangesAsync();
+        }
+
+        await using var fresh = new Avw.Data.AvwDbContext(options);
+        var user = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.SingleAsync(fresh.Users);
+
+        Assert.Equal(DateTimeKind.Utc, user.CreatedUtc.Kind);
+        Assert.Equal("\"2026-09-20T01:02:03Z\"", System.Text.Json.JsonSerializer.Serialize(user.CreatedUtc));
+    }
+}

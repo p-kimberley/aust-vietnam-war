@@ -23,12 +23,18 @@ function render(me: Me | 'pending') {
   if (me !== 'pending') {
     ctl.expectOne('/api/auth/me').flush(me);
   }
-  return { fixture, loading };
+  return { fixture, loading, ctl };
 }
 
-async function text(f: ReturnType<typeof render>) {
+/** Answers the navigation request the header makes for authored pages (none, unless a test says otherwise). */
+function answerNav(f: ReturnType<typeof render>, pages: object[] = []) {
+  f.ctl.match('/api/content/pages').forEach((r) => r.flush(pages));
+}
+
+async function text(f: ReturnType<typeof render>, pages: object[] = []) {
   await f.loading.catch(() => undefined);
   f.fixture.detectChanges();
+  answerNav(f, pages);
   await f.fixture.whenStable();
   return (f.fixture.nativeElement as HTMLElement).textContent ?? '';
 }
@@ -54,6 +60,23 @@ describe('SiteHeader', () => {
     expect(t).toContain('Pat Member');
     expect(t).toContain('Sign out');
     expect(t).not.toContain('Studio');
+  });
+
+  it('lists the published pages in the navigation, after Stories', async () => {
+    const r = render({ authenticated: false, id: null, name: null, roles: [] });
+    const t = await text(r, [
+      { title: 'About', path: 'about', children: [] },
+      { title: 'Help', path: 'help', children: [] },
+    ]);
+    const links = [...(r.fixture.nativeElement as HTMLElement).querySelectorAll<HTMLAnchorElement>('nav[aria-label=Main] a')];
+    expect(links.map((a) => [a.textContent?.trim(), a.getAttribute('href')])).toEqual([
+      ['Home', '/'],
+      ['Battle Map', '/battlemap'],
+      ['Stories', '/articles'],
+      ['About', '/about'],
+      ['Help', '/help'],
+    ]);
+    expect(t).toContain('Sign in');
   });
 
   it('links to Studio for authors and above', async () => {

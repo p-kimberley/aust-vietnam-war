@@ -18,6 +18,17 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
     /// <summary>Shared ASP.NET Data Protection keys, so every API replica can read the auth cookie.</summary>
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
+    /// <summary>
+    /// MySQL hands back timestamps with no time-zone kind. Everything stored is UTC, so say so on the way out: the JSON
+    /// then ends in <c>Z</c> and a browser in any time zone reads the same moment.
+    /// </summary>
+    protected override void ConfigureConventions(ModelConfigurationBuilder configuration) =>
+        configuration.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+
+    private sealed class UtcDateTimeConverter()
+        : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+            v => v.Kind == DateTimeKind.Local ? v.ToUniversalTime() : v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
     protected override void OnModelCreating(ModelBuilder b)
     {
         // Every table needs a primary key: InnoDB Cluster (Group Replication) rejects tables without one.

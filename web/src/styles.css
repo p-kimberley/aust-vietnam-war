@@ -1,0 +1,143 @@
+/*
+ * Design tokens from the mockups' style guide. Colour names follow the design: olive drab, khaki, paper, ink,
+ * brass, contact red. The site is a light "paper" theme; the map and studio use the dark olive surfaces.
+ */
+:root {
+  --olive-900: #1f2314;
+  --olive-700: #353d22;
+  --olive-500: #566137;
+  --khaki: #e6ddb8;
+  --paper: #efe7cc;
+  --ink: #22251a;
+  --brass: #c99a3b;
+  --smoke-yellow: #e3b92e;
+  --contact-red: #c23a26;
+  --contact-red-bright: #e0553b;
+  --friendly-blue: #2f5f86;
+  --enemy-rust: #8f3420;
+  --unit-track: #d9822b;
+  --surface: var(--paper);
+  --surface-raised: #f7f1dc;
+  --text: var(--ink);
+  --text-muted: #5b5a43;
+  --rule: #b9ac80;
+  --accent: var(--contact-red);
+  --focus: var(--friendly-blue);
+  --font-display: "Stardos Stencil", Rockwell, "Courier New", serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-data: "Courier Prime", "Courier New", monospace;
+  --radius: 3px;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --content-width: 72rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 0.5em;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+a {
+  color: var(--enemy-rust);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--contact-red);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.wrap {
+  width: min(100% - 2 * var(--gutter), var(--content-width));
+  margin-inline: auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Typewriter-style label used for data, dates and small captions. */
+.data {
+  font-family: var(--font-data);
+  letter-spacing: 0.02em;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.6em 1.2em;
+  border: 2px solid var(--olive-900);
+  border-radius: var(--radius);
+  background: var(--contact-red);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--contact-red-bright);
+  color: var(--paper);
+}
+
+.btn--quiet {
+  background: transparent;
+  color: inherit;
+  border-color: currentColor;
+}
+
+.btn--quiet:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*# sourceMappingURL=styles.css.map */

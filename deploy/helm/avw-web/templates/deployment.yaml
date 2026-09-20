@@ -33,6 +33,9 @@ spec:
               value: {{ .Values.host | quote }}
             - name: API_INTERNAL_URL
               value: {{ .Values.apiInternalUrl | quote }}
+            # Canonical links, Open Graph URLs, the feed and the sitemap use this address.
+            - name: PUBLIC_URL
+              value: {{ .Values.publicUrl | default (printf "https://%s" .Values.host) | quote }}
           # /healthz is answered before Angular's host check, so probes (which use the pod IP) succeed.
           startupProbe:
             httpGet: { path: /healthz, port: http }

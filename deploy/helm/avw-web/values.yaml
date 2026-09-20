@@ -9,6 +9,8 @@ host: vietnam-war.au
 
 # Where server-side rendering reaches the API inside the cluster (the avw-api Service).
 apiInternalUrl: http://avw-api
+# Public address of the site. Empty means https://<host>.
+publicUrl: ""
 
 replicas: 2
 resources:
