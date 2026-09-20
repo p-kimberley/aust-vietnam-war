@@ -48,12 +48,12 @@ scratch volume for uploads in progress.
    | `Auth__ClientSecret` | the `avw-api` client secret from Keycloak |
    | `DataProtection__CertificatePassword` | the `.pfx` password |
    | `Elasticsearch__ApiKey` | the base64 key from step 3 |
-   | `Smtp__Password` | only if `smtp.user` is set |
+   | `Smtp__Password` | optional: only when email is turned on and `smtp.user` is set |
    | `ConnectionStrings__Legacy` | only for the one-off import (section 4) |
 
 6. **Values.** Copy the defaults and set at least: `host`, `auth.authority`, `elasticsearch.url`, `map.basemaps` (and `overlays`,
-   `terrain` if used), `media.storage` (the RWX class or NFS export), `ingress.className` and TLS, `notifications.editorEmails` and
-   `smtp.*` (nothing is emailed until these are set), and for `avw-web` the same `host`.
+   `terrain` if used), `media.storage` (the RWX class or NFS export), `ingress.className` and TLS, and for `avw-web` the same `host`.
+   Email to editors is **optional** and can wait (section 7); nothing needs setting for the site to run.
 7. **Images.** `docker build -t <registry>/avw-server:<tag> server/` and `docker build -t <registry>/avw-web:<tag> web/`.
    The server image is about 370 MB and holds the API, worker and migrator. Both run as non-root with a read-only root filesystem.
 
@@ -91,8 +91,8 @@ MySQL 5.6 dump that contains personal data: keep it off shared machines and neve
    kubectl logs job/avw-api-api-import-<revision>
    ```
 
-   Expected counts from the June 2017 dump: 230 notes, 46 comments, 20 tributes (of 267: the other 247 have no message and are
-   skipped), 8 casualty reports and 213 person-to-incident links.
+   Expected counts from the June 2017 dump: 230 notes, 46 comments, 267 poppies (247 of them laid with no message, kept as
+   poppies with no words), 8 casualty reports and 213 person-to-incident links.
 4. Run for real with `--set import.dryRun=false`. A second run must report **0 added** (everything "unchanged").
 5. Pictures: copy the old `incident-media/` folder onto a volume, name it in `import.legacyFiles`, and run again. Files that are
    missing are skipped and reported, so it can be repeated as more arrive. The dump lists 353 pictures. Each is checked, straightened,
@@ -116,6 +116,8 @@ After the real import the Studio's Moderation page shows what is waiting (9 note
   Add hosts the map needs to `csp.extraOrigins` (the tile server and elevation host are set by default). It was checked
   in Chrome with the policy **enforced**: the home page, stories, feedback form, Battle Map with the incident panel and the charts
   raised no violations. Not checked: the Studio, and articles that embed something other than YouTube or Vimeo.
+- **Fonts.** The three type families are the site's own files (`web/src/fonts.css`), so readers' browsers contact nothing but the
+  site for them, and the policy allows no font host.
 - **Scripts.** Inline scripts are allowed only by hash, measured from each page as it is rendered. There is no `unsafe-eval`
   and no inline event handlers except the one Angular uses to load its stylesheet.
 - **Rate limits** (per signed-in person, else per address): tributes 10 an hour, other community writes 30 a minute, feedback,
@@ -150,7 +152,10 @@ Restore test: restore MySQL and the media volume into a scratch namespace, run `
 - **Scaling.** The API and web pods are stateless; raise `api.replicas` and `replicas`. A pod disruption budget keeps one up
   during maintenance. Contacts are cached in each API pod for a short time, which is what makes the map list cheap.
 - **Logs to know.** `CSP ... blocked ...` (policy would block something), `Published N scheduled article(s)`, `Swept N stale file(s)`.
-- **Email.** Nothing is sent until `smtp.host` and `notifications.editorEmails` are set. Editors still see the Moderation queue.
+- **Email is optional and off until you set it up.** With `smtp.host`, `smtp.from` and `notifications.editorEmails` not all set, the API says
+  so once at start-up ("Email notifications are off ...") and logs one line for each item waiting; nothing fails. Editors see everything
+  on the Studio's Moderation page. To turn it on later, set those three (and `smtp.user` with `Smtp__Password` in the secret if the server needs a
+  login), plus `notifications.siteUrl` so the links in the email work, then upgrade the chart; the start-up line then reads "Email notifications are on".
 
 Common problems:
 

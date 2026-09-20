@@ -54,8 +54,10 @@ map:
   #     exaggeration: 1.5
   terrain: null
 
-# Email to the editors when a member adds a note or picture, or sends casualty information. Leave `smtp.host` empty to send
-# nothing (the API then only logs that something is waiting). The SMTP password goes in the secret as Smtp__Password.
+# Email to the editors when a member adds a note or picture, or sends casualty information. OPTIONAL and off by default: while
+# `smtp.host`, `smtp.from` or `notifications.editorEmails` is empty nothing is sent, the API says so at start-up and logs each item
+# that is waiting, and editors see everything on the Studio's Moderation page. To turn it on, set all three. If the server needs a
+# login, set `smtp.user` and put the password in the secret as Smtp__Password.
 smtp:
   host: ""
   port: 587
