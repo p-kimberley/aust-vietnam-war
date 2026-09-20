@@ -243,6 +243,17 @@ public sealed class CommunityEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task A_picture_added_to_an_incident_is_placed_where_the_incident_is_so_the_map_and_area_search_find_it()
+    {
+        var up = await Read<IncidentMediaView>(await Http().SendAsync(UploadRequest(3, TestImages.Jpeg(640, 480), "editor")), HttpStatusCode.Created);      // incident 2 is at 10.5525, 107.1653
+
+        Assert.Equal((10.5525, 107.1653), (up.Lat, up.Lon));
+        var near = await Read<List<IncidentMediaView>>(await Anon("/api/community-media?minLat=10.5&minLon=107.1&maxLat=10.6&maxLon=107.2"));
+        Assert.Equal(up.Id, Assert.Single(near).Id);
+        Assert.Empty(await Read<List<IncidentMediaView>>(await Anon("/api/community-media?minLat=11&minLon=107.1&maxLat=11.5&maxLon=107.2")));      // and not somewhere else
+    }
+
+    [Fact]
     public async Task Refuses_pictures_for_a_missing_incident_a_bad_date_or_a_non_picture()
     {
         Assert.Equal(HttpStatusCode.NotFound, (await Http().SendAsync(UploadRequest(1, TestImages.Jpeg(), contact: 999))).StatusCode);

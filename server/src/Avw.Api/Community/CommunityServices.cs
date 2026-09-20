@@ -85,7 +85,7 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
 
     public async Task<CmsResult<IncidentMediaView>> UploadAsync(int contactId, Stream file, string? caption, string? credit, string? dateTaken, Person person, CancellationToken ct)
     {
-        if (await contacts.GetAsync(contactId, ct) is null)
+        if (await contacts.GetAsync(contactId, ct) is not { } incident)
         {
             return CmsResult<IncidentMediaView>.Fail(CmsError.NotFound, "There is no such incident.");
         }
@@ -111,7 +111,13 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
         var link = await db.IncidentMedia.FirstOrDefaultAsync(m => m.ContactId == contactId && m.MediaId == mediaId, ct);
         if (link is null)
         {
-            link = new IncidentMedia { ContactId = contactId, MediaId = mediaId, AttachedById = person.Id, DateTaken = taken, CreatedUtc = clock.GetUtcNow().UtcDateTime };
+            // A picture of an incident is placed where the incident is, so it can be found on the map and by distance like any other
+            // (pictures migrated from the old site carry a position of their own).
+            link = new IncidentMedia
+            {
+                ContactId = contactId, MediaId = mediaId, AttachedById = person.Id, DateTaken = taken, Lat = incident.Lat, Lon = incident.Lon,
+                CreatedUtc = clock.GetUtcNow().UtcDateTime,
+            };
             db.IncidentMedia.Add(link);
             await db.SaveChangesAsync(ct);
             if (uploaded.Value.Status == MediaStatus.Pending)
