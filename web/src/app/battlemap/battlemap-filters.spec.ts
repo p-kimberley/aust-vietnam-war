@@ -8,7 +8,6 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const SEARCH_WAIT = 480; // the page waits 400 ms for typing to pause
 
 const text = (el: Element | null) => el?.textContent?.replace(/\s+/g, ' ').trim();
-const countText = (el: HTMLElement) => text(el.querySelector('.bm__count'));
 
 /** The point features last given to the map: the first `addSource` call, then every `setData`. */
 function plotted(basemaps: Awaited<ReturnType<typeof render>>['basemaps']): number[] {
@@ -28,7 +27,7 @@ describe('Battle Map filters', () => {
 
     expect(r.el.querySelector('#tab-layers')!.getAttribute('aria-selected')).toBe('true');
     expect(r.el.querySelector('app-filters-panel')).toBeNull();
-    expect(countText(r.el)).toBe('4 contacts');
+    expect(r.el.querySelector('.bm__count')).toBeNull();      // the top bar carries no total
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
   });
 
@@ -50,7 +49,6 @@ describe('Battle Map filters', () => {
     await settle(r.fixture);
 
     expect(plotted(r.basemaps)).toEqual([2]);
-    expect(countText(r.el)).toBe('1 of 4 contacts');
     expect(text(r.el.querySelector('.summary__count'))).toBe('1 of 4 contacts');
     expect(r.basemaps.map.setPaintProperty).toHaveBeenCalledWith('avw-contacts-heat', 'heatmap-weight', expect.anything());
   });
@@ -68,7 +66,6 @@ describe('Battle Map filters', () => {
 
     expect(r.el.querySelector('#tab-filters .badge')).toBeNull();
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
-    expect(countText(r.el)).toBe('4 contacts');
   });
 
   it('filters by a unit chosen in the tree', async () => {
@@ -220,7 +217,7 @@ describe('Battle Map opened from a link with filters', () => {
     const r = await render({ contacts: CONTACTS, queryParams: { q: 'claymore' }, search: () => Promise.reject(new Error('down')) });
 
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
-    expect(r.el.querySelector('.bm__count')).not.toBeNull();
+    expect(r.el.querySelector('app-timeline')).not.toBeNull();
     warn.mockRestore();
   });
 
@@ -243,11 +240,79 @@ describe('Battle Map without the filter catalogue', () => {
     const r = await render({ contacts: CONTACTS, catalogue: new Error('down') });
 
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
-    expect(countText(r.el)).toBe('4 contacts');
 
     await openFilters(r);
     expect(text(r.el.querySelector('.panel__note'))).toContain('The filters could not be loaded');
     expect(r.el.querySelector('app-filters-panel')).toBeNull();
     warn.mockRestore();
+  });
+});
+
+describe('Battle Map operation timeline', () => {
+  const rows = (r: Awaited<ReturnType<typeof render>>) => [...r.el.querySelectorAll<HTMLElement>('app-timeline [role=option]')];
+  const named = (r: Awaited<ReturnType<typeof render>>, name: string) => rows(r).find((row) => row.querySelector('.row__name')!.firstChild!.textContent === name)!;
+  const click = async (r: Awaited<ReturnType<typeof render>>, name: string) => {
+    named(r, name).click();
+    await settle(r.fixture);
+  };
+
+  it('opens from the arrow on the timeline, and makes the timeline taller for it', async () => {
+    const r = await render({ contacts: CONTACTS });
+    const arrow = r.el.querySelector<HTMLButtonElement>('app-timeline .tl__toggle')!;
+    const bm = r.el.querySelector('.bm')!;
+    expect(bm.classList.contains('bm--timeline-open')).toBe(false);
+
+    arrow.click();
+    await settle(r.fixture);
+    expect(bm.classList.contains('bm--timeline-open')).toBe(true);
+    expect(rows(r).map((row) => row.querySelector('.row__name')!.firstChild!.textContent)).toEqual(['Hardihood, Phase 2', 'Coburg']);
+
+    arrow.click();
+    await settle(r.fixture);
+    expect(bm.classList.contains('bm--timeline-open')).toBe(false);
+  });
+
+  it('filters the map to an operation when it is clicked, and back again when it is clicked a second time', async () => {
+    const r = await render({ contacts: CONTACTS });
+    expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
+
+    await click(r, 'Coburg');
+    expect(plotted(r.basemaps)).toEqual([2]);
+    expect(named(r, 'Coburg').getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('#tab-filters .badge')?.textContent).toBe('1');
+
+    await click(r, 'Coburg');
+    expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
+    expect(named(r, 'Coburg').getAttribute('aria-selected')).toBe('false');
+    expect(r.el.querySelector('#tab-filters .badge')).toBeNull();
+  });
+
+  it('takes any number of operations at once, and drops each one as it is clicked off', async () => {
+    const r = await render({ contacts: CONTACTS });
+
+    await click(r, 'Coburg');
+    await click(r, 'Hardihood, Phase 2');
+    expect(plotted(r.basemaps)).toEqual([1, 2, 4]);
+    expect(rows(r).map((row) => row.getAttribute('aria-selected'))).toEqual(['true', 'true']);
+
+    await click(r, 'Coburg');
+    expect(plotted(r.basemaps)).toEqual([1, 4]);
+
+    await click(r, 'Hardihood, Phase 2');
+    expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
+  });
+
+  it('is the same filter as the Operation list in the Filters tab', async () => {
+    const r = await render({ contacts: CONTACTS, queryParams: { ops: 'Coburg' } });
+
+    expect(named(r, 'Coburg').getAttribute('aria-selected')).toBe('true');
+    expect(plotted(r.basemaps)).toEqual([2]);
+
+    await openFilters(r);
+    r.el.querySelector<HTMLInputElement>('app-checklist-filter input[type=checkbox]:checked')!.click();
+    await settle(r.fixture);
+
+    expect(named(r, 'Coburg').getAttribute('aria-selected')).toBe('false');
+    expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
   });
 });

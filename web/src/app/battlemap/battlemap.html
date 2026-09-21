@@ -1,4 +1,4 @@
-<div class="bm">
+<div class="bm" [class.bm--timeline-open]="timelineOpen()">
   <div #canvas class="bm__canvas" role="application" aria-label="Battle Map"></div>
 
   <header class="bm__bar">
@@ -12,13 +12,6 @@
           Following {{ followed().size }} {{ followed().size === 1 ? 'unit' : 'units' }} ✕
         </button>
       }
-      <span class="bm__count data">
-        @if (activeCount()) {
-          {{ visible().length }} of {{ allContacts().length }} contacts
-        } @else {
-          {{ allContacts().length }} contacts
-        }
-      </span>
     }
   </header>
 
@@ -31,7 +24,17 @@
 
   @if (status() === 'ready') {
     <div class="bm__timeline">
-      <app-timeline [all]="allContacts()" [visible]="visible()" [from]="filters().from" [to]="filters().to" (rangeChange)="setDateRange($event)" />
+      <app-timeline
+        [all]="allContacts()"
+        [visible]="visible()"
+        [from]="filters().from"
+        [to]="filters().to"
+        [operations]="catalogue()?.operations ?? []"
+        [selectedOperations]="filters().operations"
+        [(expanded)]="timelineOpen"
+        (rangeChange)="setDateRange($event)"
+        (operationToggled)="toggleOperation($event)"
+      />
     </div>
   }
 
@@ -59,152 +62,166 @@
     </div>
   }
 
-  @if (status() === 'ready' && config(); as cfg) {
-    <aside
-      class="panel"
-      [class.panel--wide]="tab() === 'filters'"
-      [class.panel--closed]="!panelOpen()"
-      [class.panel--shifted]="selectedId() !== null || selectedPoiId() !== null || selectedPictureId() !== null || selectedPerson() !== null"
-      aria-label="Map controls"
-    >
-      <div class="panel__head">
-        <div class="tabs" role="tablist" aria-label="Map controls">
-          <button
-            type="button"
-            role="tab"
-            id="tab-layers"
-            class="tab"
-            aria-controls="tabpanel"
-            [attr.aria-selected]="tab() === 'layers'"
-            [class.tab--on]="tab() === 'layers'"
-            (click)="showTab('layers')"
-          >
-            Layers
-          </button>
-          <button
-            type="button"
-            role="tab"
-            id="tab-filters"
-            class="tab"
-            aria-controls="tabpanel"
-            [attr.aria-selected]="tab() === 'filters'"
-            [class.tab--on]="tab() === 'filters'"
-            (click)="showTab('filters')"
-          >
-            Filters
-            @if (activeCount()) {
-              <span class="badge" aria-label="{{ activeCount() }} active">{{ activeCount() }}</span>
-            }
-          </button>
-        </div>
-        <button
-          type="button"
-          class="panel__toggle"
-          [attr.aria-expanded]="panelOpen()"
-          aria-controls="tabpanel"
-          (click)="panelOpen.set(!panelOpen())"
+  @if (status() === 'ready') {
+    <div class="bm__right" [class.bm__right--shifted]="rightPanelOpen()">
+      @if (config(); as cfg) {
+        <aside
+          class="panel"
+          [class.panel--wide]="tab() === 'filters'"
+          [class.panel--closed]="!panelOpen()"
+          aria-label="Map controls"
         >
-          {{ panelOpen() ? 'Hide' : 'Show' }}
-        </button>
-      </div>
+          <div class="panel__head">
+            <div class="tabs" role="tablist" aria-label="Map controls">
+              <button
+                type="button"
+                role="tab"
+                id="tab-layers"
+                class="tab"
+                aria-controls="tabpanel"
+                [attr.aria-selected]="tab() === 'layers'"
+                [class.tab--on]="tab() === 'layers'"
+                (click)="showTab('layers')"
+              >
+                Layers
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-filters"
+                class="tab"
+                aria-controls="tabpanel"
+                [attr.aria-selected]="tab() === 'filters'"
+                [class.tab--on]="tab() === 'filters'"
+                (click)="showTab('filters')"
+              >
+                Filters
+                @if (activeCount()) {
+                  <span class="badge" aria-label="{{ activeCount() }} active">{{ activeCount() }}</span>
+                }
+              </button>
+            </div>
+            <button
+              type="button"
+              class="panel__toggle"
+              [attr.aria-expanded]="panelOpen()"
+              aria-controls="tabpanel"
+              (click)="panelOpen.set(!panelOpen())"
+            >
+              {{ panelOpen() ? 'Hide' : 'Show' }}
+            </button>
+          </div>
 
-      <div id="tabpanel" class="panel__body" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()" [hidden]="!panelOpen()">
-        @if (tab() === 'layers') {
-          <fieldset>
-            <legend id="basemap-label">Basemap</legend>
-            <app-basemap-picker labelledBy="basemap-label" [options]="cfg.basemaps" [value]="basemaps.basemapId()" (picked)="setBasemap($event)" />
-          </fieldset>
+          <div id="tabpanel" class="panel__body" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()" [hidden]="!panelOpen()">
+            @if (tab() === 'layers') {
+              <fieldset>
+                <legend id="basemap-label">Basemap</legend>
+                <app-basemap-picker labelledBy="basemap-label" [options]="cfg.basemaps" [value]="basemaps.basemapId()" (picked)="setBasemap($event)" />
+              </fieldset>
 
-          @if (canTerrain()) {
-            <label class="panel__row">
-              <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
-              3D terrain
-            </label>
-          }
-
-          @if (cfg.overlays.length) {
-            <fieldset>
-              <legend>Overlays</legend>
-              @for (o of cfg.overlays; track o.id) {
-                <label>
-                  <input
-                    type="checkbox"
-                    [checked]="basemaps.overlayIds().includes(o.id)"
-                    (change)="setOverlay(o.id, $any($event.target).checked)"
-                  />
-                  {{ o.name }}
+              @if (canTerrain()) {
+                <label class="panel__row">
+                  <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
+                  3D terrain
                 </label>
               }
-            </fieldset>
-          }
 
-          @if (pois().length) {
-            <fieldset>
-              <legend>Points of interest</legend>
-              <label>
-                <input type="checkbox" [checked]="showPois()" (change)="setPoisVisible($any($event.target).checked)" />
-                Bases and landing zones
-              </label>
-            </fieldset>
-          }
+              @if (cfg.overlays.length) {
+                <fieldset>
+                  <legend>Overlays</legend>
+                  @for (o of cfg.overlays; track o.id) {
+                    <label>
+                      <input
+                        type="checkbox"
+                        [checked]="basemaps.overlayIds().includes(o.id)"
+                        (change)="setOverlay(o.id, $any($event.target).checked)"
+                      />
+                      {{ o.name }}
+                    </label>
+                  }
+                </fieldset>
+              }
 
-          @if (pictures().length) {
-            <fieldset>
-              <legend>Photos</legend>
-              <label>
-                <input type="checkbox" [checked]="showPhotos()" (change)="setPhotosVisible($any($event.target).checked)" />
-                Community photos ({{ pictures().length }})
-              </label>
-            </fieldset>
-          }
+              @if (pois().length) {
+                <fieldset>
+                  <legend>Points of interest</legend>
+                  <label>
+                    <input type="checkbox" [checked]="showPois()" (change)="setPoisVisible($any($event.target).checked)" />
+                    Bases and landing zones
+                  </label>
+                </fieldset>
+              }
 
-          <fieldset>
-            <legend>Contacts</legend>
-            <label>
-              <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
-              Heatmap
-            </label>
-            <label>
-              <input type="checkbox" [checked]="showMarkers()" (change)="setMarkersVisible($any($event.target).checked)" />
-              Incident markers
-            </label>
-            <label class="panel__select">
-              Heatmap shows
-              <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
-                @for (f of heatFields; track f.value) {
-                  <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
+              @if (pictures().length) {
+                <fieldset>
+                  <legend>Photos</legend>
+                  <label>
+                    <input type="checkbox" [checked]="showPhotos()" (change)="setPhotosVisible($any($event.target).checked)" />
+                    Community photos ({{ pictures().length }})
+                  </label>
+                </fieldset>
+              }
+
+              <fieldset>
+                <legend>Contacts</legend>
+                <label>
+                  <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
+                  Heatmap
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="showMarkers()" (change)="setMarkersVisible($any($event.target).checked)" />
+                  Incident markers
+                </label>
+                <label class="panel__select">
+                  Heatmap shows
+                  <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
+                    @for (f of heatFields; track f.value) {
+                      <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="panel__select">
+                  Marker size
+                  <select [value]="sizeField() ?? 'none'" (change)="setMarkerSize($any($event.target).value)">
+                    <option value="none" [selected]="sizeField() === null">The same for every incident</option>
+                    @for (f of sizeFields; track f.value) {
+                      <option [value]="f.value" [selected]="sizeField() === f.value">{{ f.name }}</option>
+                    }
+                  </select>
+                </label>
+              </fieldset>
+            } @else {
+              @if (catalogue(); as cat) {
+                @if (tree(); as unitTree) {
+                  <app-filters-panel
+                    [state]="filters()"
+                    [catalogue]="cat"
+                    [tree]="unitTree"
+                    [unitCounts]="unitCounts()"
+                    [shown]="visible().length"
+                    [total]="allContacts().length"
+                    [textStatus]="textStatus()"
+                    (changed)="setFilters($event)"
+                  />
                 }
-              </select>
-            </label>
-            <label class="panel__select">
-              Marker size
-              <select [value]="sizeField() ?? 'none'" (change)="setMarkerSize($any($event.target).value)">
-                <option value="none" [selected]="sizeField() === null">The same for every incident</option>
-                @for (f of sizeFields; track f.value) {
-                  <option [value]="f.value" [selected]="sizeField() === f.value">{{ f.name }}</option>
-                }
-              </select>
-            </label>
-          </fieldset>
-        } @else {
-          @if (catalogue(); as cat) {
-            @if (tree(); as unitTree) {
-              <app-filters-panel
-                [state]="filters()"
-                [catalogue]="cat"
-                [tree]="unitTree"
-                [unitCounts]="unitCounts()"
-                [shown]="visible().length"
-                [total]="allContacts().length"
-                [textStatus]="textStatus()"
-                (changed)="setFilters($event)"
-              />
+              } @else {
+                <p class="panel__note" role="status">The filters could not be loaded. The map still shows every contact.</p>
+              }
             }
-          } @else {
-            <p class="panel__note" role="status">The filters could not be loaded. The map still shows every contact.</p>
-          }
-        }
+          </div>
+        </aside>
+      }
+      <div class="bm__legend">
+        <app-map-legend
+          [showContacts]="showMarkers()"
+          [sizeField]="sizeFieldName()"
+          [showHeatmap]="showHeatmap()"
+          [heatField]="heatFieldName()"
+          [poiTypes]="legendPoiTypes()"
+          [showPhotos]="showPhotos() && pictures().length > 0"
+          [following]="followed().size > 0"
+        />
       </div>
-    </aside>
+    </div>
   }
 </div>

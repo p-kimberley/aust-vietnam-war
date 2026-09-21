@@ -46,31 +46,6 @@
   background: var(--olive-700);
 }
 
-details {
-  border-top: 1px solid var(--olive-700);
-}
-
-summary {
-  padding: 0.45rem 0;
-  color: var(--smoke-yellow);
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.badge {
-  display: inline-block;
-  min-width: 1.2rem;
-  margin-left: 0.3rem;
-  padding: 0 0.3rem;
-  color: var(--ink);
-  font-family: var(--font-data);
-  font-size: 0.72rem;
-  text-align: center;
-  background: var(--brass);
-  border-radius: 999px;
-}
-
 .section {
   padding: 0 0 0.6rem;
 }

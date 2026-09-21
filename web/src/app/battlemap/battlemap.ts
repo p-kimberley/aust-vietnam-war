@@ -14,6 +14,7 @@ import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { DateRange, Timeline } from './analytics/timeline';
 import { BasemapPicker } from './basemap-picker';
+import { MapLegend } from './map-legend';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
@@ -71,7 +72,7 @@ const SEARCH_DELAY_MS = 400;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, BasemapPicker, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, BasemapPicker, MapLegend, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -130,13 +131,23 @@ export class Battlemap {
   protected readonly showMarkers = signal(true);
   protected readonly heatField = signal<HeatField>(DEFAULT_HEAT_FIELD);
   protected readonly heatFields = HEAT_FIELDS;
+  protected readonly heatFieldName = computed(() => HEAT_FIELDS.find((f) => f.value === this.heatField())?.name ?? '');
   /** What point markers are scaled by; null draws them all the same size. */
   protected readonly sizeField = signal<SizeField | null>(null);
   protected readonly sizeFields = SIZE_FIELDS;
+  protected readonly sizeFieldName = computed(() => SIZE_FIELDS.find((f) => f.value === this.sizeField())?.name ?? null);
+  /** The types of point on the map, for the legend; none while the layer is switched off. */
+  protected readonly legendPoiTypes = computed(() => (this.showPois() ? [...new Set(this.pois().map((p) => p.type))] : []));
   /** The charts drawer, opened from the top bar. */
   protected readonly chartsOpen = signal(false);
+  /** The operation timeline, opened from the arrow on the timeline's top edge. */
+  protected readonly timelineOpen = signal(false);
   /** The units whose paths are drawn, contact by contact in date order. Chosen with the button beside each unit in the incident panel. */
   protected readonly followed = signal<ReadonlySet<number>>(new Set());
+  /** A panel is open at the right, so what else sits there moves aside. */
+  protected readonly rightPanelOpen = computed(
+    () => this.selectedId() !== null || this.selectedPoiId() !== null || this.selectedPictureId() !== null || this.selectedPerson() !== null,
+  );
   protected readonly canTerrain = computed(() => !!this.config()?.terrain);
 
   // ---- filters
@@ -326,6 +337,15 @@ export class Battlemap {
     this.sizeField.set(field);
     if (this.map) setMarkerSizing(this.map, this.markerSizing());
     this.syncUrl();
+  }
+
+  /** Chooses an operation as a filter, or takes it off again; any number can be chosen. */
+  protected toggleOperation(name: string): void {
+    const operations = new Set(this.filters().operations);
+    if (!operations.delete(name)) {
+      operations.add(name);
+    }
+    this.setFilters({ ...this.filters(), operations });
   }
 
   /** The timeline sets the same date filter as the filter panel does. */

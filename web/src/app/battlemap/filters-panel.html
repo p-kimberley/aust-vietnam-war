@@ -20,8 +20,7 @@
     </ul>
   }
 
-  <details>
-    <summary>Dates and time</summary>
+  <app-accordion-section heading="Dates and time" [open]="open() === 'dates'" (toggled)="toggle('dates')">
     <div class="section">
       <label class="date">
         <span>From</span>
@@ -45,17 +44,15 @@
       </label>
       <app-range-filter label="Hour of day" [bounds]="hourBounds" [value]="state().hours" (changed)="setRange('hours', $event)" />
     </div>
-  </details>
+  </app-accordion-section>
 
-  <details>
-    <summary>Units involved @if (state().units.size) { <span class="badge">{{ state().units.size }}</span> }</summary>
+  <app-accordion-section heading="Units involved" [badge]="state().units.size || null" [open]="open() === 'units'" (toggled)="toggle('units')">
     <div class="section">
       <app-unit-tree [tree]="tree()" [selected]="state().units" [counts]="unitCounts()" (toggled)="toggleUnit($event)" />
     </div>
-  </details>
+  </app-accordion-section>
 
-  <details>
-    <summary>Operation @if (state().operations.size) { <span class="badge">{{ state().operations.size }}</span> }</summary>
+  <app-accordion-section heading="Operation" [badge]="state().operations.size || null" [open]="open() === 'operation'" (toggled)="toggle('operation')">
     <div class="section">
       <app-checklist-filter
         label="Operations"
@@ -64,17 +61,15 @@
         (changed)="setNames('operations', $event)"
       />
     </div>
-  </details>
+  </app-accordion-section>
 
-  <details>
-    <summary>Unit task @if (state().tasks.size) { <span class="badge">{{ state().tasks.size }}</span> }</summary>
+  <app-accordion-section heading="Unit task" [badge]="state().tasks.size || null" [open]="open() === 'task'" (toggled)="toggle('task')">
     <div class="section">
       <app-checklist-filter label="Unit tasks" [items]="catalogue().tasks" [selected]="state().tasks" (changed)="setNames('tasks', $event)" />
     </div>
-  </details>
+  </app-accordion-section>
 
-  <details>
-    <summary>Data source @if (state().series.size) { <span class="badge">{{ state().series.size }}</span> }</summary>
+  <app-accordion-section heading="Data source" [badge]="state().series.size || null" [open]="open() === 'source'" (toggled)="toggle('source')">
     <div class="section">
       <app-checklist-filter
         label="Data sources"
@@ -84,19 +79,17 @@
         (changed)="setNames('series', $event)"
       />
     </div>
-  </details>
+  </app-accordion-section>
 
-  <details>
-    <summary>Strength and casualties</summary>
+  <app-accordion-section heading="Strength and casualties" [open]="open() === 'strength'" (toggled)="toggle('strength')">
     <div class="section">
       @for (r of ranges; track r.key) {
         <app-range-filter [label]="r.label" [bounds]="catalogue()[r.key]" [value]="rangeValue(r.key)" (changed)="setRange(r.key, $event)" />
       }
     </div>
-  </details>
+  </app-accordion-section>
 
-  <details>
-    <summary>Mine incident @if (state().mine !== 'any') { <span class="badge">1</span> }</summary>
+  <app-accordion-section heading="Mine incident" [badge]="state().mine !== 'any' ? 1 : null" [open]="open() === 'mine'" (toggled)="toggle('mine')">
     <div class="section">
       <fieldset class="radios">
         <legend class="visually-hidden">Mine incident</legend>
@@ -109,10 +102,9 @@
       </fieldset>
       <p class="hint">Contacts with no mine information recorded match neither Yes nor No.</p>
     </div>
-  </details>
+  </app-accordion-section>
 
-  <details>
-    <summary>Incident report @if (state().text.trim().length >= minText) { <span class="badge">1</span> }</summary>
+  <app-accordion-section heading="Incident report" [badge]="state().text.trim().length >= minText ? 1 : null" [open]="open() === 'text'" (toggled)="toggle('text')">
     <div class="section">
       <input
         type="search"
@@ -133,5 +125,5 @@
         }
       </p>
     </div>
-  </details>
+  </app-accordion-section>
 </div>

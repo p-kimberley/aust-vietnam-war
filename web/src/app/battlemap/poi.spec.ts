@@ -360,7 +360,7 @@ describe('Battle Map points of interest', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const r = await render({ pois: new Error('down') });
 
-    expect(r.el.querySelector('.bm__count')).not.toBeNull();
+    expect(r.el.querySelector('app-timeline')).not.toBeNull();
     expect(text(r.el.querySelector('#tabpanel'))).not.toContain('Bases and landing zones');
     warn.mockRestore();
   });

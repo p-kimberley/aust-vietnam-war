@@ -109,7 +109,7 @@ describe('Battlemap', () => {
     const { el, basemaps } = await render({});
 
     expect([...basemaps.map.layers]).toEqual(expect.arrayContaining([HEAT_LAYER, POINT_LAYER, SELECTED_LAYER]));
-    expect(el.querySelector('.bm__count')?.textContent).toContain('3 contacts');
+    expect(el.querySelector('.bm__count')).toBeNull();
     expect(el.querySelector('app-basemap-picker [role=combobox]')?.textContent).toContain('Terrain');
     expect(el.textContent).toContain('3D terrain');
     expect(el.textContent).toContain('1ATF topo');

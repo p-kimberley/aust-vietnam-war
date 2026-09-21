@@ -41,7 +41,6 @@ describe('Battle Map timeline', () => {
     await settle(r.fixture);
 
     expect(shownIds(r)).toEqual([1, 2]);
-    expect(r.el.querySelector('.bm__count')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('2 of 4 contacts');
     expect(r.el.querySelector('#tab-filters .badge')?.textContent).toBe('1');
   });
 

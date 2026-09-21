@@ -113,7 +113,8 @@ const ICONS: readonly { id: string; draw: Draw }[] = [
 /** The ids of every point icon, for checking what a layer may ask for. */
 export const POI_ICON_IDS: readonly string[] = ICONS.map((i) => i.id);
 
-function render(draw: Draw): ImageData | null {
+/** Draws an icon on a canvas, or gives `null` where there is no canvas to draw on (the server, and some test environments). */
+function paint(draw: Draw): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } | null {
   if (typeof document === 'undefined' || typeof Path2D === 'undefined') {
     return null;
   }
@@ -128,7 +129,33 @@ function render(draw: Draw): ImageData | null {
   ctx.translate(size / 2, size / 2);
   ctx.scale(PIXEL_RATIO, PIXEL_RATIO);
   draw(ctx);
-  return ctx.getImageData(0, 0, size, size);
+  return { canvas, ctx };
+}
+
+function render(draw: Draw): ImageData | null {
+  const painted = paint(draw);
+  return painted ? painted.ctx.getImageData(0, 0, BOX * PIXEL_RATIO, BOX * PIXEL_RATIO) : null;
+}
+
+// A plain object: `Map` here is the map library's type. Only pictures that were drawn are kept.
+const urls: Record<string, string | undefined> = {};
+
+/**
+ * The icon for a type of point as an image for a web page (the legend), drawn by the same code as the map's own, so the two
+ * cannot differ. `null` where there is no canvas.
+ */
+export function poiIconUrl(type: string): string | null {
+  const id = POI_ICON_BY_TYPE[type] ?? POI_ICON_OTHER;
+  if (urls[id]) {
+    return urls[id];
+  }
+  const icon = ICONS.find((i) => i.id === id);
+  const painted = icon ? paint(icon.draw) : null;
+  const url = painted ? painted.canvas.toDataURL() : null;
+  if (url) {
+    urls[id] = url;
+  }
+  return url;
 }
 
 /**

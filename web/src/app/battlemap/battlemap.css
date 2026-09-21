@@ -40,12 +40,6 @@
   color: var(--smoke-yellow);
 }
 
-.bm__count {
-  margin-left: auto;
-  color: var(--khaki);
-  font-size: 0.85rem;
-}
-
 .bm__notice {
   position: absolute;
   inset: 0;
@@ -61,11 +55,44 @@
   color: var(--contact-red-bright);
 }
 
-.panel {
+/*
+ * The map controls and the legend share one column at the right: the controls at the top, the legend at the bottom just
+ * above the credit line. When the screen is short, the controls give way (their body scrolls) rather than run under
+ * the legend or the timeline.
+ */
+.bm__right {
   position: absolute;
   z-index: 3;
   top: 3rem;
   right: 0.75rem;
+  bottom: calc(var(--timeline-h) + 2.3rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  max-width: calc(100vw - 1.5rem);
+  pointer-events: none;
+}
+
+.bm__right > * {
+  pointer-events: auto;
+}
+
+/* With an incident open the column sits beside it; on narrow screens the incident takes the space. */
+.bm__right--shifted {
+  right: calc(min(22rem, 100vw - 1.5rem) + 1.5rem);
+}
+
+.bm__legend {
+  flex: none;
+  margin-top: auto;
+}
+
+.panel {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: 0;
   width: min(16rem, calc(100vw - 1.5rem));
   background: color-mix(in srgb, var(--olive-900) 97%, transparent);
   border: 1px solid var(--olive-500);
@@ -73,9 +100,18 @@
   font-size: 0.9rem;
 }
 
-/* The timeline runs along the bottom; everything else keeps clear of it. */
+/*
+ * The timeline runs along the bottom; everything else keeps clear of it. Opening the operation timeline makes it taller
+ * (never more than about half the screen), and because the height is a registered length everything that keeps clear of it
+ * glides with it.
+ */
 .bm {
   --timeline-h: 9rem;
+  transition: --timeline-h 0.25s ease;
+}
+
+.bm--timeline-open {
+  --timeline-h: min(24rem, 55dvh);
 }
 
 .bm__timeline {
@@ -134,11 +170,6 @@
   width: min(22rem, calc(100vw - 1.5rem));
 }
 
-/* With an incident open the layer controls sit beside it; on narrow screens the incident takes the space. */
-.panel--shifted {
-  right: calc(min(22rem, 100vw - 1.5rem) + 1.5rem);
-}
-
 @media (max-width: 45rem) {
   .bm__bar {
     gap: 0.6rem;
@@ -151,10 +182,6 @@
 
   .bm__back {
     font-size: 0.85rem;
-  }
-
-  .bm__count {
-    display: none;
   }
 
   .bm__title {
@@ -174,7 +201,7 @@
     width: auto;
   }
 
-  .panel--shifted {
+  .bm__right--shifted {
     display: none;
   }
 }
@@ -240,7 +267,8 @@
 }
 
 .panel__body {
-  max-height: calc(100dvh - 9rem);
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 0.6rem 0.75rem 0.75rem;
   overflow-y: auto;
 }

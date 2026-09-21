@@ -345,10 +345,60 @@ describe('FiltersPanel', () => {
     }
   });
 
+  describe('accordion', () => {
+    const heads = (el: HTMLElement) => [...el.querySelectorAll<HTMLButtonElement>('app-accordion-section .toggle')];
+    const open = (el: HTMLElement) => heads(el).filter((h) => h.getAttribute('aria-expanded') === 'true').map((h) => h.textContent!.replace(/\s+/g, ' ').trim());
+    const press = (fixture: { detectChanges(): void }, button: HTMLButtonElement) => {
+      button.click();
+      fixture.detectChanges();
+    };
+
+    it('starts with every section closed', () => {
+      const { el } = fp();
+      expect(heads(el)).toHaveLength(8);
+      expect(open(el)).toEqual([]);
+    });
+
+    it('opens the section that is pressed, and closes the one that was open, so only one is ever open', () => {
+      const { fixture, el } = fp();
+
+      press(fixture, heads(el)[1]);
+      expect(open(el)).toEqual(['Units involved']);
+
+      press(fixture, heads(el)[3]);
+      expect(open(el)).toEqual(['Unit task']);
+      expect(el.querySelectorAll('.body.is-open')).toHaveLength(1);
+    });
+
+    it('closes the open section when it is pressed again', () => {
+      const { fixture, el } = fp();
+
+      press(fixture, heads(el)[2]);
+      press(fixture, heads(el)[2]);
+
+      expect(open(el)).toEqual([]);
+      expect(el.querySelectorAll('.body.is-open')).toHaveLength(0);
+    });
+
+    it('names each body by its heading, and points each heading at its body', () => {
+      const { el } = fp();
+      const head = heads(el)[0];
+      const body = el.querySelector<HTMLElement>('#' + head.getAttribute('aria-controls'))!;
+
+      expect(body.getAttribute('role')).toBe('region');
+      expect(body.getAttribute('aria-labelledby')).toBe(head.id);
+    });
+
+    it('keeps what a filter shows while its section is closed, so the slide has something to reveal', () => {
+      const { el } = fp();
+      expect(el.querySelector('app-accordion-section app-unit-tree')).not.toBeNull();
+    });
+  });
+
   it('marks sections that have a filter set', () => {
     const { el } = fp({ ...NO_FILTERS, units: new Set([3310, 3259]), tasks: new Set(['Patrol']), mine: 'yes', text: 'ambush' });
 
-    const summaries = [...el.querySelectorAll('summary')].map((s) => s.textContent!.replace(/\s+/g, ' ').trim());
+    const summaries = [...el.querySelectorAll('app-accordion-section .toggle')].map((s) => s.textContent!.replace(/\s+/g, ' ').trim());
     expect(summaries).toEqual([
       'Dates and time',
       'Units involved 2',

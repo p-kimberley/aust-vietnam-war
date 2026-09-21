@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { AccordionSection } from './accordion-section';
 import { ChecklistFilter } from './checklist-filter';
 import { FilterCatalogue } from './filter-catalogue';
 import {
@@ -27,7 +28,7 @@ export type TextStatus = 'idle' | 'searching' | 'ready' | 'error';
  */
 @Component({
   selector: 'app-filters-panel',
-  imports: [UnitTreeView, RangeFilter, ChecklistFilter],
+  imports: [AccordionSection, UnitTreeView, RangeFilter, ChecklistFilter],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './filters-panel.html',
   styleUrl: './filters-panel.css',
@@ -43,6 +44,8 @@ export class FiltersPanel {
   readonly textStatus = input<TextStatus>('idle');
   readonly changed = output<FilterState>();
 
+  /** The section that is open. Opening one closes the one before it, so at most one is open at a time. */
+  protected readonly open = signal<string | null>(null);
   protected readonly hourBounds = { min: 0, max: 23 };
   protected readonly minText = MIN_TEXT_LENGTH;
   protected readonly seriesLabel = seriesLabel;
@@ -53,6 +56,10 @@ export class FiltersPanel {
     { key: 'en', label: 'Enemy strength' },
     { key: 'enCas', label: 'Enemy casualties' },
   ];
+
+  protected toggle(section: string): void {
+    this.open.update((current) => (current === section ? null : section));
+  }
 
   protected describe(key: FilterKey): string {
     return describeFilter(this.state(), key);
