@@ -30,8 +30,11 @@
         [from]="filters().from"
         [to]="filters().to"
         [operations]="catalogue()?.operations ?? []"
+        [scope]="operationScope()"
         [selectedOperations]="filters().operations"
+        [focus]="timelineFocus()"
         [(expanded)]="timelineOpen"
+        [(playing)]="timelinePlaying"
         (rangeChange)="setDateRange($event)"
         (operationToggled)="toggleOperation($event)"
       />

@@ -44,13 +44,13 @@ describe('Battle Map timeline', () => {
     expect(r.el.querySelector('#tab-filters .badge')?.textContent).toBe('1');
   });
 
-  it('follows a date range set in the filter panel, and clears it with "Whole war"', async () => {
+  it('follows a date range set in the filter panel, and clears it with "Reset zoom"', async () => {
     const r = await render({ contacts: CONTACTS, queryParams: { from: '1966-03-04', to: '1966-03-31' } });
 
     expect(r.el.querySelector('.tl__range')?.textContent).toBe('1966-03-04 to 1966-03-31');
     expect(shownIds(r)).toEqual([2]);
 
-    button(r, 'Whole war').click();
+    button(r, 'Reset zoom').click();
     await settle(r.fixture);
 
     expect(shownIds(r)).toEqual([1, 2, 3, 4]);

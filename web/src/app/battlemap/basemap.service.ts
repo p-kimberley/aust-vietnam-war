@@ -7,6 +7,7 @@ const DEM_SOURCE = 'avw-dem';
 const OVERLAY_PREFIX = 'avw-overlay-';
 const TERRAIN_PITCH = 60;
 const WORKER_URL = '/vendor/maplibre-gl-worker.mjs';
+const FIT_DURATION_MS = 900;
 
 export interface MapStart {
   basemapId?: string | null;
@@ -138,6 +139,42 @@ export class BasemapService implements OnDestroy {
     });
     map.on('mouseenter', layerId, () => (map.getCanvas().style.cursor = 'pointer'));
     map.on('mouseleave', layerId, () => (map.getCanvas().style.cursor = ''));
+  }
+
+  /** Calls `handler` when the map is clicked where nothing on any of `layers` is under the pointer. */
+  bindBackgroundClick(layers: readonly string[], handler: () => void): void {
+    const map = this.map;
+    if (!map) {
+      return;
+    }
+    map.on('click', (e) => {
+      const present = layers.filter((id) => map.getLayer(id));
+      if (present.length === 0 || map.queryRenderedFeatures(e.point, { layers: present }).length === 0) {
+        handler();
+      }
+    });
+  }
+
+  /**
+   * Eases the camera so that every point is in view, inside `padding` (the room the panels and the timeline take), and no
+   * closer than `maxZoom`, so a single point does not zoom to the rooftops.
+   */
+  fitTo(points: readonly { lat: number; lon: number }[], padding: { top: number; bottom: number; left: number; right: number }, maxZoom: number): void {
+    const map = this.map;
+    if (!map || points.length === 0) {
+      return;
+    }
+    let west = Infinity;
+    let south = Infinity;
+    let east = -Infinity;
+    let north = -Infinity;
+    for (const p of points) {
+      west = Math.min(west, p.lon);
+      east = Math.max(east, p.lon);
+      south = Math.min(south, p.lat);
+      north = Math.max(north, p.lat);
+    }
+    map.fitBounds([[west, south], [east, north]], { padding, maxZoom, duration: FIT_DURATION_MS });
   }
 
   /** Eases the camera to a point, zooming in if the view is currently wider than `minZoom`. */

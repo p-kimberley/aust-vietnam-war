@@ -3,7 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, expect, it, vi } from 'vitest';
 import { Contact } from '../contacts';
 import { stubEchartIn } from './echart-stub';
-import { Timeline, ganttRows, operationSpans, windowPercent, yearTicks } from './timeline';
+import { MIN_DRAG_PX, Timeline, axisTicks, dragRange, focusWindow, ganttRows, operationSpans } from './timeline';
+import type { DateRange } from './timeline';
 
 const contact = (id: number, dtg: string, op: number): Contact => ({
   id, dtg, lat: 10, lon: 107, fr: 0, frCas: 0, en: 0, enCas: 0, frKia: 0, frWia: 0, enKia: 0, enWia: 0, units: [], op, task: 0, series: 1, mine: 0,
@@ -49,7 +50,8 @@ describe('operationSpans', () => {
 });
 
 describe('ganttRows', () => {
-  const rows = ganttRows(operationSpans(CONTACTS, OPERATIONS), MIN, MAX);
+  const spans = operationSpans(CONTACTS, OPERATIONS);
+  const rows = ganttRows(spans, MIN, MAX);
   const alpha = rows.find((r) => r.name === 'Alpha')!;
 
   it('places a bar in percent of the axis, counting the last day in full', () => {
@@ -70,22 +72,106 @@ describe('ganttRows', () => {
     expect(alpha.dates).toBe('1966-01-05 to 1966-01-20');
     expect(rows.find((r) => r.name === 'Delta')!.dates).toBe('1966-01-05');
   });
-});
 
-describe('yearTicks and windowPercent', () => {
-  it('marks each new year on the axis', () => {
-    const ticks = yearTicks(Date.UTC(1965, 4, 1), Date.UTC(1968, 5, 1));
+  it('lists only the operations that overlap the stretch of time shown, and cuts a bar that runs past its edge', () => {
+    const zoomed = ganttRows(spans, Date.UTC(1966, 0, 10), Date.UTC(1966, 0, 15));
 
-    expect(ticks.map((t) => t.year)).toEqual([1966, 1967, 1968]);
-    expect(ticks[0].left).toBeCloseTo(((Date.UTC(1966, 0, 1) - Date.UTC(1965, 4, 1)) / (Date.UTC(1968, 5, 1) - Date.UTC(1965, 4, 1))) * 100, 6);
+    expect(zoomed.map((r) => r.name)).toEqual(['Alpha']);
+    expect(zoomed[0].left).toBe(0);
+    expect(zoomed[0].width).toBeCloseTo(100, 6);              // Alpha runs the whole of that stretch
+    expect(zoomed[0].dates).toBe('1966-01-05 to 1966-01-20');  // the words still give the whole operation
   });
 
-  it('has the date filter cover a stretch of the axis, or nothing when the whole war is shown', () => {
-    expect(windowPercent({ from: null, to: null }, MIN, MAX)).toBeNull();
+  it('counts a bar that ends the day the stretch starts, and one that begins the day it ends, as outside it', () => {
+    const edge = ganttRows(spans, Date.UTC(1966, 0, 21), Date.UTC(1966, 3, 2));
 
-    const band = windowPercent({ from: '1966-04-01', to: '1966-04-30' }, MIN, MAX)!;
-    expect(band.left).toBeCloseTo(((Date.UTC(1966, 3, 1) - MIN) / (MAX - MIN)) * 100, 6);
-    expect(band.width).toBeCloseTo((30 * DAY) / (MAX - MIN) * 100, 6);
+    expect(edge.map((r) => r.name)).toEqual([]);
+  });
+});
+
+describe('axisTicks', () => {
+  const inOrder = (ticks: { left: number }[]) => ticks.every((t, i) => t.left >= 0 && t.left <= 100 && (i === 0 || t.left > ticks[i - 1].left));
+
+  it('labels the years across the whole war', () => {
+    const ticks = axisTicks(Date.UTC(1965, 4, 1), Date.UTC(1969, 5, 1));
+
+    expect(ticks.map((t) => t.label)).toEqual(['1966', '1967', '1968', '1969']);
+    expect(ticks[0].left).toBeCloseTo(((Date.UTC(1966, 0, 1) - Date.UTC(1965, 4, 1)) / (Date.UTC(1969, 5, 1) - Date.UTC(1965, 4, 1))) * 100, 6);
+  });
+
+  it('labels months for a year or two, and days when zoomed close, never more than a dozen or so', () => {
+    const months = axisTicks(Date.UTC(1966, 0, 1), Date.UTC(1967, 0, 1));
+    expect(months.map((t) => t.label).slice(0, 3)).toEqual(['Feb 1966', 'Mar 1966', 'Apr 1966']);
+
+    const days = axisTicks(Date.UTC(1966, 2, 1), Date.UTC(1966, 2, 21));
+    expect(days.every((t) => /^\d{1,2} Mar$/.test(t.label))).toBe(true);
+
+    for (const [a, b] of [[MIN, MAX], [Date.UTC(1966, 0, 1), Date.UTC(1968, 0, 1)], [Date.UTC(1966, 2, 1), Date.UTC(1966, 2, 6)], [MIN, MIN + 100 * DAY]]) {
+      const ticks = axisTicks(a, b);
+      expect(ticks.length).toBeLessThanOrEqual(14);
+      expect(inOrder(ticks)).toBe(true);
+    }
+  });
+});
+
+describe('focusWindow', () => {
+  const spans = operationSpans(CONTACTS, OPERATIONS);
+
+  it('shows an incident\'s operation from its first contact to its last, with a margin at each end', () => {
+    const wide = Date.UTC(1966, 11, 1);
+    const w = focusWindow({ date: '1966-04-15T09:00:00', operation: 'Bravo' }, spans, MIN, wide);
+
+    expect(w.start).toBeLessThan(Date.UTC(1966, 3, 2));
+    expect(w.end).toBeGreaterThan(Date.UTC(1966, 5, 30) + DAY);
+  });
+
+  it('shows a couple of months round an incident that has no operation', () => {
+    const w = focusWindow({ date: '1966-03-10T09:00:00', operation: null }, spans, MIN, MAX);
+
+    expect(w.start).toBeLessThan(Date.UTC(1966, 2, 10) - 30 * DAY + 1);
+    expect(w.end).toBeGreaterThan(Date.UTC(1966, 2, 10) + 30 * DAY);
+  });
+
+  it('never goes past the ends of the timeline, or narrower than a couple of weeks', () => {
+    const early = focusWindow({ date: '1966-01-01T00:00:00', operation: null }, spans, MIN, MAX);
+    expect(early.start).toBe(MIN);
+    const late = focusWindow({ date: '1966-06-30T00:00:00', operation: null }, spans, MIN, MAX);
+    expect(late.end).toBe(MAX);
+    expect(late.end - late.start).toBe(early.end - early.start);      // slid inward, not cut
+
+    const oneDay = focusWindow({ date: '1966-01-05T18:00:00', operation: 'Delta' }, spans, MIN, MAX);
+    expect(oneDay.end - oneDay.start).toBeGreaterThanOrEqual(13 * DAY);
+  });
+
+  it('copes with an operation that is not listed', () => {
+    const w = focusWindow({ date: '1966-02-10T09:00:00', operation: 'Nowhere' }, spans, MIN, MAX);
+
+    expect(w.end).toBeGreaterThan(w.start);
+  });
+});
+
+describe('dragRange', () => {
+  const extent = { start: MIN, end: MAX };
+
+  it('turns a drag across the bars into whole days, the plot area being inside the chart margins', () => {
+    const whole = dragRange(8, 988, 1000, extent)!;
+    expect(whole).toEqual({ start: MIN, end: MAX });
+
+    const half = dragRange(8, 498, 1000, extent)!;
+    expect(half.start).toBe(MIN);
+    expect(Math.abs(half.end % DAY)).toBe(0);
+    expect(half.end).toBe(MIN + 91 * DAY);
+  });
+
+  it('does not mind which way the pointer went, and stays inside the bars', () => {
+    expect(dragRange(498, 8, 1000, extent)).toEqual(dragRange(8, 498, 1000, extent));
+    expect(dragRange(-50, 5000, 1000, extent)).toEqual({ start: MIN, end: MAX });
+  });
+
+  it('gives at least a day, and nothing where the chart has no width', () => {
+    const tiny = dragRange(300, 300, 1000, extent)!;
+    expect(tiny.end - tiny.start).toBe(DAY);
+    expect(dragRange(0, 10, 15, extent)).toBeNull();
   });
 });
 
@@ -101,6 +187,8 @@ describe('Timeline operations', () => {
     }
     const toggled = vi.fn();
     f.componentInstance.operationToggled.subscribe(toggled);
+    const ranges: DateRange[] = [];
+    f.componentInstance.rangeChange.subscribe((r) => ranges.push(r));
     f.detectChanges();
     const el = f.nativeElement as HTMLElement;
     const arrow = () => el.querySelector<HTMLButtonElement>('.tl__toggle')!;
@@ -113,7 +201,7 @@ describe('Timeline operations', () => {
       list().dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
       settle();
     };
-    return { f, el, arrow, rows, list, toggled, settle, press };
+    return { f, el, arrow, rows, list, toggled, ranges, settle, press };
   }
 
   const text = (e: Element) => e.querySelector('.row__name')!.firstChild!.textContent;
@@ -196,27 +284,158 @@ describe('Timeline operations', () => {
     expect(rows()[1].classList.contains('is-active')).toBe(true);
   });
 
-  it('shows where the date filter sits, only while one is set', () => {
-    const none = setup();
-    expect(none.el.querySelector('.gantt__band')).toBeNull();
+  it('says so when no operation is recorded, or none matches', () => {
+    expect(setup({ operations: [] }).el.querySelector('.tl__none')!.textContent).toContain('No operations are recorded');
 
-    const some = setup({ from: '1966-02-01', to: '1966-03-31' });
-    expect(some.el.querySelector('.gantt__band')).not.toBeNull();
+    const none = setup({ scope: [] });
+    expect(none.el.querySelector('.tl__none')!.textContent).toContain('No operation has contacts that match');
+    expect(none.el.querySelector('[role=listbox]')).toBeNull();
   });
 
-  it('marks each new year on the axis', () => {
-    const { el } = setup({
-      all: [contact(1, '1965-06-01T00:00:00', 1), contact(2, '1967-03-01T00:00:00', 1)],
-      visible: [],
+  describe('the filters', () => {
+    it('list only the operations that have contacts among those the filters leave', () => {
+      const { rows } = setup({ scope: CONTACTS.filter((c) => c.op === 2) });
+
+      expect(rows().map(text)).toEqual(['Bravo']);
     });
 
-    expect([...el.querySelectorAll('.axis__tick')].map((t) => t.textContent!.trim())).toEqual(['1966', '1967']);
+    it('draw a bar for the contacts left, so a unit\'s bar runs only over the time it was in the operation', () => {
+      const { rows } = setup({ scope: [CONTACTS[0], CONTACTS[2]] });         // one Alpha contact (20 Jan), one Bravo (2 Apr)
+
+      expect(rows().map((r) => r.getAttribute('title'))).toEqual(['Alpha: 1966-01-20 (1 contact)', 'Bravo: 1966-04-02 (1 contact)']);
+    });
   });
 
-  it('says so when no operation is recorded', () => {
-    const { el } = setup({ operations: [] });
+  describe('the date extents', () => {
+    it('are the stretch of time the list shows, so it lists just the operations running in it', () => {
+      const { rows } = setup({ from: '1966-04-01', to: '1966-06-30' });
 
-    expect(el.querySelector('.tl__none')!.textContent).toContain('No operations');
-    expect(el.querySelector('[role=listbox]')).toBeNull();
+      expect(rows().map(text)).toEqual(['Bravo']);
+    });
+
+    it('label the axis to suit the stretch, and follow it as it changes', () => {
+      const whole = setup();
+      expect(whole.el.querySelector('.axis__tick')!.textContent).toMatch(/^\w{3} 1966$/);
+
+      const zoomed = setup({ from: '1966-03-01', to: '1966-03-20' });
+      expect(zoomed.el.querySelector('.axis__tick')!.textContent).toMatch(/^\d{1,2} Mar$/);
+    });
+
+    it('offer "Reset zoom" only when the dates are narrowed, which goes back to the whole war', () => {
+      const whole = setup();
+      expect(whole.el.textContent).not.toContain('Reset zoom');
+      expect(whole.el.textContent).toContain('Drag across the bars to zoom');
+
+      const narrowed = setup({ from: '1966-03-01' });
+      const button = [...narrowed.el.querySelectorAll('button')].find((b) => b.textContent?.trim() === 'Reset zoom')!;
+      button.click();
+      expect(narrowed.ranges).toEqual([{ from: null, to: null }]);
+    });
+  });
+
+  describe('an open incident', () => {
+    const focus = { date: '1966-04-15T09:30:00', operation: 'Bravo' };
+
+    it('zooms the list to its operation, and marks the operation', () => {
+      const { rows } = setup({ focus });
+
+      expect(rows().map(text)).toEqual(['Bravo']);               // the dates shown are those of Bravo, so the others are out of them
+      expect(rows()[0].classList.contains('is-focus')).toBe(true);
+    });
+
+    it('shows the date of the incident on the axis and as a line down the list', () => {
+      const { el } = setup({ focus });
+
+      expect(el.querySelector('.axis__marker')!.textContent).toContain('Incident 15 Apr 1966 09:30');
+      expect(el.querySelector('.gantt__marker')).not.toBeNull();
+    });
+
+    it('does not change the date filter, and goes back to the dates when it is closed', () => {
+      const { f, rows, el, ranges, settle } = setup({ focus });
+      expect(ranges).toEqual([]);
+
+      f.componentRef.setInput('focus', null);
+      settle();
+
+      expect(rows().map(text)).toEqual(['Alpha', 'Delta', 'Bravo']);
+      expect(el.querySelector('.axis__marker')).toBeNull();
+      expect(el.querySelector('.gantt__marker')).toBeNull();
+      expect(el.querySelector('.is-focus')).toBeNull();
+    });
+
+    it('zooms round the date when the incident has no operation, marking no row', () => {
+      const { rows, el } = setup({ focus: { date: '1966-01-10T00:00:00', operation: null } });
+
+      expect(rows().map(text)).toEqual(['Alpha', 'Delta']);
+      expect(el.querySelector('.is-focus')).toBeNull();
+      expect(el.querySelector('.axis__marker')).not.toBeNull();
+    });
+
+    it('starts the keyboard on the incident\'s operation', () => {
+      const { list, rows } = setup({ focus: { date: '1966-01-10T00:00:00', operation: 'Delta' } });
+
+      expect(list().getAttribute('aria-activedescendant')).toBe(rows().find((r) => text(r) === 'Delta')!.id);
+    });
+
+    it('can still be chosen as a filter like any other', () => {
+      const { rows, toggled } = setup({ focus });
+
+      rows()[0].click();
+
+      expect(toggled).toHaveBeenCalledWith('Bravo');
+    });
+  });
+
+  describe('dragging across the bars', () => {
+    function drag(s: ReturnType<typeof setup>, from: number, to: number, y = 50) {
+      const chart = s.el.querySelector<HTMLElement>('.tl__chart')!;
+      vi.spyOn(chart, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, right: 1000, bottom: 200, width: 1000, height: 200, x: 0, y: 0, toJSON: () => ({}) } as DOMRect);
+      const fire = (type: string, x: number, at = y) => chart.dispatchEvent(new MouseEvent(type, { clientX: x, clientY: at, button: 0, bubbles: true }));
+      fire('pointerdown', from);
+      fire('pointermove', to);
+      s.settle();
+      const boxWhileDragging = s.el.querySelector<HTMLElement>('.tl__drag');
+      fire('pointerup', to);
+      s.settle();
+      return { boxWhileDragging };
+    }
+
+    it('sets the dates to those it spans, and shows the stretch being picked while it goes', () => {
+      const s = setup();
+
+      const { boxWhileDragging } = drag(s, 8, 498);
+
+      expect(boxWhileDragging).not.toBeNull();
+      expect(boxWhileDragging!.style.left).toBe('8px');
+      expect(boxWhileDragging!.style.width).toBe('490px');
+      expect(s.ranges).toEqual([{ from: null, to: '1966-04-01' }]);
+      expect(s.el.querySelector('.tl__drag')).toBeNull();
+    });
+
+    it('picks dates from the stretch the chart shows now, not the whole war', () => {
+      const s = setup({ from: '1966-04-01', to: '1966-04-30' });          // the chart shows April
+
+      drag(s, 8, 988);
+
+      expect(s.ranges).toEqual([{ from: '1966-04-01', to: '1966-04-30' }]);
+    });
+
+    it('ignores a drag that is too short to mean it, and one that starts on the slider below the bars', () => {
+      const s = setup();
+
+      drag(s, 300, 300 + MIN_DRAG_PX - 1);
+      drag(s, 100, 600, 190);
+
+      expect(s.ranges).toEqual([]);
+    });
+
+    it('stops play, since the reader has taken over', () => {
+      const s = setup();
+      s.f.componentInstance.playing.set(true);
+
+      drag(s, 8, 498);
+
+      expect(s.f.componentInstance.playing()).toBe(false);
+    });
   });
 });

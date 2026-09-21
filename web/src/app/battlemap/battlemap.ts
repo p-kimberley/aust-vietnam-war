@@ -12,7 +12,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
-import { DateRange, Timeline } from './analytics/timeline';
+import { DateRange, Timeline, TimelineFocus } from './analytics/timeline';
 import { BasemapPicker } from './basemap-picker';
 import { MapLegend } from './map-legend';
 import { BasemapService } from './basemap.service';
@@ -62,6 +62,8 @@ type Tab = 'layers' | 'filters';
 
 /** How long typing must pause before the report search is sent. */
 const SEARCH_DELAY_MS = 400;
+/** A filter that leaves one contact, or a few close together, zooms no closer than this. */
+const FIT_MAX_ZOOM = 13;
 
 /**
  * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
@@ -103,6 +105,7 @@ export class Battlemap {
   private readonly community = inject(CommunityService);
   protected readonly basemaps = inject(BasemapService);
   private readonly canvas = viewChild.required<ElementRef<HTMLElement>>('canvas');
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   private map?: MapLibreMap;
   private urlTimer?: ReturnType<typeof setTimeout>;
@@ -142,6 +145,18 @@ export class Battlemap {
   protected readonly chartsOpen = signal(false);
   /** The operation timeline, opened from the arrow on the timeline's top edge. */
   protected readonly timelineOpen = signal(false);
+  /** Play is moving the timeline's window on. */
+  protected readonly timelinePlaying = signal(false);
+  /** The incident open in the panel, as the operation timeline needs it: when it happened and which operation it belongs to. */
+  protected readonly timelineFocus = computed<TimelineFocus | null>(() => {
+    const id = this.selectedId();
+    const contact = id === null ? undefined : this.allContacts().find((c) => c.id === id);
+    if (!contact) {
+      return null;
+    }
+    const operation = contact.op > 0 ? (this.catalogue()?.operations[contact.op - 1]?.name ?? null) : null;
+    return { date: contact.dtg, operation };
+  });
   /** The units whose paths are drawn, contact by contact in date order. Chosen with the button beside each unit in the incident panel. */
   protected readonly followed = signal<ReadonlySet<number>>(new Set());
   /** A panel is open at the right, so what else sits there moves aside. */
@@ -165,6 +180,15 @@ export class Battlemap {
   protected readonly visible = computed(() => {
     const c = this.catalogue();
     return c ? applyFilters(this.allContacts(), this.filters(), c, this.textIds()) : this.allContacts();
+  });
+  /**
+   * The contacts the operation list is drawn from: what the filters leave, except that the operation choice itself is ignored
+   * (or, once one operation was chosen, no other could be added) and so are the dates (the list has its own time axis). So
+   * choosing a unit, a task or a data source lists just the operations that have contacts of that unit, task or source.
+   */
+  protected readonly operationScope = computed(() => {
+    const c = this.catalogue();
+    return c ? applyFilters(this.allContacts(), { ...this.filters(), operations: new Set(), from: null, to: null }, c, this.textIds()) : this.allContacts();
   });
   protected readonly unitCounts = computed(() => this.tree()?.countContacts(this.allContacts()) ?? new Map<number, number>());
   protected readonly activeCount = computed(() => activeKeys(this.filters()).length);
@@ -197,6 +221,19 @@ export class Battlemap {
       }
     }
     this.syncUrl();
+  }
+
+  /** A click on empty map closes whatever the map opened: the incident, the base or the photo. */
+  protected clearMapSelection(): void {
+    if (this.selectedId() !== null) {
+      this.select(null);
+    }
+    if (this.selectedPoiId() !== null) {
+      this.selectPoi(null);
+    }
+    if (this.selectedPictureId() !== null) {
+      this.selectPicture(null);
+    }
   }
 
   /** Opens the panel for a point of interest (or closes it). One panel is open at a time, so this closes the incident panel. */
@@ -404,11 +441,36 @@ export class Battlemap {
   protected setFilters(next: FilterState): void {
     const changedText = next.text !== this.filters().text;
     this.filters.set(next);
+    // The reader chose a filter, so once the contacts it leaves are drawn the map zooms to them. A report search answers later, so
+    // its zoom waits for the answer. Play moves the window on every few hundred milliseconds, and a camera that followed each
+    // step would be dizzying, so it is left where it is.
+    if (!this.timelinePlaying()) {
+      this.fitRequest = changedText && hasText(next) ? 'search' : 'now';
+    }
     if (changedText) {
       this.queueSearch(next.text);
     }
     this.refreshContacts();
     this.syncUrl();
+  }
+
+  /** What the map is waiting to zoom to: the contacts a filter has left, now or when the report search has answered. */
+  private fitRequest: 'now' | 'search' | null = null;
+
+  /** How much of the map the panels and the timeline cover, so that the contacts land in the part that is left. */
+  private mapPadding(): { top: number; bottom: number; left: number; right: number } {
+    const root = this.host.nativeElement.getBoundingClientRect();
+    const timeline = this.host.nativeElement.querySelector('.bm__timeline')?.getBoundingClientRect();
+    const panels = [...this.host.nativeElement.querySelectorAll('.bm__right, .bm__incident')].map((e) => e.getBoundingClientRect().left);
+    const padding = {
+      top: 64,
+      left: 32,
+      bottom: (timeline ? Math.max(root.bottom - timeline.top, 0) : 0) + 24,
+      right: (panels.length ? Math.max(root.right - Math.min(...panels), 0) : 0) + 24,
+    };
+    // Padding that leaves no room for the map cannot be used.
+    const fits = padding.left + padding.right < root.width && padding.top + padding.bottom < root.height;
+    return root.width === 0 || fits ? padding : { top: 32, left: 32, bottom: 32, right: 32 };
   }
 
   private async start(): Promise<void> {
@@ -519,6 +581,8 @@ export class Battlemap {
               // Pictures are drawn on top, so they are registered last and win where they overlap a contact.
               this.basemaps.bindClick(PHOTO_POINTS, (p) => this.selectPicture(Number(p['id'])));
               this.basemaps.bindClick(PHOTO_CLUSTERS, (p, at) => void zoomIntoCluster(map, Number(p['cluster_id']), at));
+              // A click where none of those is under the pointer is a click on empty map.
+              this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_CLUSTERS], () => this.clearMapSelection());
               this.status.set('ready');
             }
           },
@@ -539,7 +603,7 @@ export class Battlemap {
   }
 
   /** Puts the filtered contacts on the map and rescales the heatmap to them, so a small subset still shows its hotspots. */
-  private refreshContacts(): void {
+  private refreshContacts(afterSearch = false): void {
     const map = this.map;
     if (!map) {
       return;
@@ -548,6 +612,12 @@ export class Battlemap {
     setContacts(map, shown);
     setHeatField(map, this.heatField(), fieldRange(shown, this.heatField()));
     setTracks(map, this.tracks());
+    if (this.fitRequest === (afterSearch ? 'search' : 'now')) {
+      this.fitRequest = null;
+      if (shown.length > 0) {
+        this.basemaps.fitTo(shown, this.mapPadding(), FIT_MAX_ZOOM);
+      }
+    }
   }
 
   /** Waits for typing to pause, then asks the server which reports contain the words. */
@@ -580,7 +650,7 @@ export class Battlemap {
       this.textIds.set(null);
       this.textStatus.set('error');
     }
-    this.refreshContacts();
+    this.refreshContacts(true);
   }
 
   private fail(message: string): void {

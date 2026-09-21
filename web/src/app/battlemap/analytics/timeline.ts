@@ -1,9 +1,26 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, computed, input, model, output, signal } from '@angular/core';
-import { Contact } from '../contacts';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnDestroy,
+  afterRenderEffect,
+  computed,
+  effect,
+  input,
+  model,
+  output,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import { Contact, formatDtg } from '../contacts';
 import { ChartOption, DARK, ChartTheme } from './analytics';
 import { EChart, ZoomRange } from './echart';
 
 const DAY = 24 * 3600 * 1000;
+
+/** The margins round the bars inside the chart's box, in pixels. A drag across the bars is measured against them. */
+export const CHART_GRID = { left: 8, right: 12, top: 6, bottom: 62 } as const;
 
 /** How often the play button moves the window on, and by how many months. */
 export const PLAY_INTERVAL_MS = 400;
@@ -123,7 +140,7 @@ export function timelineOption(buckets: readonly MonthBucket[], range: DateRange
     aria: { enabled: true },
     animation: false,
     textStyle: { color: theme.text },
-    grid: { left: 8, right: 12, top: 6, bottom: 62, containLabel: false },
+    grid: { ...CHART_GRID, containLabel: false },
     tooltip: {
       trigger: 'axis',
       confine: true,
@@ -222,44 +239,139 @@ export interface GanttRow extends OperationSpan {
 /** An operation of a day or two would be too thin to see, so no bar is narrower than this share of the axis. */
 const MIN_BAR_PERCENT = 0.35;
 
-/** Places each span on an axis from `min` to `max`, the same axis as the bar chart above it. The last day counts in full. */
+/**
+ * Places each operation that overlaps the axis from `min` to `max` (the same axis as the bar chart above it), in percent. A
+ * bar that runs past either end is cut at the edge. The last day counts in full.
+ */
 export function ganttRows(spans: readonly OperationSpan[], min: number, max: number): GanttRow[] {
   const total = max - min;
-  return spans.map((s) => {
-    const left = Math.min(Math.max(((s.start - min) / total) * 100, 0), 100 - MIN_BAR_PERCENT);
-    const width = Math.min(Math.max(((s.end + DAY - s.start) / total) * 100, MIN_BAR_PERCENT), 100 - left);
-    return { ...s, left, width, dates: s.start === s.end ? formatDay(s.start) : `${formatDay(s.start)} to ${formatDay(s.end)}` };
-  });
+  return spans
+    .filter((s) => s.end + DAY > min && s.start < max)
+    .map((s) => {
+      const from = Math.max(s.start, min);
+      const to = Math.min(s.end + DAY, max);
+      const left = Math.min(((from - min) / total) * 100, 100 - MIN_BAR_PERCENT);
+      const width = Math.min(Math.max(((to - from) / total) * 100, MIN_BAR_PERCENT), 100 - left);
+      return { ...s, left, width, dates: s.start === s.end ? formatDay(s.start) : `${formatDay(s.start)} to ${formatDay(s.end)}` };
+    });
 }
 
-/** Where each new year starts on the axis, for the labels and the faint lines behind the bars. */
-export function yearTicks(min: number, max: number): { year: number; left: number }[] {
-  const ticks: { year: number; left: number }[] = [];
-  for (let year = new Date(min).getUTCFullYear() + 1; Date.UTC(year, 0, 1) < max; year++) {
-    ticks.push({ year, left: ((Date.UTC(year, 0, 1) - min) / (max - min)) * 100 });
+/** A label on the time axis, placed in percent of its width. */
+export interface AxisTick {
+  left: number;
+  label: string;
+}
+
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * Labels for an axis from `min` to `max`: years for the whole war, months for a year or two, and days when zoomed in close.
+ * About a dozen at most, so they never crowd.
+ */
+export function axisTicks(min: number, max: number): AxisTick[] {
+  const span = max - min;
+  const at = (t: number, label: string): AxisTick => ({ left: ((t - min) / span) * 100, label });
+  const ticks: AxisTick[] = [];
+  if (span > 1200 * DAY) {
+    for (let year = new Date(min).getUTCFullYear() + 1; Date.UTC(year, 0, 1) < max; year++) {
+      ticks.push(at(Date.UTC(year, 0, 1), String(year)));
+    }
+  } else if (span > 100 * DAY) {
+    const months = span > 790 * DAY ? 3 : span > 420 * DAY ? 2 : 1;
+    const first = new Date(min);
+    for (let m = first.getUTCMonth() + 1; ; m++) {
+      const t = Date.UTC(first.getUTCFullYear(), m, 1);
+      if (t >= max) {
+        break;
+      }
+      if (m % months === 0) {
+        const d = new Date(t);
+        ticks.push(at(t, `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCFullYear()}`));
+      }
+    }
+  } else {
+    const days = [1, 2, 5, 7, 14].find((d) => span / (d * DAY) <= 14) ?? 14;
+    for (let t = Math.ceil(min / (days * DAY)) * days * DAY; t < max; t += days * DAY) {
+      const d = new Date(t);
+      ticks.push(at(t, `${d.getUTCDate()} ${MONTH_NAMES[d.getUTCMonth()]}`));
+    }
   }
   return ticks;
 }
 
-/** The stretch of the axis the date filter covers, in percent, or `null` when the whole war is shown. */
-export function windowPercent(range: DateRange, min: number, max: number): { left: number; width: number } | null {
-  if (range.from === null && range.to === null) {
+/** What the map has open, told to the timeline so its operation list can show where the incident sits in time. */
+export interface TimelineFocus {
+  /** The incident's date and time as recorded. */
+  date: string;
+  /** The operation the incident belongs to, when it has one. */
+  operation: string | null;
+}
+
+/** The stretch of time is never narrower than this, or a one-day operation would fill the screen. */
+const MIN_FOCUS_WINDOW = 14 * DAY;
+
+/**
+ * The stretch of time the operation list shows for an incident: its operation from its first contact to its last, with a
+ * margin so the ends can be seen; or, for an incident with no operation, a couple of months round its date.
+ */
+export function focusWindow(focus: TimelineFocus, spans: readonly OperationSpan[], min: number, max: number): ZoomRange {
+  const day = dayMs(focus.date);
+  const span = focus.operation ? spans.find((s) => s.name === focus.operation) : undefined;
+  let start = span ? Math.min(span.start, day) : day - 30 * DAY;
+  let end = (span ? Math.max(span.end, day) : day + 30 * DAY) + DAY;
+  const margin = Math.max((end - start) * 0.1, 7 * DAY);
+  start -= margin;
+  end += margin;
+  if (end - start < MIN_FOCUS_WINDOW) {
+    const middle = (start + end) / 2;
+    start = middle - MIN_FOCUS_WINDOW / 2;
+    end = middle + MIN_FOCUS_WINDOW / 2;
+  }
+  // Near an end of the timeline the window slides inward rather than shrink, so it keeps its width.
+  if (end - start >= max - min) {
+    return { start: min, end: max };
+  }
+  if (start < min) {
+    end += min - start;
+    start = min;
+  }
+  if (end > max) {
+    start -= end - max;
+    end = max;
+  }
+  return { start, end };
+}
+
+/** A drag across the bars shorter than this many pixels is a click, not a choice of dates. */
+export const MIN_DRAG_PX = 6;
+
+/**
+ * The dates a drag across the bar chart picks. `fromX` and `toX` are pixels across the chart, `width` its width, and `extent`
+ * the stretch of time the chart shows now, over the plot area inside its margins. The dates are whole days, at least one.
+ */
+export function dragRange(fromX: number, toX: number, width: number, extent: ZoomRange): ZoomRange | null {
+  const inner = width - CHART_GRID.left - CHART_GRID.right;
+  if (inner <= 0) {
     return null;
   }
-  const zoom = rangeToZoom(range, min, max);
-  const left = ((zoom.start - min) / (max - min)) * 100;
-  return { left, width: ((zoom.end - zoom.start) / (max - min)) * 100 };
+  const timeAt = (x: number) => extent.start + Math.min(Math.max((x - CHART_GRID.left) / inner, 0), 1) * (extent.end - extent.start);
+  const start = Math.floor(Math.min(timeAt(fromX), timeAt(toX)) / DAY) * DAY;
+  const end = Math.max(Math.ceil(Math.max(timeAt(fromX), timeAt(toX)) / DAY) * DAY, start + DAY);
+  return { start, end };
 }
 
 let nextTimelineId = 0;
 
 /**
  * The strip along the bottom of the map: contacts per month, with a slider that sets the date filter. Play moves a window of
- * time along the timeline so the map shows the war unfolding.
+ * time along the timeline so the map shows the war unfolding. Dragging across the bars picks the dates directly, and "Reset
+ * zoom" goes back to the whole war. The date filter is the stretch of time both charts show.
  *
  * An arrow at the centre of its top edge opens the operation timeline above it: a Gantt chart with one row for each operation,
- * on the same time axis as the bar chart, drawn from the operation's first contact to its last. Clicking a row chooses that
- * operation as a filter and clicking it again takes it off; any number can be chosen.
+ * on the same time axis as the bar chart, drawn from the operation's first contact to its last. It lists only the operations
+ * that have contacts left by the filters. Clicking a row chooses that operation as a filter and clicking it again takes it
+ * off; any number can be chosen. While an incident is open, the list zooms to that incident's operation and marks the date of
+ * the incident, and goes back when it is closed.
  */
 @Component({
   selector: 'app-timeline',
@@ -279,12 +391,15 @@ let nextTimelineId = 0;
       </button>
 
       <div class="tl__ops" [id]="opsId" role="region" aria-label="Operation timeline" [class.is-open]="expanded()">
-        <div class="tl__scroll">
+        <div #scroller class="tl__scroll">
           <div class="axis" aria-hidden="true">
             <div class="axis__side">Operations</div>
             <div class="axis__plot">
-              @for (t of ticks(); track t.year) {
-                <span class="axis__tick" [style.left.%]="t.left">{{ t.year }}</span>
+              @for (t of ticks(); track t.left) {
+                <span class="axis__tick" [style.left.%]="t.left">{{ t.label }}</span>
+              }
+              @if (marker(); as m) {
+                <span class="axis__marker" [class.is-right]="m.left > 65" [style.left.%]="m.left">{{ m.label }}</span>
               }
             </div>
           </div>
@@ -299,11 +414,11 @@ let nextTimelineId = 0;
               (keydown)="onKeydown($event)"
             >
               <div class="gantt__plot" aria-hidden="true">
-                @for (t of ticks(); track t.year) {
+                @for (t of ticks(); track t.left) {
                   <i class="gantt__grid" [style.left.%]="t.left"></i>
                 }
-                @if (band(); as b) {
-                  <i class="gantt__band" [style.left.%]="b.left" [style.width.%]="b.width"></i>
+                @if (marker(); as m) {
+                  <i class="gantt__marker" [style.left.%]="m.left"></i>
                 }
               </div>
               @for (row of rows(); track row.name; let i = $index) {
@@ -314,6 +429,7 @@ let nextTimelineId = 0;
                   [attr.aria-selected]="selectedOperations().has(row.name)"
                   [class.is-on]="selectedOperations().has(row.name)"
                   [class.is-active]="i === activeRow()"
+                  [class.is-focus]="i === focusRow()"
                   [attr.title]="row.name + ': ' + row.dates + ' (' + row.count + (row.count === 1 ? ' contact' : ' contacts') + ')'"
                   (click)="pick(i)"
                 >
@@ -323,7 +439,7 @@ let nextTimelineId = 0;
               }
             </div>
           } @else {
-            <p class="tl__none">No operations are recorded.</p>
+            <p class="tl__none">{{ operations().length ? 'No operation has contacts that match the filters in this stretch of time.' : 'No operations are recorded.' }}</p>
           }
         </div>
       </div>
@@ -333,11 +449,22 @@ let nextTimelineId = 0;
           <button type="button" class="tl__play" [attr.aria-pressed]="playing()" (click)="togglePlay()">{{ playing() ? 'Pause' : 'Play' }}</button>
           <span class="tl__range data" aria-live="polite">{{ label() }}</span>
           @if (from() || to()) {
-            <button type="button" class="tl__reset" (click)="reset()">Whole war</button>
+            <button type="button" class="tl__reset" (click)="reset()">Reset zoom</button>
+          } @else {
+            <span class="tl__hint">Drag across the bars to zoom</span>
           }
         </div>
-        <div class="tl__chart">
+        <div
+          class="tl__chart"
+          (pointerdown)="dragStart($event)"
+          (pointermove)="dragMove($event)"
+          (pointerup)="dragEnd($event)"
+          (pointercancel)="dragEnd($event)"
+        >
           <app-echart [option]="option()" (zoomed)="zoomed($event)" />
+          @if (dragBox(); as box) {
+            <div class="tl__drag" [style.left.px]="box.left" [style.width.px]="box.width"></div>
+          }
         </div>
       </div>
     </section>
@@ -449,6 +576,25 @@ let nextTimelineId = 0;
       padding-left: 4px;
       border-left: 1px solid var(--olive-500);
       line-height: 1.5rem;
+      white-space: nowrap;
+    }
+    /* The date of the incident that is open, flagged on the axis and drawn as a line down the list. */
+    .axis__marker {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      bottom: 0;
+      padding: 0 5px;
+      color: var(--ink);
+      font-weight: 700;
+      line-height: 1.5rem;
+      white-space: nowrap;
+      background: var(--smoke-yellow);
+      border-radius: 2px;
+      transform: translateX(-2px);
+    }
+    .axis__marker.is-right {
+      transform: translateX(calc(-100% + 2px));
     }
 
     .gantt {
@@ -469,13 +615,12 @@ let nextTimelineId = 0;
       bottom: 0;
       border-left: 1px solid rgb(230 221 184 / 0.1);
     }
-    /* The stretch of time the date filter has picked. */
-    .gantt__band {
+    .gantt__marker {
       position: absolute;
+      z-index: 1;
       top: 0;
       bottom: 0;
-      background: rgb(227 185 46 / 0.13);
-      border-inline: 1px solid rgb(227 185 46 / 0.5);
+      border-left: 2px solid var(--smoke-yellow);
     }
 
     .row {
@@ -490,6 +635,14 @@ let nextTimelineId = 0;
     }
     .row.is-on {
       background: rgb(227 185 46 / 0.16);
+    }
+    /* The operation of the incident that is open. */
+    .row.is-focus {
+      box-shadow: inset 3px 0 0 var(--smoke-yellow);
+    }
+    .row.is-focus .row__name {
+      color: var(--paper);
+      font-weight: 700;
     }
     .gantt:focus-visible .row.is-active {
       outline: 2px solid var(--smoke-yellow);
@@ -515,6 +668,7 @@ let nextTimelineId = 0;
       align-self: stretch;
       margin: 0 12px 0 8px;
     }
+    /* The bars glide as the stretch of time changes, so the eye can follow the zoom. */
     .row__bar {
       position: absolute;
       top: 50%;
@@ -523,6 +677,9 @@ let nextTimelineId = 0;
       margin-top: -0.3rem;
       background: rgb(230 221 184 / 0.75);
       border-radius: 1px;
+      transition:
+        left 0.35s ease,
+        width 0.35s ease;
     }
     .row:hover .row__bar {
       background: var(--khaki);
@@ -563,18 +720,37 @@ let nextTimelineId = 0;
       color: var(--ink);
       border-color: var(--brass);
     }
+    /* Two dates of ten characters and " to " fit the column on one line, so a date is never broken in the middle. */
     .tl__range {
-      font-size: 0.8rem;
+      font-size: 0.74rem;
+      white-space: nowrap;
       color: var(--khaki);
     }
+    .tl__hint {
+      color: var(--khaki);
+      font-size: 0.72rem;
+      opacity: 0.8;
+    }
     .tl__chart {
+      position: relative;
       flex: 1;
       min-width: 0;
+      touch-action: none;
+    }
+    /* The dates being picked by a drag across the bars. */
+    .tl__drag {
+      position: absolute;
+      top: 6px;
+      bottom: 62px;
+      background: rgb(227 185 46 / 0.22);
+      border-inline: 1px solid var(--smoke-yellow);
+      pointer-events: none;
     }
     @media (prefers-reduced-motion: reduce) {
       .tl__arrow,
       .tl__ops,
-      .tl__ops.is-open {
+      .tl__ops.is-open,
+      .row__bar {
         transition: none;
       }
     }
@@ -587,34 +763,78 @@ export class Timeline implements OnDestroy {
   readonly to = input<string | null>(null);
   /** Every operation, in the order that a contact's 1-based `op` indexes. */
   readonly operations = input<readonly { name: string }[]>([]);
+  /**
+   * The contacts the operation list is drawn from: those that pass the filters other than the operation choice itself (or no
+   * other operation could ever be added) and the dates (the list has its own axis). `null` means every contact.
+   */
+  readonly scope = input<readonly Contact[] | null>(null);
   /** The operations chosen as a filter. */
   readonly selectedOperations = input<ReadonlySet<string>>(new Set());
+  /** The incident that is open, if any: the operation list zooms to it. */
+  readonly focus = input<TimelineFocus | null>(null);
   /** Whether the operation timeline is open above the strip. */
   readonly expanded = model(false);
+  /** Whether play is moving the window along. */
+  readonly playing = model(false);
   readonly rangeChange = output<DateRange>();
   /** An operation was clicked: choose it as a filter, or take it off again. */
   readonly operationToggled = output<string>();
 
+  private readonly scroller = viewChild<ElementRef<HTMLElement>>('scroller');
   protected readonly opsId = `tl-ops-${nextTimelineId++}`;
-  protected readonly playing = signal(false);
+  /** The dates being picked by a drag across the bars: where it is across the chart, in pixels. */
+  protected readonly dragBox = signal<{ left: number; width: number } | null>(null);
+  private dragFrom: number | null = null;
   /** The row the keyboard is on; Space or Enter chooses it. */
   private readonly active = signal(0);
   private timer?: ReturnType<typeof setInterval>;
 
   private readonly buckets = computed(() => monthBuckets(this.all(), this.visible()));
   private readonly axis = computed(() => limits(this.buckets()));
+  /** The stretch of time the date filter picks, and both charts show. */
+  private readonly extent = computed(() => {
+    const axis = this.axis();
+    return axis ? rangeToZoom({ from: this.from(), to: this.to() }, axis.min, axis.max) : null;
+  });
+  private readonly allSpans = computed(() => operationSpans(this.all(), this.operations()));
+  private readonly scopedSpans = computed(() => {
+    const scope = this.scope();
+    return scope ? operationSpans(scope, this.operations()) : this.allSpans();
+  });
+  /** What the operation list shows: the dates, or for an open incident the period of its operation. */
+  private readonly view = computed(() => {
+    const axis = this.axis();
+    const extent = this.extent();
+    const focus = this.focus();
+    if (!axis || !extent) {
+      return null;
+    }
+    return focus ? focusWindow(focus, this.allSpans(), axis.min, axis.max) : extent;
+  });
+
   protected readonly option = computed(() => timelineOption(this.buckets(), { from: this.from(), to: this.to() }));
   protected readonly rows = computed(() => {
-    const axis = this.axis();
-    return axis ? ganttRows(operationSpans(this.all(), this.operations()), axis.min, axis.max) : [];
+    const view = this.view();
+    return view ? ganttRows(this.scopedSpans(), view.start, view.end) : [];
   });
   protected readonly ticks = computed(() => {
-    const axis = this.axis();
-    return axis ? yearTicks(axis.min, axis.max) : [];
+    const view = this.view();
+    return view ? axisTicks(view.start, view.end) : [];
   });
-  protected readonly band = computed(() => {
-    const axis = this.axis();
-    return axis ? windowPercent({ from: this.from(), to: this.to() }, axis.min, axis.max) : null;
+  /** Where the open incident falls on the operation list's axis, when it falls on it. */
+  protected readonly marker = computed(() => {
+    const view = this.view();
+    const focus = this.focus();
+    if (!view || !focus) {
+      return null;
+    }
+    const left = ((dayMs(focus.date) + DAY / 2 - view.start) / (view.end - view.start)) * 100;
+    return left < 0 || left > 100 ? null : { left, label: `Incident ${formatDtg(focus.date)}` };
+  });
+  /** The row of the open incident's operation, or -1. */
+  protected readonly focusRow = computed(() => {
+    const operation = this.focus()?.operation;
+    return operation ? this.rows().findIndex((r) => r.name === operation) : -1;
   });
   protected readonly activeRow = computed(() => Math.min(this.active(), Math.max(this.rows().length - 1, 0)));
   protected readonly label = computed(() => {
@@ -622,6 +842,28 @@ export class Timeline implements OnDestroy {
     const to = this.to();
     return from || to ? `${from ?? 'the start'} to ${to ?? 'the end'}` : 'The whole war';
   });
+
+  constructor() {
+    // The keyboard starts from the incident's operation.
+    effect(() => {
+      const row = this.focusRow();
+      if (row >= 0) {
+        untracked(() => this.active.set(row));
+      }
+    });
+    // Scroll the list so that operation is in the middle. Opening the list scrolls it too, since a closed list has no height to scroll in.
+    afterRenderEffect(() => {
+      const row = this.focusRow();
+      this.expanded();
+      const scroller = this.scroller()?.nativeElement;
+      const element = row >= 0 ? document.getElementById(this.rowId(row)) : null;
+      if (scroller && element) {
+        const box = scroller.getBoundingClientRect();
+        const at = element.getBoundingClientRect();
+        scroller.scrollTop += at.top - box.top - (box.height - at.height) / 2;
+      }
+    });
+  }
 
   protected rowId(index: number): string {
     return `${this.opsId}-row-${index}`;
@@ -659,6 +901,52 @@ export class Timeline implements OnDestroy {
       case ' ':
         event.preventDefault();
         return this.pick(now);
+    }
+  }
+
+  /** The pointer went down over the bars: a drag from here picks the dates. The slider below has its own handles. */
+  protected dragStart(event: PointerEvent): void {
+    const target = event.currentTarget as HTMLElement;
+    const box = target.getBoundingClientRect();
+    const x = event.clientX - box.left;
+    const y = event.clientY - box.top;
+    const inPlot = x >= CHART_GRID.left && x <= box.width - CHART_GRID.right && y >= CHART_GRID.top && y <= box.height - CHART_GRID.bottom;
+    if (event.button !== 0 || !inPlot || !this.extent()) {
+      return;
+    }
+    this.dragFrom = x;
+    target.setPointerCapture?.(event.pointerId);
+    this.dragBox.set({ left: x, width: 0 });
+  }
+
+  protected dragMove(event: PointerEvent): void {
+    if (this.dragFrom === null) {
+      return;
+    }
+    const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = Math.min(Math.max(event.clientX - box.left, CHART_GRID.left), box.width - CHART_GRID.right);
+    this.dragBox.set({ left: Math.min(this.dragFrom, x), width: Math.abs(x - this.dragFrom) });
+  }
+
+  /** The pointer came up: a long enough drag sets the date filter to the dates it spanned. */
+  protected dragEnd(event: PointerEvent): void {
+    if (this.dragFrom === null) {
+      return;
+    }
+    const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const from = this.dragFrom;
+    const to = Math.min(Math.max(event.clientX - box.left, CHART_GRID.left), box.width - CHART_GRID.right);
+    this.dragFrom = null;
+    this.dragBox.set(null);
+    const extent = this.extent();
+    const axis = this.axis();
+    if (event.type === 'pointercancel' || Math.abs(to - from) < MIN_DRAG_PX || !extent || !axis) {
+      return;
+    }
+    const range = dragRange(from, to, box.width, extent);
+    if (range) {
+      this.stop();
+      this.rangeChange.emit(zoomToRange(range, axis.min, axis.max));
     }
   }
 

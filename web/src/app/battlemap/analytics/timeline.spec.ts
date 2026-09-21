@@ -133,11 +133,11 @@ describe('Timeline', () => {
   it('describes the range and offers to go back to the whole war only when one is set', () => {
     const open = setup();
     expect(open.el.querySelector('.tl__range')?.textContent).toBe('The whole war');
-    expect(open.button('Whole war')).toBeUndefined();
+    expect(open.button('Reset zoom')).toBeUndefined();
 
     const set = setup({ from: '1966-02-01', to: null });
     expect(set.el.querySelector('.tl__range')?.textContent).toBe('1966-02-01 to the end');
-    expect(set.button('Whole war')).toBeDefined();
+    expect(set.button('Reset zoom')).toBeDefined();
   });
 
   it('hands the chart the option built from the contacts and the range', () => {
@@ -157,7 +157,7 @@ describe('Timeline', () => {
   it('clears the range on request', () => {
     const { emitted, button, f } = setup({ from: '1966-02-01', to: '1966-03-31' });
 
-    button('Whole war').click();
+    button('Reset zoom').click();
     f.detectChanges();
 
     expect(emitted).toEqual([{ from: null, to: null }]);

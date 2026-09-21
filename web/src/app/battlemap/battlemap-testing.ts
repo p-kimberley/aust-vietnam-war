@@ -99,6 +99,12 @@ export class FakeBasemapService {
   setTerrain = vi.fn();
   setOverlay = vi.fn();
   flyTo = vi.fn();
+  fitTo = vi.fn();
+  /** What runs when the map is clicked where none of the layers has anything. */
+  backgroundClick?: () => void;
+  bindBackgroundClick = vi.fn((_layers: readonly string[], handler: () => void) => {
+    this.backgroundClick = handler;
+  });
   clickHandler?: (p: Record<string, unknown>, at?: { lon: number; lat: number }) => void;
   /** The handler for every layer that was bound, by layer id. `clickHandler` is the one for the incident markers. */
   readonly handlers = new Map<string, (p: Record<string, unknown>, at?: { lon: number; lat: number }) => void>();
