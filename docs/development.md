@@ -105,7 +105,7 @@ Use the "Sign in" link (for example under an incident's Notes tab) and one of th
 The dev database starts empty. To load the old site's content, follow `runbook.md` section 4, using the same commands from the repo root:
 `import-poi` (fire support bases, for the map's bases layer) and `import-community` (notes, poppies, pictures). They need the legacy dump
 loaded in a scratch MySQL (`ConnectionStrings__Legacy`; add `;SslMode=Disabled` for an old 5.x server) and, for pictures,
-`--media-root <the incident-media folder>` with `Media__RootPath` set to somewhere outside the repository. Both are safe to repeat. To empty
+`--media-root <the incident-media folder>` with `Media__RootPath` set to **the folder the dev API serves pictures from** (an absolute path; by default `server/src/Avw.Api/data/media`, which is git-ignored), or the pictures are stored but the site cannot show them. The dev web server passes `/media` to the API, as it does `/api`. Both are safe to repeat. To empty
 the imported content again, delete rows with a `LegacyId` from `incident_notes`, `tributes`, `casualty_submissions` and `incident_media`
 (and everything in `casualty_links`).
 

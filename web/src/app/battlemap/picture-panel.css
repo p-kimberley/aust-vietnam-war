@@ -68,6 +68,8 @@ h2:focus {
 }
 
 .pic__close:focus-visible,
+.pic__zoom:focus-visible,
+.fs__close:focus-visible,
 .pic__button:focus-visible,
 .pic__link-button:focus-visible,
 .pic__link:focus-visible {
@@ -84,6 +86,23 @@ h2:focus {
 .pic__link {
   display: block;
   color: var(--khaki);
+}
+
+/* The picture is itself a button that opens it full screen. */
+.pic__zoom {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: zoom-in;
+}
+
+.pic__newtab {
+  display: inline-block;
+  color: var(--paper);
+  font-size: 0.9rem;
+  text-decoration: none;
 }
 
 .pic__img {
@@ -125,4 +144,50 @@ h2:focus {
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+/* The picture over the whole window (and full screen, where the browser allows it). */
+.fs {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 1rem 3.5rem;
+  background: rgb(10 12 6 / 0.96);
+  cursor: zoom-out;
+}
+
+.fs__img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: default;
+}
+
+.fs__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--paper);
+  font-size: 1.8rem;
+  line-height: 1;
+  background: rgb(31 35 20 / 0.9);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.fs__caption {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.9rem;
+  left: 1rem;
+  margin: 0;
+  color: var(--paper);
+  text-align: center;
+  cursor: default;
 }

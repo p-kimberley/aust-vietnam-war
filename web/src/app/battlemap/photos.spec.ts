@@ -18,7 +18,7 @@ import {
   toPhotoGeoJson,
   zoomIntoCluster,
 } from './photo-layers';
-import { PicturePanel } from './picture-panel';
+import { PicturePanel, formatBytes, formatType } from './picture-panel';
 
 const text = (el: Element | null) => el?.textContent?.replace(/\s+/g, ' ').trim();
 
@@ -38,6 +38,10 @@ const pic = (over: Partial<IncidentMediaView> = {}): IncidentMediaView => ({
   status: 'Approved',
   likes: 3,
   likedByMe: false,
+  byteSize: 183_500,
+  contentType: 'image/jpeg',
+  addedUtc: '2018-09-02T04:15:00Z',
+  addedBy: 'Alex Member',
   mine: false,
   canRemove: false,
   ...over,
@@ -281,6 +285,169 @@ describe('PicturePanel', () => {
     el.querySelector<HTMLButtonElement>('.pic__close')!.click();
 
     expect(closed).toBe(1);
+  });
+});
+
+describe('PicturePanel upload details and full screen', () => {
+  function open(over: Partial<IncidentMediaView> = {}) {
+    TestBed.resetTestingModule();
+    const community = fakeCommunity({ mediaDetail: vi.fn(() => Promise.resolve(pic(over))) });
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), ...communityProviders(community, fakeAuth({}))] });
+    const fixture = TestBed.createComponent(PicturePanel);
+    fixture.componentRef.setInput('pictureId', 5);
+    fixture.detectChanges();
+    return { fixture, el: fixture.nativeElement as HTMLElement };
+  }
+  const button = (el: HTMLElement, label: string) => [...el.querySelectorAll('button')].find((b) => text(b) === label)!;
+
+  it('shows what was recorded when it was uploaded: who added it, when, where, and the size and kind of file', async () => {
+    const { fixture, el } = open({ contactId: 2 });
+    await settle(fixture);
+
+    expect(text(el)).toContain('Added by Alex Member');
+    expect(text(el)).toContain('Added2 Sep 2018');
+    expect(text(el)).toContain('Location10.56000, 107.17000');
+    expect(text(el)).toContain('Image800 × 600 px · 179.2 KB · JPG');
+    expect(text(el)).toContain('Incident2');
+  });
+
+  it('leaves out who added it when that is not known, and the place and incident when it has none', async () => {
+    const { fixture, el } = open({ addedBy: null, lat: null, lon: null, contactId: null });
+    await settle(fixture);
+
+    expect(text(el)).not.toContain('Added by');
+    expect(text(el)).not.toContain('Location');
+    expect(text(el)).not.toContain('Incident2');
+    expect(text(el)).toContain('Added2 Sep 2018');
+  });
+
+  it('writes a file size and a kind of file for a person', () => {
+    expect(formatBytes(512)).toBe('512 B');
+    expect(formatBytes(2048)).toBe('2.0 KB');
+    expect(formatBytes(3.5 * 1024 * 1024)).toBe('3.5 MB');
+    expect(formatType('image/jpeg')).toBe('JPG');
+    expect(formatType('image/png')).toBe('PNG');
+    expect(formatType('image/webp')).toBe('WEBP');
+  });
+
+  it('has a button to view the photo full screen, and the photo is one too, keeping the link to open it in a tab', async () => {
+    const { fixture, el } = open();
+    await settle(fixture);
+
+    expect(button(el, 'View fullscreen')).toBeDefined();
+    expect(el.querySelector('.pic__zoom')!.getAttribute('aria-label')).toBe('View the photo full screen');
+    const tab = [...el.querySelectorAll('a')].find((a) => text(a) === 'Open in a new tab')!;
+    expect(tab.getAttribute('href')).toBe('/media/aa/full.jpg');
+    expect(tab.getAttribute('target')).toBe('_blank');
+    expect(el.querySelector('.fs')).toBeNull();
+  });
+
+  it('opens the full-size photo over the window, with its caption and credit, and takes focus', async () => {
+    const { fixture, el } = open();
+    await settle(fixture);
+
+    button(el, 'View fullscreen').click();
+    await settle(fixture);
+
+    const fs = el.querySelector('.fs')!;
+    expect(fs.getAttribute('role')).toBe('dialog');
+    expect(fs.getAttribute('aria-modal')).toBe('true');
+    expect(fs.querySelector('img')!.getAttribute('src')).toBe('/media/aa/full.jpg');
+    expect(text(fs)).toContain('A patrol at Nui Dat');
+    expect(text(fs)).toContain('AWM');
+    expect(document.activeElement).toBe(fs.querySelector('.fs__close'));
+  });
+
+  it('asks the browser for true full screen where there is one, and is still a full-window view where there is not', async () => {
+    const request = vi.fn(() => Promise.resolve());
+    (HTMLElement.prototype as unknown as { requestFullscreen: unknown }).requestFullscreen = request;
+    try {
+      const { fixture, el } = open();
+      await settle(fixture);
+      button(el, 'View fullscreen').click();
+      await settle(fixture);
+
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(el.querySelector('.fs')).not.toBeNull();
+    } finally {
+      delete (HTMLElement.prototype as unknown as { requestFullscreen?: unknown }).requestFullscreen;
+    }
+  });
+
+  it('opens from a click on the photo itself', async () => {
+    const { fixture, el } = open();
+    await settle(fixture);
+
+    el.querySelector<HTMLButtonElement>('.pic__zoom')!.click();
+    await settle(fixture);
+
+    expect(el.querySelector('.fs')).not.toBeNull();
+  });
+
+  it('closes with the close button, Escape or a click beside the photo, and gives focus back', async () => {
+    const { fixture, el } = open();
+    await settle(fixture);
+    const reopen = async () => {
+      button(el, 'View fullscreen').click();
+      await settle(fixture);
+    };
+
+    await reopen();
+    el.querySelector<HTMLButtonElement>('.fs__close')!.click();
+    await settle(fixture);
+    expect(el.querySelector('.fs')).toBeNull();
+    expect(document.activeElement).toBe(el.querySelector('.pic__zoom'));
+
+    await reopen();
+    el.querySelector('.fs')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await settle(fixture);
+    expect(el.querySelector('.fs')).toBeNull();
+
+    await reopen();
+    el.querySelector<HTMLElement>('.fs')!.click();
+    await settle(fixture);
+    expect(el.querySelector('.fs')).toBeNull();
+  });
+
+  it('stays open when the photo or its caption is clicked, and keeps Tab on the close button', async () => {
+    const { fixture, el } = open();
+    await settle(fixture);
+    button(el, 'View fullscreen').click();
+    await settle(fixture);
+
+    el.querySelector<HTMLElement>('.fs__img')!.click();
+    el.querySelector<HTMLElement>('.fs__caption')!.click();
+    const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+    el.querySelector('.fs')!.dispatchEvent(tab);
+    await settle(fixture);
+
+    expect(el.querySelector('.fs')).not.toBeNull();
+    expect(tab.defaultPrevented).toBe(true);
+  });
+
+  it('closes when the browser leaves full screen, as it does on Escape', async () => {
+    const { fixture, el } = open();
+    await settle(fixture);
+    button(el, 'View fullscreen').click();
+    await settle(fixture);
+
+    document.dispatchEvent(new Event('fullscreenchange'));                  // nothing is full screen any more
+    await settle(fixture);
+
+    expect(el.querySelector('.fs')).toBeNull();
+  });
+
+  it('starts shut for another photo', async () => {
+    const { fixture, el } = open();
+    await settle(fixture);
+    button(el, 'View fullscreen').click();
+    await settle(fixture);
+    expect(el.querySelector('.fs')).not.toBeNull();
+
+    fixture.componentRef.setInput('pictureId', 6);
+    await settle(fixture);
+
+    expect(el.querySelector('.fs')).toBeNull();
   });
 });
 

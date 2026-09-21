@@ -218,6 +218,15 @@ public sealed class CommunityEndpointTests : IDisposable
         var shown = Assert.Single(await Read<List<IncidentMediaView>>(await Anon("/api/contacts/2/media")));
         Assert.Equal((0, false, false), (shown.Likes, shown.LikedByMe, shown.Mine));
 
+        // The picture's own page carries what was recorded at upload: who added it, when, and the file's format and size.
+        var detail = await Read<IncidentMediaView>(await Anon($"/api/incident-media/{up.Id}"));
+        Assert.Equal("image/jpeg", detail.ContentType);
+        Assert.True(detail.ByteSize > 0);
+        Assert.True(detail.AddedUtc > DateTime.UtcNow.AddMinutes(-5));
+        Assert.False(string.IsNullOrWhiteSpace(detail.AddedBy));
+        // The lists (an incident's pictures, the map's) do not name the uploader.
+        Assert.Null(shown.AddedBy);
+
         var liked = await Read<LikeResult>(await As(2, HttpMethod.Post, $"/api/incident-media/{up.Id}/like"));
         Assert.Equal((1, true), (liked.Likes, liked.Liked));
         Assert.Equal((1, true), (await Read<List<IncidentMediaView>>(await As(2, HttpMethod.Get, "/api/contacts/2/media"))).Select(m => (m.Likes, m.LikedByMe)).Single());

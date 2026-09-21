@@ -9,6 +9,16 @@ const TERRAIN_PITCH = 60;
 const WORKER_URL = '/vendor/maplibre-gl-worker.mjs';
 const FIT_DURATION_MS = 900;
 
+/** What the map is looking at: the edges of the view and its middle. */
+export interface MapView {
+  west: number;
+  south: number;
+  east: number;
+  north: number;
+  lat: number;
+  lon: number;
+}
+
 export interface MapStart {
   basemapId?: string | null;
   camera?: Camera | null;
@@ -35,6 +45,8 @@ export class BasemapService implements OnDestroy {
   private map?: Map;
   private config?: MapConfig;
 
+  /** The view, kept up to date as the map stops moving. `null` until the map has drawn. */
+  readonly view = signal<MapView | null>(null);
   readonly basemapId = signal<string | undefined>(undefined);
   readonly terrainEnabled = signal(false);
   readonly overlayIds = signal<readonly string[]>([]);
@@ -77,10 +89,17 @@ export class BasemapService implements OnDestroy {
       this.applyOverlays(map);
       hooks.styleLoaded(map);
     });
+    const publishView = () => {
+      const edges = map.getBounds();
+      const middle = map.getCenter();
+      this.view.set({ west: edges.getWest(), south: edges.getSouth(), east: edges.getEast(), north: edges.getNorth(), lat: middle.lat, lon: middle.lng });
+    };
     map.on('moveend', () => {
       const c = map.getCenter();
       hooks.cameraChanged({ lat: c.lat, lon: c.lng, zoom: map.getZoom() });
+      publishView();
     });
+    map.once('load', publishView);
     map.on('error', (e) => {
       const error = e.error as { message?: string; status?: number; url?: string } | undefined;
       // A style that cannot be fetched leaves a blank map, so say so. Individual tile failures are routine.

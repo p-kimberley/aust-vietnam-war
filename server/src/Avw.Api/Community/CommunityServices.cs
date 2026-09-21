@@ -24,7 +24,11 @@ public sealed record IncidentMediaView(
     int Likes,
     bool LikedByMe,
     bool Mine,
-    bool CanRemove);
+    bool CanRemove,
+    long ByteSize = 0,
+    string ContentType = "image/jpeg",
+    DateTime? AddedUtc = null,
+    string? AddedBy = null);
 
 public sealed record LikeResult(int Likes, bool Liked);
 
@@ -65,14 +69,14 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
     /// <summary>One picture as one viewer sees it (their like, whether they can remove it). Pictures nobody but the uploader or an editor may see are not found.</summary>
     public async Task<IncidentMediaView?> GetAsync(long id, Person? viewer, CancellationToken ct)
     {
-        var link = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).FirstOrDefaultAsync(m => m.Id == id, ct);
+        var link = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).ThenInclude(m => m.UploadedBy).FirstOrDefaultAsync(m => m.Id == id, ct);
         if (link is null || link.Media.Status != MediaStatus.Approved && !(viewer is not null && (viewer.IsEditor || link.Media.UploadedById == viewer.Id)))
         {
             return null;
         }
 
         var likes = await db.MediaLikes.AsNoTracking().Where(l => l.MediaId == link.MediaId).Select(l => l.UserId).ToListAsync(ct);
-        return ToView(link, link.Media, likes.Count + link.LegacyLikes, viewer is not null && likes.Contains(viewer.Id), viewer);
+        return ToView(link, link.Media, likes.Count + link.LegacyLikes, viewer is not null && likes.Contains(viewer.Id), viewer, AddedBy(link));
     }
 
     /// <summary>Approved pictures whose place falls inside a box, newest first (at most <see cref="MaxInArea"/>). For the map's picture layer.</summary>
@@ -211,15 +215,23 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
 
     private async Task<CmsResult<IncidentMediaView>> ViewAsync(long id, Person person, CancellationToken ct)
     {
-        var link = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).FirstAsync(m => m.Id == id, ct);
+        var link = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).ThenInclude(m => m.UploadedBy).FirstAsync(m => m.Id == id, ct);
         var likes = await db.MediaLikes.AsNoTracking().Where(l => l.MediaId == link.MediaId).Select(l => l.UserId).ToListAsync(ct);
-        return CmsResult<IncidentMediaView>.Success(ToView(link, link.Media, likes.Count + link.LegacyLikes, likes.Contains(person.Id), person));
+        return CmsResult<IncidentMediaView>.Success(ToView(link, link.Media, likes.Count + link.LegacyLikes, likes.Contains(person.Id), person, AddedBy(link)));
     }
 
-    private static IncidentMediaView ToView(IncidentMedia link, MediaAsset m, int likes, bool liked, Person? viewer) => new(
+    /// <summary>
+    /// Who added a picture, as the page names them: the name kept with a migrated picture, or else the display name of whoever
+    /// uploaded it (the same names notes are shown under). Needs the uploader loaded with the picture.
+    /// </summary>
+    private static string? AddedBy(IncidentMedia link) =>
+        !string.IsNullOrWhiteSpace(link.AuthorName) ? link.AuthorName : link.Media.UploadedBy?.DisplayName;
+
+    private static IncidentMediaView ToView(IncidentMedia link, MediaAsset m, int likes, bool liked, Person? viewer, string? addedBy = null) => new(
         link.Id, m.Id, link.ContactId, PublicContent.MediaUrl(m.Sha256), $"/media/{m.Sha256[..2]}/{m.Sha256}-480.jpg", m.Width, m.Height,
         m.Caption, m.Credit, link.DateTaken, link.Lat, link.Lon, m.Status, likes, liked,
-        viewer is not null && m.UploadedById == viewer.Id, viewer is not null && (viewer.IsEditor || link.AttachedById == viewer.Id));
+        viewer is not null && m.UploadedById == viewer.Id, viewer is not null && (viewer.IsEditor || link.AttachedById == viewer.Id),
+        m.ByteSize, m.ContentType, link.CreatedUtc, addedBy);
 }
 
 /// <summary>Poppies: short messages left for people on the honour roll.</summary>

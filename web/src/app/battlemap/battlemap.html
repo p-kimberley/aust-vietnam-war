@@ -1,4 +1,4 @@
-<div class="bm" [class.bm--timeline-open]="timelineOpen()">
+<div class="bm" [class.bm--timeline-open]="timelineOpen()" [class.bm--film]="filmItems().length > 0" [class.bm--film-wide]="filmItems().length > 0 && filmWide()">
   <div #canvas class="bm__canvas" role="application" aria-label="Battle Map"></div>
 
   <header class="bm__bar">
@@ -62,6 +62,12 @@
   } @else if (status() === 'ready' && selectedPictureId(); as pictureId) {
     <div class="bm__incident">
       <app-picture-panel [pictureId]="pictureId" (closed)="selectPicture(null)" (openIncident)="openContact($event)" />
+    </div>
+  }
+
+  @if (status() === 'ready') {
+    <div class="bm__film">
+      <app-filmstrip [items]="filmItems()" [selectedId]="selectedPictureId()" [(expanded)]="filmWide" (picked)="openPictureAt($event)" />
     </div>
   }
 

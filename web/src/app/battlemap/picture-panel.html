@@ -11,10 +11,9 @@
       <p role="alert">This photo could not be loaded.</p>
       <button type="button" class="pic__button" (click)="picture.reload()">Try again</button>
     } @else if (picture.value(); as p) {
-      <a [href]="p.url" target="_blank" rel="noopener" class="pic__link">
+      <button type="button" #trigger class="pic__zoom" aria-label="View the photo full screen" (click)="openFullscreen()">
         <img class="pic__img" [src]="p.thumbUrl" [width]="480" [height]="p.width ? (480 * p.height) / p.width : 360" [alt]="p.caption || 'A photo placed on the map'" />
-        <span class="pic__hint">Open full size</span>
-      </a>
+      </button>
       @if (p.caption) {
         <p class="pic__caption">{{ p.caption }}</p>
       }
@@ -24,12 +23,25 @@
       @if (p.dateTaken) {
         <p class="pic__line"><strong>Taken</strong> <span class="data">{{ p.dateTaken | date: 'd MMM y' }}</span></p>
       }
+      @if (p.addedBy) {
+        <p class="pic__line"><strong>Added by</strong> {{ p.addedBy }}</p>
+      }
+      <p class="pic__line"><strong>Added</strong> <span class="data">{{ p.addedUtc | date: 'd MMM y' }}</span></p>
+      @if (p.lat !== null && p.lon !== null) {
+        <p class="pic__line"><strong>Location</strong> <span class="data">{{ p.lat.toFixed(5) }}, {{ p.lon.toFixed(5) }}</span></p>
+      }
+      <p class="pic__line"><strong>Image</strong> <span class="data">{{ p.width }} × {{ p.height }} px · {{ formatBytes(p.byteSize) }} · {{ formatType(p.contentType) }}</span></p>
+      @if (p.contactId !== null) {
+        <p class="pic__line"><strong>Incident</strong> <span class="data">{{ p.contactId }}</span></p>
+      }
       <p class="pic__line"><strong>Likes</strong> <span class="data">{{ likes(p) }}</span></p>
 
       @if (message()) {
         <p class="pic__error" role="alert">{{ message() }}</p>
       }
       <div class="pic__actions">
+        <button type="button" class="pic__button" (click)="openFullscreen()">View fullscreen</button>
+        <a class="pic__button pic__newtab" [href]="p.url" target="_blank" rel="noopener">Open in a new tab</a>
         @if (auth.isAuthenticated()) {
           <button type="button" class="pic__button" [attr.aria-pressed]="liked(p)" (click)="like(p)">
             {{ liked(p) ? '♥ Liked' : '♡ Like this photo' }}
@@ -41,6 +53,24 @@
           <button type="button" class="pic__button" (click)="openIncident.emit(p.contactId)">Open the incident</button>
         }
       </div>
+      @if (fullscreen()) {
+        <div
+          #overlay
+          class="fs"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Photo, full screen"
+          (click)="closeFullscreen()"
+          (keydown.escape)="closeFullscreen()"
+          (keydown.tab)="$event.preventDefault()"
+        >
+          <button type="button" class="fs__close" aria-label="Close full screen" (click)="closeFullscreen(); $event.stopPropagation()">×</button>
+          <img class="fs__img" [src]="p.url" [alt]="p.caption || 'A photo placed on the map'" (click)="$event.stopPropagation()" />
+          @if (p.caption || p.credit) {
+            <p class="fs__caption" (click)="$event.stopPropagation()">{{ p.caption }}@if (p.credit) { <span class="data"> · {{ p.credit }}</span> }</p>
+          }
+        </div>
+      }
     } @else {
       <p role="status">This photo was not found.</p>
     }

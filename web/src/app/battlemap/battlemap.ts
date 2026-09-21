@@ -14,6 +14,7 @@ import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { DateRange, Timeline, TimelineFocus } from './analytics/timeline';
 import { BasemapPicker } from './basemap-picker';
+import { Filmstrip, picturesInView } from './filmstrip';
 import { MapLegend } from './map-legend';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
@@ -74,7 +75,7 @@ const FIT_MAX_ZOOM = 13;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, BasemapPicker, MapLegend, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, BasemapPicker, Filmstrip, MapLegend, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -126,6 +127,10 @@ export class Battlemap {
   protected readonly pictures = signal<readonly IncidentMediaView[]>([]);
   protected readonly showPhotos = signal(true);
   protected readonly selectedPictureId = signal<number | null>(null);
+  /** The photo strip at the left is wide, with captions. */
+  protected readonly filmWide = signal(false);
+  /** The photos in the map's view, nearest the middle first; none while the photo layer is switched off. */
+  protected readonly filmItems = computed(() => (this.showPhotos() ? picturesInView(this.pictures(), this.basemaps.view()) : []));
   /** The tab an incident opens on. Search sends a note's reader straight to the notes; anything else starts on the details. */
   protected readonly incidentTab = signal<'details' | 'notes'>('details');
   protected readonly tab = signal<Tab>('layers');

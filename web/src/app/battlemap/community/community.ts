@@ -65,6 +65,11 @@ export interface IncidentMediaView {
   likedByMe: boolean;
   mine: boolean;
   canRemove: boolean;
+  /** Recorded when the picture was uploaded. Who added it is sent only with a picture's own page, not in lists. */
+  byteSize: number;
+  contentType: string;
+  addedUtc: string;
+  addedBy: string | null;
 }
 
 /** A picture taken near an incident (not one of its own), from `GET /api/contacts/{id}/nearby-media`. */

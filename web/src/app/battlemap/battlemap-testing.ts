@@ -7,7 +7,7 @@ import { AnalyticsService, ChartInfo, ChartResult } from './analytics/analytics'
 import { stubEchartIn } from './analytics/echart-stub';
 import { communityProviders, fakeAuth, fakeCommunity } from './community/community-testing';
 import { Timeline } from './analytics/timeline';
-import { BasemapService, MapHooks } from './basemap.service';
+import { BasemapService, MapHooks, MapView } from './basemap.service';
 import { Battlemap } from './battlemap';
 import { Contact, ContactDetail } from './contacts';
 import { ContactsService } from './contacts.service';
@@ -86,6 +86,8 @@ export class FakeBasemapService {
   readonly basemapId = signal<string | undefined>('terrain');
   readonly terrainEnabled = signal(false);
   readonly overlayIds = signal<readonly string[]>([]);
+  /** What the map is looking at; a test moves it by setting this. */
+  readonly view = signal<MapView | null>(null);
   readonly map = fakeMap();
   startedWith?: unknown;
   hooks?: MapHooks;
