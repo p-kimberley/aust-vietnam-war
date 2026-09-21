@@ -1,9 +1,13 @@
+import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
-import { config, contacts, render } from './battlemap-testing';
-import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight } from './contact-layers';
-import { fieldRange, formatDtg, toGeoJson } from './contacts';
+import { config, contacts, render, settle } from './battlemap-testing';
+import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight, pointRadius, selectedRadius } from './contact-layers';
+import { fieldRange, formatDtg, sizeCap, toGeoJson } from './contacts';
 import { MapConfig, pickBasemap } from './map-config';
 import { formatAt, parseAt } from './map-url';
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 describe('contacts', () => {
   it('converts contacts to GeoJSON with [lon, lat] coordinates and the id as feature id', () => {
@@ -11,7 +15,7 @@ describe('contacts', () => {
     expect(fc.features).toHaveLength(3);
     expect(fc.features[1].geometry.coordinates).toEqual([107.2, 10.61]);
     expect(fc.features[1].id).toBe(9);
-    expect(fc.features[1].properties).toEqual({ id: 9, dtg: '1966-03-05T08:10:00', fr: 40, frCas: 2, en: 12, enCas: 7 });
+    expect(fc.features[1].properties).toEqual({ id: 9, dtg: '1966-03-05T08:10:00', fr: 40, frCas: 2, en: 12, enCas: 7, frKia: 1, frWia: 1, enKia: 5, enWia: 2 });
   });
 
   it('finds the range of a field, and copes with no data', () => {
@@ -33,6 +37,41 @@ describe('heatWeight', () => {
 
   it('avoids a degenerate scale when every value is equal', () => {
     expect(heatWeight('fr', { min: 5, max: 5 })).toBe(0.5);
+  });
+});
+
+describe('marker sizing', () => {
+  const equalSizes = ['interpolate', ['linear'], ['zoom'], 7, 0.8, 10, 2.5, 12, 5, 14, 8];
+
+  it('reaches the largest size at the 95th percentile of the recorded values, so one huge engagement does not shrink the rest', () => {
+    const values = [...Array.from({ length: 99 }, (_, i) => i + 1), 1000];
+    const all = values.map((enKia, id) => ({ ...contacts[0], id, enKia }));
+    expect(sizeCap(all, 'enKia')).toBe(96);
+  });
+
+  it('ignores contacts with none recorded, and has no cap when nothing is recorded', () => {
+    expect(sizeCap([{ ...contacts[0], frKia: 0 }, { ...contacts[0], frKia: 0 }, { ...contacts[0], frKia: 3 }], 'frKia')).toBe(3);
+    expect(sizeCap([contacts[0]], 'frKia')).toBe(0);
+    expect(sizeCap([], 'fr')).toBe(0);
+  });
+
+  it('draws every marker as it always was when no field is chosen, or the chosen one is never recorded', () => {
+    expect(pointRadius({ field: null, cap: 0 })).toEqual(equalSizes);
+    expect(pointRadius({ field: 'enWia', cap: 0 })).toEqual(equalSizes);
+    expect(selectedRadius({ field: null, cap: 0 })).toEqual(['interpolate', ['linear'], ['zoom'], 6, 6, 14, 14]);
+  });
+
+  it('scales the radius with the square root of the value, from 0.6 for none to 3 at the cap', () => {
+    const scale = ['interpolate', ['linear'], ['sqrt', ['get', 'frKia']], 0, 0.6, 2, 3];
+    const radius = pointRadius({ field: 'frKia', cap: 4 }) as unknown[];
+    expect(radius.slice(0, 5)).toEqual(['interpolate', ['linear'], ['zoom'], 7, ['*', scale, 0.8]]);
+    expect(radius.at(-1)).toEqual(['*', scale, 8]);
+  });
+
+  it('keeps the ring round the open incident outside its scaled marker', () => {
+    const scale = ['interpolate', ['linear'], ['sqrt', ['get', 'fr']], 0, 0.6, 10, 3];
+    const ring = selectedRadius({ field: 'fr', cap: 100 }) as unknown[];
+    expect(ring.at(-1)).toEqual(['max', 14, ['+', ['*', scale, 8], 4]]);
   });
 });
 
@@ -71,7 +110,7 @@ describe('Battlemap', () => {
 
     expect([...basemaps.map.layers]).toEqual(expect.arrayContaining([HEAT_LAYER, POINT_LAYER, SELECTED_LAYER]));
     expect(el.querySelector('.bm__count')?.textContent).toContain('3 contacts');
-    expect([...el.querySelectorAll('input[name=basemap]')]).toHaveLength(2);
+    expect(el.querySelector('app-basemap-picker [role=combobox]')?.textContent).toContain('Terrain');
     expect(el.textContent).toContain('3D terrain');
     expect(el.textContent).toContain('1ATF topo');
   });
@@ -92,8 +131,9 @@ describe('Battlemap', () => {
   it('passes the chosen basemap through to the map', async () => {
     const { el, basemaps, fixture } = await render({});
 
-    const dark = el.querySelectorAll<HTMLInputElement>('input[name=basemap]')[1];
-    dark.dispatchEvent(new Event('change'));
+    el.querySelector<HTMLButtonElement>('app-basemap-picker [role=combobox]')!.click();
+    fixture.detectChanges();
+    [...el.querySelectorAll<HTMLElement>('app-basemap-picker [role=option]')].find((o) => o.textContent?.includes('Dark'))!.click();
     fixture.detectChanges();
 
     expect(basemaps.setBasemap).toHaveBeenCalledWith('dark');
@@ -132,6 +172,53 @@ describe('Battlemap', () => {
 
     expect(el.querySelector('app-incident-panel')).not.toBeNull();
     expect(basemaps.map.setFilter).toHaveBeenCalledWith(SELECTED_LAYER, ['==', ['get', 'id'], 9]);
+  });
+
+  it('scales the markers by the field chosen in the layers panel, and puts the choice in the link', async () => {
+    const { el, basemaps, fixture } = await render({});
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    basemaps.map.setPaintProperty.mockClear();
+
+    const label = [...el.querySelectorAll('label.panel__select')].find((l) => l.textContent?.includes('Marker size'))!;
+    const select = label.querySelector('select')!;
+    expect([...select.options].map((o) => o.textContent?.trim())).toEqual([
+      'The same for every incident',
+      'Size of friendly force',
+      'Friendly force killed',
+      'Friendly force wounded',
+      'Size of enemy force',
+      'Enemy force killed',
+      'Enemy force wounded',
+    ]);
+    select.value = 'enKia';
+    select.dispatchEvent(new Event('change'));
+    await settle(fixture);
+    await wait(450);
+
+    // Enemy killed is 0, 5 and 3 in the fixtures, so the cap is 5.
+    expect(basemaps.map.setPaintProperty).toHaveBeenCalledWith(POINT_LAYER, 'circle-radius', pointRadius({ field: 'enKia', cap: 5 }));
+    expect(basemaps.map.setPaintProperty).toHaveBeenCalledWith(SELECTED_LAYER, 'circle-radius', selectedRadius({ field: 'enKia', cap: 5 }));
+    expect(navigate.mock.calls.at(-1)![1]!.queryParams!['size']).toBe('enKia');
+
+    select.value = 'none';
+    select.dispatchEvent(new Event('change'));
+    await settle(fixture);
+    await wait(450);
+    expect(basemaps.map.setPaintProperty).toHaveBeenLastCalledWith(SELECTED_LAYER, 'circle-radius', selectedRadius({ field: null, cap: 0 }));
+    expect(navigate.mock.calls.at(-1)![1]!.queryParams!['size']).toBeNull();
+  });
+
+  const pointPaint = (r: Awaited<ReturnType<typeof render>>) =>
+    r.basemaps.map.addLayer.mock.calls.map((c) => c[0] as { id: string; paint: Record<string, unknown> }).find((l) => l.id === POINT_LAYER)!.paint;
+
+  it('opens with the marker size from the link', async () => {
+    const r = await render({ inputs: { size: 'frWia' } });
+    expect(pointPaint(r)['circle-radius']).toEqual(pointRadius({ field: 'frWia', cap: 1 }));
+  });
+
+  it('ignores a marker size in the link that it does not know', async () => {
+    const r = await render({ inputs: { size: 'bogus' } });
+    expect(pointPaint(r)['circle-radius']).toEqual(pointRadius({ field: null, cap: 0 }));
   });
 
   it('closes the incident panel and clears the ring', async () => {

@@ -268,25 +268,6 @@ label {
   cursor: pointer;
 }
 
-.panel__step {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-top: 0.4rem;
-}
-
-.panel__step button {
-  width: 2.2rem;
-  padding: 0.1rem 0;
-  border: 1px solid var(--olive-500);
-  background: var(--olive-700);
-  color: var(--paper);
-  font-size: 1.2rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
 .panel__row {
   margin-bottom: 0.6rem;
 }
@@ -296,15 +277,6 @@ label {
   align-items: stretch;
   gap: 0.25rem;
   margin-top: 0.4rem;
-}
-
-select {
-  font: inherit;
-  color: var(--ink);
-  background: var(--paper);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 0.25rem;
 }
 
 :focus-visible {

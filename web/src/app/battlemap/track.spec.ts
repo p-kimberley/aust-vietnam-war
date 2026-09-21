@@ -17,7 +17,7 @@ import {
 } from './track';
 
 const c = (id: number, dtg: string, units: number[], lon = 107 + id / 100, lat = 10 + id / 100): Contact => ({
-  id, dtg, lat, lon, fr: 0, frCas: 0, en: 0, enCas: 0, units, op: 0, task: 0, series: 1, mine: 0,
+  id, dtg, lat, lon, fr: 0, frCas: 0, en: 0, enCas: 0, frKia: 0, frWia: 0, enKia: 0, enWia: 0, units, op: 0, task: 0, series: 1, mine: 0,
 });
 
 const CONTACTS = [

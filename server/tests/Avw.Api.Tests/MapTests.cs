@@ -266,7 +266,8 @@ public class ElasticsearchContactSourceTests
           {"_index":"avw_contacts","_id":"2","_source":{"DTG":"1966-03-03T19:50:00","Location":{"lat":10.5525403933,"lon":107.165297718204},
             "Fr_Force_Present":25,"Total_Fr_Cas":0,"En_Force":5,"Total_En_Cas":0,"Fr_Units":[{"_id":3}]}},
           {"_index":"avw_contacts","_id":"7","_source":{"DTG":"1966-03-04T01:00:00","Location":{"lat":10.6,"lon":107.2},
-            "Fr_Force_Present":40,"Total_Fr_Cas":2,"En_Force":12,"Total_En_Cas":7,"Fr_Units":[{"_id":3},{"_id":4}]}},
+            "Fr_Force_Present":40,"Total_Fr_Cas":2,"En_Force":12,"Total_En_Cas":7,"Fr_KIA":1,"Fr_WIA":1,"En_KIA":5,"En_WIA":2,
+            "Fr_Units":[{"_id":3},{"_id":4}]}},
           {"_index":"avw_contacts","_id":"8","_source":{"DTG":"1966-03-05T01:00:00"}}
         ]}}
         """;
@@ -294,6 +295,18 @@ public class ElasticsearchContactSourceTests
         Assert.Equal(25, contacts[0].Fr);
         Assert.Equal(new[] { 3, 4 }, contacts[1].Units);
         Assert.Equal(7, contacts[1].EnCas);
+        Assert.Equal((1, 1, 5, 2), (contacts[1].FrKia, contacts[1].FrWia, contacts[1].EnKia, contacts[1].EnWia));
+        Assert.Equal((0, 0, 0, 0), (contacts[0].FrKia, contacts[0].FrWia, contacts[0].EnKia, contacts[0].EnWia));
+    }
+
+    [Fact]
+    public async Task Carries_killed_and_wounded_onto_the_compact_list_the_map_loads()
+    {
+        var (source, _) = Create(Response);
+
+        var (summaries, _) = CatalogueBuilder.Build(await source.GetAllAsync(default));
+
+        Assert.Equal((1, 1, 5, 2), (summaries[1].FrKia, summaries[1].FrWia, summaries[1].EnKia, summaries[1].EnWia));
     }
 
     [Fact]
@@ -311,6 +324,7 @@ public class ElasticsearchContactSourceTests
         Assert.Equal(8000, body.RootElement.GetProperty("size").GetInt32());
         var fields = body.RootElement.GetProperty("_source").EnumerateArray().Select(f => f.GetString()).ToArray();
         Assert.Contains("Location", fields);
+        Assert.Subset(fields.ToHashSet(), new HashSet<string?> { "Fr_KIA", "Fr_WIA", "En_KIA", "En_WIA" });
         Assert.DoesNotContain("Description_of_Incident", fields);
     }
 

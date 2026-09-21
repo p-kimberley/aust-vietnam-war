@@ -18,7 +18,7 @@ import {
 } from './timeline';
 
 const DAY = 86_400_000;
-const c = (id: number, dtg: string): Contact => ({ id, dtg, lat: 10, lon: 107, fr: 0, frCas: 0, en: 0, enCas: 0, units: [], op: 0, task: 0, series: 1, mine: 0 });
+const c = (id: number, dtg: string): Contact => ({ id, dtg, lat: 10, lon: 107, fr: 0, frCas: 0, en: 0, enCas: 0, frKia: 0, frWia: 0, enKia: 0, enWia: 0, units: [], op: 0, task: 0, series: 1, mine: 0 });
 
 const CONTACTS = [c(1, '1966-01-05T10:00:00'), c(2, '1966-01-20T10:00:00'), c(3, '1966-04-02T10:00:00'), c(4, '1966-06-30T23:59:00')];
 const MIN = Date.UTC(1966, 0, 1);

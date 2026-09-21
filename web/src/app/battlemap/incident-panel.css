@@ -100,7 +100,78 @@ h3.incident__when {
 
 .incident__units {
   margin: 0;
-  padding-left: 1.1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.incident__units li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0;
+}
+
+.unit__name {
+  min-width: 0;
+}
+
+/* A small button beside the unit's name: it draws the unit's path on the map. */
+.unit__follow {
+  display: inline-grid;
+  flex: none;
+  place-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  color: var(--khaki);
+  background: var(--olive-700);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.unit__follow:hover:not(:disabled) {
+  color: var(--smoke-yellow);
+  border-color: var(--smoke-yellow);
+}
+
+.unit__follow.is-on {
+  color: var(--ink);
+  background: var(--brass);
+  border-color: var(--brass);
+}
+
+.unit__follow:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* The colour of the unit's line on the map. */
+.unit__swatch {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 1px solid var(--olive-900);
+  border-radius: 50%;
+}
+
+.unit__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+.unit__step button {
+  width: 1.6rem;
+  padding: 0.05rem 0;
+  color: var(--paper);
+  font-size: 1.1rem;
+  line-height: 1;
+  background: var(--olive-700);
+  border: 1px solid var(--olive-500);
+  cursor: pointer;
 }
 
 .incident__none {

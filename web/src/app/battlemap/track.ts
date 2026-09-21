@@ -23,6 +23,12 @@ export interface Track {
   stops: Contact[];
 }
 
+/** What the incident panel shows beside a followed unit: the colour of its line, and how many incidents it has. */
+export interface FollowInfo {
+  colour: string;
+  stops: number;
+}
+
 export type TrackProperties = { key: number; colour: string; order?: number; count?: number; end?: 'first' | 'last' | 'middle' };
 
 /**

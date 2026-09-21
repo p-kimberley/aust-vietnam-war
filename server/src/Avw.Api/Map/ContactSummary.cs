@@ -16,6 +16,10 @@ namespace Avw.Api.Map;
 /// <param name="Task">1-based position in <see cref="FilterCatalogue.Tasks"/>; 0 when no task is recorded.</param>
 /// <param name="Series">1-based position in <see cref="FilterCatalogue.Series"/>; 0 when unknown.</param>
 /// <param name="Mine">0 when not recorded, 1 for no mine incident, 2 for a mine incident.</param>
+/// <param name="FrKia">Friendly killed in action, for sizing markers.</param>
+/// <param name="FrWia">Friendly wounded in action.</param>
+/// <param name="EnKia">Enemy killed in action.</param>
+/// <param name="EnWia">Enemy wounded in action.</param>
 public sealed record ContactSummary(
     int Id,
     string Dtg,
@@ -29,4 +33,8 @@ public sealed record ContactSummary(
     int Op = 0,
     int Task = 0,
     int Series = 0,
-    int Mine = 0);
+    int Mine = 0,
+    int FrKia = 0,
+    int FrWia = 0,
+    int EnKia = 0,
+    int EnWia = 0);

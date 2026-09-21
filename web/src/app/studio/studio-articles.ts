@@ -120,7 +120,6 @@ const STATUSES: (ArticleStatus | '')[] = ['', 'Draft', 'InReview', 'Scheduled', 
       flex: 1;
       min-width: 12rem;
     }
-    select,
     input {
       padding: 0.4rem;
       font: inherit;

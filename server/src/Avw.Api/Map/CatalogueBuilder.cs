@@ -14,7 +14,8 @@ public static class CatalogueBuilder
         var contacts = records.Select(c => new ContactSummary(
             c.Id, c.Dtg, c.Lat, c.Lon, c.Fr, c.FrCas, c.En, c.EnCas, c.Units,
             operations.Lookup(c.Operation), tasks.Lookup(c.Task), series.Lookup(c.Series),
-            c.Mine is null ? 0 : c.Mine.Value ? 2 : 1)).ToArray();
+            c.Mine is null ? 0 : c.Mine.Value ? 2 : 1,
+            c.FrKia, c.FrWia, c.EnKia, c.EnWia)).ToArray();
 
         var filters = new FilterCatalogue(
             DateMin: records.Count == 0 ? "" : records.Min(c => DateOf(c.Dtg))!,

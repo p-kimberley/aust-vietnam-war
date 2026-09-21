@@ -13,6 +13,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { DateRange, Timeline } from './analytics/timeline';
+import { BasemapPicker } from './basemap-picker';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
@@ -25,14 +26,27 @@ import { PoiPanel } from './poi-panel';
 import { SearchBox } from './search-box';
 import {
   HEAT_LAYER,
+  MarkerSizing,
   POINT_LAYER,
   addContactLayers,
   setContactVisibility,
   setContacts,
   setHeatField,
+  setMarkerSizing,
   setSelectedContact,
 } from './contact-layers';
-import { Contact, DEFAULT_HEAT_FIELD, HEAT_FIELDS, HeatField, fieldRange, isHeatField } from './contacts';
+import {
+  Contact,
+  DEFAULT_HEAT_FIELD,
+  HEAT_FIELDS,
+  HeatField,
+  SIZE_FIELDS,
+  SizeField,
+  fieldRange,
+  isHeatField,
+  isSizeField,
+  sizeCap,
+} from './contacts';
 import { ContactsService } from './contacts.service';
 import { FilterCatalogue, FilterCatalogueService } from './filter-catalogue';
 import { FiltersPanel, TextStatus } from './filters-panel';
@@ -57,7 +71,7 @@ const SEARCH_DELAY_MS = 400;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, BasemapPicker, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -69,12 +83,14 @@ export class Battlemap {
   readonly basemap = input<string>();
   readonly terrain = input<string>();
   readonly field = input<string>();
+  readonly size = input<string>();
   readonly overlays = input<string>();
   readonly incident = input<string>();
   readonly poi = input<string>();
   readonly picture = input<string>();
   readonly charts = input<string>();
   readonly track = input<string>();
+  readonly follow = input<string>();
   readonly person = input<string>();
 
   private readonly router = inject(Router);
@@ -114,10 +130,13 @@ export class Battlemap {
   protected readonly showMarkers = signal(true);
   protected readonly heatField = signal<HeatField>(DEFAULT_HEAT_FIELD);
   protected readonly heatFields = HEAT_FIELDS;
+  /** What point markers are scaled by; null draws them all the same size. */
+  protected readonly sizeField = signal<SizeField | null>(null);
+  protected readonly sizeFields = SIZE_FIELDS;
   /** The charts drawer, opened from the top bar. */
   protected readonly chartsOpen = signal(false);
-  /** Draws the path of each chosen unit, contact by contact in date order. */
-  protected readonly showTrack = signal(false);
+  /** The units whose paths are drawn, contact by contact in date order. Chosen with the button beside each unit in the incident panel. */
+  protected readonly followed = signal<ReadonlySet<number>>(new Set());
   protected readonly canTerrain = computed(() => !!this.config()?.terrain);
 
   // ---- filters
@@ -140,10 +159,11 @@ export class Battlemap {
   protected readonly activeCount = computed(() => activeKeys(this.filters()).length);
   /** The ids the charts are drawn from: what the map shows. */
   protected readonly visibleIds = computed(() => this.visible().map((c) => c.id));
-  protected readonly tracks = computed<Track[]>(() => (this.showTrack() ? buildTracks(this.visible(), this.filters().units) : []));
-  protected readonly maxTracks = MAX_SEPARATE_TRACKS;
-  /** With exactly one unit followed, its incidents can be stepped through one by one. */
-  protected readonly singleTrack = computed(() => (this.tracks().length === 1 ? this.tracks()[0] : null));
+  protected readonly tracks = computed<Track[]>(() => buildTracks(this.visible(), this.followed()));
+  /** What the incident panel shows beside a followed unit: the colour of its line, and how many incidents it has. */
+  protected readonly followInfo = computed(() => new Map(this.tracks().map((t) => [t.key, { colour: t.colour, stops: t.stops.length }])));
+  /** Paths of more units than this would only tangle, so no more can be followed. */
+  protected readonly followFull = computed(() => this.followed().size >= MAX_SEPARATE_TRACKS);
 
   constructor() {
     afterNextRender(() => void this.start());
@@ -295,6 +315,19 @@ export class Battlemap {
     this.syncUrl();
   }
 
+  /** Marker sizes are absolute: the cap comes from every contact, not just the filtered ones, so a marker does not change size as filters change. */
+  private markerSizing(): MarkerSizing {
+    const field = this.sizeField();
+    return { field, cap: field ? sizeCap(this.allContacts(), field) : 0 };
+  }
+
+  protected setMarkerSize(value: string): void {
+    const field = isSizeField(value) ? value : null;
+    this.sizeField.set(field);
+    if (this.map) setMarkerSizing(this.map, this.markerSizing());
+    this.syncUrl();
+  }
+
   /** The timeline sets the same date filter as the filter panel does. */
   protected setDateRange(range: DateRange): void {
     this.setFilters({ ...this.filters(), from: range.from, to: range.to });
@@ -305,22 +338,46 @@ export class Battlemap {
     this.syncUrl();
   }
 
-  /** Opens the previous or next incident of the followed unit, flying to it. */
-  protected stepTrack(direction: 1 | -1): void {
-    const track = this.singleTrack();
+  /** Follows a unit, or stops following it. */
+  protected toggleFollow(unit: number): void {
+    const next = new Set(this.followed());
+    if (!next.delete(unit)) {
+      if (next.size >= MAX_SEPARATE_TRACKS) {
+        return;
+      }
+      next.add(unit);
+    }
+    this.setFollowed(next);
+  }
+
+  protected stopFollowing(): void {
+    this.setFollowed(new Set());
+  }
+
+  /** The paths show whenever any unit is followed, and only then. */
+  private setFollowed(units: ReadonlySet<number>): void {
+    this.followed.set(units);
+    if (this.map) {
+      setTracks(this.map, this.tracks());
+      setTrackVisibility(this.map, units.size > 0);
+    }
+    this.syncUrl();
+  }
+
+  /** `follow=` lists unit ids. An older link's `track=1` followed whichever units the filters had chosen. */
+  private followedFromLink(): ReadonlySet<number> {
+    const ids = (this.follow() ?? '').split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0);
+    const units = ids.length ? new Set(ids) : this.track() === '1' ? new Set(this.filters().units) : new Set<number>();
+    return units.size <= MAX_SEPARATE_TRACKS ? units : new Set();
+  }
+
+  /** Opens the previous or next incident of a followed unit, flying to it. */
+  protected stepFollowed(unit: number, direction: 1 | -1): void {
+    const track = this.tracks().find((t) => t.key === unit);
     const next = track ? neighbour(track, this.selectedId(), direction) : null;
     if (next) {
       this.openContact(next.id);
     }
-  }
-
-  protected setTrackVisible(visible: boolean): void {
-    this.showTrack.set(visible);
-    if (this.map) {
-      setTracks(this.map, this.tracks());
-      setTrackVisibility(this.map, visible);
-    }
-    this.syncUrl();
   }
 
   /** Applies a change from the filter panel: redraws the map, starts a report search if the text changed, updates the URL. */
@@ -377,11 +434,15 @@ export class Battlemap {
       }
 
       this.chartsOpen.set(this.charts() === '1');
-      this.showTrack.set(this.track() === '1');
+      this.followed.set(this.followedFromLink());
 
       const field = this.field();
       if (field && isHeatField(field)) {
         this.heatField.set(field);
+      }
+      const size = this.size();
+      if (size && isSizeField(size)) {
+        this.sizeField.set(size);
       }
 
       // A shared link may open straight onto an incident. Ignore ids that are not real contacts.
@@ -425,8 +486,9 @@ export class Battlemap {
               heatmap: this.showHeatmap(),
               markers: this.showMarkers(),
               selectedId: this.selectedId(),
+              sizing: this.markerSizing(),
             });
-            addTrackLayers(map, this.tracks(), this.showTrack());
+            addTrackLayers(map, this.tracks(), this.followed().size > 0);
             // Pictures last, so they draw over the contacts.
             addPhotoLayers(map, this.pictures(), { visible: this.showPhotos(), selectedId: this.selectedPictureId() });
             if (firstStyle) {
@@ -525,13 +587,15 @@ export class Battlemap {
           basemap: basemapId && basemapId !== defaultBasemap ? basemapId : null,
           terrain: this.basemaps.terrainEnabled() ? '1' : null,
           field: this.heatField() !== DEFAULT_HEAT_FIELD ? this.heatField() : null,
+          size: this.sizeField(),
           overlays: this.basemaps.overlayIds().join(',') || null,
           incident: this.selectedId(),
           poi: this.selectedPoiId(),
           picture: this.selectedPictureId(),
           person: this.selectedPerson(),
           charts: this.chartsOpen() ? '1' : null,
-          track: this.showTrack() ? '1' : null,
+          track: null,
+          follow: this.followed().size ? [...this.followed()].sort((a, b) => a - b).join(',') : null,
           ...(tree ? toParams(this.filters(), tree) : {}),
         },
         queryParamsHandling: 'merge',

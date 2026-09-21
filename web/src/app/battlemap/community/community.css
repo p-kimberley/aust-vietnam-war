@@ -135,14 +135,17 @@ label {
 }
 
 input,
-textarea,
-select {
+textarea {
   font: inherit;
   padding: 0.3rem 0.4rem;
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--olive-500);
   border-radius: var(--radius);
+  width: 100%;
+}
+
+select {
   width: 100%;
 }
 

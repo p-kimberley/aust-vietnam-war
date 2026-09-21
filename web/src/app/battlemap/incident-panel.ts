@@ -5,6 +5,7 @@ import { NearbyPicture } from './community/community';
 import { PicturesTab } from './community/pictures-tab';
 import { ContactsService } from './contacts.service';
 import { formatDtg } from './contacts';
+import { FollowInfo } from './track';
 
 /**
  * "About this incident": the full record for one contact, loaded when it is selected on the map, with tabs for what the
@@ -26,6 +27,16 @@ export class IncidentPanel {
   readonly openPicture = output<NearbyPicture>();
   /** Opens a person on the honour roll, by service number. */
   readonly openPerson = output<string>();
+  /** The units whose paths are drawn on the map. */
+  readonly following = input<ReadonlySet<number>>(new Set());
+  /** For each followed unit that has a path: its colour and how many incidents it has. */
+  readonly trackInfo = input<ReadonlyMap<number, FollowInfo>>(new Map());
+  /** No more units can be followed. */
+  readonly followFull = input(false);
+  /** Follows a unit, or stops following it. */
+  readonly follow = output<number>();
+  /** Opens the previous or next incident of a followed unit. */
+  readonly step = output<{ unit: number; direction: 1 | -1 }>();
 
   private readonly contacts = inject(ContactsService);
   private readonly heading = viewChild<ElementRef<HTMLElement>>('heading');

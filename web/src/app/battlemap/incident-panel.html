@@ -40,7 +40,33 @@
       @if (d.units.length) {
         <ul class="incident__units">
           @for (u of d.units; track u.id) {
-            <li [attr.title]="u.longName">{{ u.shortName }}</li>
+            <li [attr.title]="u.longName">
+              <span class="unit__name">{{ u.shortName }}</span>
+              <button
+                type="button"
+                class="unit__follow"
+                [class.is-on]="following().has(u.id)"
+                [attr.aria-pressed]="following().has(u.id)"
+                [disabled]="followFull() && !following().has(u.id)"
+                [attr.aria-label]="(following().has(u.id) ? 'Stop following ' : 'Follow ') + u.shortName + ' on the map'"
+                [attr.title]="following().has(u.id) ? 'Stop following on the map' : followFull() ? 'Too many units are followed; stop following one first' : 'Follow on the map'"
+                (click)="follow.emit(u.id)"
+              >
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+                  <path d="M2.5 12.5C5 12.5 5 4 8 6.5S11 3.5 13.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.2 1.6" stroke-linecap="round" />
+                  <circle cx="2.5" cy="12.5" r="1.8" fill="currentColor" />
+                  <circle cx="13.5" cy="3.5" r="1.8" fill="currentColor" />
+                </svg>
+              </button>
+              @if (trackInfo().get(u.id); as t) {
+                <span class="unit__swatch" [style.background]="t.colour" aria-hidden="true"></span>
+                <span class="unit__step" role="group" [attr.aria-label]="'Step through the incidents of ' + u.shortName">
+                  <button type="button" aria-label="Previous incident" (click)="step.emit({ unit: u.id, direction: -1 })">‹</button>
+                  <span class="data">{{ t.stops }}</span>
+                  <button type="button" aria-label="Next incident" (click)="step.emit({ unit: u.id, direction: 1 })">›</button>
+                </span>
+              }
+            </li>
           }
         </ul>
       } @else {

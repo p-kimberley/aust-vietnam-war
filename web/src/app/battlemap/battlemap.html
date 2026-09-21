@@ -7,6 +7,11 @@
     @if (status() === 'ready') {
       <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" (pickPerson)="openPerson($event)" (pickNote)="openNote($event)" (pickPicture)="openPictureAt($event)" />
       <button type="button" class="bm__charts" [attr.aria-pressed]="chartsOpen()" (click)="setChartsOpen(!chartsOpen())">Charts</button>
+      @if (followed().size) {
+        <button type="button" class="bm__charts" (click)="stopFollowing()" [attr.aria-label]="'Stop following ' + followed().size + (followed().size === 1 ? ' unit' : ' units')">
+          Following {{ followed().size }} {{ followed().size === 1 ? 'unit' : 'units' }} ✕
+        </button>
+      }
       <span class="bm__count data">
         @if (activeCount()) {
           {{ visible().length }} of {{ allContacts().length }} contacts
@@ -38,7 +43,7 @@
 
   @if (status() === 'ready' && selectedId(); as id) {
     <div class="bm__incident">
-      <app-incident-panel [contactId]="id" [startTab]="incidentTab()" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
+      <app-incident-panel [contactId]="id" [startTab]="incidentTab()" [following]="followed()" [trackInfo]="followInfo()" [followFull]="followFull()" (follow)="toggleFollow($event)" (step)="stepFollowed($event.unit, $event.direction)" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
     </div>
   } @else if (status() === 'ready' && selectedPerson(); as serviceNumber) {
     <div class="bm__incident">
@@ -106,19 +111,8 @@
       <div id="tabpanel" class="panel__body" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()" [hidden]="!panelOpen()">
         @if (tab() === 'layers') {
           <fieldset>
-            <legend>Basemap</legend>
-            @for (b of cfg.basemaps; track b.id) {
-              <label>
-                <input
-                  type="radio"
-                  name="basemap"
-                  [value]="b.id"
-                  [checked]="basemaps.basemapId() === b.id"
-                  (change)="setBasemap(b.id)"
-                />
-                {{ b.name }}
-              </label>
-            }
+            <legend id="basemap-label">Basemap</legend>
+            <app-basemap-picker labelledBy="basemap-label" [options]="cfg.basemaps" [value]="basemaps.basemapId()" (picked)="setBasemap($event)" />
           </fieldset>
 
           @if (canTerrain()) {
@@ -165,27 +159,6 @@
           }
 
           <fieldset>
-            <legend>Units</legend>
-            <label>
-              <input type="checkbox" [checked]="showTrack()" (change)="setTrackVisible($any($event.target).checked)" />
-              Follow chosen units
-            </label>
-            @if (showTrack()) {
-              @if (!filters().units.size) {
-                <p class="panel__note">Choose a unit in the Filters tab to see where it went.</p>
-              } @else if (filters().units.size > maxTracks) {
-                <p class="panel__note">That is too many units to follow at once. Choose {{ maxTracks }} or fewer, such as one company or platoon.</p>
-              } @else if (singleTrack(); as t) {
-                <div class="panel__step" role="group" aria-label="Step through the unit's incidents">
-                  <button type="button" (click)="stepTrack(-1)" aria-label="Previous incident">‹</button>
-                  <span class="data">{{ t.stops.length }} incidents</span>
-                  <button type="button" (click)="stepTrack(1)" aria-label="Next incident">›</button>
-                </div>
-              }
-            }
-          </fieldset>
-
-          <fieldset>
             <legend>Contacts</legend>
             <label>
               <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
@@ -200,6 +173,15 @@
               <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
                 @for (f of heatFields; track f.value) {
                   <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
+                }
+              </select>
+            </label>
+            <label class="panel__select">
+              Marker size
+              <select [value]="sizeField() ?? 'none'" (change)="setMarkerSize($any($event.target).value)">
+                <option value="none" [selected]="sizeField() === null">The same for every incident</option>
+                @for (f of sizeFields; track f.value) {
+                  <option [value]="f.value" [selected]="sizeField() === f.value">{{ f.name }}</option>
                 }
               </select>
             </label>

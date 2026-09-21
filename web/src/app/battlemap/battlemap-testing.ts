@@ -19,9 +19,9 @@ import { Poi, PoiDetail, PoiService } from './poi';
 /** Fixtures and a harness shared by the Battle Map specs. The map itself is replaced by a recording stand-in. */
 
 export const contacts: Contact[] = [
-  { id: 2, dtg: '1966-03-03T19:50:00', lat: 10.55, lon: 107.16, fr: 25, frCas: 0, en: 5, enCas: 0, units: [3], op: 0, task: 0, series: 1, mine: 0 },
-  { id: 9, dtg: '1966-03-05T08:10:00', lat: 10.61, lon: 107.2, fr: 40, frCas: 2, en: 12, enCas: 7, units: [3, 4], op: 0, task: 0, series: 1, mine: 0 },
-  { id: 11, dtg: '1966-04-01T00:00:00', lat: 10.7, lon: 107.3, fr: 10, frCas: 1, en: 0, enCas: 3, units: [], op: 0, task: 0, series: 1, mine: 0 },
+  { id: 2, dtg: '1966-03-03T19:50:00', lat: 10.55, lon: 107.16, fr: 25, frCas: 0, en: 5, enCas: 0, frKia: 0, frWia: 0, enKia: 0, enWia: 0, units: [3], op: 0, task: 0, series: 1, mine: 0 },
+  { id: 9, dtg: '1966-03-05T08:10:00', lat: 10.61, lon: 107.2, fr: 40, frCas: 2, en: 12, enCas: 7, frKia: 1, frWia: 1, enKia: 5, enWia: 2, units: [3, 4], op: 0, task: 0, series: 1, mine: 0 },
+  { id: 11, dtg: '1966-04-01T00:00:00', lat: 10.7, lon: 107.3, fr: 10, frCas: 1, en: 0, enCas: 3, frKia: 0, frWia: 1, enKia: 3, enWia: 0, units: [], op: 0, task: 0, series: 1, mine: 0 },
 ];
 
 export const detail: ContactDetail = {
@@ -74,6 +74,8 @@ export function fakeMap() {
     addLayer: vi.fn((l: { id: string }) => void layers.add(l.id)),
     setFilter: vi.fn(),
     setPaintProperty: vi.fn(),
+    hasImage: vi.fn(() => false),
+    addImage: vi.fn(),
     setLayoutProperty: vi.fn(),
     getCenter: () => ({ lat: 10.55, lng: 107.17 }),
     getZoom: () => 8,

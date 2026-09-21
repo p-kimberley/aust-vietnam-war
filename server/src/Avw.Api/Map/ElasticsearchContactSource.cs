@@ -18,7 +18,7 @@ public sealed class ElasticsearchContactSource(
     private static readonly string[] Fields =
     [
         "DTG", "Location", "Fr_Force_Present", "Total_Fr_Cas", "En_Force", "Total_En_Cas", "Series", "Operation",
-        "Unit_Task", "Mine_Incid", "Fr_Units",
+        "Unit_Task", "Mine_Incid", "Fr_Units", "Fr_KIA", "Fr_WIA", "En_KIA", "En_WIA",
     ];
 
     public async Task<ContactSet> GetAllAsync(CancellationToken ct)
@@ -68,7 +68,8 @@ public sealed class ElasticsearchContactSource(
                 id, s.Dtg, s.Location.Lat, s.Location.Lon,
                 s.FrForce, s.TotalFrCas, s.EnForce, s.TotalEnCas,
                 involved.Select(u => u.Id).ToArray(),
-                Clean(s.Operation), Clean(s.Task), Clean(s.Series), s.MineIncident is null ? null : s.MineIncident != 0));
+                Clean(s.Operation), Clean(s.Task), Clean(s.Series), s.MineIncident is null ? null : s.MineIncident != 0,
+                s.FrKia, s.FrWia, s.EnKia, s.EnWia));
         }
 
         return new ContactSet(contacts, [.. units.Values]);
@@ -316,7 +317,11 @@ public sealed class ElasticsearchContactSource(
         [property: JsonPropertyName("Operation")] string? Operation,
         [property: JsonPropertyName("Unit_Task")] string? Task,
         [property: JsonPropertyName("Mine_Incid")] int? MineIncident,
-        [property: JsonPropertyName("Fr_Units")] List<UnitDoc>? FrUnits);
+        [property: JsonPropertyName("Fr_Units")] List<UnitDoc>? FrUnits,
+        [property: JsonPropertyName("Fr_KIA")] int FrKia,
+        [property: JsonPropertyName("Fr_WIA")] int FrWia,
+        [property: JsonPropertyName("En_KIA")] int EnKia,
+        [property: JsonPropertyName("En_WIA")] int EnWia);
 
     private sealed record SearchIds(SearchIdHits Hits);
 

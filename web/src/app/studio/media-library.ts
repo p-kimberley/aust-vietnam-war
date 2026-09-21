@@ -107,8 +107,7 @@ import { MediaStatus, MediaView, Paged, StudioApi, problemMessage } from './stud
       gap: 0.2rem;
       font-size: 0.9rem;
     }
-    input,
-    select {
+    input {
       padding: 0.4rem;
       font: inherit;
     }

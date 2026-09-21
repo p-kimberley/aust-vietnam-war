@@ -1,6 +1,7 @@
 import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Feature, FeatureCollection, Point } from 'geojson';
 import type { Map } from 'maplibre-gl';
+import { POI_ICON_BY_TYPE, POI_ICON_OTHER, addPoiIcons } from './poi-icons';
 import { Poi, poiLabel } from './poi';
 
 export const POI_SOURCE = 'avw-pois';
@@ -9,8 +10,6 @@ export const POI_LABELS = 'avw-pois-labels';
 export const POI_SELECTED = 'avw-pois-selected';
 
 // Colours match the style guide tokens in styles.scss; map paint properties cannot read CSS variables.
-const BRASS = '#c99a3b';
-const FRIENDLY_BLUE = '#2f5f86';
 const INK = '#22251a';
 const PAPER = '#efe7cc';
 const SMOKE_YELLOW = '#e3b92e';
@@ -31,26 +30,38 @@ function selectedFilter(id: number | null): ExpressionSpecification {
 
 const visibility = (visible: boolean) => (visible ? 'visible' : 'none');
 
+/** Which icon each point is drawn with, by its type: a triangle for a fire support base, an H for a landing zone, and so on. */
+const ICON_BY_TYPE: ExpressionSpecification = [
+  'match',
+  ['get', 'type'],
+  ...Object.entries(POI_ICON_BY_TYPE).flat(),
+  POI_ICON_OTHER,
+] as unknown as ExpressionSpecification;
+
 /**
- * Adds fire support bases and landing zones as brass markers (blue for landing zones) with names from zoom 11. Called
- * after every style load and before the contact layers, so contacts always draw over these.
+ * Adds fire support bases, landing zones and the other points as icons for their type, with names from zoom 11.
+ * Called after every style load and before the contact layers, so contacts always draw over these.
  */
 export function addPoiLayers(map: Map, pois: readonly Poi[], state: { visible: boolean; selectedId: number | null }): void {
   if (!map.getSource(POI_SOURCE)) {
     map.addSource(POI_SOURCE, { type: 'geojson', data: toPoiGeoJson(pois) });
   }
 
+  // A new style has no images, so they are added each time, ahead of the layer that names them.
+  addPoiIcons(map);
+
   if (!map.getLayer(POI_POINTS)) {
     map.addLayer({
       id: POI_POINTS,
-      type: 'circle',
+      type: 'symbol',
       source: POI_SOURCE,
-      layout: { visibility: visibility(state.visible) },
-      paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 7, 2.5, 11, 5, 15, 8],
-        'circle-color': ['match', ['get', 'type'], 'LZ', FRIENDLY_BLUE, BRASS],
-        'circle-stroke-color': INK,
-        'circle-stroke-width': 1.2,
+      layout: {
+        visibility: visibility(state.visible),
+        'icon-image': ICON_BY_TYPE,
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 7, 0.55, 11, 0.85, 15, 1.15],
+        // Every point is drawn, however close its neighbours, and never pushes the labels or contacts aside.
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
       },
     });
   }
@@ -68,7 +79,7 @@ export function addPoiLayers(map: Map, pois: readonly Poi[], state: { visible: b
         'text-font': ['Noto Sans Bold'],
         'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 15, 13],
         'text-anchor': 'top',
-        'text-offset': [0, 0.9],
+        'text-offset': [0, 1.4],
         'text-optional': true,
       },
       paint: { 'text-color': INK, 'text-halo-color': PAPER, 'text-halo-width': 1.5 },

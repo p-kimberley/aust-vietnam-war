@@ -18,7 +18,11 @@ public sealed record ContactRecord(
     string? Operation,
     string? Task,
     string? Series,
-    bool? Mine);
+    bool? Mine,
+    int FrKia = 0,
+    int FrWia = 0,
+    int EnKia = 0,
+    int EnWia = 0);
 
 /// <summary>Everything the catalogue is built from, read in one request.</summary>
 public sealed record ContactSet(IReadOnlyList<ContactRecord> Contacts, IReadOnlyList<UnitInfo> Units);

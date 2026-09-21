@@ -339,10 +339,12 @@ export function defaultScheduleValue(now = new Date()): string {
       gap: 0.4rem;
     }
     .panel input:not([type='checkbox']),
-    .panel select,
     .panel textarea {
       padding: 0.4rem;
       font: inherit;
+      width: 100%;
+    }
+    .panel select {
       width: 100%;
     }
     .meta {

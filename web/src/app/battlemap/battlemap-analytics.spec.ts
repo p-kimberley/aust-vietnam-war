@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it } from 'vitest';
+import { Router } from '@angular/router';
+import { describe, expect, it, vi } from 'vitest';
 import { REFRESH_DELAY_MS } from './analytics/analytics-panel';
 import { StubEChart } from './analytics/echart-stub';
 import { dayMs } from './analytics/timeline';
-import { render, settle } from './battlemap-testing';
-import { NO_FILTERS } from './filters';
+import { contacts, render, settle } from './battlemap-testing';
 import { CONTACTS } from './filter-fixtures';
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -102,76 +102,100 @@ describe('Battle Map unit tracks', () => {
     (r.basemaps.map.dataFor('avw-tracks').mock.calls.at(-1)?.[0] ?? (r.basemaps.map.addSource.mock.calls.find(([id]) => id === 'avw-tracks')?.[1] as { data: unknown } | undefined)?.data) as
       | { features: { geometry: { type: string } }[] }
       | undefined;
-  /** The Layers tab, which is not the one showing when a filter is set from the link. */
-  const layers = (r: Rendered) => r.el.querySelector<HTMLButtonElement>('#tab-layers')!.click();
-  const followBox = (r: Rendered) => [...r.el.querySelectorAll<HTMLLabelElement>('fieldset label')].find((l) => l.textContent?.includes('Follow chosen units'))!.querySelector('input')!;
+  const stops = (r: Rendered) => trackData(r)!.features.filter((f) => f.geometry.type === 'Point').length;
+  /** The small button beside the unit's name in the incident panel; the fixture incident involves unit 3, "1 Pl, A Coy". */
+  const followButton = (r: Rendered) => r.el.querySelector<HTMLButtonElement>('.unit__follow')!;
+  const chip = (r: Rendered) => [...r.el.querySelectorAll<HTMLButtonElement>('.bm__bar button')].find((b) => b.textContent?.includes('Following'));
 
-  it('starts off, with the track layers ready but hidden', async () => {
-    const r = await render({ contacts: CONTACTS, queryParams: { units: '3233' } });
-    layers(r);
-    await settle(r.fixture);
+  it('starts with nothing followed: the layers are ready but hidden, and the layer list has no unit switch', async () => {
+    const r = await render({});
 
-    expect(followBox(r).checked).toBe(false);
+    expect(r.el.querySelector('#tabpanel')!.textContent).not.toContain('Follow chosen units');
+    expect([...r.el.querySelectorAll('legend')].map((l) => l.textContent)).not.toContain('Units');
+    expect(chip(r)).toBeUndefined();
     expect(r.basemaps.map.layers.has('avw-tracks-line')).toBe(true);
     expect(r.basemaps.map.addLayer.mock.calls.filter(([l]) => (l as { id: string }).id.startsWith('avw-tracks')).every(([l]) => (l as unknown as { layout: { visibility: string } }).layout.visibility === 'none')).toBe(true);
   });
 
-  it('draws a path through the chosen unit\'s contacts when switched on, and hides it when switched off', async () => {
-    const r = await render({ contacts: CONTACTS, queryParams: { units: '3233' } });
-    layers(r);
+  it('follows a unit from the button beside its name in the incident panel, and stops when pressed again', async () => {
+    const r = await render({ inputs: { incident: '2' } });
+    await settle(r.fixture);
+    expect(followButton(r).getAttribute('aria-label')).toBe('Follow 1 Pl, A Coy on the map');
+    expect(followButton(r).getAttribute('aria-pressed')).toBe('false');
+
+    followButton(r).click();
     await settle(r.fixture);
 
-    followBox(r).checked = true;
-    followBox(r).dispatchEvent(new Event('change'));
-    await settle(r.fixture);
-
-    expect(trackData(r)!.features.map((f) => f.geometry.type)).toContain('Point');
+    expect(stops(r)).toBe(2);                       // contacts 2 and 9 involve the unit
     expect(r.basemaps.map.setLayoutProperty).toHaveBeenCalledWith('avw-tracks-line', 'visibility', 'visible');
+    expect(followButton(r).getAttribute('aria-pressed')).toBe('true');
+    expect(followButton(r).getAttribute('aria-label')).toBe('Stop following 1 Pl, A Coy on the map');
+    expect(chip(r)!.textContent).toContain('Following 1 unit');
 
-    followBox(r).checked = false;
-    followBox(r).dispatchEvent(new Event('change'));
+    followButton(r).click();
     await settle(r.fixture);
+
     expect(trackData(r)!.features).toEqual([]);
     expect(r.basemaps.map.setLayoutProperty).toHaveBeenLastCalledWith('avw-tracks-stops', 'visibility', 'none');
+    expect(chip(r)).toBeUndefined();
   });
 
-  it('tells the reader to choose a unit when none is chosen', async () => {
-    const r = await render({ contacts: CONTACTS, inputs: { track: '1' } });
+  it('shows the colour of the line and the number of incidents beside a followed unit, and steps through them', async () => {
+    const r = await render({ inputs: { incident: '2', follow: '3' } });
+    await settle(r.fixture);
 
-    expect(r.el.textContent).toContain('Choose a unit in the Filters tab');
+    expect(r.el.querySelector('.unit__swatch')).not.toBeNull();
+    expect(r.el.querySelector('.unit__step')!.textContent).toContain('2');
+
+    r.el.querySelector<HTMLButtonElement>('.unit__step [aria-label="Next incident"]')!.click();
+    await settle(r.fixture);
+
+    expect(r.basemaps.flyTo).toHaveBeenCalledWith(contacts[1].lat, contacts[1].lon, expect.anything());     // contact 9 follows contact 2
   });
 
-  it('tells the reader when too many units are chosen to follow, and draws nothing', async () => {
-    const r = await render({ contacts: CONTACTS, inputs: { track: '1' } });
+  it('opens with the units in the link followed, and writes them back into the link', async () => {
+    const r = await render({ inputs: { follow: '3' } });
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 
-    (r.fixture.componentInstance as unknown as { setFilters(f: unknown): void }).setFilters({ ...NO_FILTERS, units: new Set([3310, 3259, 3234, 15838, 15839, 3233, 1]) });
+    expect(stops(r)).toBe(2);
+    expect(chip(r)!.textContent).toContain('Following 1 unit');
+
+    chip(r)!.click();
     await settle(r.fixture);
+    await wait(450);
 
-    expect(r.el.textContent).toContain('too many units to follow at once');
-    expect(trackData(r)!.features).toEqual([]);
+    expect(stops(r)).toBe(0);
+    expect(navigate.mock.calls.at(-1)![1]!.queryParams).toMatchObject({ follow: null, track: null });
   });
 
-  it('steps through the incidents of one followed unit, opening each in turn', async () => {
-    const r = await render({ contacts: CONTACTS, queryParams: { units: '3259!' }, inputs: { track: '1' } });      // unit 3259 alone: contact 2
-    layers(r);
-    await settle(r.fixture);
-    expect(r.el.querySelector('.panel__step')?.textContent).toContain('1 incidents');
+  it('still follows, for an older link with track=1, the units the filters chose', async () => {
+    const r = await render({ contacts: CONTACTS, queryParams: { units: '3233' }, inputs: { track: '1' } });
 
-    r.el.querySelector<HTMLButtonElement>('[aria-label="Next incident"]')!.click();
+    expect(stops(r)).toBeGreaterThan(0);
+    expect(chip(r)!.textContent).toContain('Following 4 units');    // unit 3233 and the three beneath it
+  });
+
+  it('follows no more units than can be drawn, and greys out the button for another', async () => {
+    const tooMany = await render({ inputs: { follow: '1,2,3,4,5,6,7' } });
+    expect(chip(tooMany)).toBeUndefined();
+    expect(trackData(tooMany)!.features).toEqual([]);
+  });
+
+  it('disables the button for a unit that would be a seventh', async () => {
+    const r = await render({ inputs: { incident: '2', follow: '10,11,12,13,14,15' } });
     await settle(r.fixture);
 
-    expect(r.el.querySelector('app-incident-panel')).not.toBeNull();
-    expect(r.basemaps.flyTo).toHaveBeenCalledWith(CONTACTS[1].lat, CONTACTS[1].lon, expect.anything());
+    expect(followButton(r).disabled).toBe(true);
+    expect(followButton(r).getAttribute('title')).toContain('Too many units');
   });
 
   it('follows the filters: the path changes as the contacts shown change', async () => {
-    const r = await render({ contacts: CONTACTS, queryParams: { units: '3233' }, inputs: { track: '1' } });
-    const stops = () => trackData(r)!.features.filter((f) => f.geometry.type === 'Point').length;
-    const before = stops();
+    const r = await render({ inputs: { follow: '3' } });
+    const before = stops(r);
 
     timelineChart(r).zoomed.emit({ start: dayMs('1966-03-01'), end: dayMs('1966-03-04') });
     await settle(r.fixture);
 
-    expect(before).toBeGreaterThan(stops());
+    expect(before).toBeGreaterThan(stops(r));
   });
 });

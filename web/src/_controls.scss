@@ -1,0 +1,211 @@
+/*
+ * Native controls in the vintage skin: checkboxes, radio buttons, drop-downs, the file button and scrollbars. They stay
+ * the browser's own elements, so keyboard use, screen readers, autofill and form submission are untouched; only how they
+ * look changes, from the design tokens in styles.scss (the mockups' style guide: field fill, olive edge, brass hardware).
+ *
+ * The site is paper and the map is dark olive, so the colours are variables. `:root` holds the paper set and the map
+ * overrides it below; a control picks up whichever set its surroundings define.
+ */
+:root {
+  color-scheme: light;
+
+  --control-size: 1.125rem;
+  --control-edge: var(--olive-500);
+  --control-edge-hover: var(--olive-900);
+  --control-on: var(--olive-500);
+  --control-mark: var(--paper);
+
+  --scroll-track: color-mix(in srgb, var(--khaki) 65%, var(--paper));
+  --scroll-thumb: var(--olive-500);
+}
+
+/* The map's panels, and code blocks, are dark olive: brass hardware on olive, as in the style guide. */
+.bm,
+.prose pre {
+  --control-edge-hover: var(--smoke-yellow);
+  --control-on: var(--brass);
+  --control-mark: var(--ink);
+
+  --scroll-track: var(--olive-900);
+  --scroll-thumb: var(--brass);
+}
+
+/* ---- checkboxes and radio buttons ---- */
+
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: none;
+  flex: none;
+  display: inline-grid;
+  place-content: center;
+  width: var(--control-size);
+  height: var(--control-size);
+  margin: 0;
+  vertical-align: middle;
+  background: var(--field);
+  border: 2px solid var(--control-edge);
+  cursor: pointer;
+  transition:
+    background-color 0.12s,
+    border-color 0.12s;
+}
+
+input[type='checkbox'] {
+  border-radius: 2px;
+}
+
+input[type='radio'] {
+  border-radius: 50%;
+}
+
+input[type='checkbox']:hover:not(:disabled),
+input[type='radio']:hover:not(:disabled) {
+  border-color: var(--control-edge-hover);
+}
+
+input[type='checkbox']:is(:checked, :indeterminate),
+input[type='radio']:checked {
+  background: var(--control-on);
+  border-color: var(--control-on);
+}
+
+input[type='checkbox']:disabled,
+input[type='radio']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* The tick, the dash for "some of these", and the dot; each is drawn with borders and grows in when switched on. */
+input[type='checkbox']::before,
+input[type='radio']::before {
+  content: '';
+  transform: scale(0);
+  transition: transform 0.12s;
+}
+
+input[type='checkbox']::before {
+  width: 0.62rem;
+  height: 0.32rem;
+  margin-top: -0.1rem;
+  border: solid var(--control-mark);
+  border-width: 0 0 0.16rem 0.16rem;
+  transform: rotate(-45deg) scale(0);
+}
+
+input[type='checkbox']:checked::before {
+  transform: rotate(-45deg) scale(1);
+}
+
+input[type='checkbox']:indeterminate::before {
+  width: 0.6rem;
+  height: 0;
+  margin-top: 0;
+  border-width: 0 0 0.16rem;
+  transform: scale(1);
+}
+
+input[type='radio']::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--control-mark);
+  border-radius: 50%;
+}
+
+input[type='radio']:checked::before {
+  transform: scale(1);
+}
+
+/* ---- drop-downs ---- */
+
+select {
+  appearance: none;
+  min-height: 2.25rem;
+  padding: 0.35rem 2rem 0.35rem 0.6rem;
+  color: var(--ink);
+  font: inherit;
+  background-color: var(--field);
+  /* Two triangles that meet to make the arrow; they take the text colour, so it suits paper and olive alike. */
+  background-image: linear-gradient(45deg, transparent 50%, currentcolor 50%), linear-gradient(135deg, currentcolor 50%, transparent 50%);
+  background-position:
+    calc(100% - 1rem) 50%,
+    calc(100% - 0.65rem) 50%;
+  background-size: 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+  border: 1px solid var(--control-edge);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+select:hover:not(:disabled) {
+  border-color: var(--control-edge-hover);
+}
+
+select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* A list box has no arrow to make room for. */
+select:is([multiple], [size]:not([size='1'])) {
+  padding-right: 0.6rem;
+  background-image: none;
+  cursor: default;
+}
+
+/* The open list is the browser's own, but takes these colours where it lets a page choose them. */
+option,
+optgroup {
+  color: var(--ink);
+  background: var(--surface-raised);
+}
+
+/* ---- the file button ---- */
+
+input[type='file']::file-selector-button {
+  margin-inline-end: 0.75rem;
+  padding: 0.3rem 0.8rem;
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--olive-700);
+  border: 1px solid var(--olive-900);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+input[type='file']:hover::file-selector-button {
+  background: var(--olive-500);
+}
+
+/* ---- scrollbars ---- */
+
+/*
+ * The standard properties, which every current browser supports: a thin bar with an olive slider on a khaki track, or a
+ * brass one on olive where the surroundings are dark. They are set on every element rather than inherited, so each
+ * scrolling area works out its own colours from the variables above. (Drawing the bar with the ::-webkit-scrollbar
+ * pseudo-elements gave a ruled track, but Chrome left those bars unpainted in some panels, so that is not used.)
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+/* Windows high-contrast and similar modes replace colours; the system's own controls are the ones people chose there. */
+@media (forced-colors: active) {
+  input[type='checkbox'],
+  input[type='radio'],
+  select {
+    appearance: auto;
+  }
+
+  input[type='checkbox']::before,
+  input[type='radio']::before {
+    display: none;
+  }
+
+  select {
+    background-image: none;
+  }
+}

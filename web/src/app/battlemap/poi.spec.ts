@@ -5,6 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { describe, expect, it, vi } from 'vitest';
 import { POIS, poiDetail, render, settle } from './battlemap-testing';
 import { Poi, PoiService, poiLabel, typeName } from './poi';
+import { POI_ICON_IDS } from './poi-icons';
 import { POI_LABELS, POI_POINTS, POI_SELECTED, POI_SOURCE, addPoiLayers, setPoiVisibility, setSelectedPoi, toPoiGeoJson } from './poi-layers';
 import { PoiPanel } from './poi-panel';
 
@@ -83,9 +84,13 @@ describe('POI layers', () => {
   function fake() {
     const sources = new Set<string>();
     const layers = new Map<string, Record<string, unknown>>();
+    const images = new Set<string>();
     return {
       sources,
       layers,
+      images,
+      hasImage: (id: string) => images.has(id),
+      addImage: vi.fn((id: string, _image?: unknown, _options?: unknown) => void images.add(id)),
       getSource: (id: string) => (sources.has(id) ? {} : undefined),
       getLayer: (id: string) => layers.get(id),
       addSource: vi.fn((id: string) => void sources.add(id)),
@@ -104,6 +109,84 @@ describe('POI layers', () => {
     expect(map.addSource).toHaveBeenCalledTimes(1);
     expect(map.addSource.mock.calls[0][0]).toBe(POI_SOURCE);
     expect([...map.layers.keys()]).toEqual([POI_POINTS, POI_LABELS, POI_SELECTED]);
+  });
+
+  it('draws each type of point with its own icon, and anything else as a flag', () => {
+    const map = fake();
+    addPoiLayers(map as never, POIS, { visible: true, selectedId: null });
+
+    const layer = map.layers.get(POI_POINTS)!;
+    expect(layer['type']).toBe('symbol');
+    const icon = (layer['layout'] as Record<string, unknown[]>)['icon-image'];
+    expect(icon).toEqual([
+      'match',
+      ['get', 'type'],
+      'FSB',
+      'avw-poi-fsb',
+      'FSPB',
+      'avw-poi-fspb',
+      'LZ',
+      'avw-poi-lz',
+      'Base',
+      'avw-poi-base',
+      'avw-poi-other',
+    ]);
+    // Every icon the layer can ask for is one that gets registered.
+    expect(icon.filter((v) => typeof v === 'string' && v.startsWith('avw-poi-'))).toEqual(expect.arrayContaining([...POI_ICON_IDS]));
+  });
+
+  describe('icons', () => {
+    // jsdom has no canvas, so a stand-in that accepts every drawing call and hands back a blank image.
+    const canvasContext = new Proxy({}, { get: (_t, name) => (name === 'getImageData' ? () => ({ width: 48, height: 48, data: new Uint8ClampedArray(48 * 48 * 4) }) : vi.fn()), set: () => true });
+
+    function withCanvas(run: () => void): void {
+      vi.stubGlobal('Path2D', class { constructor(_path?: string) {} rect() {} arc() {} });
+      const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+      try {
+        run();
+      } finally {
+        getContext.mockRestore();
+        vi.unstubAllGlobals();
+      }
+    }
+
+    it('registers one image for each icon before the layer that uses them, at twice the density', () => {
+      withCanvas(() => {
+        const map = fake();
+        addPoiLayers(map as never, POIS, { visible: true, selectedId: null });
+
+        expect(map.addImage.mock.calls.map((c) => c[0])).toEqual(POI_ICON_IDS);
+        expect(map.addImage.mock.calls.every((c) => (c[2] as { pixelRatio: number }).pixelRatio === 2)).toBe(true);
+        expect(map.addImage.mock.invocationCallOrder[0]).toBeLessThan(map.addLayer.mock.invocationCallOrder[0]);
+      });
+    });
+
+    it('leaves images that are already there, and adds them again to a new style', () => {
+      withCanvas(() => {
+        const map = fake();
+        addPoiLayers(map as never, POIS, { visible: true, selectedId: null });
+        map.layers.clear();
+        addPoiLayers(map as never, POIS, { visible: true, selectedId: null });
+        expect(map.addImage).toHaveBeenCalledTimes(POI_ICON_IDS.length);
+
+        // Switching basemap discards the images along with the style.
+        map.images.clear();
+        map.layers.clear();
+        addPoiLayers(map as never, POIS, { visible: true, selectedId: null });
+        expect(map.addImage).toHaveBeenCalledTimes(POI_ICON_IDS.length * 2);
+      });
+    });
+
+    it('carries on without icons where there is no canvas', () => {
+      vi.stubGlobal('Path2D', undefined);
+      try {
+        const map = fake();
+        expect(() => addPoiLayers(map as never, POIS, { visible: true, selectedId: null })).not.toThrow();
+        expect(map.addImage).not.toHaveBeenCalled();
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
   });
 
   it('starts hidden when the layer is off, and rings the selected point only while shown', () => {

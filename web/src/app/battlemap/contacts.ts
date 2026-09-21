@@ -15,6 +15,14 @@ export interface Contact {
   en: number;
   /** Total enemy casualties. */
   enCas: number;
+  /** Friendly killed in action. */
+  frKia: number;
+  /** Friendly wounded in action. */
+  frWia: number;
+  /** Enemy killed in action. */
+  enKia: number;
+  /** Enemy wounded in action. */
+  enWia: number;
   /** Ids of the friendly units involved. */
   units: number[];
   /** 1-based position in the catalogue's operations; 0 when none is recorded. */
@@ -73,6 +81,31 @@ export function isHeatField(value: unknown): value is HeatField {
   return HEAT_FIELDS.some((f) => f.value === value);
 }
 
+/** What a point marker can be scaled by. Unlike the heatmap's fields these include killed and wounded. */
+export type SizeField = 'fr' | 'frKia' | 'frWia' | 'en' | 'enKia' | 'enWia';
+
+export const SIZE_FIELDS: readonly { value: SizeField; name: string }[] = [
+  { value: 'fr', name: 'Size of friendly force' },
+  { value: 'frKia', name: 'Friendly force killed' },
+  { value: 'frWia', name: 'Friendly force wounded' },
+  { value: 'en', name: 'Size of enemy force' },
+  { value: 'enKia', name: 'Enemy force killed' },
+  { value: 'enWia', name: 'Enemy force wounded' },
+];
+
+export function isSizeField(value: unknown): value is SizeField {
+  return SIZE_FIELDS.some((f) => f.value === value);
+}
+
+/**
+ * The value at which a marker reaches its largest size: the 95th percentile of the non-zero values, so that a few
+ * very large engagements do not shrink every other marker to a dot. 0 when the field is never recorded.
+ */
+export function sizeCap(contacts: readonly Contact[], field: SizeField): number {
+  const values = contacts.map((c) => c[field]).filter((v) => v > 0).sort((a, b) => a - b);
+  return values.length === 0 ? 0 : values[Math.min(values.length - 1, Math.floor(values.length * 0.95))];
+}
+
 export interface Range {
   min: number;
   max: number;
@@ -93,7 +126,7 @@ export function fieldRange(contacts: readonly Contact[], field: HeatField): Rang
   return { min, max };
 }
 
-export type ContactProperties = Pick<Contact, 'id' | 'dtg' | 'fr' | 'frCas' | 'en' | 'enCas'>;
+export type ContactProperties = Pick<Contact, 'id' | 'dtg' | 'fr' | 'frCas' | 'en' | 'enCas' | 'frKia' | 'frWia' | 'enKia' | 'enWia'>;
 
 /** GeoJSON is what the map library consumes; the id doubles as the feature id so clicks can be traced back. */
 export function toGeoJson(contacts: readonly Contact[]): FeatureCollection<Point, ContactProperties> {
@@ -101,7 +134,18 @@ export function toGeoJson(contacts: readonly Contact[]): FeatureCollection<Point
     type: 'Feature',
     id: c.id,
     geometry: { type: 'Point', coordinates: [c.lon, c.lat] },
-    properties: { id: c.id, dtg: c.dtg, fr: c.fr, frCas: c.frCas, en: c.en, enCas: c.enCas },
+    properties: {
+      id: c.id,
+      dtg: c.dtg,
+      fr: c.fr,
+      frCas: c.frCas,
+      en: c.en,
+      enCas: c.enCas,
+      frKia: c.frKia,
+      frWia: c.frWia,
+      enKia: c.enKia,
+      enWia: c.enWia,
+    },
   }));
   return { type: 'FeatureCollection', features };
 }

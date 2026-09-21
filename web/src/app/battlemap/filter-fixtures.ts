@@ -36,7 +36,7 @@ export const CATALOGUE: FilterCatalogue = {
 };
 
 function contact(c: Partial<Contact> & Pick<Contact, 'id' | 'dtg'>): Contact {
-  return { lat: 10.5, lon: 107.1, fr: 0, frCas: 0, en: 0, enCas: 0, units: [], op: 0, task: 0, series: 1, mine: 0, ...c };
+  return { lat: 10.5, lon: 107.1, fr: 0, frCas: 0, en: 0, enCas: 0, frKia: 0, frWia: 0, enKia: 0, enWia: 0, units: [], op: 0, task: 0, series: 1, mine: 0, ...c };
 }
 
 export const CONTACTS: Contact[] = [

@@ -164,11 +164,8 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
       color: var(--khaki);
     }
     select {
-      padding: 0.4rem;
-      font: inherit;
-      background: var(--olive-700);
+      background-color: var(--olive-700);
       color: var(--paper);
-      border: 1px solid var(--olive-500);
     }
     .ap__about,
     .ap__note {
