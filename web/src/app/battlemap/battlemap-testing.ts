@@ -9,6 +9,10 @@ import { communityProviders, fakeAuth, fakeCommunity } from './community/communi
 import { Timeline } from './analytics/timeline';
 import { BasemapService, MapHooks } from './basemap.service';
 import { Battlemap } from './battlemap';
+import { MapSelectionService } from './map-selection.service';
+import { MapViewStateService } from './map-view-state.service';
+import { ContactFilteringService } from './contact-filtering.service';
+import { UnitFollowService } from './unit-follow.service';
 import { Contact, ContactDetail } from './contacts';
 import { ContactsService } from './contacts.service';
 import { CATALOGUE } from './filter-fixtures';
@@ -192,7 +196,11 @@ export async function render(opts: RenderOptions = {}) {
   TestBed.configureTestingModule({ providers: [{ provide: AnalyticsService, useValue: analytics }, ...communityProviders(community, auth)] });
   stubEchartIn(Timeline);
   stubEchartIn(AnalyticsPanel);
-  TestBed.overrideComponent(Battlemap, { set: { providers: [{ provide: BasemapService, useValue: basemaps }] } });
+  TestBed.overrideComponent(Battlemap, {
+    set: {
+      providers: [{ provide: BasemapService, useValue: basemaps }, MapSelectionService, MapViewStateService, UnitFollowService, ContactFilteringService],
+    },
+  });
   const fixture = TestBed.createComponent(Battlemap);
   for (const [k, v] of Object.entries(opts.inputs ?? {})) {
     fixture.componentRef.setInput(k, v);

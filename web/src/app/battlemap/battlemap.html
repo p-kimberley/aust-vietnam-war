@@ -6,9 +6,9 @@
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
       <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" (pickPerson)="openPerson($event)" (pickNote)="openNote($event)" (pickPicture)="openPictureAt($event)" />
-      @if (followed().size) {
-        <button type="button" class="bm__charts" (click)="stopFollowing()" [attr.aria-label]="'Stop following ' + followed().size + (followed().size === 1 ? ' unit' : ' units')">
-          Following {{ followed().size }} {{ followed().size === 1 ? 'unit' : 'units' }} ✕
+      @if (followUnits.followed().size) {
+        <button type="button" class="bm__charts" (click)="stopFollowing()" [attr.aria-label]="'Stop following ' + followUnits.followed().size + (followUnits.followed().size === 1 ? ' unit' : ' units')">
+          Following {{ followUnits.followed().size }} {{ followUnits.followed().size === 1 ? 'unit' : 'units' }} ✕
         </button>
       }
     }
@@ -24,13 +24,13 @@
   @if (status() === 'ready') {
     <div class="bm__timeline">
       <app-timeline
-        [all]="allContacts()"
-        [visible]="visible()"
-        [from]="filters().from"
-        [to]="filters().to"
-        [operations]="catalogue()?.operations ?? []"
-        [scope]="operationScope()"
-        [selectedOperations]="filters().operations"
+        [all]="contactFilter.allContacts()"
+        [visible]="contactFilter.visible()"
+        [from]="contactFilter.filters().from"
+        [to]="contactFilter.filters().to"
+        [operations]="contactFilter.catalogue()?.operations ?? []"
+        [scope]="contactFilter.operationScope()"
+        [selectedOperations]="contactFilter.filters().operations"
         [focus]="timelineFocus()"
         [(expanded)]="timelineOpen"
         [(playing)]="timelinePlaying"
@@ -55,7 +55,7 @@
     >
       @switch (flyoutShown()) {
         @case ('charts') {
-          <app-analytics-panel [ids]="visibleIds()" [filtered]="activeCount() > 0" (closed)="setFlyout(null)" />
+          <app-analytics-panel [ids]="contactFilter.visibleIds()" [filtered]="contactFilter.activeCount() > 0" (closed)="setFlyout(null)" />
         }
         @case ('roll') {
           <app-nominal-roll (closed)="setFlyout(null)" (openIncident)="openContact($event)" />
@@ -64,19 +64,19 @@
     </div>
   }
 
-  @if (status() === 'ready' && selectedId(); as id) {
+  @if (status() === 'ready' && selection.selectedId(); as id) {
     <div class="bm__incident">
-      <app-incident-panel [contactId]="id" [startTab]="incidentTab()" [following]="followed()" [trackInfo]="followInfo()" [followFull]="followFull()" (follow)="toggleFollow($event)" (step)="stepFollowed($event.unit, $event.direction)" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
+      <app-incident-panel [contactId]="id" [startTab]="selection.incidentTab()" [following]="followUnits.followed()" [trackInfo]="followInfo()" [followFull]="followUnits.full()" (follow)="toggleFollow($event)" (step)="stepFollowed($event.unit, $event.direction)" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
     </div>
-  } @else if (status() === 'ready' && selectedPerson(); as serviceNumber) {
+  } @else if (status() === 'ready' && selection.selectedPerson(); as serviceNumber) {
     <div class="bm__incident">
       <app-honour-panel [serviceNumber]="serviceNumber" (closed)="openPerson(null)" (openIncident)="openContact($event)" />
     </div>
-  } @else if (status() === 'ready' && selectedPoiId(); as poiId) {
+  } @else if (status() === 'ready' && selection.selectedPoiId(); as poiId) {
     <div class="bm__incident">
       <app-poi-panel [poiId]="poiId" (closed)="selectPoi(null)" />
     </div>
-  } @else if (status() === 'ready' && selectedPictureId(); as pictureId) {
+  } @else if (status() === 'ready' && selection.selectedPictureId(); as pictureId) {
     <div class="bm__incident">
       <app-picture-panel [pictureId]="pictureId" (closed)="selectPicture(null)" (openIncident)="openContact($event)" />
     </div>
@@ -116,8 +116,8 @@
                 (click)="showTab('filters')"
               >
                 Filters
-                @if (activeCount()) {
-                  <span class="badge" aria-label="{{ activeCount() }} active">{{ activeCount() }}</span>
+                @if (contactFilter.activeCount()) {
+                  <span class="badge" aria-label="{{ contactFilter.activeCount() }} active">{{ contactFilter.activeCount() }}</span>
                 }
               </button>
             </div>
@@ -211,16 +211,16 @@
                 </label>
               </fieldset>
             } @else {
-              @if (catalogue(); as cat) {
-                @if (tree(); as unitTree) {
+              @if (contactFilter.catalogue(); as cat) {
+                @if (contactFilter.tree(); as unitTree) {
                   <app-filters-panel
-                    [state]="filters()"
+                    [state]="contactFilter.filters()"
                     [catalogue]="cat"
                     [tree]="unitTree"
-                    [unitCounts]="unitCounts()"
-                    [shown]="visible().length"
-                    [total]="allContacts().length"
-                    [textStatus]="textStatus()"
+                    [unitCounts]="contactFilter.unitCounts()"
+                    [shown]="contactFilter.visible().length"
+                    [total]="contactFilter.allContacts().length"
+                    [textStatus]="contactFilter.textStatus()"
                     (changed)="setFilters($event)"
                   />
                 }
@@ -239,7 +239,7 @@
           [heatField]="heatFieldName()"
           [poiTypes]="legendPoiTypes()"
           [showPhotos]="showPhotos() && pictures().length > 0"
-          [following]="followed().size > 0"
+          [following]="followUnits.followed().size > 0"
         />
       </div>
     </div>

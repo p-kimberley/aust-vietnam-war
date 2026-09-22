@@ -60,6 +60,16 @@ export function neighbour(track: Track, currentId: number | null, direction: 1 |
   return track.stops[Math.min(Math.max(at + direction, 0), track.stops.length - 1)];
 }
 
+/**
+ * Which units a link asks to follow: `follow=` lists unit ids. An older link's `track=1` followed whichever units the filters
+ * had chosen. More than {@link MAX_SEPARATE_TRACKS} follows nothing, since that many paths would only tangle.
+ */
+export function followedFromLink(follow: string | undefined, track: string | undefined, filterUnits: ReadonlySet<number>): ReadonlySet<number> {
+  const ids = (follow ?? '').split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0);
+  const units = ids.length ? new Set(ids) : track === '1' ? new Set(filterUnits) : new Set<number>();
+  return units.size <= MAX_SEPARATE_TRACKS ? units : new Set();
+}
+
 /** Contacts at exactly the same place add nothing to a line, so runs of them are drawn once. */
 function distinctPlaces(stops: readonly Contact[]): Contact[] {
   return stops.filter((c, i) => i === 0 || c.lon !== stops[i - 1].lon || c.lat !== stops[i - 1].lat);

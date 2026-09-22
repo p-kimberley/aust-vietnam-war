@@ -11,6 +11,7 @@ import {
   TRACK_STOPS,
   addTrackLayers,
   buildTracks,
+  followedFromLink,
   setTrackVisibility,
   setTracks,
   toTrackGeoJson,
@@ -112,6 +113,31 @@ describe('toTrackGeoJson', () => {
 
   it('is empty for no tracks', () => {
     expect(toTrackGeoJson([]).features).toEqual([]);
+  });
+});
+
+describe('followedFromLink', () => {
+  it('follows the units named in follow=, ignoring anything that is not a positive whole number', () => {
+    expect(followedFromLink('3,1', undefined, new Set())).toEqual(new Set([3, 1]));
+    expect(followedFromLink('3,abc,-1,0,2.5,1', undefined, new Set())).toEqual(new Set([3, 1]));
+  });
+
+  it('falls back to the filters’ units for an older track=1 link, only when follow= is absent', () => {
+    expect(followedFromLink(undefined, '1', new Set([2, 5]))).toEqual(new Set([2, 5]));
+    expect(followedFromLink('', '1', new Set([2, 5]))).toEqual(new Set([2, 5]));
+    expect(followedFromLink(undefined, '0', new Set([2, 5]))).toEqual(new Set());
+    expect(followedFromLink('3', '1', new Set([2, 5]))).toEqual(new Set([3]));       // follow= wins when both are given
+  });
+
+  it('follows nothing when neither is given', () => {
+    expect(followedFromLink(undefined, undefined, new Set([2]))).toEqual(new Set());
+  });
+
+  it('follows nothing when the link asks for more than the most that can be followed', () => {
+    const many = Array.from({ length: MAX_SEPARATE_TRACKS + 1 }, (_, i) => i + 1).join(',');
+
+    expect(followedFromLink(many, undefined, new Set())).toEqual(new Set());
+    expect(followedFromLink(many.slice(0, many.lastIndexOf(',')), undefined, new Set()).size).toBe(MAX_SEPARATE_TRACKS);
   });
 });
 
