@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 # server and web run inside a container image rather than on the runner's own Ubuntu userland, and neither image is Ubuntu:
 #   .NET   Microsoft's SDK image on Azure Linux 3.0 (and, for the images that ship, its distroless ASP.NET image; see server/Dockerfile)
@@ -15,6 +16,11 @@ permissions:
 # helm runs directly on that Ubuntu runner instead of in a container: Azure Linux's own package mirror (tdnf) has proven too flaky
 # from GitHub's network for a job that needs nothing from it beyond Helm, git and tar, all of which Ubuntu already has or gets
 # from a maintained action.
+#
+# The `images` and `helm` jobs also publish to ghcr.io, but only on a push to master or develop (never a pull_request, so a fork's
+# PR cannot publish under this repo's name): container images once they have passed the checks below them, tagged with the short
+# commit SHA and floated to the branch name; each chart once it has passed lint and render, versioned as its Chart.yaml version
+# plus that same SHA, so nothing already published is ever overwritten.
 
 jobs:
   server:
@@ -97,6 +103,22 @@ jobs:
             helm template avw "$chart" --set import.enabled=true | ./kubeconform -strict -summary -ignore-missing-schemas
             helm template avw "$chart" --set import.enabled=true --set import.command=import-roll --set elasticsearch.caSecret=es-ca | ./kubeconform -strict -summary -ignore-missing-schemas
           done
+      - name: Publish the charts to GHCR
+        if: github.event_name == 'push'
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          sha=$(echo "${{ github.sha }}" | cut -c1-12)
+          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username "${{ github.actor }}" --password-stdin
+          mkdir -p release-artifacts
+          for chart in deploy/helm/*/; do
+            base=$(sed -n 's/^version: *//p' "$chart/Chart.yaml")
+            # Each push gets its own chart version -- the Chart.yaml version, suffixed with the commit -- so nothing already
+            # published is overwritten and a values file can pin to an exact one, matching how the images above are tagged.
+            helm package "$chart" --app-version "$sha" --version "$base-$sha" --destination release-artifacts
+          done
+          for pkg in release-artifacts/*.tgz; do
+            helm push "$pkg" "oci://ghcr.io/$owner/charts"
+          done
 
   # Building an image needs Docker on the machine that runs the job, so this is the one job that is not itself in a container. What it
   # builds is: the Dockerfiles use only the hardened base images above, and a build that pulled anything else would be a change to them.
@@ -142,3 +164,21 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://localhost:4000/healthz && exit 0; sleep 1; done
           docker logs web
           exit 1
+      - name: Login to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish the images that passed the checks above
+        if: github.event_name == 'push'
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          sha=$(echo "${{ github.sha }}" | cut -c1-12)
+          for name in avw-server avw-web; do
+            docker tag "$name:ci" "ghcr.io/$owner/$name:$sha"
+            docker tag "$name:ci" "ghcr.io/$owner/$name:${{ github.ref_name }}"
+            docker push "ghcr.io/$owner/$name:$sha"
+            docker push "ghcr.io/$owner/$name:${{ github.ref_name }}"
+          done
