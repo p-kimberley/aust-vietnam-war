@@ -6,8 +6,11 @@ import { CONTACTS } from './filter-fixtures';
 
 type Rendered = Awaited<ReturnType<typeof render>>;
 
+const DAY = 86_400_000;
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const names = (r: Rendered) => [...r.el.querySelectorAll('app-timeline [role=option] .row__name')].map((n) => n.firstChild!.textContent);
+const chart = (r: Rendered) =>
+  r.fixture.debugElement.query((d) => d.name === 'app-timeline').query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
 const openFilters = async (r: Rendered) => {
   r.el.querySelector<HTMLButtonElement>('#tab-filters')!.click();
   await settle(r.fixture);
@@ -53,7 +56,8 @@ describe('the operation list and the filters', () => {
 
     // Coburg (5 March) runs in that stretch; Hardihood, 3 March to November 1971, runs through it.
     expect(names(r)).toEqual(['Hardihood, Phase 2', 'Coburg']);
-    expect(r.el.querySelector('.axis__tick')!.textContent).toMatch(/^\d{1,2} Mar$/);
+    // The list and the bar chart below it always show the same stretch, so this is also what the chart is zoomed to.
+    expect((chart(r).option() as Record<string, any>)['dataZoom'][0]).toMatchObject({ startValue: dayMs('1966-03-04'), endValue: dayMs('1966-03-31') + DAY });
   });
 });
 
@@ -64,7 +68,9 @@ describe('an incident and the operation list', () => {
     expect(r.el.querySelector('app-incident-panel')).not.toBeNull();
     expect(r.el.querySelector('app-timeline .row.is-focus .row__name')!.firstChild!.textContent).toBe('Coburg');
     expect(r.el.querySelector('app-timeline .axis__marker')!.textContent).toContain('Incident 5 Mar 1966 08:10');
-    expect(r.el.querySelector('app-timeline .gantt__marker')).not.toBeNull();
+    expect(r.el.querySelector('app-timeline .tl__marker')).not.toBeNull();
+    // The bar chart is zoomed to match, not left showing the plain (unset) date filter.
+    expect((chart(r).option() as Record<string, any>)['dataZoom'][0].startValue).toBeLessThan(dayMs('1966-03-05'));
   });
 
   it('moves to another incident\'s operation when another is chosen', async () => {

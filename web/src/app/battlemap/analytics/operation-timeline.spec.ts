@@ -2,8 +2,8 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, expect, it, vi } from 'vitest';
 import { Contact } from '../contacts';
-import { stubEchartIn } from './echart-stub';
-import { MIN_DRAG_PX, Timeline, axisTicks, dragRange, focusWindow, ganttRows, operationSpans } from './timeline';
+import { StubEChart, stubEchartIn } from './echart-stub';
+import { MIN_DRAG_PX, Timeline, axisTicks, dayMs, dragRange, focusWindow, ganttRows, operationSpans } from './timeline';
 import type { DateRange } from './timeline';
 
 const contact = (id: number, dtg: string, op: number): Contact => ({
@@ -194,6 +194,7 @@ describe('Timeline operations', () => {
     const arrow = () => el.querySelector<HTMLButtonElement>('.tl__toggle')!;
     const rows = () => [...el.querySelectorAll<HTMLElement>('[role=option]')];
     const list = () => el.querySelector<HTMLElement>('[role=listbox]')!;
+    const chart = () => f.debugElement.query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
     const settle = () => {
       f.detectChanges();
     };
@@ -201,7 +202,7 @@ describe('Timeline operations', () => {
       list().dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
       settle();
     };
-    return { f, el, arrow, rows, list, toggled, ranges, settle, press };
+    return { f, el, arrow, rows, list, chart, toggled, ranges, settle, press };
   }
 
   const text = (e: Element) => e.querySelector('.row__name')!.firstChild!.textContent;
@@ -313,12 +314,17 @@ describe('Timeline operations', () => {
       expect(rows().map(text)).toEqual(['Bravo']);
     });
 
-    it('label the axis to suit the stretch, and follow it as it changes', () => {
-      const whole = setup();
-      expect(whole.el.querySelector('.axis__tick')!.textContent).toMatch(/^\w{3} 1966$/);
+    it('shows date labels only on the bar chart below, not said again above the operations', () => {
+      const { el } = setup();
 
-      const zoomed = setup({ from: '1966-03-01', to: '1966-03-20' });
-      expect(zoomed.el.querySelector('.axis__tick')!.textContent).toMatch(/^\d{1,2} Mar$/);
+      expect(el.querySelectorAll('.axis__tick')).toHaveLength(0);
+      expect(el.querySelectorAll('.gantt__grid').length).toBeGreaterThan(0);      // the grid lines that line up with the labels are still there
+    });
+
+    it('always shows the same stretch of time as the bar chart below it', () => {
+      const { chart } = setup({ from: '1966-03-01', to: '1966-03-20' });
+
+      expect((chart().option() as Record<string, any>)['dataZoom'][0]).toMatchObject({ startValue: dayMs('1966-03-01'), endValue: dayMs('1966-03-20') + DAY });
     });
 
     it('offer "Reset zoom" only when the dates are narrowed, which goes back to the whole war', () => {
@@ -343,11 +349,23 @@ describe('Timeline operations', () => {
       expect(rows()[0].classList.contains('is-focus')).toBe(true);
     });
 
-    it('shows the date of the incident on the axis and as a line down the list', () => {
+    it('marks the date of the incident on the axis, and with a red line the full height of the timeline', () => {
       const { el } = setup({ focus });
 
       expect(el.querySelector('.axis__marker')!.textContent).toContain('Incident 15 Apr 1966 09:30');
-      expect(el.querySelector('.gantt__marker')).not.toBeNull();
+      const marker = el.querySelector('.tl__marker')!;
+      expect(marker).not.toBeNull();
+      // Outside the scrollable operation list, so the line reaches into the bar chart below it too, not just the rows.
+      expect(el.querySelector('.tl__ops')!.contains(marker)).toBe(false);
+    });
+
+    it('always shows the same stretch of time as the bar chart below it, zoomed to the incident\'s operation', () => {
+      const spans = operationSpans(CONTACTS, OPERATIONS);
+      const expected = focusWindow(focus, spans, MIN, MAX);
+
+      const { chart } = setup({ focus });
+
+      expect((chart().option() as Record<string, any>)['dataZoom'][0]).toMatchObject({ startValue: expected.start, endValue: expected.end });
     });
 
     it('does not change the date filter, and goes back to the dates when it is closed', () => {
@@ -359,7 +377,7 @@ describe('Timeline operations', () => {
 
       expect(rows().map(text)).toEqual(['Alpha', 'Delta', 'Bravo']);
       expect(el.querySelector('.axis__marker')).toBeNull();
-      expect(el.querySelector('.gantt__marker')).toBeNull();
+      expect(el.querySelector('.tl__marker')).toBeNull();
       expect(el.querySelector('.is-focus')).toBeNull();
     });
 

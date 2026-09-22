@@ -18,8 +18,20 @@ import { CASUALTY_TYPES, CommunityService, HonourSummary } from './community';
         <ul class="people">
           @for (p of list; track p.serviceNumber) {
             <li>
-              <button type="button" class="link" (click)="open.emit(p.serviceNumber)">{{ p.name }}</button>
-              <span class="meta">{{ [p.rank, p.branch].filter(present).join(', ') }}</span>
+              <button type="button" class="person" (click)="open.emit(p.serviceNumber)">
+                @if (p.portraitUrl) {
+                  <img class="person__portrait" [src]="p.portraitUrl" alt="" width="28" height="34" loading="lazy" />
+                } @else {
+                  <svg class="person__portrait person__portrait--none" viewBox="0 0 36 44" aria-hidden="true" focusable="false">
+                    <circle cx="18" cy="16" r="7" fill="currentColor" />
+                    <path d="M4 44c0-10 6-15 14-15s14 5 14 15z" fill="currentColor" />
+                  </svg>
+                }
+                <span class="person__text">
+                  <span class="person__name">{{ p.name }}</span>
+                  <span class="meta">{{ [p.rank, p.branch].filter(present).join(', ') }}</span>
+                </span>
+              </button>
             </li>
           }
         </ul>
@@ -55,10 +67,50 @@ import { CASUALTY_TYPES, CommunityService, HonourSummary } from './community';
   styles: `
     .people {
       margin: 0.4rem 0;
-      padding-left: 1.1rem;
+      padding: 0;
+      list-style: none;
     }
     .people li {
       margin: 0.25rem 0;
+    }
+    .person {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+    .person__portrait {
+      flex: none;
+      width: 1.75rem;
+      height: 2.125rem;
+      object-fit: cover;
+      background: var(--olive-700);
+      border: 1px solid var(--olive-500);
+      border-radius: 2px;
+    }
+    /* The silhouette that stands in for a portrait that has not been found. */
+    .person__portrait--none {
+      color: var(--olive-500);
+    }
+    .person__text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .person__name {
+      color: var(--smoke-yellow);
+      text-decoration: underline;
+    }
+    .person:focus-visible {
+      outline: 2px solid var(--smoke-yellow);
+      outline-offset: 2px;
     }
   `,
 })

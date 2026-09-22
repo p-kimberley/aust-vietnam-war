@@ -469,19 +469,32 @@ describe('PicturesTab nearby photos', () => {
 describe('PeopleTab', () => {
   const people = [{ serviceNumber: '5715978', name: 'James Mungo White', rank: 'Private', branch: 'Royal Australian Infantry Corps', birth: null, death: null, ageAtDeath: null, portraitUrl: null }];
 
-  it('lists the honour roll people linked to the incident and opens one', async () => {
-    const { fixture, el } = mount(PeopleTab, fakeCommunity({ casualties: vi.fn(() => Promise.resolve(people)) }), fakeAuth(), { contactId: 2 });
+  it('lists the honour roll people linked to the incident, with a portrait where there is one, and opens one', async () => {
+    const withPortrait = [{ ...people[0], portraitUrl: '/media/portraits/5715978.jpg' }];
+    const { fixture, el } = mount(PeopleTab, fakeCommunity({ casualties: vi.fn(() => Promise.resolve(withPortrait)) }), fakeAuth(), { contactId: 2 });
     const opened: string[] = [];
     const counted: number[] = [];
     fixture.componentInstance.open.subscribe((s) => opened.push(s));
     fixture.componentInstance.counted.subscribe((n) => counted.push(n));
     await settle(fixture);
 
-    expect([...el.querySelector('.people li')!.children].map((c) => text(c))).toEqual(['James Mungo White', 'Private, Royal Australian Infantry Corps']);
+    const row = el.querySelector('.people li')!;
+    expect(text(row.querySelector('.person__name'))).toBe('James Mungo White');
+    expect(text(row.querySelector('.meta'))).toBe('Private, Royal Australian Infantry Corps');
+    expect(row.querySelector('img.person__portrait')!.getAttribute('src')).toBe('/media/portraits/5715978.jpg');
     el.querySelector<HTMLButtonElement>('.people button')!.click();
 
     expect(opened).toEqual(['5715978']);
     expect(counted).toEqual([1]);
+  });
+
+  it('shows a silhouette in place of a portrait that has not been found', async () => {
+    const { fixture, el } = mount(PeopleTab, fakeCommunity({ casualties: vi.fn(() => Promise.resolve(people)) }), fakeAuth(), { contactId: 2 });
+    await settle(fixture);
+
+    const row = el.querySelector('.people li')!;
+    expect(row.querySelector('img.person__portrait')).toBeNull();
+    expect(row.querySelector('.person__portrait--none')).not.toBeNull();
   });
 
   it('says when nobody is linked, and asks a visitor to sign in before telling us about a casualty', async () => {

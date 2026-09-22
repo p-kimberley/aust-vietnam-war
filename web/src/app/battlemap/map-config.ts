@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import type { StyleSpecification } from 'maplibre-gl';
 
 /** Mirrors `GET /api/map/config`: the basemap, overlay and terrain catalogue is deployment configuration. */
 export interface MapConfig {
@@ -15,8 +16,12 @@ export interface MapConfig {
 export interface BasemapConfig {
   id: string;
   name: string;
-  /** An absolute http(s) URL of a MapLibre-compatible style (validated by the API at startup). */
+  /** An absolute http(s) URL of a MapLibre-compatible style (validated by the API at startup). Empty for plain raster tiles; see `tiles`. */
   style: string;
+  /** XYZ raster tile templates for a basemap with no style of its own (for example satellite imagery). Empty when `style` is set. */
+  tiles: string[];
+  tileSize: number;
+  attribution: string | null;
   default: boolean;
 }
 
@@ -60,4 +65,18 @@ export function pickBasemap(config: MapConfig, requestedId?: string | null): Bas
   return (
     config.basemaps.find((b) => b.id === requestedId) ?? config.basemaps.find((b) => b.default) ?? config.basemaps[0]
   );
+}
+
+/** What to give the map library: the basemap's own style, or, for one with no style, a minimal style built from its raster tiles. */
+export function basemapStyle(basemap: BasemapConfig): string | StyleSpecification {
+  if (basemap.style) {
+    return basemap.style;
+  }
+  return {
+    version: 8,
+    sources: {
+      basemap: { type: 'raster', tiles: basemap.tiles, tileSize: basemap.tileSize, attribution: basemap.attribution ?? undefined },
+    },
+    layers: [{ id: 'basemap', type: 'raster', source: 'basemap' }],
+  };
 }

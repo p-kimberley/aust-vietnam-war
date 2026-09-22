@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { config, contacts, render, settle } from './battlemap-testing';
 import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight, pointRadius, selectedRadius } from './contact-layers';
 import { fieldRange, formatDtg, sizeCap, toGeoJson } from './contacts';
-import { MapConfig, pickBasemap } from './map-config';
+import { MapConfig, basemapStyle, pickBasemap } from './map-config';
 import { formatAt, parseAt } from './map-url';
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -101,6 +101,15 @@ describe('map config helpers', () => {
     expect(pickBasemap(config, 'gone')?.id).toBe('terrain');
     expect(pickBasemap({ ...config, basemaps: [{ ...config.basemaps[1] }] }, null)?.id).toBe('dark');
     expect(pickBasemap({ ...config, basemaps: [] })).toBeUndefined();
+  });
+
+  it('gives a basemap its own style, or, for one with none, a minimal style built from its raster tiles', () => {
+    expect(basemapStyle(config.basemaps[0])).toBe(config.basemaps[0].style);
+
+    const satellite = config.basemaps.find((b) => b.id === 'satellite')!;
+    const style = basemapStyle(satellite) as { sources: Record<string, unknown>; layers: { source: string }[] };
+    expect(style['sources']['basemap']).toEqual({ type: 'raster', tiles: satellite.tiles, tileSize: satellite.tileSize, attribution: satellite.attribution });
+    expect(style['layers']).toEqual([{ id: 'basemap', type: 'raster', source: 'basemap' }]);
   });
 });
 

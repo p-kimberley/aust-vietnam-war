@@ -17,7 +17,8 @@ import { Contact, formatDtg } from '../contacts';
 import { ChartOption, DARK, ChartTheme } from './analytics';
 import { EChart, ZoomRange } from './echart';
 
-const DAY = 24 * 3600 * 1000;
+const HOUR = 3600 * 1000;
+const DAY = 24 * HOUR;
 
 /** The margins round the bars inside the chart's box, in pixels. A drag across the bars is measured against them. */
 export const CHART_GRID = { left: 8, right: 12, top: 6, bottom: 62 } as const;
@@ -29,11 +30,13 @@ export const PLAY_STEP_MONTHS = 1;
 export const PLAY_MIN_MONTHS = 3;
 
 export interface MonthBucket {
-  /** UTC midnight on the first of the month, in milliseconds. */
+  /** The start of the bucket, in UTC milliseconds: midnight on the first of the month, unless it is a finer bucket (see {@link intervalBuckets}). */
   t: number;
-  /** All contacts that month. */
+  /** The moment the bucket ends (the start of the next one), in UTC milliseconds. */
+  end: number;
+  /** All contacts in the bucket. */
   all: number;
-  /** Contacts that month that pass the filters. */
+  /** Contacts in the bucket that pass the filters. */
   shown: number;
 }
 
@@ -64,6 +67,14 @@ function addMonths(ms: number, months: number): number {
   return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + months, d.getUTCDate());
 }
 
+/** The exact moment `dtg` records (not just its day), in UTC milliseconds. */
+function dtgMs(dtg: string): number {
+  const h = dtg.length > 12 ? Number(dtg.slice(11, 13)) : 0;
+  const min = dtg.length > 15 ? Number(dtg.slice(14, 16)) : 0;
+  const s = dtg.length > 18 ? Number(dtg.slice(17, 19)) : 0;
+  return dayMs(dtg) + ((h * 60 + min) * 60 + s) * 1000;
+}
+
 /** Contacts per month, for every month from the first contact to the last (empty months included, so the bars keep their spacing). */
 export function monthBuckets(all: readonly Contact[], visible: readonly Contact[]): MonthBucket[] {
   if (all.length === 0) {
@@ -84,14 +95,61 @@ export function monthBuckets(all: readonly Contact[], visible: readonly Contact[
   const last = Math.max(...times);
   const buckets: MonthBucket[] = [];
   for (let t = first; t <= last; t = addMonths(t, 1)) {
-    buckets.push({ t, all: total.get(t) ?? 0, shown: shown.get(t) ?? 0 });
+    buckets.push({ t, end: addMonths(t, 1), all: total.get(t) ?? 0, shown: shown.get(t) ?? 0 });
   }
   return buckets;
 }
 
-/** The start of the timeline and the day after its last month, the limits of the slider. */
+/** More bars than this would crowd the chart and cost more to draw than they are worth. */
+const MAX_BARS = 90;
+
+/** The bucket widths {@link bucketIntervalMs} chooses from, closest fit first; never finer than an hour. */
+const BUCKET_STEPS_MS = [
+  HOUR, 2 * HOUR, 3 * HOUR, 6 * HOUR, 12 * HOUR,
+  DAY, 2 * DAY, 3 * DAY, 5 * DAY, 7 * DAY, 14 * DAY, 21 * DAY,
+];
+
+/**
+ * The width of one bar, chosen automatically from the stretch of time shown so there are at most {@link MAX_BARS} of them:
+ * hours when zoomed in close, widening through days as the stretch grows. `null` once even the widest of these steps would
+ * still crowd the chart (the stretch is some years), which means calendar months (see {@link monthBuckets}) suit it better.
+ */
+export function bucketIntervalMs(spanMs: number): number | null {
+  return BUCKET_STEPS_MS.find((ms) => spanMs / ms <= MAX_BARS) ?? null;
+}
+
+/**
+ * Contacts per `intervalMs`, from `min` (inclusive) to `max` (exclusive) — the same span {@link monthBuckets} would give for
+ * the same contacts, just finer. `min` is always a calendar month start (so a whole day, and a whole hour), and every bucket
+ * is anchored to it, so the bars fall on round times: midnight, or the top of the hour. Empty buckets are included, so the
+ * bars keep their spacing.
+ */
+export function intervalBuckets(all: readonly Contact[], visible: readonly Contact[], min: number, max: number, intervalMs: number): MonthBucket[] {
+  const bucketOf = (dtg: string) => min + Math.floor((dtgMs(dtg) - min) / intervalMs) * intervalMs;
+  const shown = new Map<number, number>();
+  for (const c of visible) {
+    const t = bucketOf(c.dtg);
+    if (t >= min && t < max) {
+      shown.set(t, (shown.get(t) ?? 0) + 1);
+    }
+  }
+  const total = new Map<number, number>();
+  for (const c of all) {
+    const t = bucketOf(c.dtg);
+    if (t >= min && t < max) {
+      total.set(t, (total.get(t) ?? 0) + 1);
+    }
+  }
+  const buckets: MonthBucket[] = [];
+  for (let t = min; t < max; t += intervalMs) {
+    buckets.push({ t, end: t + intervalMs, all: total.get(t) ?? 0, shown: shown.get(t) ?? 0 });
+  }
+  return buckets;
+}
+
+/** The start of the timeline and the end of its last bucket, the limits of the slider. */
 export function limits(buckets: readonly MonthBucket[]): { min: number; max: number } | null {
-  return buckets.length ? { min: buckets[0].t, max: addMonths(buckets[buckets.length - 1].t, 1) } : null;
+  return buckets.length ? { min: buckets[0].t, max: buckets[buckets.length - 1].end } : null;
 }
 
 /** The slider position for a date range; an open end sits at the end of the timeline. */
@@ -132,10 +190,15 @@ export function nextWindow(range: DateRange, min: number, max: number): DateRang
   return { from: formatDay(start), to: formatDay(Math.min(end, max) - DAY) };
 }
 
-/** The bar chart behind the slider: every month grey, the months that pass the filters bright, and a slider to pick a stretch of time. */
-export function timelineOption(buckets: readonly MonthBucket[], range: DateRange, theme: ChartTheme = DARK): ChartOption {
+/**
+ * The bar chart behind the slider: every month grey, the months that pass the filters bright, and a slider to pick a stretch
+ * of time. The slider normally sits on `range`, but `zoom` overrides it when given, so the chart can be made to show the same
+ * stretch of time as the operation list above it (for example while it is zoomed to an open incident) without touching the
+ * date filter itself.
+ */
+export function timelineOption(buckets: readonly MonthBucket[], range: DateRange, zoom?: ZoomRange, theme: ChartTheme = DARK): ChartOption {
   const lim = limits(buckets);
-  const zoom = lim ? rangeToZoom(range, lim.min, lim.max) : undefined;
+  const shown = zoom ?? (lim ? rangeToZoom(range, lim.min, lim.max) : undefined);
   return {
     aria: { enabled: true },
     animation: false,
@@ -165,8 +228,8 @@ export function timelineOption(buckets: readonly MonthBucket[], range: DateRange
         bottom: 4,
         realtime: false,           // report when the handle is let go, not on every pixel of a drag
         filterMode: 'none',
-        startValue: zoom?.start,
-        endValue: zoom?.end,
+        startValue: shown?.start,
+        endValue: shown?.end,
         textStyle: { color: theme.muted },
         borderColor: theme.grid,
         fillerColor: 'rgba(227, 185, 46, 0.22)',
@@ -365,13 +428,15 @@ let nextTimelineId = 0;
 /**
  * The strip along the bottom of the map: contacts per month, with a slider that sets the date filter. Play moves a window of
  * time along the timeline so the map shows the war unfolding. Dragging across the bars picks the dates directly, and "Reset
- * zoom" goes back to the whole war. The date filter is the stretch of time both charts show.
+ * zoom" goes back to the whole war.
  *
  * An arrow at the centre of its top edge opens the operation timeline above it: a Gantt chart with one row for each operation,
  * on the same time axis as the bar chart, drawn from the operation's first contact to its last. It lists only the operations
  * that have contacts left by the filters. Clicking a row chooses that operation as a filter and clicking it again takes it
- * off; any number can be chosen. While an incident is open, the list zooms to that incident's operation and marks the date of
- * the incident, and goes back when it is closed.
+ * off; any number can be chosen. The two always show the same stretch of time: normally the date filter, or, while an
+ * incident is open, the window zoomed to that incident's operation (the date filter itself is untouched, and the bar chart
+ * goes back to it when the incident is closed). Only the bar chart carries date labels; a red line marks the open incident's
+ * date, running the full height of both.
  */
 @Component({
   selector: 'app-timeline',
@@ -395,9 +460,7 @@ let nextTimelineId = 0;
           <div class="axis" aria-hidden="true">
             <div class="axis__side">Operations</div>
             <div class="axis__plot">
-              @for (t of ticks(); track t.left) {
-                <span class="axis__tick" [style.left.%]="t.left">{{ t.label }}</span>
-              }
+              <!-- The date labels are only on the bar chart below, so they are not said twice. -->
               @if (marker(); as m) {
                 <span class="axis__marker" [class.is-right]="m.left > 65" [style.left.%]="m.left">{{ m.label }}</span>
               }
@@ -416,9 +479,6 @@ let nextTimelineId = 0;
               <div class="gantt__plot" aria-hidden="true">
                 @for (t of ticks(); track t.left) {
                   <i class="gantt__grid" [style.left.%]="t.left"></i>
-                }
-                @if (marker(); as m) {
-                  <i class="gantt__marker" [style.left.%]="m.left"></i>
                 }
               </div>
               @for (row of rows(); track row.name; let i = $index) {
@@ -467,6 +527,13 @@ let nextTimelineId = 0;
           }
         </div>
       </div>
+
+      <!-- The open incident's date, drawn over both charts (not just the operation list), so it reads as one line down to the bar chart. -->
+      @if (marker(); as m) {
+        <div class="tl__plot" aria-hidden="true">
+          <i class="tl__marker" [style.left.%]="m.left"></i>
+        </div>
+      }
     </section>
   `,
   styles: `
@@ -569,16 +636,7 @@ let nextTimelineId = 0;
       flex: 1;
       margin: 0 12px 0 8px;
     }
-    .axis__tick {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      padding-left: 4px;
-      border-left: 1px solid var(--olive-500);
-      line-height: 1.5rem;
-      white-space: nowrap;
-    }
-    /* The date of the incident that is open, flagged on the axis and drawn as a line down the list. */
+    /* The date of the incident that is open, flagged on the axis; the line itself runs the full height of the timeline (see .tl__marker). */
     .axis__marker {
       position: absolute;
       z-index: 1;
@@ -614,13 +672,6 @@ let nextTimelineId = 0;
       top: 0;
       bottom: 0;
       border-left: 1px solid rgb(230 221 184 / 0.1);
-    }
-    .gantt__marker {
-      position: absolute;
-      z-index: 1;
-      top: 0;
-      bottom: 0;
-      border-left: 2px solid var(--smoke-yellow);
     }
 
     .row {
@@ -746,6 +797,23 @@ let nextTimelineId = 0;
       border-inline: 1px solid var(--smoke-yellow);
       pointer-events: none;
     }
+    /* Inset the same way as the bar chart and the operation list's own plot, so a date sits at the same place in all three. */
+    .tl__plot {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      right: calc(0.75rem + 12px);
+      bottom: 0;
+      left: calc(0.75rem + var(--tl-side) + 0.75rem + 8px);
+      pointer-events: none;
+    }
+    /* The open incident's date, in the colour of its marker on the map, running the full height of the timeline. */
+    .tl__marker {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border-left: 2px solid var(--contact-red);
+    }
     @media (prefers-reduced-motion: reduce) {
       .tl__arrow,
       .tl__ops,
@@ -789,8 +857,20 @@ export class Timeline implements OnDestroy {
   private readonly active = signal(0);
   private timer?: ReturnType<typeof setInterval>;
 
-  private readonly buckets = computed(() => monthBuckets(this.all(), this.visible()));
-  private readonly axis = computed(() => limits(this.buckets()));
+  /** The whole span of the timeline, always by calendar month: what decides the axis and the slider's overview, whatever the bars are bucketed by. */
+  private readonly monthlyBuckets = computed(() => monthBuckets(this.all(), this.visible()));
+  private readonly axis = computed(() => limits(this.monthlyBuckets()));
+  /**
+   * The bars: bucketed finely enough to suit the stretch of time the chart is zoomed to (never finer than an hour), or by
+   * calendar month once that stretch is wide enough that finer bars would just crowd the chart. Always spans the whole
+   * timeline, like `monthlyBuckets`, so the slider's overview still shows the whole war.
+   */
+  private readonly buckets = computed(() => {
+    const axis = this.axis();
+    const view = this.view();
+    const ms = view ? bucketIntervalMs(view.end - view.start) : null;
+    return axis && ms ? intervalBuckets(this.all(), this.visible(), axis.min, axis.max, ms) : this.monthlyBuckets();
+  });
   /** The stretch of time the date filter picks, and both charts show. */
   private readonly extent = computed(() => {
     const axis = this.axis();
@@ -812,7 +892,9 @@ export class Timeline implements OnDestroy {
     return focus ? focusWindow(focus, this.allSpans(), axis.min, axis.max) : extent;
   });
 
-  protected readonly option = computed(() => timelineOption(this.buckets(), { from: this.from(), to: this.to() }));
+  // The bar chart always shows the same stretch of time as the operation list above it (`view`), so the two never disagree,
+  // whether that stretch is the plain date filter or, while an incident is open, the window zoomed to its operation.
+  protected readonly option = computed(() => timelineOption(this.buckets(), { from: this.from(), to: this.to() }, this.view() ?? undefined));
   protected readonly rows = computed(() => {
     const view = this.view();
     return view ? ganttRows(this.scopedSpans(), view.start, view.end) : [];
@@ -951,7 +1033,7 @@ export class Timeline implements OnDestroy {
   }
 
   protected zoomed(zoom: ZoomRange): void {
-    const lim = limits(this.buckets());
+    const lim = this.axis();
     if (lim) {
       this.stop();
       this.rangeChange.emit(zoomToRange(zoom, lim.min, lim.max));
@@ -968,7 +1050,7 @@ export class Timeline implements OnDestroy {
       this.stop();
       return;
     }
-    const lim = limits(this.buckets());
+    const lim = this.axis();
     if (!lim) {
       return;
     }

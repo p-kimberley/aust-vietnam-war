@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import type { Map } from 'maplibre-gl';
-import { MapConfig, OverlayConfig, pickBasemap } from './map-config';
+import { MapConfig, OverlayConfig, basemapStyle, pickBasemap } from './map-config';
 import { Camera } from './map-url';
 
 const DEM_SOURCE = 'avw-dem';
@@ -59,7 +59,7 @@ export class BasemapService implements OnDestroy {
     const camera = start.camera ?? { lat: config.center[1], lon: config.center[0], zoom: config.zoom };
     const map = new maplibre.Map({
       container,
-      style: basemap.style,
+      style: basemapStyle(basemap),
       center: [camera.lon, camera.lat],
       zoom: camera.zoom,
       pitch: this.terrainEnabled() ? TERRAIN_PITCH : 0,
@@ -100,7 +100,7 @@ export class BasemapService implements OnDestroy {
       return;
     }
     this.basemapId.set(id);
-    this.map.setStyle(basemap.style);
+    this.map.setStyle(basemapStyle(basemap));
   }
 
   setTerrain(enabled: boolean): void {
@@ -190,8 +190,9 @@ export class BasemapService implements OnDestroy {
     this.map = undefined;
   }
 
+  /** `undefined` for a basemap built from raw tiles: it has no style URL that could itself fail to load. */
   private currentStyleUrl(): string | undefined {
-    return this.config?.basemaps.find((b) => b.id === this.basemapId())?.style;
+    return this.config?.basemaps.find((b) => b.id === this.basemapId())?.style || undefined;
   }
 
   private applyTerrain(map: Map): void {

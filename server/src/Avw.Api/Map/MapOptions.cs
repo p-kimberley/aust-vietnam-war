@@ -25,8 +25,18 @@ public sealed class BasemapOption
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
 
-    /// <summary>An absolute http(s) URL of a MapLibre/Mapbox style JSON, for example a TileServer GL <c>/styles/{id}/style.json</c>.</summary>
+    /// <summary>
+    /// An absolute http(s) URL of a MapLibre/Mapbox style JSON, for example a TileServer GL <c>/styles/{id}/style.json</c>.
+    /// Leave empty for a basemap that is plain raster tiles with no style of its own (for example satellite imagery) and set
+    /// <see cref="Tiles"/> instead; the map is then given a minimal style built from them.
+    /// </summary>
     public string Style { get; set; } = "";
+
+    /// <summary>XYZ raster tile templates, used only when <see cref="Style"/> is empty.</summary>
+    public string[] Tiles { get; set; } = [];
+
+    public int TileSize { get; set; } = 256;
+    public string? Attribution { get; set; }
 
     public bool Default { get; set; }
 }
@@ -81,10 +91,16 @@ public sealed class MapOptionsValidator : IValidateOptions<MapOptions>
                 errors.Add("Every Map:Basemaps entry needs an id and a name.");
             }
 
-            if (!IsHttpUrl(b.Style))
+            var hasStyle = IsHttpUrl(b.Style);
+            var hasTiles = b.Tiles.Length > 0 && b.Tiles.All(t => IsHttpUrl(t.Replace("{", "%7B").Replace("}", "%7D")));
+            if (!string.IsNullOrEmpty(b.Style) && !hasStyle)
             {
                 errors.Add($"Map:Basemaps '{b.Id}' style must be an absolute http(s) URL, not '{b.Style}'. "
                            + "mapbox:// styles cannot be loaded; host the style on a tile server instead.");
+            }
+            else if (!hasStyle && !hasTiles)
+            {
+                errors.Add($"Map:Basemaps '{b.Id}' needs a style (an absolute http(s) URL) or one or more absolute http(s) Tiles templates.");
             }
         }
 

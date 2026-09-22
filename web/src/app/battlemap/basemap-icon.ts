@@ -20,6 +20,8 @@ const PALETTES: Readonly<Record<string, Palette>> = {
   bright: { land: '#f1eadb', water: '#9dc8e8', road: '#f6c451', casing: '#d9a52c', minor: '#ffffff', contour: null },
   positron: { land: '#f0f0ee', water: '#cfd8dc', road: '#ffffff', casing: '#cfcfca', minor: '#ffffff', contour: null },
   'dark-matter': { land: '#2a2e35', water: '#12151a', road: '#464c56', casing: '#1a1d22', minor: '#363b43', contour: null },
+  // Photographic, not styled: muted greens and a dusty track rather than a drawn road, since imagery shows no cartography of its own.
+  satellite: { land: '#4f5a3a', water: '#1c2a38', road: '#8a8562', casing: '#3a4128', minor: '#6b7350', contour: null },
 };
 
 /** Neutral colours for a basemap the icons do not know, so a newly configured one still gets a picture. */

@@ -7,8 +7,10 @@ import {
   DateRange,
   PLAY_INTERVAL_MS,
   Timeline,
+  bucketIntervalMs,
   dayMs,
   formatDay,
+  intervalBuckets,
   limits,
   monthBuckets,
   nextWindow,
@@ -17,7 +19,8 @@ import {
   zoomToRange,
 } from './timeline';
 
-const DAY = 86_400_000;
+const HOUR = 3_600_000;
+const DAY = 24 * HOUR;
 const c = (id: number, dtg: string): Contact => ({ id, dtg, lat: 10, lon: 107, fr: 0, frCas: 0, en: 0, enCas: 0, frKia: 0, frWia: 0, enKia: 0, enWia: 0, units: [], op: 0, task: 0, series: 1, mine: 0 });
 
 const CONTACTS = [c(1, '1966-01-05T10:00:00'), c(2, '1966-01-20T10:00:00'), c(3, '1966-04-02T10:00:00'), c(4, '1966-06-30T23:59:00')];
@@ -45,6 +48,60 @@ describe('monthBuckets', () => {
 
   it('spans from the first month to the day after the last', () => {
     expect(limits(monthBuckets(CONTACTS, CONTACTS))).toEqual({ min: MIN, max: MAX });
+  });
+});
+
+describe('bucketIntervalMs', () => {
+  it('picks an hour for a stretch that short, and never anything finer', () => {
+    expect(bucketIntervalMs(HOUR)).toBe(HOUR);
+    expect(bucketIntervalMs(1)).toBe(HOUR);
+  });
+
+  it('widens through the ladder of steps as the stretch grows, always leaving at most 90 bars', () => {
+    for (const spanMs of [3 * HOUR, DAY, 10 * DAY, 100 * DAY, 1000 * DAY]) {
+      const ms = bucketIntervalMs(spanMs)!;
+      expect(ms).not.toBeNull();
+      expect(spanMs / ms).toBeLessThanOrEqual(90);
+    }
+    expect(bucketIntervalMs(DAY)).toBeLessThan(bucketIntervalMs(30 * DAY)!);
+  });
+
+  it('gives up once even three weeks would still crowd the chart, since the stretch runs to years', () => {
+    expect(bucketIntervalMs(1890 * DAY)).not.toBeNull();               // 21-day bars still fit
+    expect(bucketIntervalMs(1891 * DAY)).toBeNull();                   // a hair over: calendar months suit it better
+    expect(bucketIntervalMs(2000 * DAY)).toBeNull();
+  });
+});
+
+describe('intervalBuckets', () => {
+  const min = Date.UTC(1966, 0, 1);
+
+  it('counts every contact and the shown ones per interval, anchored to min, empty ones included', () => {
+    const contacts = [c(1, '1966-01-01T00:30:00'), c(2, '1966-01-01T05:00:00'), c(3, '1966-01-01T08:15:00')];
+    const max = min + 12 * HOUR;
+
+    const buckets = intervalBuckets(contacts, [contacts[0], contacts[2]], min, max, 6 * HOUR);
+
+    expect(buckets.map((b) => [formatDay(b.t) + ' ' + new Date(b.t).getUTCHours(), b.all, b.shown])).toEqual([
+      ['1966-01-01 0', 2, 1],           // 00:30 and 05:00 both fall in the first six hours
+      ['1966-01-01 6', 1, 1],
+    ]);
+    expect(buckets[0].end).toBe(min + 6 * HOUR);
+  });
+
+  it('leaves out anything at or past max, or before min', () => {
+    const max = min + HOUR;
+    const contacts = [c(1, '1966-01-01T00:30:00'), c(2, '1966-01-01T01:00:00'), c(3, '1965-12-31T23:00:00')];
+
+    const buckets = intervalBuckets(contacts, contacts, min, max, HOUR);
+
+    expect(buckets.map((b) => b.all)).toEqual([1]);
+  });
+
+  it('gives one bucket per hour when asked for hours, on the hour', () => {
+    const buckets = intervalBuckets([], [], min, min + 3 * HOUR, HOUR);
+
+    expect(buckets.map((b) => new Date(b.t).getUTCHours())).toEqual([0, 1, 2]);
   });
 });
 
@@ -144,6 +201,48 @@ describe('Timeline', () => {
     const { chart } = setup({ from: '1966-02-01', to: '1966-03-31' });
 
     expect((chart().option() as Record<string, any>)['dataZoom'][0].startValue).toBe(dayMs('1966-02-01'));
+  });
+
+  describe('the bar interval', () => {
+    const bars = (o: unknown) => (o as Record<string, any>)['series'][0].data as [number, number][];
+    const spacing = (o: unknown) => {
+      const data = bars(o);
+      return data.length > 1 ? data[1][0] - data[0][0] : null;
+    };
+
+    it('narrows automatically as the reader zooms in, never below an hour', () => {
+      const { chart } = setup();
+      const whole = spacing(chart().option());
+
+      const zoomed = setup({ from: '1966-01-01', to: '1966-01-02' });
+      const narrow = spacing(zoomed.chart().option());
+      expect(narrow).toBeLessThan(whole!);
+
+      const tiny = setup({ from: '1966-01-01', to: '1966-01-01' });
+      expect(spacing(tiny.chart().option())).toBe(HOUR);
+    });
+
+    it('still spans the whole war, whatever the bars are bucketed by, so the overview slider keeps the whole shape', () => {
+      const { chart } = setup({ from: '1966-01-01', to: '1966-01-02' });
+
+      const data = bars(chart().option());
+      expect(data[0][0]).toBe(MIN);
+      expect(data[data.length - 1][0]).toBeLessThan(MAX);
+    });
+
+    it('falls back to calendar months once the stretch shown runs to years, so the bars stay few enough to read', () => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+      stubEchartIn(Timeline);
+      const f: ComponentFixture<Timeline> = TestBed.createComponent(Timeline);
+      const long = [c(1, '1966-01-05T10:00:00'), c(2, '1971-11-02T23:59:00')];       // about six years apart
+      f.componentRef.setInput('all', long);
+      f.componentRef.setInput('visible', long);
+      f.detectChanges();
+      const chart = f.debugElement.query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
+
+      expect(bars(chart.option()).map((b) => formatDay(b[0])).slice(0, 2)).toEqual(['1966-01-01', '1966-02-01']);
+    });
   });
 
   it('turns a slider change into a date range', () => {

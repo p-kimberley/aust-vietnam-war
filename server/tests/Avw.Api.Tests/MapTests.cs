@@ -459,6 +459,33 @@ public class MapOptionsValidatorTests
     }
 
     [Fact]
+    public void A_basemap_with_no_style_of_its_own_can_be_plain_raster_tiles_instead()
+    {
+        var o = Valid();
+        o.Basemaps.Add(new() { Id = "satellite", Name = "Satellite", Tiles = ["https://tiles.test/{z}/{y}/{x}.jpg"] });
+
+        Assert.Empty(Failures(o));
+    }
+
+    [Fact]
+    public void A_basemap_needs_a_style_or_tiles()
+    {
+        var o = Valid();
+        o.Basemaps[0] = new() { Id = "empty", Name = "Empty" };
+
+        Assert.Contains(Failures(o), f => f.Contains("Basemaps 'empty'") && f.Contains("absolute http(s) URL"));
+    }
+
+    [Fact]
+    public void A_basemap_tile_template_must_also_be_an_absolute_http_url()
+    {
+        var o = Valid();
+        o.Basemaps.Add(new() { Id = "satellite", Name = "Satellite", Tiles = ["/relative/{z}/{y}/{x}.jpg"] });
+
+        Assert.Contains(Failures(o), f => f.Contains("Basemaps 'satellite'"));
+    }
+
+    [Fact]
     public void Duplicate_ids_are_rejected()
     {
         var o = Valid();

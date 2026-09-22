@@ -46,8 +46,9 @@ export const config: MapConfig = {
   center: [107.17, 10.55],
   zoom: 8,
   basemaps: [
-    { id: 'terrain', name: 'Terrain', style: 'https://tiles.test/styles/terrain/style.json', default: true },
-    { id: 'dark', name: 'Dark', style: 'https://tiles.test/styles/dark/style.json', default: false },
+    { id: 'terrain', name: 'Terrain', style: 'https://tiles.test/styles/terrain/style.json', tiles: [], tileSize: 256, attribution: null, default: true },
+    { id: 'dark', name: 'Dark', style: 'https://tiles.test/styles/dark/style.json', tiles: [], tileSize: 256, attribution: null, default: false },
+    { id: 'satellite', name: 'Satellite', style: '', tiles: ['https://tiles.test/sat/{z}/{y}/{x}.jpg'], tileSize: 256, attribution: 'Test imagery', default: false },
   ],
   overlays: [
     { id: 'topo', name: '1ATF topo', tiles: ['https://tiles.test/{z}/{x}/{y}.png'], tileSize: 256, attribution: null, opacity: 0.8 },
