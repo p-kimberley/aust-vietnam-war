@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  Injector,
   afterNextRender,
   computed,
   inject,
@@ -68,6 +69,8 @@ type Tab = 'layers' | 'filters';
 const FLYOUT_SLIDE_MS = 300;
 /** A filter that leaves one contact, or a few close together, zooms no closer than this. */
 const FIT_MAX_ZOOM = 13;
+/** Air round the fitted contacts, beyond the panels and the timeline, so they do not land flush against an edge. */
+const FIT_PADDING_PX = 50;
 
 /**
  * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
@@ -115,6 +118,7 @@ export class Battlemap {
   protected readonly contactFilter = inject(ContactFilteringService);
   private readonly canvas = viewChild.required<ElementRef<HTMLElement>>('canvas');
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
 
   private map?: MapLibreMap;
 
@@ -368,16 +372,20 @@ export class Battlemap {
   /** What the map is waiting to zoom to: the contacts a filter has left, now or when the report search has answered. */
   private fitRequest: 'now' | 'search' | null = null;
 
-  /** How much of the map the panels and the timeline cover, so that the contacts land in the part that is left. */
+  /**
+   * How much of the map the panels and the timeline cover, so that the contacts land in the part that is left, with
+   * {@link FIT_PADDING_PX} of air beyond that. The legend does not count: it sits low enough, and is easy enough to look
+   * past, that contacts landing behind it are fine.
+   */
   private mapPadding(): { top: number; bottom: number; left: number; right: number } {
     const root = this.host.nativeElement.getBoundingClientRect();
     const timeline = this.host.nativeElement.querySelector('.bm__timeline')?.getBoundingClientRect();
-    const panels = [...this.host.nativeElement.querySelectorAll('.bm__right, .bm__incident')].map((e) => e.getBoundingClientRect().left);
+    const panels = [...this.host.nativeElement.querySelectorAll('.panel, .bm__incident')].map((e) => e.getBoundingClientRect().left);
     const padding = {
-      top: 64,
-      left: 32,
-      bottom: (timeline ? Math.max(root.bottom - timeline.top, 0) : 0) + 24,
-      right: (panels.length ? Math.max(root.right - Math.min(...panels), 0) : 0) + 24,
+      top: 64 + FIT_PADDING_PX,
+      left: 32 + FIT_PADDING_PX,
+      bottom: (timeline ? Math.max(root.bottom - timeline.top, 0) : 0) + 24 + FIT_PADDING_PX,
+      right: (panels.length ? Math.max(root.right - Math.min(...panels), 0) : 0) + 24 + FIT_PADDING_PX,
     };
     // Padding that leaves no room for the map cannot be used.
     const fits = padding.left + padding.right < root.width && padding.top + padding.bottom < root.height;
@@ -462,6 +470,9 @@ export class Battlemap {
         this.selection.selectedPictureId.set(openedPicture.id);
       }
 
+      const target = opened ?? openedPoi ?? openedPicture;
+      const hasOwnView = !!parseAt(this.at());
+
       let firstStyle = true;
       this.map = await this.basemaps.create(
         this.canvas().nativeElement,
@@ -498,6 +509,20 @@ export class Battlemap {
               // A click where none of those is under the pointer is a click on empty map.
               this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS], () => this.clearMapSelection());
               this.status.set('ready');
+              // With no explicit view in the link and nothing else to fly to, animate to fit whatever the filters leave.
+              // Deferred to after this is rendered: mapPadding reads the panels' real width, and they do not exist (the
+              // whole right-hand column is behind an `@if (status() === 'ready')`) until this has been drawn.
+              if (!target && !hasOwnView) {
+                afterNextRender(
+                  () => {
+                    const shown = this.contactFilter.visible();
+                    if (shown.length > 0) {
+                      this.basemaps.fitTo(shown, this.mapPadding(), FIT_MAX_ZOOM);
+                    }
+                  },
+                  { injector: this.injector },
+                );
+              }
             }
           },
           cameraChanged: () => this.syncUrl(),
@@ -506,9 +531,8 @@ export class Battlemap {
       );
       this.selection.attach(this.map);
 
-      // With no explicit view in the link, bring the incident into frame.
-      const target = opened ?? openedPoi ?? openedPicture;
-      if (target && !parseAt(this.at())) {
+      // With no explicit view in the link, bring the incident, base or photo into frame.
+      if (target && !hasOwnView) {
         this.basemaps.flyTo(target.lat!, target.lon!, 11);
       }
     } catch (e) {

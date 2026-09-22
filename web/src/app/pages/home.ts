@@ -31,7 +31,7 @@ import { SITE_NAME, Seo } from '../core/seo.service';
       <article class="tile">
         <h2>Honour roll</h2>
         <p>The names of those who died, with portraits and biographies where they are known.</p>
-        <a routerLink="/battlemap">See the honour roll</a>
+        <a routerLink="/battlemap" [queryParams]="{ roll: '1' }">See the honour roll</a>
       </article>
       <article class="tile">
         <h2>Stories</h2>

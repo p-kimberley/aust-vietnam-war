@@ -122,23 +122,73 @@ describe('an incident and the operation list', () => {
   });
 });
 
+describe('animating to the data extents on load', () => {
+  it('fits to every contact when the page opens with no view or filters of its own', async () => {
+    const r = await render({ contacts: CONTACTS });
+
+    expect(fitted(r)).toEqual([1, 2, 3, 4]);
+    expect(r.basemaps.fitTo.mock.calls[0][2]).toBe(13);
+  });
+
+  it('fits to the filtered contacts, not everyone, when the page opens with filters in its link', async () => {
+    const r = await render({ contacts: CONTACTS, queryParams: { mine: 'yes' } });
+
+    expect(fitted(r)).toEqual([2]);                                                       // only contact 2 has a mine incident
+  });
+
+  it('does not animate when the link already names a view of its own', async () => {
+    const r = await render({ contacts: CONTACTS, inputs: { at: '10.6,107.2,11' } });
+
+    expect(r.basemaps.fitTo).not.toHaveBeenCalled();
+  });
+
+  it('flies to the incident, base or photo the link opens instead of fitting to everyone', async () => {
+    const r = await render({ contacts: CONTACTS, inputs: { incident: '2' } });
+
+    expect(r.basemaps.flyTo).toHaveBeenCalledWith(CONTACTS[1].lat, CONTACTS[1].lon, 11);
+    expect(r.basemaps.fitTo).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when there is nothing to fit to', async () => {
+    const r = await render({ contacts: [] });
+
+    expect(r.basemaps.fitTo).not.toHaveBeenCalled();
+  });
+});
+
 describe('zooming the map to the contacts a filter leaves', () => {
   const chooseMine = async (r: Rendered) => {
     r.el.querySelector<HTMLInputElement>('input[name=mine][value=yes]')!.click();               // only contact 2 has a mine incident
     await settle(r.fixture);
   };
 
-  it('zooms to the contacts left, no closer than a single incident should be, clear of the panels', async () => {
+  it('zooms to the contacts left, no closer than a single incident should be, with 50px of air beyond the panels', async () => {
     const r = await render({ contacts: CONTACTS });
     await openFilters(r);
-    expect(r.basemaps.fitTo).not.toHaveBeenCalled();
+    r.basemaps.fitTo.mockClear();                                                          // the initial animate-to-everyone already happened
 
     await chooseMine(r);
 
     expect(r.basemaps.fitTo).toHaveBeenCalledTimes(1);
     expect(fitted(r)).toEqual([2]);
-    expect(r.basemaps.fitTo.mock.calls[0][1]).toEqual({ top: 64, left: 32, bottom: expect.any(Number), right: expect.any(Number) });
+    expect(r.basemaps.fitTo.mock.calls[0][1]).toEqual({ top: 114, left: 82, bottom: expect.any(Number), right: expect.any(Number) });
     expect(r.basemaps.fitTo.mock.calls[0][2]).toBe(13);
+  });
+
+  it('keeps clear of the controls panel on the right, but not of the legend below it', async () => {
+    const r = await render({ contacts: CONTACTS });
+    await openFilters(r);
+    const rect = (left: number, top: number, bottom: number) => ({ left, top, right: 1000, bottom, width: 1000 - left, height: bottom - top, x: left, y: top, toJSON: () => ({}) }) as DOMRect;
+    vi.spyOn(r.el, 'getBoundingClientRect').mockReturnValue(rect(0, 0, 800));
+    vi.spyOn(r.el.querySelector('.bm__timeline')!, 'getBoundingClientRect').mockReturnValue(rect(0, 750, 800));
+    vi.spyOn(r.el.querySelector('.panel')!, 'getBoundingClientRect').mockReturnValue(rect(700, 0, 400));
+    // Wider than the panel: were it still counted, right would be far larger than the panel alone asks for.
+    vi.spyOn(r.el.querySelector('.bm__legend')!, 'getBoundingClientRect').mockReturnValue(rect(100, 400, 800));
+    r.basemaps.fitTo.mockClear();
+
+    await chooseMine(r);
+
+    expect(r.basemaps.fitTo.mock.calls[0][1].right).toBe(1000 - 700 + 24 + 50);
   });
 
   it('zooms back out to everything when the filters are cleared', async () => {
@@ -174,15 +224,10 @@ describe('zooming the map to the contacts a filter leaves', () => {
     expect(fitted(r)).toEqual([1, 2]);                                                    // the two March 1966 contacts
   });
 
-  it('does not zoom when the page opens with filters in its link, which has a view of its own', async () => {
-    const r = await render({ contacts: CONTACTS, queryParams: { mine: 'yes' } });
-
-    expect(r.basemaps.fitTo).not.toHaveBeenCalled();
-  });
-
   it('does not zoom when a filter leaves nothing to zoom to', async () => {
     const r = await render({ contacts: CONTACTS.map((c) => ({ ...c, mine: 1 })) });
     await openFilters(r);
+    r.basemaps.fitTo.mockClear();                                                          // the initial animate-to-everyone already happened
 
     await chooseMine(r);                                                                  // nothing has a mine incident
 
@@ -193,6 +238,7 @@ describe('zooming the map to the contacts a filter leaves', () => {
     const search = vi.fn(() => Promise.resolve([2]));
     const r = await render({ contacts: CONTACTS, search });
     await openFilters(r);
+    r.basemaps.fitTo.mockClear();                                                          // the initial animate-to-everyone already happened
 
     const box = r.el.querySelector<HTMLInputElement>('input.text')!;
     box.value = 'claymore';
@@ -211,6 +257,7 @@ describe('zooming the map to the contacts a filter leaves', () => {
   it('leaves the camera alone while play moves the window on', async () => {
     const r = await render({ contacts: CONTACTS });
     await openFilters(r);
+    r.basemaps.fitTo.mockClear();                                                          // the initial animate-to-everyone already happened
     const play = [...r.el.querySelectorAll<HTMLButtonElement>('app-timeline button')].find((b) => b.textContent?.trim() === 'Play')!;
 
     play.click();
