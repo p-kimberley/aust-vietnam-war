@@ -71,6 +71,16 @@ describe('bucketIntervalMs', () => {
     expect(bucketIntervalMs(1891 * DAY)).toBeNull();                   // a hair over: calendar months suit it better
     expect(bucketIntervalMs(2000 * DAY)).toBeNull();
   });
+
+  it('never picks a step so fine that the whole axis would need more than 3000 buckets, however narrow the stretch shown is', () => {
+    // A drag down to a single hour, on an axis spanning six years, would otherwise ask for tens of thousands of hourly bars.
+    const sixYears = 6 * 365 * DAY;
+    expect(bucketIntervalMs(HOUR, sixYears)).toBe(DAY);                // 6 years / 3000 buckets ≈ 17.5h, so a day is the next step up
+    expect(sixYears / bucketIntervalMs(HOUR, sixYears)!).toBeLessThanOrEqual(3000);
+
+    // Leaving axisSpanMs out defaults it to spanMs itself, so a caller that only cares about the shown stretch is unaffected.
+    expect(bucketIntervalMs(HOUR)).toBe(HOUR);
+  });
 });
 
 describe('intervalBuckets', () => {
@@ -210,7 +220,7 @@ describe('Timeline', () => {
       return data.length > 1 ? data[1][0] - data[0][0] : null;
     };
 
-    it('narrows automatically as the reader zooms in, never below an hour', () => {
+    it('narrows automatically as the reader zooms in, but never below what the whole axis can afford', () => {
       const { chart } = setup();
       const whole = spacing(chart().option());
 
@@ -218,8 +228,10 @@ describe('Timeline', () => {
       const narrow = spacing(zoomed.chart().option());
       expect(narrow).toBeLessThan(whole!);
 
+      // Narrower still, but the fixture's ~181-day axis caps the floor above an hour (see bucketIntervalMs's axis-wide cap),
+      // so a single day's drag settles on 2-hour bars rather than 1-hour ones.
       const tiny = setup({ from: '1966-01-01', to: '1966-01-01' });
-      expect(spacing(tiny.chart().option())).toBe(HOUR);
+      expect(spacing(tiny.chart().option())).toBe(2 * HOUR);
     });
 
     it('still spans the whole war, whatever the bars are bucketed by, so the overview slider keeps the whole shape', () => {

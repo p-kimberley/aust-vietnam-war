@@ -103,6 +103,13 @@ export function monthBuckets(all: readonly Contact[], visible: readonly Contact[
 /** More bars than this would crowd the chart and cost more to draw than they are worth. */
 const MAX_BARS = 90;
 
+/**
+ * However fine the stretch shown would suggest, buckets are never so many across the *whole* timeline (they always span
+ * it; see {@link intervalBuckets}) that building and drawing them costs real time. A drag that picks a stretch of minutes,
+ * on a timeline of years, would otherwise ask for tens of thousands of hourly buckets to cover years it cannot see.
+ */
+const MAX_TOTAL_BUCKETS = 3000;
+
 /** The bucket widths {@link bucketIntervalMs} chooses from, closest fit first; never finer than an hour. */
 const BUCKET_STEPS_MS = [
   HOUR, 2 * HOUR, 3 * HOUR, 6 * HOUR, 12 * HOUR,
@@ -111,11 +118,14 @@ const BUCKET_STEPS_MS = [
 
 /**
  * The width of one bar, chosen automatically from the stretch of time shown so there are at most {@link MAX_BARS} of them:
- * hours when zoomed in close, widening through days as the stretch grows. `null` once even the widest of these steps would
- * still crowd the chart (the stretch is some years), which means calendar months (see {@link monthBuckets}) suit it better.
+ * hours when zoomed in close, widening through days as the stretch grows. Never finer, either, than leaves at most
+ * {@link MAX_TOTAL_BUCKETS} across `axisSpanMs` (the whole timeline, which defaults to `spanMs` itself, for a caller that
+ * only cares about the shown stretch). `null` once even the widest of these steps would still crowd the chart (the stretch
+ * is some years), which means calendar months (see {@link monthBuckets}) suit it better.
  */
-export function bucketIntervalMs(spanMs: number): number | null {
-  return BUCKET_STEPS_MS.find((ms) => spanMs / ms <= MAX_BARS) ?? null;
+export function bucketIntervalMs(spanMs: number, axisSpanMs: number = spanMs): number | null {
+  const minForWholeAxis = axisSpanMs / MAX_TOTAL_BUCKETS;
+  return BUCKET_STEPS_MS.find((ms) => ms >= minForWholeAxis && spanMs / ms <= MAX_BARS) ?? null;
 }
 
 /**
@@ -861,14 +871,15 @@ export class Timeline implements OnDestroy {
   private readonly monthlyBuckets = computed(() => monthBuckets(this.all(), this.visible()));
   private readonly axis = computed(() => limits(this.monthlyBuckets()));
   /**
-   * The bars: bucketed finely enough to suit the stretch of time the chart is zoomed to (never finer than an hour), or by
-   * calendar month once that stretch is wide enough that finer bars would just crowd the chart. Always spans the whole
-   * timeline, like `monthlyBuckets`, so the slider's overview still shows the whole war.
+   * The bars: bucketed finely enough to suit the stretch of time the chart is zoomed to (never finer than an hour, and
+   * never so fine that the whole timeline would need more than {@link MAX_TOTAL_BUCKETS} of them), or by calendar month
+   * once that stretch is wide enough that finer bars would just crowd the chart. Always spans the whole timeline, like
+   * `monthlyBuckets`, so the slider's overview still shows the whole war.
    */
   private readonly buckets = computed(() => {
     const axis = this.axis();
     const view = this.view();
-    const ms = view ? bucketIntervalMs(view.end - view.start) : null;
+    const ms = axis && view ? bucketIntervalMs(view.end - view.start, axis.max - axis.min) : null;
     return axis && ms ? intervalBuckets(this.all(), this.visible(), axis.min, axis.max, ms) : this.monthlyBuckets();
   });
   /** The stretch of time the date filter picks, and both charts show. */
