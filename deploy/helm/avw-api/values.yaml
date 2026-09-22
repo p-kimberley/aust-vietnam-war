@@ -44,12 +44,11 @@ map:
       name: Satellite
       tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"]
       attribution: "Esri, Maxar, Earthstar Geographics, and the GIS User Community"
-  # Raster overlays such as the 1ATF topographic maps from GeoServer, for example:
-  #   - id: 1atf-hillshaded
-  #     name: "1ATF topo (hillshaded)"
-  #     tiles: ["https://vietnam-war.au/geoserver/gwc/service/wmts/rest/avw:1atf/EPSG:900913/EPSG:900913:{z}/{y}/{x}?format=image/png"]
-  #     opacity: 0.85
-  overlays: []
+  # Raster overlays, off by default; a reader switches one on under "Imagery" beneath the basemap picker.
+  overlays:
+    - id: 1atf-topo
+      name: 1ATF topo
+      tiles: ["https://geoserver.hosting.gradata.com.au/geoserver/vietnam/wms?bbox={bbox-epsg-3857}&service=WMS&version=1.1.1&request=GetMap&transparent=true&layers=vietnam:1atf-topo-classic&width=256&height=256&srs=EPSG:3857&format=image/png8"]
   # Elevation for the 3D switch. Unset (null) hides the switch. Either a TileJSON url or explicit tiles, with the
   # encoding of the elevation PNGs (terrarium or mapbox). For example public Terrarium tiles (AWS Open Data):
   #   terrain:

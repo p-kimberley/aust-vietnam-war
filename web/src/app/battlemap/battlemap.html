@@ -137,18 +137,16 @@
               <fieldset>
                 <legend id="basemap-label">Basemap</legend>
                 <app-basemap-picker labelledBy="basemap-label" [options]="cfg.basemaps" [value]="basemaps.basemapId()" (picked)="setBasemap($event)" />
-              </fieldset>
 
-              @if (canTerrain()) {
-                <label class="panel__row">
-                  <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
-                  3D terrain
-                </label>
-              }
+                @if (canTerrain()) {
+                  <label class="panel__row">
+                    <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
+                    3D terrain
+                  </label>
+                }
 
-              @if (cfg.overlays.length) {
-                <fieldset>
-                  <legend>Overlays</legend>
+                @if (cfg.overlays.length) {
+                  <p class="panel__subheading">Imagery</p>
                   @for (o of cfg.overlays; track o.id) {
                     <label>
                       <input
@@ -159,8 +157,8 @@
                       {{ o.name }}
                     </label>
                   }
-                </fieldset>
-              }
+                }
+              </fieldset>
 
               @if (pois().length) {
                 <fieldset>

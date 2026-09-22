@@ -124,6 +124,20 @@ describe('Battlemap', () => {
     expect(el.textContent).toContain('1ATF topo');
   });
 
+  it('lists imagery overlays under Basemap, off by default, and switches one on', async () => {
+    const { el, basemaps, fixture } = await render({});
+
+    const basemapFieldset = [...el.querySelectorAll('fieldset')].find((f) => f.querySelector('legend')?.textContent === 'Basemap')!;
+    expect(basemapFieldset.querySelector('.panel__subheading')?.textContent).toBe('Imagery');
+    const checkbox = [...basemapFieldset.querySelectorAll('label')].find((l) => l.textContent?.includes('1ATF topo'))!.querySelector('input')!;
+    expect(checkbox.checked).toBe(false);
+
+    checkbox.click();
+    fixture.detectChanges();
+
+    expect(basemaps.setOverlay).toHaveBeenCalledWith('topo', true);
+  });
+
   it('starts from the view in the URL', async () => {
     const { basemaps } = await render({
       inputs: { at: '10.6,107.2,11', basemap: 'dark', terrain: '1', overlays: 'topo' },
