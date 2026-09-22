@@ -19,7 +19,7 @@ import { LayerRow } from './layer-row';
 import { LeftTab, LeftTabs } from './left-tabs';
 import { MapLegend } from './map-legend';
 import { NominalRoll } from './nominal-roll';
-import { BasemapService } from './basemap.service';
+import { BasemapService, parseOverlayOpacities } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
 import { POI_POINTS, addPoiLayers, setPoiVisibility } from './poi-layers';
@@ -76,8 +76,9 @@ const FIT_PADDING_PX = 50;
  * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
  * draws a heatmap and incident markers on a MapLibre GL map. Filters run in the browser over the loaded contacts (the
  * dataset is small); only the incident-report word search goes to the server. The view is kept in the URL (`?at=`,
- * `?basemap=`, `?terrain=`, `?field=`, `?overlays=`, `?incident=`, `?poi=`, `?picture=` and the filter parameters described in
- * `filters.ts`) so a link reproduces what the sender was looking at.
+ * `?basemap=`, `?terrain=`, `?field=`, `?size=`, `?overlays=`, `?opacity=`, `?bases=`, `?photos=`, `?markers=`, `?heatmap=`,
+ * `?incident=`, `?poi=`, `?picture=` and the filter parameters described in `filters.ts`) so a link reproduces what the
+ * sender was looking at; every one of them is left out when it is at its default, so a plain `/battlemap` link stays short.
  */
 @Component({
   selector: 'app-battlemap',
@@ -95,6 +96,11 @@ export class Battlemap {
   readonly field = input<string>();
   readonly size = input<string>();
   readonly overlays = input<string>();
+  readonly opacity = input<string>();
+  readonly bases = input<string>();
+  readonly photos = input<string>();
+  readonly markers = input<string>();
+  readonly heatmap = input<string>();
   readonly incident = input<string>();
   readonly poi = input<string>();
   readonly picture = input<string>();
@@ -242,11 +248,13 @@ export class Battlemap {
   protected setPhotosVisible(visible: boolean): void {
     this.showPhotos.set(visible);
     if (this.map) setPhotoVisibility(this.map, visible);
+    this.syncUrl();
   }
 
   protected setPoisVisible(visible: boolean): void {
     this.showPois.set(visible);
     if (this.map) setPoiVisibility(this.map, visible);
+    this.syncUrl();
   }
 
   protected showTab(tab: Tab): void {
@@ -269,14 +277,21 @@ export class Battlemap {
     this.syncUrl();
   }
 
+  protected setOverlayOpacity(id: string, opacity: number): void {
+    this.basemaps.setOverlayOpacity(id, opacity);
+    this.syncUrl();
+  }
+
   protected setHeatmapVisible(visible: boolean): void {
     this.showHeatmap.set(visible);
     if (this.map) setContactVisibility(this.map, HEAT_LAYER, visible);
+    this.syncUrl();
   }
 
   protected setMarkersVisible(visible: boolean): void {
     this.showMarkers.set(visible);
     if (this.map) setContactVisibility(this.map, POINT_LAYER, visible);
+    this.syncUrl();
   }
 
   protected setHeatField(value: string): void {
@@ -447,6 +462,10 @@ export class Battlemap {
       if (size && isSizeField(size)) {
         this.sizeField.set(size);
       }
+      this.showPois.set(this.bases() !== '0');
+      this.showPhotos.set(this.photos() !== '0');
+      this.showMarkers.set(this.markers() !== '0');
+      this.showHeatmap.set(this.heatmap() !== '0');
 
       // A shared link may open straight onto an incident. Ignore ids that are not real contacts.
       const requested = Number(this.incident());
@@ -482,6 +501,7 @@ export class Battlemap {
           camera: parseAt(this.at()),
           terrain: this.terrain() === '1',
           overlays: (this.overlays() ?? '').split(',').filter(Boolean),
+          overlayOpacities: parseOverlayOpacities(this.opacity()),
         },
         {
           styleLoaded: (map) => {
@@ -583,6 +603,15 @@ export class Battlemap {
         field: this.heatField() !== DEFAULT_HEAT_FIELD ? this.heatField() : null,
         size: this.sizeField(),
         overlays: this.basemaps.overlayIds().join(',') || null,
+        opacity:
+          (this.config()?.overlays ?? [])
+            .filter((o) => this.basemaps.overlayOpacity(o.id) !== (o.opacity ?? 1))
+            .map((o) => `${o.id}:${this.basemaps.overlayOpacity(o.id)}`)
+            .join(',') || null,
+        bases: this.showPois() ? null : '0',
+        photos: this.showPhotos() ? null : '0',
+        markers: this.showMarkers() ? null : '0',
+        heatmap: this.showHeatmap() ? null : '0',
         incident: this.selection.selectedId(),
         poi: this.selection.selectedPoiId(),
         picture: this.selection.selectedPictureId(),

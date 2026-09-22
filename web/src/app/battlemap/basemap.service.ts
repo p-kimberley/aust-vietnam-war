@@ -14,6 +14,21 @@ export interface MapStart {
   camera?: Camera | null;
   terrain?: boolean;
   overlays?: readonly string[];
+  /** Opacity chosen for an overlay before the map exists (from a link); an overlay not here starts at its configured default. */
+  overlayOpacities?: ReadonlyMap<string, number>;
+}
+
+/** The inverse of how {@link BasemapService.overlayOpacity} choices are put in a link: `id:value` pairs, comma-separated. */
+export function parseOverlayOpacities(value: string | null | undefined): ReadonlyMap<string, number> {
+  const out = new globalThis.Map<string, number>();
+  for (const token of (value ?? '').split(',')) {
+    const [id, raw] = token.split(':');
+    const n = Number(raw);
+    if (id && Number.isFinite(n) && n >= 0 && n <= 1) {
+      out.set(id, n);
+    }
+  }
+  return out;
 }
 
 export interface MapHooks {
@@ -57,6 +72,7 @@ export class BasemapService implements OnDestroy {
     this.basemapId.set(basemap.id);
     this.terrainEnabled.set(!!start.terrain && !!config.terrain);
     this.overlayIds.set((start.overlays ?? []).filter((id) => config.overlays.some((o) => o.id === id)));
+    this.overlayOpacities.set(start.overlayOpacities ?? new globalThis.Map());
 
     const camera = start.camera ?? { lat: config.center[1], lon: config.center[0], zoom: config.zoom };
     const map = new maplibre.Map({

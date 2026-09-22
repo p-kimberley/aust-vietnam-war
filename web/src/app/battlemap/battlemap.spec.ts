@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { config, contacts, render, settle } from './battlemap-testing';
 import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight, pointRadius, selectedRadius } from './contact-layers';
 import { fieldRange, formatDtg, sizeCap, toGeoJson } from './contacts';
+import { parseOverlayOpacities } from './basemap.service';
 import { MapConfig, basemapStyle, pickBasemap } from './map-config';
 import { formatAt, parseAt } from './map-url';
 
@@ -93,6 +94,13 @@ describe('map URL state', () => {
   it('ignores a missing value', () => {
     expect(parseAt(undefined)).toBeNull();
   });
+
+  it('reads overlay opacities as id:value pairs, ignoring anything out of range or malformed', () => {
+    expect(parseOverlayOpacities('topo:0.35,other:1')).toEqual(new Map([['topo', 0.35], ['other', 1]]));
+    expect(parseOverlayOpacities('topo:2,other:-1,:0.5,bogus,topo:0.4')).toEqual(new Map([['topo', 0.4]]));
+    expect(parseOverlayOpacities(undefined)).toEqual(new Map());
+    expect(parseOverlayOpacities('')).toEqual(new Map());
+  });
 });
 
 describe('map config helpers', () => {
@@ -145,14 +153,14 @@ describe('Battlemap', () => {
       fixture.detectChanges();
     };
 
-    it('fades the 1ATF topo overlay from fully opaque, without touching it until the arrow is opened', async () => {
+    it('fades the 1ATF topo overlay from its configured default (0.8 in the fixture), without touching it until the arrow is opened', async () => {
       const { el, basemaps, fixture } = await render({});
       const row = rowFor(el, '1ATF topo');
       expect(row.querySelector('.toggle')!.getAttribute('aria-expanded')).toBe('false');
 
       open(row, fixture);
       const slider = row.querySelector<HTMLInputElement>('input[type=range]')!;
-      expect(slider.value).toBe('1');
+      expect(slider.value).toBe('0.8');
 
       slider.value = '0';
       slider.dispatchEvent(new Event('input', { bubbles: true }));
@@ -212,7 +220,7 @@ describe('Battlemap', () => {
 
   it('starts from the view in the URL', async () => {
     const { basemaps } = await render({
-      inputs: { at: '10.6,107.2,11', basemap: 'dark', terrain: '1', overlays: 'topo' },
+      inputs: { at: '10.6,107.2,11', basemap: 'dark', terrain: '1', overlays: 'topo', opacity: 'topo:0.35' },
     });
 
     expect(basemaps.startedWith).toEqual({
@@ -220,6 +228,7 @@ describe('Battlemap', () => {
       camera: { lat: 10.6, lon: 107.2, zoom: 10 },
       terrain: true,
       overlays: ['topo'],
+      overlayOpacities: new Map([['topo', 0.35]]),
     });
   });
 
@@ -301,6 +310,91 @@ describe('Battlemap', () => {
     await wait(450);
     expect(basemaps.map.setPaintProperty).toHaveBeenLastCalledWith(SELECTED_LAYER, 'circle-radius', selectedRadius({ field: null, cap: 0 }));
     expect(navigate.mock.calls.at(-1)![1]!.queryParams!['size']).toBeNull();
+  });
+
+  const checkboxFor = (el: HTMLElement, text: string) =>
+    [...el.querySelectorAll('label')].find((l) => l.textContent?.includes(text))!.querySelector<HTMLInputElement>('input[type=checkbox]')!;
+
+  it('puts a layer switched off in the link, but leaves it out while every layer is at its default', async () => {
+    const { el, fixture } = await render({});
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+    checkboxFor(el, 'Bases and landing zones').click();
+    checkboxFor(el, 'Incident markers').click();
+    checkboxFor(el, 'Heatmap').click();
+    await settle(fixture);
+    await wait(450);
+
+    const params = navigate.mock.calls.at(-1)![1]!.queryParams!;
+    expect(params['bases']).toBe('0');
+    expect(params['markers']).toBe('0');
+    expect(params['heatmap']).toBe('0');
+    expect(params['photos']).toBeNull();
+
+    checkboxFor(el, 'Bases and landing zones').click();
+    checkboxFor(el, 'Incident markers').click();
+    checkboxFor(el, 'Heatmap').click();
+    await settle(fixture);
+    await wait(450);
+
+    const restored = navigate.mock.calls.at(-1)![1]!.queryParams!;
+    expect(restored['bases']).toBeNull();
+    expect(restored['markers']).toBeNull();
+    expect(restored['heatmap']).toBeNull();
+  });
+
+  it('puts community photos switched off in the link too', async () => {
+    const pic = { id: 5, mediaId: 1, contactId: null, url: '/media/a.jpg', thumbUrl: '/media/a-480.jpg', width: 800, height: 600, caption: null, credit: null, dateTaken: '1966-08-18', lat: 10.56, lon: 107.17, status: 'Approved' as const, likes: 0, likedByMe: false, byteSize: 1, contentType: 'image/jpeg', addedUtc: '2018-09-02T04:15:00Z', addedBy: 'Alex Member', mine: false, canRemove: false };
+    const { el, fixture } = await render({ community: { mediaOnMap: vi.fn(() => Promise.resolve([pic])) } });
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+    checkboxFor(el, 'Community photos').click();
+    await settle(fixture);
+    await wait(450);
+
+    expect(navigate.mock.calls.at(-1)![1]!.queryParams!['photos']).toBe('0');
+  });
+
+  it('restores which layers are switched on from the link', async () => {
+    const { el } = await render({ inputs: { bases: '0', photos: '0', markers: '0', heatmap: '0' } });
+
+    expect(checkboxFor(el, 'Bases and landing zones').checked).toBe(false);
+    expect(checkboxFor(el, 'Incident markers').checked).toBe(false);
+    expect(checkboxFor(el, 'Heatmap').checked).toBe(false);
+  });
+
+  it('keeps a changed overlay opacity in the link, but not one left at its configured default', async () => {
+    const { el, fixture, basemaps } = await render({});
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const row = [...el.querySelectorAll('app-layer-row')].find((r) => r.textContent?.includes('1ATF topo'))! as HTMLElement;
+    row.querySelector<HTMLButtonElement>('.toggle')!.click();
+    fixture.detectChanges();
+    const slider = row.querySelector<HTMLInputElement>('input[type=range]')!;
+
+    slider.value = '0.3';
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+    await settle(fixture);
+    await wait(450);
+
+    expect(basemaps.setOverlayOpacity).toHaveBeenCalledWith('topo', 0.3);
+    expect(navigate.mock.calls.at(-1)![1]!.queryParams!['opacity']).toBe('topo:0.3');
+
+    // Back to the fixture's own configured default (0.8): the link should stop mentioning it.
+    slider.value = '0.8';
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+    await settle(fixture);
+    await wait(450);
+
+    expect(navigate.mock.calls.at(-1)![1]!.queryParams!['opacity']).toBeNull();
+  });
+
+  it('restores an overlay opacity from the link', async () => {
+    const { el, fixture } = await render({ inputs: { opacity: 'topo:0.35' } });
+    const row = [...el.querySelectorAll('app-layer-row')].find((r) => r.textContent?.includes('1ATF topo'))! as HTMLElement;
+    row.querySelector<HTMLButtonElement>('.toggle')!.click();
+    fixture.detectChanges();
+
+    expect(row.querySelector<HTMLInputElement>('input[type=range]')!.value).toBe('0.35');
   });
 
   const pointPaint = (r: Awaited<ReturnType<typeof render>>) =>

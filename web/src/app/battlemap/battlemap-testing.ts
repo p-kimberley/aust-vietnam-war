@@ -95,8 +95,11 @@ export class FakeBasemapService {
   readonly map = fakeMap();
   startedWith?: unknown;
   hooks?: MapHooks;
-  create = vi.fn(async (_c: HTMLElement, _cfg: MapConfig, start: unknown, hooks: MapHooks) => {
+  private mapConfig?: MapConfig;
+  create = vi.fn(async (_c: HTMLElement, cfg: MapConfig, start: { overlayOpacities?: ReadonlyMap<string, number> }, hooks: MapHooks) => {
     this.startedWith = start;
+    this.mapConfig = cfg;
+    this.overlayOpacities = new Map(start.overlayOpacities ?? []);
     this.hooks = hooks;
     hooks.styleLoaded(this.map as never);
     return this.map as never;
@@ -104,8 +107,9 @@ export class FakeBasemapService {
   setBasemap = vi.fn();
   setTerrain = vi.fn();
   setOverlay = vi.fn();
-  private readonly overlayOpacities = new Map<string, number>();
-  overlayOpacity = vi.fn((id: string) => this.overlayOpacities.get(id) ?? 1);
+  private overlayOpacities = new Map<string, number>();
+  // Mirrors BasemapService.overlayOpacity: what was chosen, or the overlay's own configured default.
+  overlayOpacity = vi.fn((id: string) => this.overlayOpacities.get(id) ?? this.mapConfig?.overlays.find((o) => o.id === id)?.opacity ?? 1);
   setOverlayOpacity = vi.fn((id: string, opacity: number) => void this.overlayOpacities.set(id, opacity));
   flyTo = vi.fn();
   fitTo = vi.fn();

@@ -166,7 +166,7 @@
                           max="1"
                           step="0.01"
                           [value]="basemaps.overlayOpacity(o.id)"
-                          (input)="basemaps.setOverlayOpacity(o.id, $any($event.target).valueAsNumber)"
+                          (input)="setOverlayOpacity(o.id, $any($event.target).valueAsNumber)"
                         />
                       </label>
                     </app-layer-row>
