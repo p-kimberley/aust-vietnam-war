@@ -8,11 +8,13 @@ on:
 permissions:
   contents: read
 
-# Every job runs inside a container image rather than on the runner's own Ubuntu userland, and none of those images is Ubuntu:
+# server and web run inside a container image rather than on the runner's own Ubuntu userland, and neither image is Ubuntu:
 #   .NET   Microsoft's SDK image on Azure Linux 3.0 (and, for the images that ship, its distroless ASP.NET image; see server/Dockerfile)
 #   web    Node's own Debian image (and Google's distroless Node to ship; see web/Dockerfile)
-#   helm   Microsoft's Azure Linux base image, with Helm from Azure Linux's own package repository
-# `runs-on: ubuntu-latest` is only the GitHub-hosted machine that starts the containers (it cannot be changed without a self-hosted runner).
+# `runs-on: ubuntu-latest` is the GitHub-hosted machine that starts those containers (it cannot be changed without a self-hosted runner).
+# helm runs directly on that Ubuntu runner instead of in a container: Azure Linux's own package mirror (tdnf) has proven too flaky
+# from GitHub's network for a job that needs nothing from it beyond Helm, git and tar, all of which Ubuntu already has or gets
+# from a maintained action.
 
 jobs:
   server:
@@ -68,12 +70,10 @@ jobs:
 
   helm:
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/azurelinux/base/core:3.0
     steps:
-      - name: Install the tools
-        run: tdnf install -y helm git tar ca-certificates
       - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
       - name: Lint and render every chart
         run: |
           for chart in deploy/helm/*/; do
