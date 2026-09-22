@@ -52,7 +52,7 @@ It prints how many migrations are applied. `--dry-run` lists what is pending wit
 
 ## 4. Point the API at Elasticsearch
 
-The contacts on the map, the honour roll and the charts are read from Elasticsearch (`avw_contacts` and `avw_nomroll`). **There is no
+The contacts on the map and the charts are read from Elasticsearch (`avw_contacts` and `avw_nomroll`). The honour roll is in MySQL: copy it in once with the migrator (below). **There is no
 Elasticsearch in the dev stack**, so use the shared cluster with a **read-only** key (the project only ever reads from it). Set these in
 the shell that runs the API:
 
@@ -71,7 +71,16 @@ $env:Elasticsearch__CaCertificatePath = "<full path to the cluster's CA certific
 
 In this workspace the key and the CA certificate are kept in `.ai/` (git-ignored). Never commit them or paste the key into a log.
 
-Without this the API still starts, and sign-in, the Studio, stories, notes and pictures work, but the map, honour roll and charts show errors.
+Without this the API still starts, and sign-in, the Studio, stories, notes and pictures work, but the map and charts show errors.
+
+The honour roll and the nominal roll panel need the roll copied into MySQL, once, with the same variables (and `ConnectionStrings__Default` for the dev database) set:
+
+```
+dotnet run --project server/src/Avw.Migrator -- import-roll --dry-run     # reports the counts, writes nothing
+dotnet run --project server/src/Avw.Migrator -- import-roll               # 522 people who died in service
+```
+
+Repeat it any time; a second run reports everything unchanged. Until it has run, the roll is empty.
 
 ## 5. Run the API
 

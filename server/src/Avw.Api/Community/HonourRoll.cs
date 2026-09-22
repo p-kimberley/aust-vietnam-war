@@ -1,15 +1,17 @@
-using System.Globalization;
-using System.Net.Http.Json;
+using System.Linq.Expressions;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Avw.Api.Analytics;
-using Avw.Api.Map;
 using Avw.Api.Media;
+using Avw.Data;
+using Avw.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Avw.Api.Community;
 
-/// <summary>One line of the honour roll: who they were and when they died.</summary>
+/// <summary>
+/// One line of the honour roll: who they were and when they died. <c>Name</c> reads naturally ("James Mungo White"); <c>SortName</c> is
+/// the way a roll is written ("White, James Mungo").
+/// </summary>
 public sealed record HonourSummary(
     string ServiceNumber,
     string Name,
@@ -18,7 +20,8 @@ public sealed record HonourSummary(
     DateOnly? Birth,
     DateOnly? Death,
     int? AgeAtDeath,
-    string? PortraitUrl);
+    string? PortraitUrl,
+    string? SortName = null);
 
 public sealed record HonourTour(string? Unit, string? Start, string? End);
 
@@ -39,12 +42,29 @@ public sealed record HonourPerson(
     IReadOnlyList<int> Incidents,
     int Tributes);
 
-public sealed record HonourPage(IReadOnlyList<HonourSummary> Items, long Total, int Page, int PageSize);
+/// <summary>What to restrict the roll to. A blank value is no restriction; each value is matched as a whole.</summary>
+public sealed record HonourFilter(string? Service = null, string? Rank = null, string? Corps = null)
+{
+    public static readonly HonourFilter None = new();
+}
 
-/// <summary>People on the nominal roll who died in service, as recorded in Elasticsearch.</summary>
+/// <summary>One choice in a drop-down, and how many people it would leave.</summary>
+public sealed record HonourFacetOption(string Value, int Count);
+
+/// <summary>
+/// The choices for each drop-down. Each is counted with the other two filters and the search text applied but not its own, so
+/// choosing Navy leaves only the Navy's ranks and corps, and the service list still shows what the others would give.
+/// </summary>
+public sealed record HonourFacets(
+    IReadOnlyList<HonourFacetOption> Services, IReadOnlyList<HonourFacetOption> Ranks, IReadOnlyList<HonourFacetOption> Corps);
+
+public sealed record HonourPage(IReadOnlyList<HonourSummary> Items, long Total, int Page, int PageSize, HonourFacets? Facets = null);
+
+/// <summary>People on the nominal roll who died in service.</summary>
 public interface IHonourRollSource
 {
-    Task<HonourPage> SearchAsync(string? text, int page, int pageSize, CancellationToken ct);
+    /// <summary>The roll by surname, restricted by the words typed and the filter, with the drop-down choices if asked for.</summary>
+    Task<HonourPage> SearchAsync(string? text, HonourFilter filter, bool withFacets, int page, int pageSize, CancellationToken ct);
 
     /// <summary>One person by service number, or <c>null</c> if the roll has nobody with that number who died.</summary>
     Task<HonourPerson?> GetAsync(string serviceNumber, CancellationToken ct);
@@ -52,51 +72,48 @@ public interface IHonourRollSource
     Task<IReadOnlyList<HonourSummary>> GetManyAsync(IReadOnlyCollection<string> serviceNumbers, CancellationToken ct);
 }
 
-public sealed class ElasticsearchHonourRoll(
-    HttpClient http, IOptions<ElasticsearchOptions> options, IOptions<MediaOptions> media) : IHonourRollSource
+/// <summary>
+/// The roll as MySQL holds it (imported by <c>Avw.Migrator import-roll</c>): names are found with the full-text index, and the database does the
+/// sorting, filtering, counting and paging, so nothing is kept in the application and Elasticsearch is not asked at all.
+/// </summary>
+public sealed class HonourRollStore(AvwDbContext db, IOptions<MediaOptions> media) : IHonourRollSource
 {
-    private static readonly JsonSerializerOptions RequestJson = new() { PropertyNamingPolicy = null };
-    private static readonly string[] NameFields = ["FirstName", "SecondName", "ThirdName", "LastName", "ServiceNumber"];
-
     public const int MaxPageSize = 50;
 
-    public async Task<HonourPage> SearchAsync(string? text, int page, int pageSize, CancellationToken ct)
+    /// <summary>More words than this in a search are ignored, so a pasted paragraph cannot build an enormous query.</summary>
+    public const int MaxSearchWords = 8;
+
+    /// <summary>
+    /// The words to look for in what a person typed: in lower case, split at anything that is not a letter or a digit (so
+    /// <c>MC DONALD-SMITH</c> is three words, as it is in the index), and no more than <see cref="MaxSearchWords"/> of them.
+    /// </summary>
+    public static IReadOnlyList<string> SearchWords(string? text) => HonourRollRows.Words(text).Take(MaxSearchWords).ToList();
+
+    public async Task<HonourPage> SearchAsync(string? text, HonourFilter filter, bool withFacets, int page, int pageSize, CancellationToken ct)
     {
         page = Math.Clamp(page, 1, 200);
         pageSize = Math.Clamp(pageSize, 1, MaxPageSize);
-        var must = new List<object> { new { exists = new { field = "Death.Date" } } };
-        if (!string.IsNullOrWhiteSpace(text))
-        {
-            must.Add(new { multi_match = new { query = text.Trim(), fields = NameFields, type = "cross_fields", @operator = "and" } });
-        }
+        var named = Named(SearchWords(text));
+        var found = Restrict(named, filter, Facet.None);
 
-        var body = new
-        {
-            from = (page - 1) * pageSize,
-            size = pageSize,
-            track_total_hits = true,
-            query = new { @bool = new { must } },
-            sort = new object[] { new Dictionary<string, string> { ["Death.Date"] = "asc" }, new Dictionary<string, string> { ["ServiceNumber.keyword"] = "asc" } },
-        };
-
-        var res = await SearchRawAsync(body, ct);
-        return new HonourPage(res.Hits.Hits.Select(h => ToSummary(h.Source)).ToList(), res.Hits.Total.Value, page, pageSize);
+        var total = await found.CountAsync(ct);
+        var rows = await found.OrderBy(p => p.SortKey).ThenBy(p => p.ServiceNumber).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(ct);
+        return new HonourPage(rows.Select(ToSummary).ToList(), total, page, pageSize, withFacets ? await FacetsAsync(named, filter, ct) : null);
     }
 
     public async Task<HonourPerson?> GetAsync(string serviceNumber, CancellationToken ct)
     {
-        var res = await SearchRawAsync(new { size = 1, query = ByServiceNumber([serviceNumber]) }, ct);
-        var s = res.Hits.Hits.FirstOrDefault()?.Source;
-        if (s is null || s.Death?.Date is null)
+        var number = serviceNumber.Trim();
+        var row = await db.HonourRoll.AsNoTracking().FirstOrDefaultAsync(p => p.ServiceNumber == number, ct);
+        if (row is null)
         {
             return null;
         }
 
-        var summary = ToSummary(s);
+        var summary = ToSummary(row);
         return new HonourPerson(
             summary.ServiceNumber, summary.Name, summary.Rank, summary.Branch, summary.Birth, summary.Death, summary.AgeAtDeath, summary.PortraitUrl,
-            Clean(s.Birth?.Place), Clean(s.Birth?.State), Clean(s.Birth?.Country), s.NationalService,
-            (s.Tours ?? []).Select(t => new HonourTour(Clean(t.Unit), Clean(t.StartDate), Clean(t.EndDate))).ToList(), [], 0);
+            row.BirthPlace, row.BirthState, row.BirthCountry, row.NationalService, Tours(row.Tours), [], 0);
     }
 
     public async Task<IReadOnlyList<HonourSummary>> GetManyAsync(IReadOnlyCollection<string> serviceNumbers, CancellationToken ct)
@@ -106,32 +123,112 @@ public sealed class ElasticsearchHonourRoll(
             return [];
         }
 
-        var res = await SearchRawAsync(new { size = Math.Min(serviceNumbers.Count, 200), query = ByServiceNumber(serviceNumbers) }, ct);
-        return res.Hits.Hits.Select(h => ToSummary(h.Source)).OrderBy(p => p.Death).ThenBy(p => p.Name).ToList();
+        var wanted = serviceNumbers.ToList();
+        var rows = await db.HonourRoll.AsNoTracking().Where(p => wanted.Contains(p.ServiceNumber)).ToListAsync(ct);
+        return rows.Select(ToSummary).OrderBy(p => p.Death).ThenBy(p => p.Name).ToList();
     }
 
-    private static object ByServiceNumber(IEnumerable<string> numbers) =>
-        new { @bool = new { filter = new object[] { new { terms = new Dictionary<string, string[]> { ["ServiceNumber.keyword"] = numbers.ToArray() } }, new { exists = new { field = "Death.Date" } } } } };
+    // ---- searching
 
-    private async Task<SearchResult> SearchRawAsync(object body, CancellationToken ct)
+    /// <summary>
+    /// The people each of whose words starts a word of a name or of the service number, so "will smi" finds William Smith with the words
+    /// in different names. Words the full-text index can hold are found with it; a shorter word (at least three letters are indexed) or a
+    /// stop word such as "will" is looked for in the text itself, which at about 520 people costs nothing.
+    /// </summary>
+    private IQueryable<HonourRollPerson> Named(IReadOnlyList<string> words)
     {
-        using var res = await http.PostAsJsonAsync($"{Uri.EscapeDataString(options.Value.PersonnelIndex)}/_search", body, RequestJson, ct);
-        if (!res.IsSuccessStatusCode)
+        // The in-memory database used by tests has no full-text index, so there every word is looked for in the text.
+        var indexed = db.Database.IsRelational() ? words.Where(SearchTerms.CanBeIndexed).ToList() : [];
+        IQueryable<HonourRollPerson> query = db.HonourRoll;
+        if (indexed.Count > 0)
         {
-            var detail = await res.Content.ReadAsStringAsync(ct);
-            throw new HttpRequestException($"Elasticsearch answered {(int)res.StatusCode}: {(detail.Length > 300 ? detail[..300] : detail)}");
+            var boolean = string.Join(' ', indexed.Select(w => $"+{w}*"));      // only letters and digits, so no operator can be typed in
+            query = db.HonourRoll.FromSql($"SELECT * FROM honour_roll WHERE MATCH(SearchText) AGAINST ({boolean} IN BOOLEAN MODE)");
         }
 
-        return await res.Content.ReadFromJsonAsync<SearchResult>(ct) ?? throw new InvalidOperationException("Elasticsearch returned an empty response.");
+        foreach (var word in words.Except(indexed))
+        {
+            var startOfAWord = " " + word;
+            query = query.Where(p => p.SearchText.Contains(startOfAWord));
+        }
+
+        return query.AsNoTracking();
     }
 
-    private HonourSummary ToSummary(PersonSource s)
+    // ---- filtering
+
+    private enum Facet { None, Service, Rank, Corps }
+
+    private static string? Chosen(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static IQueryable<HonourRollPerson> Restrict(IQueryable<HonourRollPerson> query, HonourFilter filter, Facet skip)
     {
-        var birth = ElasticsearchAnalyticsSource.TryParseDate(s.Birth?.Date);
-        var death = ElasticsearchAnalyticsSource.TryParseDate(s.Death?.Date);
-        var sn = s.ServiceNumber?.Trim() ?? "";
-        return new HonourSummary(sn, DisplayName(s), Clean(s.Rank), Clean(s.Branch), birth, death,
-            birth is not null && death is not null ? Analytics.Charts.AgeOn(birth.Value, death.Value) : null, PortraitFor(sn));
+        var service = Chosen(filter.Service);
+        var rank = Chosen(filter.Rank);
+        var corps = Chosen(filter.Corps);
+        // A service in any case is the service ("air force"); anything else is left to find nobody.
+        service = HonourRollRows.Services.FirstOrDefault(s => string.Equals(s, service, StringComparison.OrdinalIgnoreCase)) ?? service;
+        if (skip != Facet.Service && service is not null)
+        {
+            query = query.Where(p => p.Service == service);
+        }
+
+        if (skip != Facet.Rank && rank is not null)
+        {
+            query = query.Where(p => p.Rank == rank);
+        }
+
+        if (skip != Facet.Corps && corps is not null)
+        {
+            query = query.Where(p => p.Corps == corps);
+        }
+
+        return query;
+    }
+
+    private async Task<HonourFacets> FacetsAsync(IQueryable<HonourRollPerson> named, HonourFilter filter, CancellationToken ct)
+    {
+        async Task<List<HonourFacetOption>> Count(Facet facet, Expression<Func<HonourRollPerson, string?>> field, string? chosen, IComparer<string> order)
+        {
+            var groups = await Restrict(named, filter, facet).Select(field).Where(v => v != null).GroupBy(v => v!)
+                .Select(g => new { Value = g.Key, Count = g.Count() }).ToListAsync(ct);
+            var options = groups.ToDictionary(g => g.Value, g => g.Count, StringComparer.OrdinalIgnoreCase);
+            if (Chosen(chosen) is { } picked && !options.ContainsKey(picked))
+            {
+                options[picked] = 0;                            // a choice already made stays in its list, even when nothing is left under it
+            }
+
+            return options.OrderBy(o => o.Key, order).Select(o => new HonourFacetOption(o.Key, o.Value)).ToList();
+        }
+
+        var byRank = Comparer<string>.Create((a, b) =>
+        {
+            var c = StringComparer.InvariantCultureIgnoreCase.Compare(HonourRollRows.RankSortKey(a), HonourRollRows.RankSortKey(b));
+            return c != 0 ? c : a.Length != b.Length ? a.Length - b.Length : StringComparer.InvariantCultureIgnoreCase.Compare(a, b);      // the plain rank before its temporary or acting one
+        });
+        var byService = Comparer<string>.Create((a, b) => Array.IndexOf(HonourRollRows.Services, a) - Array.IndexOf(HonourRollRows.Services, b));
+        return new HonourFacets(
+            await Count(Facet.Service, p => p.Service, filter.Service, byService),
+            await Count(Facet.Rank, p => p.Rank, filter.Rank, byRank),
+            await Count(Facet.Corps, p => p.Corps, filter.Corps, StringComparer.InvariantCultureIgnoreCase));
+    }
+
+    // ---- shaping
+
+    private HonourSummary ToSummary(HonourRollPerson p) =>
+        new(p.ServiceNumber, p.Name, p.Rank, p.Corps, p.BirthDate, p.DeathDate,
+            p.BirthDate is not null && p.DeathDate is not null ? Analytics.Charts.AgeOn(p.BirthDate.Value, p.DeathDate.Value) : null, PortraitFor(p.ServiceNumber), p.SortName);
+
+    private static List<HonourTour> Tours(string json)
+    {
+        try
+        {
+            return (JsonSerializer.Deserialize<List<RollTour>>(json) ?? []).Select(t => new HonourTour(t.Unit, t.Start, t.End)).ToList();
+        }
+        catch (JsonException)
+        {
+            return [];
+        }
     }
 
     /// <summary>The portrait's address, if a file for this service number has been put in the media folder's <c>portraits</c> folder.</summary>
@@ -140,46 +237,4 @@ public sealed class ElasticsearchHonourRoll(
         && File.Exists(Path.Combine(media.Value.RootPath, "portraits", serviceNumber + ".jpg"))
             ? $"/media/portraits/{serviceNumber}.jpg"
             : null;
-
-    public static string DisplayName(PersonSource s)
-    {
-        var given = string.Join(' ', new[] { s.FirstName, s.SecondName, s.ThirdName }.Where(n => !string.IsNullOrWhiteSpace(n)).Select(n => n!.Trim()));
-        var family = string.IsNullOrWhiteSpace(s.LastName) ? "" : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(s.LastName.Trim().ToLowerInvariant());
-        return $"{given} {family}".Trim();
-    }
-
-    private static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-
-    // ---- response shapes
-
-    private sealed record Total([property: JsonPropertyName("value")] long Value);
-
-    private sealed record Hit([property: JsonPropertyName("_source")] PersonSource Source);
-
-    private sealed record HitList([property: JsonPropertyName("total")] Total Total, [property: JsonPropertyName("hits")] List<Hit> Hits);
-
-    private sealed record SearchResult([property: JsonPropertyName("hits")] HitList Hits);
-
-    public sealed record PersonSource(
-        [property: JsonPropertyName("ServiceNumber")] string? ServiceNumber,
-        [property: JsonPropertyName("FirstName")] string? FirstName,
-        [property: JsonPropertyName("SecondName")] string? SecondName,
-        [property: JsonPropertyName("ThirdName")] string? ThirdName,
-        [property: JsonPropertyName("LastName")] string? LastName,
-        [property: JsonPropertyName("Rank")] string? Rank,
-        [property: JsonPropertyName("Branch")] string? Branch,
-        [property: JsonPropertyName("NationalService")] bool? NationalService,
-        [property: JsonPropertyName("Birth")] BirthSource? Birth,
-        [property: JsonPropertyName("Death")] DeathSource? Death,
-        [property: JsonPropertyName("Tours")] List<TourSource>? Tours);
-
-    public sealed record BirthSource(
-        [property: JsonPropertyName("Date")] string? Date, [property: JsonPropertyName("Place")] string? Place,
-        [property: JsonPropertyName("State")] string? State, [property: JsonPropertyName("Country")] string? Country);
-
-    public sealed record DeathSource([property: JsonPropertyName("Date")] string? Date);
-
-    public sealed record TourSource(
-        [property: JsonPropertyName("Unit")] string? Unit, [property: JsonPropertyName("StartDate")] string? StartDate,
-        [property: JsonPropertyName("EndDate")] string? EndDate);
 }

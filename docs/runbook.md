@@ -94,6 +94,10 @@ MySQL 5.6 dump that contains personal data: keep it off shared machines and neve
 
    Expected counts from the June 2017 dump: 230 notes, 46 comments, 267 poppies (247 of them laid with no message, kept as
    poppies with no words), 8 casualty reports and 213 person-to-incident links.
+   3a. The **nominal roll** (the people who died in service) is copied from the legacy Elasticsearch index into MySQL with `import-roll`. It reads
+   Elasticsearch, not the legacy MySQL, so it needs no `ConnectionStrings__Legacy`, but the job is given the chart's `elasticsearch.*` values
+   and the API key from the secret (a read-only key is enough). Expected: 522 added. Run it before the site goes live, and again if the old index is
+   corrected; it never removes anybody, so the table can be added to or corrected once Elasticsearch is retired.
 4. Run for real with `--set import.dryRun=false`. A second run must report **0 added** (everything "unchanged").
 5. Pictures: copy the old `incident-media/` folder onto a volume, name it in `import.legacyFiles`, and run again. Files that are
    missing are skipped and reported, so it can be repeated as more arrive. The dump lists 353 pictures. Each is checked, straightened,

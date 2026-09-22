@@ -184,7 +184,7 @@ describe('Battle Map: finding notes and photos', () => {
     await settle(r.fixture);
 
     expect(r.el.querySelector('app-picture-panel')).not.toBeNull();
-    expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.5979, 107.0504, 14);
+    expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.5979, 107.0504, 15);
   });
 
   it('opens a found photo that has no place without moving the map', async () => {
@@ -208,6 +208,6 @@ describe('Battle Map: finding notes and photos', () => {
 
     expect(r.el.querySelector('app-picture-panel')).not.toBeNull();
     expect(r.el.querySelector('app-incident-panel')).toBeNull();
-    expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.56, 107.17, 14);
+    expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.56, 107.17, 15);
   });
 });

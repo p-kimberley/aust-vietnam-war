@@ -39,6 +39,9 @@ public sealed partial record SearchTerms(string Boolean, IReadOnlyList<string> W
     [GeneratedRegex(@"[\p{L}\p{N}]+")]
     private static partial Regex Word();
 
+    /// <summary>Whether the full-text index holds a word like this one: a shorter word, or a stop word, is not in it, so it cannot be searched for there.</summary>
+    public static bool CanBeIndexed(string word) => word.Length >= MinWordLength && !StopWords.Contains(word);
+
     public bool IsEmpty => Words.Count == 0;
 
     public static SearchTerms Parse(string? text)
@@ -70,7 +73,7 @@ public sealed partial record SearchTerms(string Boolean, IReadOnlyList<string> W
 
         void Add(string word)
         {
-            if (word.Length >= MinWordLength && !StopWords.Contains(word))
+            if (CanBeIndexed(word))
             {
                 terms.Add($"+{word}*");
                 words.Add(word);

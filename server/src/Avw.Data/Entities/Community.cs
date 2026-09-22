@@ -158,3 +158,42 @@ public class CasualtyLink
     public string ServiceNumber { get; set; } = "";
     public int ContactId { get; set; }
 }
+
+/// <summary>
+/// One person of the nominal roll who died in service, copied from Elasticsearch so that the roll can be searched with a MySQL
+/// full-text index, sorted and filtered by the database. Refreshed from Elasticsearch on a schedule; never edited by hand.
+/// </summary>
+public class HonourRollPerson
+{
+    public string ServiceNumber { get; set; } = "";
+
+    /// <summary>"James Mungo White".</summary>
+    public string Name { get; set; } = "";
+
+    /// <summary>"White, James Mungo": how a roll writes a name.</summary>
+    public string SortName { get; set; } = "";
+
+    /// <summary><see cref="SortName"/> in lower case, so every database sorts the roll the same way.</summary>
+    public string SortKey { get; set; } = "";
+
+    public string? Rank { get; set; }
+
+    /// <summary>The roll's "branch": the corps, for the Army.</summary>
+    public string? Corps { get; set; }
+
+    /// <summary>Army, Navy or Air Force, worked out from the rank and corps because the roll does not say.</summary>
+    public string? Service { get; set; }
+
+    public DateOnly? BirthDate { get; set; }
+    public DateOnly? DeathDate { get; set; }
+    public string? BirthPlace { get; set; }
+    public string? BirthState { get; set; }
+    public string? BirthCountry { get; set; }
+    public bool? NationalService { get; set; }
+
+    /// <summary>The tours of duty, as JSON.</summary>
+    public string Tours { get; set; } = "[]";
+
+    /// <summary>The words of the names and the service number, in lower case with a space before each: what the full-text index and the short-word search read.</summary>
+    public string SearchText { get; set; } = "";
+}

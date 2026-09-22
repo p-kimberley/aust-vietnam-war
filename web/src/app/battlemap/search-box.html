@@ -1,93 +1,136 @@
 <div class="search" #root (focusout)="onBlur($event, root)">
-  <input
-    type="search"
-    class="search__input"
-    role="combobox"
-    autocomplete="off"
-    maxlength="100"
-    placeholder="Search bases, people, reports, notes and photos"
-    aria-label="Search bases, people on the honour roll, incident reports, notes and photos"
-    aria-autocomplete="list"
-    aria-controls="search-results"
-    [attr.aria-expanded]="open() && (options().length > 0 || status() !== 'idle')"
-    [attr.aria-activedescendant]="active() >= 0 ? optionId(active()) : null"
-    [value]="query()"
-    (input)="onInput($any($event.target).value)"
-    (keydown)="onKeydown($event)"
-    (focus)="open.set(true)"
-  />
+  <div class="search__box">
+    <svg class="search__icon" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+      <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="M13 13l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <input
+      #field
+      type="search"
+      class="search__input"
+      role="combobox"
+      autocomplete="off"
+      maxlength="100"
+      [attr.placeholder]="placeholder()"
+      [attr.aria-label]="label()"
+      aria-autocomplete="list"
+      aria-controls="search-results"
+      [attr.aria-expanded]="open() && (options().length > 0 || status() !== 'idle')"
+      [attr.aria-activedescendant]="active() >= 0 ? optionId(active()) : null"
+      [value]="query()"
+      (input)="onInput($any($event.target).value)"
+      (keydown)="onKeydown($event)"
+      (focus)="open.set(true)"
+    />
+    @if (query()) {
+      <button type="button" class="search__clear" aria-label="Clear the search" (click)="clear()">×</button>
+    }
+    <button
+      #typesButton
+      type="button"
+      class="search__types"
+      [class.is-limited]="limited()"
+      aria-haspopup="true"
+      aria-controls="search-types"
+      [attr.aria-expanded]="menuOpen()"
+      [attr.aria-label]="'Kinds of thing to search for: ' + typesSummary()"
+      (click)="toggleMenu()"
+    >
+      <span>{{ typesSummary() }}</span>
+      <span class="search__chevron" aria-hidden="true"></span>
+    </button>
+  </div>
 
-  @if (open() && query().trim().length >= minLength) {
+  @if (menuOpen() || (open() && query().trim().length >= minLength)) {
     <div class="search__popup">
-      <ul id="search-results" class="search__list" role="listbox" aria-label="Search results">
-        @for (option of options(); track option.kind + option.id; let i = $index) {
-          <li
-            role="option"
-            class="search__option"
-            tabindex="-1"
-            [id]="optionId(i)"
-            [class.search__option--active]="i === active()"
-            [attr.aria-selected]="i === active()"
-            (mousedown)="$event.preventDefault()"
-            (click)="choose(option)"
-          >
-            @if (option.kind === 'poi') {
-              <span class="search__kind">{{ typeName(option.poi.type) }}</span>
-              <span class="search__title">{{ option.poi.name }}</span>
-            } @else if (option.kind === 'person') {
-              <span class="search__kind">Honour roll</span>
-              <span class="search__title">{{ option.person.name }}</span>
-              <span class="search__snippet">{{ option.person.rank }}{{ option.person.death ? ', died ' + option.person.death.slice(0, 4) : '' }}</span>
-            } @else if (option.kind === 'note') {
-              <span class="search__kind">Note</span>
-              <span class="search__title">{{ option.note.title }}</span>
-              <span class="search__snippet">
-                @for (part of option.note.snippet; track $index) {
-                  @if (part.match) {
-                    <mark>{{ part.text }}</mark>
-                  } @else {
-                    {{ part.text }}
-                  }
-                }
-              </span>
-            } @else if (option.kind === 'picture') {
-              <span class="search__kind">Photo</span>
-              <span class="search__photo">
-                <img class="search__thumb" [src]="option.picture.thumbUrl" alt="" width="48" height="36" loading="lazy" />
-                <span class="search__title">{{ option.picture.caption || 'Photo' }}</span>
-                @if (option.picture.credit) {
-                  <span class="search__snippet">{{ option.picture.credit }}</span>
-                }
-              </span>
-            } @else {
-              <span class="search__kind data">{{ formatDtg(option.hit.dtg) }}</span>
-              <span class="search__snippet">
-                @for (part of option.hit.snippet; track $index) {
-                  @if (part.match) {
-                    <mark>{{ part.text }}</mark>
-                  } @else {
-                    {{ part.text }}
-                  }
-                }
-              </span>
-            }
-          </li>
+      @if (menuOpen()) {
+      <div id="search-types" class="search__menu" (keydown)="onMenuKeydown($event)">
+        <fieldset class="search__kinds">
+          <legend class="search__legend">Search only</legend>
+          @for (k of kindChoices; track k.kind) {
+            <label class="search__kind-choice">
+              <input type="checkbox" [checked]="kinds().has(k.kind)" (change)="toggleKind(k.kind)" />
+              {{ k.label }}
+            </label>
+          }
+        </fieldset>
+        <p class="search__menu-note">Choose any number. With none chosen, everything is searched.</p>
+        @if (kinds().size) {
+          <button type="button" class="search__everything" (click)="allKinds()">Search everything</button>
         }
-      </ul>
+      </div>
+      }
+      @if (open() && query().trim().length >= minLength) {
+        <ul id="search-results" class="search__list" role="listbox" aria-label="Search results">
+          @for (option of options(); track option.kind + option.id; let i = $index) {
+            <li
+              role="option"
+              class="search__option"
+              tabindex="-1"
+              [id]="optionId(i)"
+              [class.search__option--active]="i === active()"
+              [attr.aria-selected]="i === active()"
+              (mousedown)="$event.preventDefault()"
+              (click)="choose(option)"
+            >
+              @if (option.kind === 'poi') {
+                <span class="search__kind">{{ typeName(option.poi.type) }}</span>
+                <span class="search__title">{{ option.poi.name }}</span>
+              } @else if (option.kind === 'person') {
+                <span class="search__kind">Honour roll</span>
+                <span class="search__title">{{ option.person.name }}</span>
+                <span class="search__snippet">{{ option.person.rank }}{{ option.person.death ? ', died ' + option.person.death.slice(0, 4) : '' }}</span>
+              } @else if (option.kind === 'note') {
+                <span class="search__kind">Note</span>
+                <span class="search__title">{{ option.note.title }}</span>
+                <span class="search__snippet">
+                  @for (part of option.note.snippet; track $index) {
+                    @if (part.match) {
+                      <mark>{{ part.text }}</mark>
+                    } @else {
+                      {{ part.text }}
+                    }
+                  }
+                </span>
+              } @else if (option.kind === 'picture') {
+                <span class="search__kind">Photo</span>
+                <span class="search__photo">
+                  <img class="search__thumb" [src]="option.picture.thumbUrl" alt="" width="48" height="36" loading="lazy" />
+                  <span class="search__title">{{ option.picture.caption || 'Photo' }}</span>
+                  @if (option.picture.credit) {
+                    <span class="search__snippet">{{ option.picture.credit }}</span>
+                  }
+                </span>
+              } @else {
+                <span class="search__kind data">{{ formatDtg(option.hit.dtg) }}</span>
+                <span class="search__snippet">
+                  @for (part of option.hit.snippet; track $index) {
+                    @if (part.match) {
+                      <mark>{{ part.text }}</mark>
+                    } @else {
+                      {{ part.text }}
+                    }
+                  }
+                </span>
+              }
+            </li>
+          }
+        </ul>
 
-      <p class="search__note" role="status" aria-live="polite">
-        @switch (status()) {
-          @case ('searching') { Searching reports… }
-          @case ('error') { The search failed. Try again in a moment. }
-          @default {
-            @if (nothingFound()) {
-              Nothing matches.
-            } @else if (total() > hits().length) {
-              Showing the best {{ hits().length }} of {{ total() }} incidents. Use Filters to narrow them all.
+        <p class="search__note" role="status" aria-live="polite">
+          @switch (status()) {
+            @case ('searching') { Searching reports… }
+            @case ('error') { The search failed. Try again in a moment. }
+            @default {
+              @if (nothingFound()) {
+                Nothing matches{{ limited() ? ' in the kinds chosen' : '' }}.
+              } @else if (total() > hits().length) {
+                Showing the best {{ hits().length }} of {{ total() }} incidents. Use Filters to narrow them all.
+              }
             }
           }
-        }
-      </p>
+        </p>
+      }
     </div>
   }
 </div>

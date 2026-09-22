@@ -4,10 +4,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Avw.Api.Community;
 using Avw.Api.Map;
+using Avw.Api.Media;
 using Avw.Data;
 using Avw.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Avw.Api.Tests;
 
@@ -458,5 +460,40 @@ public sealed class MySqlFullTextTests : IAsyncLifetime
         var near = await media.NearbyAsync(2, 2000, 8, default);
 
         Assert.Equal(["Near"], near!.Select(n => n.Caption));
+    }
+
+    [MySqlFact]
+    public async Task The_honour_roll_is_searched_sorted_and_counted_by_mysql_including_stop_words_and_short_names()
+    {
+        var extra = new[]
+        {
+            """{"_source":{"ServiceNumber":"55","FirstName":"Anh","LastName":"LE","Rank":"Private","Branch":"Royal Australian Infantry Corps","Death":{"Date":"1970-01-01"}}}""",
+            """{"_source":{"ServiceNumber":"66","FirstName":"Will","LastName":"WILLIAMS","Rank":"Sapper","Branch":"Royal Australian Engineers","Death":{"Date":"1970-01-01"}}}""",
+        };
+        await RollFixtures.LoadedAsync(RollFixtures.Json(RollFixtures.Records.Concat(extra)), _db);
+        var store = new HonourRollStore(_db!, Options.Create(new MediaOptions { RootPath = Path.GetTempPath() }));
+        async Task<string[]> Find(string text, HonourFilter? filter = null) =>
+            (await store.SearchAsync(text, filter ?? HonourFilter.None, false, 1, 50, default)).Items.Select(i => i.ServiceNumber).ToArray();
+
+        Assert.Equal(["1111", "2222", "66"], await Find("will"));                 // "will" is a stop word the index does not hold, and is the start of William and Williams
+        Assert.Equal(["1111", "2222", "66"], await Find("wil"));                  // an indexed word: found by the full-text index itself
+        Assert.Equal(["2222"], await Find("will smi"));                           // a stop word and an indexed word together
+        Assert.Equal(["55"], await Find("le"));                                   // two letters are not in the index either
+        Assert.Equal(["55"], await Find("anh le"));
+        Assert.Equal(["39426"], await Find("donald"));
+        Assert.Equal(["5715978"], await Find("57159"));
+        Assert.Equal(["5715978"], await Find("mungo"));
+        Assert.Empty(await Find("ill"));
+
+        var page = await store.SearchAsync(null, HonourFilter.None, true, 1, 50, default);
+        Assert.Equal(7, page.Total);
+        Assert.Equal(7, page.Items.Count);
+        Assert.Equal(page.Items.Select(i => i.SortName!.ToLowerInvariant()).Order(StringComparer.Ordinal), page.Items.Select(i => i.SortName!.ToLowerInvariant()));      // by surname, whatever the case
+        Assert.Equal([("Army", 4), ("Navy", 1), ("Air Force", 1)], page.Facets!.Services.Select(o => (o.Value, o.Count)));
+
+        var soldiers = await store.SearchAsync("will", new HonourFilter(Service: "Army"), true, 1, 50, default);
+        Assert.Equal(["66"], soldiers.Items.Select(i => i.ServiceNumber));
+        Assert.Equal([("Army", 1), ("Navy", 1), ("Air Force", 1)], soldiers.Facets!.Services.Select(o => (o.Value, o.Count)));
+        Assert.Equal(["Sapper"], soldiers.Facets.Ranks.Select(o => o.Value));
     }
 }

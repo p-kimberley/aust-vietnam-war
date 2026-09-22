@@ -9,19 +9,161 @@
   position: relative;
 }
 
-.search__input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.35rem 0.6rem;
-  font: inherit;
-  font-size: 0.9rem;
+/* The box: a magnifier, the field, a clear button and the menu of kinds, all inside one border. */
+.search__box {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.25rem 0 0.6rem;
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
 }
 
-.search__input:focus-visible {
+.search__box:focus-within {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 1px;
+}
+
+.search__icon {
+  flex: none;
+  color: var(--olive-500);
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.15rem;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+
+/* The browser's own clear button would sit under the menu button, so the box has its own. */
+.search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search__clear {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  color: var(--olive-700);
+  font-size: 1.2rem;
+  line-height: 1;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.search__clear:hover {
+  background: rgb(31 35 20 / 12%);
+}
+
+.search__types {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.45rem;
+  color: var(--paper);
+  font: inherit;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  background: var(--olive-700);
+  border: 1px solid var(--olive-700);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.search__types:hover {
+  background: var(--olive-500);
+}
+
+/* Brass while the search is limited, so it is plain that something is being left out. */
+.search__types.is-limited {
+  color: var(--ink);
+  background: var(--brass);
+  border-color: var(--brass);
+}
+
+.search__chevron {
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-top: -0.15rem;
+  border: solid currentcolor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.search__clear:focus-visible,
+.search__types:focus-visible {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 1px;
+}
+
+/* The kinds to choose from, at the top of the popup, above the results they change. */
+.search__menu {
+  padding: 0.5rem 0.75rem 0.6rem;
+  border-bottom: 1px solid var(--olive-500);
+}
+
+.search__kinds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.search__legend {
+  grid-column: 1 / -1;
+}
+
+.search__legend {
+  padding: 0;
+  margin-bottom: 0.25rem;
+  color: var(--brass);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.search__kind-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.search__menu-note {
+  margin: 0.4rem 0 0;
+  color: var(--khaki);
+  font-size: 0.75rem;
+}
+
+.search__everything {
+  margin-top: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  color: var(--paper);
+  font: inherit;
+  font-size: 0.8rem;
+  background: none;
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.search__everything:focus-visible {
   outline: 2px solid var(--smoke-yellow);
   outline-offset: 1px;
 }

@@ -11,12 +11,6 @@
   initial-value: 9rem;
 }
 
-@property --film-w {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0rem;
-}
-
 :root {
   --olive-900: #1f2314;
   --olive-700: #353d22;

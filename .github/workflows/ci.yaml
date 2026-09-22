@@ -8,27 +8,36 @@ on:
 permissions:
   contents: read
 
+# Every job runs inside a container image rather than on the runner's own Ubuntu userland, and none of those images is Ubuntu:
+#   .NET   Microsoft's SDK image on Azure Linux 3.0 (and, for the images that ship, its distroless ASP.NET image; see server/Dockerfile)
+#   web    Node's own Debian image (and Google's distroless Node to ship; see web/Dockerfile)
+#   helm   Microsoft's Azure Linux base image, with Helm from Azure Linux's own package repository
+# `runs-on: ubuntu-latest` is only the GitHub-hosted machine that starts the containers (it cannot be changed without a self-hosted runner).
+
 jobs:
   server:
     runs-on: ubuntu-latest
-    # A real MySQL, for the tests of full-text search (which is MySQL's own). They make and drop a database of their own.
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:10.0-azurelinux3.0
+      env:
+        DOTNET_NOLOGO: "1"
+        DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    # A real MySQL, for the tests of full-text search (which is MySQL's own). They make and drop a database of their own. In a container
+    # job the service is reached by its name, not by 127.0.0.1.
     services:
       mysql:
         image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: root
-        ports: ["3306:3306"]
         options: --health-cmd="mysqladmin ping -uroot -proot --silent" --health-interval=5s --health-retries=20
     env:
-      AVW_TEST_MYSQL: Server=127.0.0.1;Port=3306;User=root;Password=root;CharSet=utf8mb4
+      AVW_TEST_MYSQL: Server=mysql;Port=3306;User=root;Password=root;CharSet=utf8mb4
     defaults:
       run:
         working-directory: server
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: server/global.json
+      # The SDK comes with the image; server/global.json says which version is wanted, and the build fails if the image is older.
       - run: dotnet restore Avw.slnx
       - run: dotnet build Avw.slnx --no-restore -c Release
       - run: dotnet test Avw.slnx --no-build -c Release
@@ -39,16 +48,18 @@ jobs:
 
   web:
     runs-on: ubuntu-latest
+    container:
+      image: node:24-trixie-slim
     defaults:
       run:
         working-directory: web
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/cache@v4
         with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: web/package-lock.json
+          path: ~/.npm
+          key: npm-${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
       - run: npm ci
       - run: npx ng test --watch=false
       - run: npx ng build
@@ -57,9 +68,12 @@ jobs:
 
   helm:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/azurelinux/base/core:3.0
     steps:
+      - name: Install the tools
+        run: tdnf install -y helm git tar ca-certificates
       - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
       - name: Lint and render every chart
         run: |
           for chart in deploy/helm/*/; do
@@ -68,17 +82,24 @@ jobs:
           done
       - name: Render with the media and scratch volumes enabled
         run: helm template avw deploy/helm/avw-api --set media.enabled=true --set scratch.enabled=true > /dev/null
-      - name: Render the one-off import job, both ways
+      - name: Render the one-off import job, every way
         run: |
           helm template avw deploy/helm/avw-api --set import.enabled=true > /dev/null
           helm template avw deploy/helm/avw-api --set import.enabled=true --set import.dryRun=false --set import.legacyFiles.existingClaim=legacy-uploads > /dev/null
+          helm template avw deploy/helm/avw-api --set import.enabled=true --set import.command=import-roll --set elasticsearch.caSecret=es-ca > /dev/null
       - name: Check the rendered manifests against the Kubernetes schemas
         run: |
-          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz | tar xz kubeconform
+          # Pinned by version and by checksum: a tool that reads the manifests should not be whatever a download happens to return.
+          curl -sSLo kubeconform.tar.gz https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz
+          echo "95f14e87aa28c09d5941f11bd024c1d02fdc0303ccaa23f61cef67bc92619d73  kubeconform.tar.gz" | sha256sum -c -
+          tar xz -f kubeconform.tar.gz kubeconform
           for chart in deploy/helm/*/; do
             helm template avw "$chart" --set import.enabled=true | ./kubeconform -strict -summary -ignore-missing-schemas
+            helm template avw "$chart" --set import.enabled=true --set import.command=import-roll --set elasticsearch.caSecret=es-ca | ./kubeconform -strict -summary -ignore-missing-schemas
           done
 
+  # Building an image needs Docker on the machine that runs the job, so this is the one job that is not itself in a container. What it
+  # builds is: the Dockerfiles use only the hardened base images above, and a build that pulled anything else would be a change to them.
   images:
     runs-on: ubuntu-latest
     needs: [server, web]
@@ -88,12 +109,36 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: server
-          push: false
+          load: true
+          tags: avw-server:ci
           cache-from: type=gha,scope=server
           cache-to: type=gha,scope=server,mode=max
       - uses: docker/build-push-action@v6
         with:
           context: web
-          push: false
+          load: true
+          tags: avw-web:ci
           cache-from: type=gha,scope=web
           cache-to: type=gha,scope=web,mode=max
+      - name: The base images are the hardened ones (not Debian or Ubuntu userlands with a shell)
+        run: |
+          # Distroless: there is no shell to run. If one of these succeeds, the image is not what it is meant to be. (A `!` in front of a
+          # command does not stop a script that has `set -e`, so this is spelled out.)
+          for image in avw-server:ci avw-web:ci; do
+            if docker run --rm --entrypoint /bin/sh "$image" -c true 2> /dev/null; then
+              echo "$image has a shell"
+              exit 1
+            fi
+          done
+      - name: The server image runs as a non-root user and starts each of its programs
+        run: |
+          test "$(docker inspect --format '{{.Config.User}}' avw-server:ci)" != "0"
+          # The chart starts each program as `dotnet <dll>`. Each refuses to start without its settings, and says so: enough to show that the
+          # runtime and its libraries are there.
+          docker run --rm --entrypoint dotnet avw-server:ci /app/migrator/Avw.Migrator.dll 2>&1 | grep -q "ConnectionStrings__Default is not set"
+      - name: The web image serves its health check
+        run: |
+          docker run -d --name web -p 4000:4000 avw-web:ci
+          for i in $(seq 1 30); do curl -fsS http://localhost:4000/healthz && exit 0; sleep 1; done
+          docker logs web
+          exit 1

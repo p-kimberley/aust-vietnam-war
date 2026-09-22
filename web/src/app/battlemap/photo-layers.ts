@@ -2,11 +2,13 @@ import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Feature, FeatureCollection, Point } from 'geojson';
 import type { GeoJSONSource, Map } from 'maplibre-gl';
 import { IncidentMediaView } from './community/community';
+import { PHOTO_IMAGE_PREFIX, registerPhotoThumbnails } from './photo-thumbnails';
 
 export const PHOTO_SOURCE = 'avw-photos';
 export const PHOTO_CLUSTERS = 'avw-photos-clusters';
 export const PHOTO_COUNTS = 'avw-photos-counts';
 export const PHOTO_POINTS = 'avw-photos-points';
+export const PHOTO_IMAGES = 'avw-photos-images';
 export const PHOTO_SELECTED = 'avw-photos-selected';
 
 // Colours match the style guide tokens in styles.scss; map paint properties cannot read CSS variables.
@@ -14,6 +16,41 @@ const INK = '#22251a';
 const PAPER = '#efe7cc';
 const KHAKI = '#e6ddb8';
 const SMOKE_YELLOW = '#e3b92e';
+
+/** The thumbnails start to fade in at this zoom, and are fully there one level later, where the pictures no longer group. */
+export const PHOTO_FADE_START = 14;
+export const PHOTO_FULL_ZOOM = 15;
+/** From this zoom the thumbnails grow with the zoom, in a straight line: this much of their size again for each level. */
+export const PHOTO_GROW_FROM = 18;
+export const PHOTO_GROWTH_PER_ZOOM = 0.5;
+const MAX_ZOOM = 22;
+/** The ring round the open picture, at the sizes the thumbnails are, so it goes round the thumbnail and not behind it. */
+const RING_AT_FULL_SIZE = 34;
+
+/** How many times its usual size a thumbnail is at a zoom: 1 up to zoom 18, then growing steadily. */
+export function thumbnailScale(zoom: number): number {
+  return zoom <= PHOTO_GROW_FROM ? 1 : 1 + (zoom - PHOTO_GROW_FROM) * PHOTO_GROWTH_PER_ZOOM;
+}
+
+const IMAGE_SIZE: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], PHOTO_GROW_FROM, 1, MAX_ZOOM, thumbnailScale(MAX_ZOOM)];
+/** The thumbnail fades in as the plain marker under it fades out, so the one turns into the other. */
+const IMAGE_OPACITY: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], PHOTO_FADE_START, 0, PHOTO_FULL_ZOOM, 1];
+const DOT_OPACITY: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], PHOTO_FADE_START, 1, PHOTO_FULL_ZOOM, 0];
+const RING_RADIUS: ExpressionSpecification = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  8,
+  9,
+  PHOTO_FADE_START,
+  14,
+  PHOTO_FULL_ZOOM,
+  RING_AT_FULL_SIZE,
+  PHOTO_GROW_FROM,
+  RING_AT_FULL_SIZE,
+  MAX_ZOOM,
+  RING_AT_FULL_SIZE * thumbnailScale(MAX_ZOOM),
+];
 
 type PhotoProperties = { id: number };
 
@@ -35,14 +72,17 @@ function selectedFilter(id: number | null): ExpressionSpecification {
 const visibility = (visible: boolean) => (visible ? 'visible' : 'none');
 
 /**
- * Adds the community pictures: a print-like marker for each one, grouped into a numbered disc where they crowd together, and a
- * ring round the one open in the panel. Called after every style load and after the contact layers, so these draw on top:
- * there are few of them, and hiding one under a contact marker would hide it altogether.
+ * Adds the community pictures: a marker for each one, grouped into a numbered disc where they crowd together, then the pictures
+ * themselves as thumbnails from zoom 14, fading in as the marker fades out and fully there at 15, and a ring round the one open
+ * in the panel. Called after every style load and after the contact layers, so these draw on top: there are few of them, and
+ * hiding one under a contact marker would hide it altogether.
  */
 export function addPhotoLayers(map: Map, pictures: readonly IncidentMediaView[], state: { visible: boolean; selectedId: number | null }): void {
   if (!map.getSource(PHOTO_SOURCE)) {
-    map.addSource(PHOTO_SOURCE, { type: 'geojson', data: toPhotoGeoJson(pictures), cluster: true, clusterRadius: 36, clusterMaxZoom: 14 });
+    // Groups break up by zoom 14, where the thumbnails begin to show.
+    map.addSource(PHOTO_SOURCE, { type: 'geojson', data: toPhotoGeoJson(pictures), cluster: true, clusterRadius: 36, clusterMaxZoom: PHOTO_FADE_START - 1 });
   }
+  registerPhotoThumbnails(map, pictures);
 
   if (!map.getLayer(PHOTO_CLUSTERS)) {
     map.addLayer({
@@ -90,7 +130,29 @@ export function addPhotoLayers(map: Map, pictures: readonly IncidentMediaView[],
         'circle-color': PAPER,
         'circle-stroke-color': INK,
         'circle-stroke-width': 2.5,
+        'circle-opacity': DOT_OPACITY,
+        'circle-stroke-opacity': DOT_OPACITY,
       },
+    });
+  }
+
+  if (!map.getLayer(PHOTO_IMAGES)) {
+    map.addLayer({
+      id: PHOTO_IMAGES,
+      type: 'symbol',
+      source: PHOTO_SOURCE,
+      // Below this zoom there is nothing to draw, and no thumbnail is fetched.
+      minzoom: PHOTO_FADE_START,
+      filter: ['!', ['has', 'point_count']],
+      layout: {
+        visibility: visibility(state.visible),
+        'icon-image': ['concat', PHOTO_IMAGE_PREFIX, ['to-string', ['get', 'id']]],
+        'icon-size': IMAGE_SIZE,
+        // Every picture is drawn, however close its neighbours.
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
+      },
+      paint: { 'icon-opacity': IMAGE_OPACITY },
     });
   }
 
@@ -101,7 +163,7 @@ export function addPhotoLayers(map: Map, pictures: readonly IncidentMediaView[],
       source: PHOTO_SOURCE,
       filter: selectedFilter(state.visible ? state.selectedId : null),
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 9, 15, 14],
+        'circle-radius': RING_RADIUS,
         'circle-color': 'rgba(0,0,0,0)',
         'circle-stroke-color': SMOKE_YELLOW,
         'circle-stroke-width': 3,
@@ -111,7 +173,7 @@ export function addPhotoLayers(map: Map, pictures: readonly IncidentMediaView[],
 }
 
 export function setPhotoVisibility(map: Map, visible: boolean): void {
-  for (const id of [PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS]) {
+  for (const id of [PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS, PHOTO_IMAGES]) {
     if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility(visible));
   }
   if (!visible && map.getLayer(PHOTO_SELECTED)) map.setFilter(PHOTO_SELECTED, selectedFilter(null));

@@ -1,6 +1,10 @@
 # One image holds the API, the worker and the migrator; the Helm chart picks the entry point per workload.
 #   docker build -t avw-server server/
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+#
+# Both images are Microsoft's own, on Azure Linux 3.0 rather than Debian or Ubuntu. The runtime one is "distroless": it has the .NET
+# runtime and little else (no shell, no package manager, no curl), runs as a non-root user (UID 1654), and Microsoft rebuilds it as
+# Azure Linux is patched. Nothing here may need a shell at run time: the chart's probes are HTTP, and its commands run `dotnet`.
+FROM mcr.microsoft.com/dotnet/sdk:10.0-azurelinux3.0 AS build
 WORKDIR /src
 
 # Restore first, against project files only, so dependency layers cache.
@@ -26,13 +30,14 @@ RUN RID="$(cat /rid)" \
  && dotnet publish src/Avw.Worker -c Release -r "$RID" --no-self-contained --no-restore -o /out/worker \
  && dotnet publish src/Avw.Api -c Release -r "$RID" --no-self-contained --no-restore -o /out/api
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-azurelinux3.0-distroless AS runtime
 WORKDIR /app
 COPY --from=build /out .
 
-# The .NET images provide a non-root user (UID 1654).
+# The .NET images provide a non-root user (UID 1654), and the distroless one already runs as it.
 USER $APP_UID
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080
-# CMD (not ENTRYPOINT) so the Helm chart, or a person, can run the worker or migrator from the same image.
-CMD ["dotnet", "/app/api/Avw.Api.dll"]
+# The image's own entry point is `dotnet`, so CMD is only the program. It is CMD (not ENTRYPOINT) so that the Helm chart, or a person,
+# can run the worker or migrator from the same image: the chart's `command: ["dotnet", "<dll>"]` replaces both.
+CMD ["/app/api/Avw.Api.dll"]

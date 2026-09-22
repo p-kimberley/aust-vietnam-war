@@ -1,5 +1,6 @@
 {{- if .Values.import.enabled }}
-# A one-off job that copies the legacy community content (and, when the files are supplied, the pictures) into the new database.
+# A one-off job that copies the legacy community content (and, when the files are supplied, the pictures) into the new database, or, with
+# import.command=import-roll, the nominal roll of those who died in service from the legacy Elasticsearch index into the honour_roll table.
 # Not a hook: run it on purpose, for example
 #   helm upgrade avw deploy/helm/avw-api --reuse-values --set import.enabled=true
 # It starts as a dry run that only reports counts; set import.dryRun=false once the counts look right. Repeating it is safe.
@@ -46,12 +47,30 @@ spec:
                 secretKeyRef:
                   name: {{ include "avw-api.secretName" . }}
                   key: ConnectionStrings__Default
-            # The legacy MySQL, reached read-only. Add it to the same secret; it is only needed here.
+            # The legacy MySQL, reached read-only. Add it to the same secret; it is only needed here (and not for import-roll).
             - name: ConnectionStrings__Legacy
               valueFrom:
                 secretKeyRef:
                   name: {{ include "avw-api.secretName" . }}
                   key: ConnectionStrings__Legacy
+                  optional: true
+            {{- if eq .Values.import.command "import-roll" }}
+            # The legacy nominal roll is read once from Elasticsearch, read-only. The application itself never asks for it.
+            - name: Elasticsearch__Url
+              value: {{ .Values.elasticsearch.url | quote }}
+            - name: Elasticsearch__PersonnelIndex
+              value: {{ .Values.elasticsearch.personnelIndex | quote }}
+            {{- if .Values.elasticsearch.caSecret }}
+            - name: Elasticsearch__CaCertificatePath
+              value: /etc/avw/es-ca/ca.crt
+            {{- end }}
+            - name: Elasticsearch__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "avw-api.secretName" . }}
+                  key: Elasticsearch__ApiKey
+                  optional: true
+            {{- end }}
             {{- if .Values.media.enabled }}
             - name: Media__RootPath
               value: {{ .Values.media.mountPath | quote }}
@@ -73,6 +92,11 @@ spec:
               mountPath: /legacy-files
               readOnly: true
             {{- end }}
+            {{- if and (eq .Values.import.command "import-roll") .Values.elasticsearch.caSecret }}
+            - name: es-ca
+              mountPath: /etc/avw/es-ca
+              readOnly: true
+            {{- end }}
       volumes:
         {{- include "avw-api.volumes" . | nindent 8 }}
         - name: scratch
@@ -89,6 +113,14 @@ spec:
             server: {{ .Values.import.legacyFiles.nfs.server }}
             path: {{ required "import.legacyFiles.nfs.path is required" .Values.import.legacyFiles.nfs.path }}
             readOnly: true
+        {{- end }}
+        {{- if and (eq .Values.import.command "import-roll") .Values.elasticsearch.caSecret }}
+        - name: es-ca
+          secret:
+            secretName: {{ .Values.elasticsearch.caSecret }}
+            items:
+              - key: ca.crt
+                path: ca.crt
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}

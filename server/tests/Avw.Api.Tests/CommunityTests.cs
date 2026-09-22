@@ -10,7 +10,9 @@ using Avw.Api.Map;
 using Avw.Api.Media;
 using Avw.Data;
 using Avw.Data.Entities;
+using Avw.Migration;
 using ImageMagick;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -27,8 +29,12 @@ public sealed class FakeHonourRoll : IHonourRollSource
         new("39426", "Robert Maxwell Grist", "Sapper", "Royal Australian Engineers", new(1948, 8, 28), new(1968, 2, 1), 19, "/media/portraits/39426.jpg"),
     ];
 
-    public Task<HonourPage> SearchAsync(string? text, int page, int pageSize, CancellationToken ct)
+    /// <summary>What the last search was asked for, so a test can see that the endpoint passed it on.</summary>
+    public (string? Text, HonourFilter Filter, bool Facets)? LastSearch { get; private set; }
+
+    public Task<HonourPage> SearchAsync(string? text, HonourFilter filter, bool withFacets, int page, int pageSize, CancellationToken ct)
     {
+        LastSearch = (text, filter, withFacets);
         var found = People.Where(p => string.IsNullOrWhiteSpace(text) || p.Name.Contains(text, StringComparison.OrdinalIgnoreCase) || p.ServiceNumber == text).ToList();
         return Task.FromResult(new HonourPage(found.Skip((page - 1) * pageSize).Take(pageSize).ToList(), found.Count, page, pageSize));
     }
@@ -440,6 +446,11 @@ public sealed class CommunityEndpointTests : IDisposable
 
         var found = await Read<HonourPage>(await Anon("/api/honour-roll?q=grist"));
         Assert.Equal(["39426"], found.Items.Select(p => p.ServiceNumber));
+        Assert.Null(found.Facets);
+        Assert.Equal(("grist", HonourFilter.None, false), _roll.LastSearch);
+
+        await Anon("/api/honour-roll?service=Navy&rank=Able%20Seaman&corps=Seaman&facets=true");
+        Assert.Equal((null, new HonourFilter("Navy", "Able Seaman", "Seaman"), true), _roll.LastSearch);
 
         var person = await Read<HonourPerson>(await Anon("/api/honour-roll/5715978"));
         Assert.Equal(("James Mungo White", 21), (person.Name, person.AgeAtDeath));
@@ -543,7 +554,54 @@ public sealed class CommunityEndpointTests : IDisposable
     }
 }
 
-public class ElasticsearchHonourRollTests : IDisposable
+/// <summary>A small nominal roll as Elasticsearch holds it, and the way to bring it into a database.</summary>
+public static class RollFixtures
+{
+    // Five who died, not in order, and one who lived. Two are Army (White, White), one Navy (Smith), one Air Force (Hack), one with no rank or corps.
+    public static readonly string[] Records =
+    [
+        """{"_source":{"ServiceNumber":"5715978","FirstName":"James","SecondName":"Mungo","ThirdName":null,"LastName":"WHITE","Rank":"Private","Branch":"Royal Australian Infantry Corps","NationalService":true,"Birth":{"Date":"1947-09-10","Place":"COLLIE","State":"WESTERN AUSTRALIA","Country":"AUSTRALIA"},"Death":{"Date":"1969-04-04"},"Tours":[{"Unit":"5th Battalion","StartDate":"05/02/1969","EndDate":"04/04/1969"}]}}""",
+        """{"_source":{"ServiceNumber":"39426","FirstName":"Robert","LastName":"MC DONALD-SMITH","Birth":{"Date":"1948-08-28"},"Death":{"Date":"1968-08-27"}}}""",
+        """{"_source":{"ServiceNumber":"2222","FirstName":"william","LastName":"SMITH","Rank":"Petty Officer","Branch":"Seaman","Birth":{"Date":"1940-01-01"},"Death":{"Date":"1970-01-01"}}}""",
+        """{"_source":{"ServiceNumber":"1111","FirstName":"William","LastName":"HACK","Rank":"Pilot Officer","Branch":"General Duties","Birth":{"Date":"1944-01-01"},"Death":{"Date":"1967-06-01"}}}""",
+        """{"_source":{"ServiceNumber":"3333","FirstName":"Alan","LastName":"WHITE","Rank":"(Temporary) Corporal","Branch":"Royal Australian Engineers","Birth":{"Date":"1945-01-01"},"Death":{"Date":"1969-01-01"}}}""",
+        """{"_source":{"ServiceNumber":"4444","FirstName":"Lucky","LastName":"LIVED","Rank":"Private","Branch":"Royal Australian Infantry Corps","Birth":{"Date":"1940-01-01"}}}""",
+    ];
+
+    public static string Json(IEnumerable<string> records) => "{\"hits\":{\"hits\":[" + string.Join(',', records) + "]}}";
+
+    public static string Roll => Json(Records);
+
+    public sealed class Stub(string response) : HttpMessageHandler
+    {
+        public List<(string Path, string Body)> Calls { get; } = [];
+
+        public string Response { get; set; } = response;
+
+        public HttpStatusCode Status { get; set; } = HttpStatusCode.OK;
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Calls.Add((request.RequestUri!.PathAndQuery, await request.Content!.ReadAsStringAsync(cancellationToken)));
+            return new HttpResponseMessage(Status) { Content = new StringContent(Response, Encoding.UTF8, "application/json") };
+        }
+    }
+
+    /// <summary>The records in a response from Elasticsearch, as the importer receives them.</summary>
+    public static List<NomRollRecord> Parse(string json) =>
+        JsonDocument.Parse(json).RootElement.GetProperty("hits").GetProperty("hits").EnumerateArray()
+            .Select(h => h.GetProperty("_source").Deserialize<NomRollRecord>()!).ToList();
+
+    /// <summary>A database holding the roll, as the import leaves it.</summary>
+    public static async Task<AvwDbContext> LoadedAsync(string? json = null, AvwDbContext? db = null)
+    {
+        db ??= SearchFixtures.Db();
+        await RollImporter.ImportAsync(Parse(json ?? Roll), db, dryRun: false);
+        return db;
+    }
+}
+
+public class HonourRollStoreTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), "avw-roll-" + Guid.NewGuid().ToString("N"));
 
@@ -558,113 +616,392 @@ public class ElasticsearchHonourRollTests : IDisposable
         }
     }
 
-    private sealed class Stub(string response) : HttpMessageHandler
-    {
-        public List<(string Path, string Body)> Calls { get; } = [];
-
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            Calls.Add((request.RequestUri!.PathAndQuery, await request.Content!.ReadAsStringAsync(cancellationToken)));
-            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(response, Encoding.UTF8, "application/json") };
-        }
-    }
-
-    private ElasticsearchHonourRoll Source(Stub stub)
+    private HonourRollStore Store(AvwDbContext db)
     {
         Directory.CreateDirectory(Path.Combine(_dir, "portraits"));
-        return new(new HttpClient(stub) { BaseAddress = new Uri("http://es.test/") }, Options.Create(new ElasticsearchOptions { Url = "http://es.test" }),
-            Options.Create(new MediaOptions { RootPath = _dir }));
+        return new HonourRollStore(db, Options.Create(new MediaOptions { RootPath = _dir }));
     }
 
-    private const string TwoPeople = """
-        {"hits":{"total":{"value":522},"hits":[
-          {"_source":{"ServiceNumber":"5715978","FirstName":"James","SecondName":"Mungo","ThirdName":null,"LastName":"WHITE","Rank":"Private","Branch":"Royal Australian Infantry Corps",
-            "NationalService":true,"Birth":{"Date":"1947-09-10","Place":"COLLIE","State":"WESTERN AUSTRALIA","Country":"AUSTRALIA"},"Death":{"Date":"1969-04-04"},
-            "Tours":[{"Unit":"5th Battalion","StartDate":"05/02/1969","EndDate":"04/04/1969"}]}},
-          {"_source":{"ServiceNumber":"39426","FirstName":"Robert","LastName":"MC DONALD-SMITH","Birth":{"Date":"1948-08-28"},"Death":{"Date":"1968-08-27"}}}
-        ]}}
-        """;
+    private async Task<HonourRollStore> Loaded(string? json = null) => Store(await RollFixtures.LoadedAsync(json));
+
+    private static async Task<string[]> Numbers(HonourRollStore store, string? text = null, HonourFilter? filter = null) =>
+        (await store.SearchAsync(text, filter ?? HonourFilter.None, false, 1, 50, default)).Items.Select(i => i.ServiceNumber).ToArray();
+
+    // ---- order and names
 
     [Fact]
-    public async Task Searches_only_those_who_died_with_every_word_matching_and_pages_by_death_date()
+    public async Task Lists_those_who_died_by_surname_then_given_names_whatever_the_case_they_are_held_in()
     {
-        var stub = new Stub(TwoPeople);
+        var page = await (await Loaded()).SearchAsync(null, HonourFilter.None, false, 1, 20, default);
 
-        var page = await Source(stub).SearchAsync("  white  ", 3, 20, default);
-
-        Assert.Equal((522, 3, 20), (page.Total, page.Page, page.PageSize));
-        var body = stub.Calls[0].Body;
-        Assert.Equal("/avw_nomroll/_search", stub.Calls[0].Path);
-        Assert.Contains("\"exists\":{\"field\":\"Death.Date\"}", body);
-        Assert.Contains("\"type\":\"cross_fields\"", body);
-        Assert.Contains("\"operator\":\"and\"", body);
-        Assert.Contains("\"query\":\"white\"", body);
-        Assert.Contains("\"from\":40", body);
-        Assert.Contains("\"Death.Date\":\"asc\"", body);
+        Assert.Equal(5, page.Total);                                        // not the one who lived
+        Assert.Equal(["1111", "39426", "2222", "3333", "5715978"], page.Items.Select(i => i.ServiceNumber));
     }
 
     [Fact]
-    public async Task Turns_records_into_readable_names_ages_and_dates()
+    public async Task Writes_the_name_for_reading_and_for_a_roll_and_works_out_ages_and_dates()
     {
-        var page = await Source(new Stub(TwoPeople)).SearchAsync(null, 1, 20, default);
+        var page = await (await Loaded()).SearchAsync(null, HonourFilter.None, false, 1, 20, default);
 
-        var white = page.Items[0];
-        Assert.Equal(("5715978", "James Mungo White", "Private", 21), (white.ServiceNumber, white.Name, white.Rank, white.AgeAtDeath));
-        Assert.Equal((new DateOnly(1947, 9, 10), new DateOnly(1969, 4, 4)), (white.Birth, white.Death));
-        Assert.Equal(("Robert Mc Donald-Smith", 19), (page.Items[1].Name, page.Items[1].AgeAtDeath));
+        var white = page.Items.Single(i => i.ServiceNumber == "5715978");
+        Assert.Equal(("James Mungo White", "White, James Mungo", "Private", 21), (white.Name, white.SortName, white.Rank, white.AgeAtDeath));
+        Assert.Equal(("Royal Australian Infantry Corps", new DateOnly(1947, 9, 10), new DateOnly(1969, 4, 4)), (white.Branch, white.Birth, white.Death));
+        var mc = page.Items.Single(i => i.ServiceNumber == "39426");
+        Assert.Equal(("Robert Mc Donald-Smith", "Mc Donald-Smith, Robert", 19), (mc.Name, mc.SortName, mc.AgeAtDeath));
+        Assert.Equal("Smith, william", page.Items.Single(i => i.ServiceNumber == "2222").SortName);   // given names as the record has them
     }
 
     [Fact]
-    public async Task Sends_no_query_text_when_none_is_given_and_keeps_the_page_within_bounds()
+    public async Task Pages_the_sorted_list_and_keeps_the_page_within_bounds()
     {
-        var stub = new Stub(TwoPeople);
+        var store = await Loaded();
 
-        await Source(stub).SearchAsync("   ", 0, 5000, default);
+        var second = await store.SearchAsync(null, HonourFilter.None, false, 2, 2, default);
+        Assert.Equal((5, 2, 2), (second.Total, second.Page, second.PageSize));
+        Assert.Equal(["2222", "3333"], second.Items.Select(i => i.ServiceNumber));
 
-        Assert.DoesNotContain("multi_match", stub.Calls[0].Body);
-        Assert.Contains("\"from\":0", stub.Calls[0].Body);
-        Assert.Contains($"\"size\":{ElasticsearchHonourRoll.MaxPageSize}", stub.Calls[0].Body);
+        var clamped = await store.SearchAsync("   ", HonourFilter.None, false, 0, 5000, default);
+        Assert.Equal((1, HonourRollStore.MaxPageSize), (clamped.Page, clamped.PageSize));
+        Assert.Equal(5, clamped.Items.Count);
+        Assert.Empty((await store.SearchAsync(null, HonourFilter.None, false, 4, 2, default)).Items);
     }
+
+    // ---- searching
+
+    [Fact]
+    public async Task Matches_the_start_of_a_word_in_any_name_or_the_service_number_so_will_finds_william()
+    {
+        var store = await Loaded();
+
+        Assert.Equal(["1111", "2222"], await Numbers(store, "Will"));      // any case
+        Assert.Equal(["3333", "5715978"], await Numbers(store, "wh"));
+        Assert.Equal(["5715978"], await Numbers(store, "57159"));         // the service number
+        Assert.Equal(["5715978"], await Numbers(store, "mun"));           // a middle name
+        Assert.Equal(["39426"], await Numbers(store, "donald"));          // the second word of a surname
+        Assert.Empty(await Numbers(store, "ill"));                        // the start of a word, not the middle
+        Assert.Empty(await Numbers(store, "lived"));                      // who lived is not on this roll
+    }
+
+    [Fact]
+    public async Task Needs_every_word_typed_to_start_some_word_and_lets_them_fall_in_different_names()
+    {
+        var store = await Loaded();
+
+        Assert.Equal(["2222"], await Numbers(store, "will smi"));
+        Assert.Equal(["2222"], await Numbers(store, "smi will"));
+        Assert.Equal(["5715978"], await Numbers(store, "james white"));
+        Assert.Empty(await Numbers(store, "will white"));
+    }
+
+    [Theory]
+    [InlineData("will", new[] { "will" })]
+    [InlineData("  WILL   Smi ", new[] { "will", "smi" })]
+    [InlineData("mc donald-smith", new[] { "mc", "donald", "smith" })]
+    [InlineData("o'brien", new[] { "o", "brien" })]
+    [InlineData("will will", new[] { "will" })]
+    [InlineData("571 5978", new[] { "571", "5978" })]
+    [InlineData("émile", new[] { "émile" })]
+    [InlineData("  ...  ", new string[0])]
+    [InlineData(null, new string[0])]
+    public void Splits_what_was_typed_into_lower_case_words_at_anything_that_is_not_a_letter_or_digit(string? typed, string[] expected) =>
+        Assert.Equal(expected, HonourRollStore.SearchWords(typed));
+
+    [Fact]
+    public async Task Ignores_words_beyond_the_eighth_and_reads_no_wildcards_or_query_syntax_into_the_words()
+    {
+        Assert.Equal(HonourRollStore.MaxSearchWords, HonourRollStore.SearchWords("a b c d e f g h i j k l").Count);
+        Assert.Equal(new[] { "smi", "and", "name" }, HonourRollStore.SearchWords("smi* AND name:*"));
+
+        var store = await Loaded();
+        Assert.Equal(5, (await Numbers(store, "*")).Length);                // nothing to look for, so no words: everyone
+        Assert.Equal(["39426", "2222"], await Numbers(store, "smi*"));      // the star is dropped, not a wildcard: both Smiths
+    }
+
+    // ---- filtering
+
+    [Theory]
+    [InlineData("Army", new[] { "3333", "5715978" })]
+    [InlineData("Navy", new[] { "2222" })]
+    [InlineData("Air Force", new[] { "1111" })]
+    [InlineData("air force", new[] { "1111" })]
+    [InlineData("  Navy ", new[] { "2222" })]
+    [InlineData("Marines", new string[0])]
+    public async Task Restricts_the_roll_to_a_service(string service, string[] expected) =>
+        Assert.Equal(expected, await Numbers(await Loaded(), filter: new HonourFilter(Service: service)));
+
+    [Fact]
+    public async Task Restricts_the_roll_by_rank_and_by_corps_and_by_all_of_them_with_the_search()
+    {
+        var store = await Loaded();
+
+        Assert.Equal(["3333"], await Numbers(store, filter: new HonourFilter(Rank: "(Temporary) Corporal")));
+        Assert.Equal(["5715978"], await Numbers(store, filter: new HonourFilter(Rank: "Private")));
+        Assert.Equal(["3333"], await Numbers(store, filter: new HonourFilter(Corps: "Royal Australian Engineers")));
+        Assert.Equal(["5715978"], await Numbers(store, "white", new HonourFilter("Army", "Private", "Royal Australian Infantry Corps")));
+        Assert.Empty(await Numbers(store, "white", new HonourFilter(Service: "Navy")));
+        Assert.Equal(5, (await Numbers(store, filter: new HonourFilter("", " ", null))).Length);          // blank is no restriction
+    }
+
+    [Fact]
+    public async Task Counts_those_the_filter_and_search_leave_as_the_total()
+    {
+        var page = await (await Loaded()).SearchAsync("white", new HonourFilter(Service: "Army"), false, 1, 1, default);
+
+        Assert.Equal(2, page.Total);
+        Assert.Single(page.Items);
+    }
+
+    [Fact]
+    public async Task Leaves_out_the_drop_down_choices_unless_asked_for_them()
+    {
+        var store = await Loaded();
+
+        Assert.Null((await store.SearchAsync(null, HonourFilter.None, false, 1, 20, default)).Facets);
+        Assert.NotNull((await store.SearchAsync(null, HonourFilter.None, true, 1, 20, default)).Facets);
+    }
+
+    [Fact]
+    public async Task Offers_each_service_rank_and_corps_that_there_is_with_how_many_it_would_leave()
+    {
+        var facets = (await (await Loaded()).SearchAsync(null, HonourFilter.None, true, 1, 20, default)).Facets!;
+
+        Assert.Equal([("Army", 2), ("Navy", 1), ("Air Force", 1)], facets.Services.Select(o => (o.Value, o.Count)));        // in this order, not alphabetical
+        Assert.Equal(["(Temporary) Corporal", "Petty Officer", "Pilot Officer", "Private"], facets.Ranks.Select(o => o.Value));
+        Assert.Equal(["General Duties", "Royal Australian Engineers", "Royal Australian Infantry Corps", "Seaman"], facets.Corps.Select(o => o.Value));
+        Assert.All(facets.Ranks.Concat(facets.Corps), o => Assert.Equal(1, o.Count));
+    }
+
+    [Fact]
+    public async Task Sorts_ranks_without_their_temporary_or_acting_so_a_captain_and_a_temporary_captain_sit_together()
+    {
+        var ranks = RollFixtures.Json(new[] { ("1", "Major"), ("2", "(Temporary) Captain"), ("3", "Captain"), ("4", "(Acting) Sergeant"), ("5", "Sergeant") }
+            .Select(r => "{\"_source\":{\"ServiceNumber\":\"" + r.Item1 + "\",\"LastName\":\"P" + r.Item1 + "\",\"Rank\":\"" + r.Item2 + "\",\"Death\":{\"Date\":\"1969-01-01\"}}}"));
+
+        var facets = (await (await Loaded(ranks)).SearchAsync(null, HonourFilter.None, true, 1, 20, default)).Facets!;
+
+        Assert.Equal(["Captain", "(Temporary) Captain", "Major", "Sergeant", "(Acting) Sergeant"], facets.Ranks.Select(o => o.Value));
+    }
+
+    [Fact]
+    public async Task Counts_each_list_with_the_search_and_the_other_two_choices_but_not_its_own()
+    {
+        var store = await Loaded();
+
+        var navy = (await store.SearchAsync(null, new HonourFilter(Service: "Navy"), true, 1, 20, default)).Facets!;
+        Assert.Equal(["Petty Officer"], navy.Ranks.Select(o => o.Value));                    // only the Navy's ranks and corps...
+        Assert.Equal(["Seaman"], navy.Corps.Select(o => o.Value));
+        Assert.Equal(["Army", "Navy", "Air Force"], navy.Services.Select(o => o.Value));     // ...but the services still all show
+
+        var hack = (await store.SearchAsync("hack", HonourFilter.None, true, 1, 20, default)).Facets!;
+        Assert.Equal(["Air Force"], hack.Services.Select(o => o.Value));                     // the search narrows every list
+
+        var private1 = (await store.SearchAsync(null, new HonourFilter(Rank: "Private"), true, 1, 20, default)).Facets!;
+        Assert.Equal(4, private1.Ranks.Count);                                               // its own list keeps the alternatives
+        Assert.Equal([("Army", 1)], private1.Services.Select(o => (o.Value, o.Count)));
+    }
+
+    [Fact]
+    public async Task Keeps_a_choice_already_made_in_its_list_even_when_nothing_is_left_under_it()
+    {
+        var facets = (await (await Loaded()).SearchAsync("hack", new HonourFilter(Service: "Army"), true, 1, 20, default)).Facets!;
+
+        Assert.Contains(("Army", 0), facets.Services.Select(o => (o.Value, o.Count)));
+    }
+
+    // ---- one person, or several
 
     [Fact]
     public async Task Gets_one_person_with_birthplace_and_tours_and_nobody_for_an_unknown_or_surviving_number()
     {
-        var person = await Source(new Stub(TwoPeople)).GetAsync("5715978", default);
+        var store = await Loaded();
+
+        var person = await store.GetAsync("5715978", default);
 
         Assert.Equal(("COLLIE", "WESTERN AUSTRALIA", true), (person!.BirthPlace, person.BirthState, person.NationalService));
         Assert.Equal(("5th Battalion", "05/02/1969"), (person.Tours[0].Unit, person.Tours[0].Start));
-
-        Assert.Null(await Source(new Stub("""{"hits":{"total":{"value":0},"hits":[]}}""")).GetAsync("nope", default));
-        Assert.Null(await Source(new Stub("""{"hits":{"total":{"value":1},"hits":[{"_source":{"ServiceNumber":"1","LastName":"LIVED","Birth":{"Date":"1940-01-01"}}}]}}""")).GetAsync("1", default));
+        Assert.Null(await store.GetAsync("nope", default));
+        Assert.Null(await store.GetAsync("4444", default));                 // lived
     }
 
     [Fact]
-    public async Task Looks_up_several_people_by_service_number_in_one_request_and_none_without_asking()
+    public async Task Looks_up_several_people_by_service_number_in_order_of_death_and_none_for_none()
     {
-        var stub = new Stub(TwoPeople);
-        var source = Source(stub);
+        var store = await Loaded();
 
-        var many = await source.GetManyAsync(["5715978", "39426"], default);
-        Assert.Equal(["39426", "5715978"], many.Select(p => p.ServiceNumber));          // in order of death
-        Assert.Contains("ServiceNumber.keyword", stub.Calls[0].Body);
+        var many = await store.GetManyAsync(["5715978", "39426", "nope"], default);
 
-        Assert.Empty(await source.GetManyAsync([], default));
-        Assert.Single(stub.Calls);
+        Assert.Equal(["39426", "5715978"], many.Select(p => p.ServiceNumber));
+        Assert.Empty(await store.GetManyAsync([], default));
     }
 
     [Fact]
     public async Task Points_at_a_portrait_only_when_its_file_exists_and_the_number_is_a_safe_name()
     {
-        var source = Source(new Stub(TwoPeople));
+        var store = await Loaded();
         await File.WriteAllBytesAsync(Path.Combine(_dir, "portraits", "5715978.jpg"), [1]);
 
-        var page = await source.SearchAsync(null, 1, 20, default);
+        var page = await store.SearchAsync(null, HonourFilter.None, false, 1, 20, default);
 
-        Assert.Equal("/media/portraits/5715978.jpg", page.Items[0].PortraitUrl);
-        Assert.Null(page.Items[1].PortraitUrl);
-        var evil = await Source(new Stub("""{"hits":{"total":{"value":1},"hits":[{"_source":{"ServiceNumber":"../../secret","LastName":"X","Death":{"Date":"1969-01-01"}}}]}}""")).SearchAsync(null, 1, 20, default);
+        Assert.Equal("/media/portraits/5715978.jpg", page.Items.Single(i => i.ServiceNumber == "5715978").PortraitUrl);
+        Assert.Null(page.Items.Single(i => i.ServiceNumber == "39426").PortraitUrl);
+        var evil = await (await Loaded(RollFixtures.Json(["""{"_source":{"ServiceNumber":"../../secret","LastName":"X","Death":{"Date":"1969-01-01"}}}"""]))).SearchAsync(null, HonourFilter.None, false, 1, 20, default);
         Assert.Null(evil.Items[0].PortraitUrl);
     }
+}
+
+public class RollImporterTests
+{
+    private static Task<ImportReport> Import(AvwDbContext db, string json, bool dryRun = false) => RollImporter.ImportAsync(RollFixtures.Parse(json), db, dryRun);
+
+    [Fact]
+    public async Task Imports_those_who_died_and_skips_the_one_who_lived()
+    {
+        var db = SearchFixtures.Db();
+
+        var report = await Import(db, RollFixtures.Roll);
+
+        Assert.Equal((5, 0, 0), (report.Added, report.Updated, report.Unchanged));
+        Assert.Equal(1, report.Skipped["who did not die"]);
+        Assert.Equal(5, await db.HonourRoll.CountAsync());
+        Assert.DoesNotContain(await db.HonourRoll.Select(p => p.ServiceNumber).ToListAsync(), n => n == "4444");
+    }
+
+    [Fact]
+    public async Task Stores_what_searching_and_the_drop_downs_need_worked_out()
+    {
+        var db = await RollFixtures.LoadedAsync();
+
+        var smith = await db.HonourRoll.SingleAsync(p => p.ServiceNumber == "2222");
+        Assert.Equal(("Navy", "smith, william", " william smith 2222 "), (smith.Service, smith.SortKey, smith.SearchText));
+        var white = await db.HonourRoll.SingleAsync(p => p.ServiceNumber == "5715978");
+        Assert.Equal(" james mungo white 5715978 ", white.SearchText);
+        Assert.Equal(("Army", "White, James Mungo"), (white.Service, white.SortName));
+        Assert.Contains("5th Battalion", white.Tours);
+        Assert.Null((await db.HonourRoll.SingleAsync(p => p.ServiceNumber == "39426")).Service);          // no rank or corps recorded
+    }
+
+    [Fact]
+    public async Task Sets_given_names_held_in_capitals_in_the_usual_way_and_leaves_mixed_case_alone()
+    {
+        var db = SearchFixtures.Db();
+
+        await Import(db, RollFixtures.Json(
+        [
+            """{"_source":{"ServiceNumber":"1","FirstName":"DENNIS","SecondName":"ERIC","LastName":"ABRAHAM","Death":{"Date":"1969-01-01"}}}""",
+            """{"_source":{"ServiceNumber":"2","FirstName":"Richard","SecondName":"McLEOD","LastName":"ABRAHAM","Death":{"Date":"1969-01-01"}}}""",
+        ]));
+
+        var names = await db.HonourRoll.OrderBy(p => p.ServiceNumber).Select(p => p.SortName).ToListAsync();
+        Assert.Equal(["Abraham, Dennis Eric", "Abraham, Richard McLEOD"], names);
+    }
+
+    [Fact]
+    public async Task Repeating_it_changes_nothing_and_a_changed_record_is_the_only_one_written()
+    {
+        var db = await RollFixtures.LoadedAsync();
+        var changed = RollFixtures.Roll.Replace("\"Rank\":\"Private\",\"Branch\":\"Royal Australian Infantry Corps\",\"NationalService\"", "\"Rank\":\"Lance-Corporal\",\"Branch\":\"Royal Australian Infantry Corps\",\"NationalService\"");
+
+        var again = await Import(db, RollFixtures.Roll);
+        Assert.Equal((0, 0, 5), (again.Added, again.Updated, again.Unchanged));
+
+        var edited = await Import(db, changed);
+        Assert.Equal((0, 1, 4), (edited.Added, edited.Updated, edited.Unchanged));
+        Assert.Equal("Lance-Corporal", (await db.HonourRoll.SingleAsync(p => p.ServiceNumber == "5715978")).Rank);
+    }
+
+    [Fact]
+    public async Task Never_removes_anybody_so_the_table_can_be_added_to_after_the_import()
+    {
+        var db = await RollFixtures.LoadedAsync();
+        var without = RollFixtures.Json(RollFixtures.Records.Where(r => !r.Contains("\"1111\"")).Append(
+            """{"_source":{"ServiceNumber":"9999","FirstName":"New","LastName":"PERSON","Death":{"Date":"1971-01-01"}}}"""));
+
+        var report = await Import(db, without);
+
+        Assert.Equal((1, 0), (report.Added, report.Updated));
+        Assert.Equal(6, await db.HonourRoll.CountAsync());                 // 1111 is still there
+    }
+
+    [Fact]
+    public async Task A_dry_run_reports_what_it_would_do_and_writes_nothing()
+    {
+        var db = SearchFixtures.Db();
+
+        var report = await Import(db, RollFixtures.Roll, dryRun: true);
+
+        Assert.Equal(5, report.Added);
+        Assert.Equal(0, await db.HonourRoll.CountAsync());
+        Assert.Contains("dry run", report.ToString());
+    }
+
+    [Fact]
+    public async Task Ignores_a_record_with_no_service_number_and_the_same_number_twice()
+    {
+        var json = RollFixtures.Json(
+        [
+            """{"_source":{"LastName":"NONUMBER","Death":{"Date":"1969-01-01"}}}""",
+            """{"_source":{"ServiceNumber":"7","LastName":"ONE","Death":{"Date":"1969-01-01"}}}""",
+            """{"_source":{"ServiceNumber":" 7 ","LastName":"TWO","Death":{"Date":"1969-01-01"}}}""",
+        ]);
+
+        var db = SearchFixtures.Db();
+        var report = await Import(db, json);
+
+        Assert.Equal(["One"], await db.HonourRoll.Select(p => p.Name).ToListAsync());
+        Assert.Equal(1, report.Skipped["without a service number"]);
+        Assert.Equal(1, report.Skipped["with a service number already seen"]);
+    }
+
+    [Fact]
+    public async Task Reads_everyone_with_a_date_of_death_from_the_roll_index()
+    {
+        var stub = new RollFixtures.Stub(RollFixtures.Roll);
+
+        var records = await LegacyRollReader.ReadAsync(new HttpClient(stub) { BaseAddress = new Uri("http://es.test/") }, "avw_nomroll");
+
+        Assert.Equal(6, records.Count);
+        Assert.Equal("/avw_nomroll/_search", stub.Calls[0].Path);
+        Assert.Contains("\"exists\":{\"field\":\"Death.Date\"}", stub.Calls[0].Body);
+        Assert.Contains($"\"size\":{LegacyRollReader.MaxPeople}", stub.Calls[0].Body);
+    }
+
+    [Fact]
+    public async Task Fails_when_elasticsearch_will_not_answer()
+    {
+        var stub = new RollFixtures.Stub("{}") { Status = HttpStatusCode.Forbidden };
+
+        await Assert.ThrowsAsync<HttpRequestException>(() => LegacyRollReader.ReadAsync(new HttpClient(stub) { BaseAddress = new Uri("http://es.test/") }, "avw_nomroll"));
+    }
+}
+
+public class HonourRollRowsTests
+{
+    [Theory]
+    [InlineData("Private", "Royal Australian Infantry Corps", "Army")]
+    [InlineData("Private", null, "Army")]
+    [InlineData(null, "Royal Australian Engineers", "Army")]
+    [InlineData("Lieutenant", "Royal Australian Infantry Corps", "Army")]
+    [InlineData("Lieutenant", "Supplementary List Seaman Branch", "Navy")]
+    [InlineData("Able Seaman Clearance Diver", "Seaman", "Navy")]
+    [InlineData("Leading Airman Aircrewman", "Naval Airman", "Navy")]
+    [InlineData("Chief Electrician Weapons Radio", "Electrical", "Navy")]
+    [InlineData("Lieutenant-Commander", null, "Navy")]
+    [InlineData("Acting Sub-Lieutenant", null, "Navy")]
+    [InlineData("Petty Officer Airman Aircrewman", null, "Navy")]
+    [InlineData("Pilot Officer", "General Duties", "Air Force")]
+    [InlineData("Leading Aircraftman", null, "Air Force")]
+    [InlineData("Flight Lieutenant", null, "Air Force")]
+    [InlineData("Wing Commander", null, "Air Force")]                      // a commander, but not of the Navy
+    [InlineData(null, null, null)]
+    public void Works_out_the_service_from_the_corps_and_the_rank_since_the_roll_does_not_say(string? rank, string? corps, string? expected) =>
+        Assert.Equal(expected, HonourRollRows.ServiceOf(rank, corps));
+
+    [Theory]
+    [InlineData("Captain", "Captain")]
+    [InlineData("(Temporary) Captain", "Captain")]
+    [InlineData("(Acting) Lance-Corporal", "Lance-Corporal")]
+    [InlineData("Temporary", "Temporary")]
+    public void Sorts_a_rank_without_its_temporary_or_acting(string rank, string expected) => Assert.Equal(expected, HonourRollRows.RankSortKey(rank));
 }
 
 public class EmailNotifierTests

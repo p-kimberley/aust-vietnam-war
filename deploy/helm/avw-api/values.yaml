@@ -109,7 +109,7 @@ migrate:
 # Add ConnectionStrings__Legacy (read-only access to the old MySQL) to the secret first.
 import:
   enabled: false
-  command: import-community     # or import-poi
+  command: import-community     # or import-poi, or import-roll (the nominal roll: reads Elasticsearch once, needs no legacy MySQL)
   dryRun: true                  # report counts only; set false to write
   scratchSize: 2Gi
   # The legacy incident-media/ folder, mounted read-only, so the pictures can be imported too. Leave both empty to skip pictures.

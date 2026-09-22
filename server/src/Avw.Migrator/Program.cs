@@ -1,3 +1,4 @@
+using Avw.Api.Map;
 using Avw.Api.Media;
 using Avw.Data;
 using Avw.Migration;
@@ -15,6 +16,10 @@ using MySql.Data.MySqlClient;
 //                                                  Pictures are read from --media-root (the legacy uploads folder), processed
 //                                                  like a new upload and written to Media__RootPath. Without --media-root,
 //                                                  or with --skip-media, only the text content is imported.
+//   Avw.Migrator import-roll [--dry-run]           copy the nominal roll of those who died in service from the legacy Elasticsearch
+//                                                  index (avw_nomroll) into the honour_roll table, where it is searched. Once done,
+//                                                  the application never asks Elasticsearch for the roll. Needs Elasticsearch__Url
+//                                                  and, as for the API, Elasticsearch__ApiKey and Elasticsearch__CaCertificatePath.
 //
 // Import commands read the legacy database named by ConnectionStrings__Legacy, write to ConnectionStrings__Default, are
 // idempotent (safe to repeat) and honour --dry-run, which reports counts and changes nothing. Reports never print rows,
@@ -112,8 +117,37 @@ switch (command)
         return 0;
     }
 
+    case "import-roll":
+    {
+        var url = config["Elasticsearch:Url"];
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            Console.Error.WriteLine("Elasticsearch__Url is not set.");
+            return 2;
+        }
+
+        var handler = new SocketsHttpHandler();
+        var ca = config["Elasticsearch:CaCertificatePath"];
+        if (!string.IsNullOrWhiteSpace(ca))
+        {
+            var validation = PrivateCaValidation.FromFile(ca);
+            handler.SslOptions.RemoteCertificateValidationCallback = (_, cert, chain, errors) => validation.Validate(cert, chain, errors);
+        }
+
+        using var http = new HttpClient(handler) { BaseAddress = new Uri(url.TrimEnd('/') + "/"), Timeout = TimeSpan.FromSeconds(60) };
+        if (!string.IsNullOrWhiteSpace(config["Elasticsearch:ApiKey"]))
+        {
+            http.DefaultRequestHeaders.Authorization = new("ApiKey", config["Elasticsearch:ApiKey"]);
+        }
+
+        var records = await LegacyRollReader.ReadAsync(http, config["Elasticsearch:PersonnelIndex"] ?? "avw_nomroll");
+        Console.WriteLine($"Read {records.Count} people who died from the legacy roll.");
+        Console.WriteLine(await RollImporter.ImportAsync(records, db, dryRun));
+        return 0;
+    }
+
     default:
-        Console.Error.WriteLine($"Unknown command '{command}'. Commands: import-poi, import-community.");
+        Console.Error.WriteLine($"Unknown command '{command}'. Commands: import-poi, import-community, import-roll.");
         return 2;
 }
 

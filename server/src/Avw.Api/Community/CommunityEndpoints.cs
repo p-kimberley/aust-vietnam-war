@@ -39,8 +39,8 @@ public static class CommunityEndpoints
         services.AddScoped<CasualtyService>();
         services.AddScoped<CommunitySearch>();
 
-        var client = services.AddHttpClient<IHonourRollSource, ElasticsearchHonourRoll>(MapEndpoints.ConfigureElasticsearchClient(TimeSpan.FromSeconds(30)));
-        client.ConfigurePrimaryHttpMessageHandler(MapEndpoints.ElasticsearchHandler);
+        // The roll lives in MySQL (imported from the legacy Elasticsearch index by `Avw.Migrator import-roll`), so it can be joined to tributes and links.
+        services.AddScoped<IHonourRollSource, HonourRollStore>();
 
         // Per signed-in person (or address): enough for a keen contributor, too little for spam.
         static string Who(HttpContext ctx) => ctx.User.FindFirstValue(UserSync.LocalIdClaim) ?? ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -278,12 +278,12 @@ public static class CommunityEndpoints
     {
         var g = api.MapGroup("/").WithTags("Community");
 
-        g.MapGet("/honour-roll", async (string? q, int? page, int? pageSize, IHonourRollSource roll, HttpContext ctx, CancellationToken ct) =>
+        g.MapGet("/honour-roll", async (string? q, string? service, string? rank, string? corps, bool? facets, int? page, int? pageSize, IHonourRollSource roll, HttpContext ctx, CancellationToken ct) =>
             {
                 ctx.Response.Headers.CacheControl = "public, max-age=300";
-                return Results.Ok(await roll.SearchAsync(q, page ?? 1, pageSize ?? 20, ct));
+                return Results.Ok(await roll.SearchAsync(q, new HonourFilter(service, rank, corps), facets ?? false, page ?? 1, pageSize ?? 20, ct));
             })
-            .RequireRateLimiting(MapEndpoints.SearchPolicy)
+            .RequireRateLimiting(CommunitySearchPolicy)                // searched in memory, so no Elasticsearch call to protect
             .WithName("SearchHonourRoll").Produces<HonourPage>();
 
         g.MapGet("/honour-roll/{serviceNumber}", async (string serviceNumber, IHonourRollSource roll, AvwDbContext db, HttpContext ctx, CancellationToken ct) =>
@@ -299,7 +299,7 @@ public static class CommunityEndpoints
                 ctx.Response.Headers.CacheControl = "no-store";                        // the tribute count changes as people leave poppies
                 return Results.Ok(person with { Incidents = incidents, Tributes = tributes });
             })
-            .RequireRateLimiting(MapEndpoints.SearchPolicy)
+            .RequireRateLimiting(CommunitySearchPolicy)
             .WithName("GetHonourRollPerson").Produces<HonourPerson>().Produces(StatusCodes.Status404NotFound);
 
         g.MapGet("/contacts/{id:int:min(1)}/casualties", async (int id, CasualtyService casualties, HttpContext ctx, CancellationToken ct) =>

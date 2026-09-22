@@ -107,19 +107,7 @@
  */
 .bm {
   --timeline-h: 9rem;
-  /* How much room the photo strip at the left takes, so what shares that edge (the charts) can keep clear of it. */
-  --film-w: 0rem;
-  transition:
-    --timeline-h 0.25s ease,
-    --film-w 0.25s ease;
-}
-
-.bm--film {
-  --film-w: 4.8rem;
-}
-
-.bm--film-wide {
-  --film-w: 16.4rem;
+  transition: --timeline-h 0.25s ease;
 }
 
 .bm--timeline-open {
@@ -135,37 +123,56 @@
   height: var(--timeline-h);
 }
 
-.bm__analytics {
+/* The rail of tabs at the top left, and the panel that flies out from beside it. */
+.bm__tabs {
+  position: absolute;
+  z-index: 4;
+  top: calc(3rem + 10px);
+  left: 0;
+}
+
+.bm__flyout {
   position: absolute;
   z-index: 3;
-  top: 3rem;
-  left: calc(0.75rem + var(--film-w));
+  top: calc(3rem + 10px);
+  left: 2.4rem;
   bottom: calc(var(--timeline-h) + 0.75rem);
-  width: min(40rem, calc(100vw - 1.5rem - var(--film-w)));
+  width: min(40rem, calc(100vw - 3.15rem));
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  /* Out of sight to the left until a tab is chosen; hidden once it has gone, so nothing in it can be reached. */
+  transform: translateX(calc(-100% - 2.4rem));
+  visibility: hidden;
+  transition:
+    transform 0.25s ease,
+    width 0.25s ease,
+    visibility 0s linear 0.25s;
 }
 
-.bm__analytics > * {
+.bm__flyout.is-open {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform 0.25s ease,
+    width 0.25s ease,
+    visibility 0s;
+}
+
+/* The nominal roll needs less room than the charts. */
+.bm__flyout--roll {
+  width: min(24rem, calc(100vw - 3.15rem));
+}
+
+.bm__flyout > * {
   max-height: 100%;
 }
 
-/*
- * The photos in view run down the left edge, from the top bar to just above the map's zoom buttons and scale bar, which sit at
- * the bottom left above the timeline.
- */
-.bm__film {
-  position: absolute;
-  z-index: 3;
-  top: 3rem;
-  left: 0.75rem;
-  bottom: calc(var(--timeline-h) + 9rem);
-  pointer-events: none;
-}
-
-.bm__film > * {
-  pointer-events: auto;
+@media (prefers-reduced-motion: reduce) {
+  .bm__flyout,
+  .bm__flyout.is-open {
+    transition: none;
+  }
 }
 
 .bm__charts {
@@ -176,12 +183,6 @@
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
-}
-
-.bm__charts[aria-pressed='true'] {
-  background: var(--brass);
-  color: var(--ink);
-  border-color: var(--brass);
 }
 
 /* MapLibre's own controls and credit line would otherwise sit under the timeline. */
@@ -225,20 +226,10 @@
     bottom: calc(var(--timeline-h) + 0.75rem);
   }
 
-  .bm__analytics {
-    left: 0.75rem;
+  .bm__flyout,
+  .bm__flyout--roll {
     right: 0.75rem;
     width: auto;
-  }
-
-  /* A phone has no room for the strip. */
-  .bm__film {
-    display: none;
-  }
-
-  .bm--film,
-  .bm--film-wide {
-    --film-w: 0rem;
   }
 
   .bm__right--shifted {

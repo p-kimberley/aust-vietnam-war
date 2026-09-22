@@ -14,15 +14,16 @@ import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { DateRange, Timeline, TimelineFocus } from './analytics/timeline';
 import { BasemapPicker } from './basemap-picker';
-import { Filmstrip, picturesInView } from './filmstrip';
+import { LeftTab, LeftTabs } from './left-tabs';
 import { MapLegend } from './map-legend';
+import { NominalRoll } from './nominal-roll';
 import { BasemapService } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
 import { POI_POINTS, addPoiLayers, setPoiVisibility, setSelectedPoi } from './poi-layers';
 import { CommunityService, IncidentMediaView } from './community/community';
 import { HonourPanel } from './community/honour-panel';
-import { PHOTO_CLUSTERS, PHOTO_POINTS, addPhotoLayers, setPhotoVisibility, setSelectedPhoto, zoomIntoCluster } from './photo-layers';
+import { PHOTO_CLUSTERS, PHOTO_IMAGES, PHOTO_POINTS, PHOTO_FULL_ZOOM, addPhotoLayers, setPhotoVisibility, setSelectedPhoto, zoomIntoCluster } from './photo-layers';
 import { PicturePanel } from './picture-panel';
 import { PoiPanel } from './poi-panel';
 import { SearchBox } from './search-box';
@@ -63,6 +64,8 @@ type Tab = 'layers' | 'filters';
 
 /** How long typing must pause before the report search is sent. */
 const SEARCH_DELAY_MS = 400;
+/** How long the fly-out takes to slide away; its panel is put away when it has gone. */
+const FLYOUT_SLIDE_MS = 300;
 /** A filter that leaves one contact, or a few close together, zooms no closer than this. */
 const FIT_MAX_ZOOM = 13;
 
@@ -75,7 +78,7 @@ const FIT_MAX_ZOOM = 13;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, BasemapPicker, Filmstrip, MapLegend, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, BasemapPicker, LeftTabs, MapLegend, NominalRoll, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -93,6 +96,7 @@ export class Battlemap {
   readonly poi = input<string>();
   readonly picture = input<string>();
   readonly charts = input<string>();
+  readonly roll = input<string>();
   readonly track = input<string>();
   readonly follow = input<string>();
   readonly person = input<string>();
@@ -127,10 +131,6 @@ export class Battlemap {
   protected readonly pictures = signal<readonly IncidentMediaView[]>([]);
   protected readonly showPhotos = signal(true);
   protected readonly selectedPictureId = signal<number | null>(null);
-  /** The photo strip at the left is wide, with captions. */
-  protected readonly filmWide = signal(false);
-  /** The photos in the map's view, nearest the middle first; none while the photo layer is switched off. */
-  protected readonly filmItems = computed(() => (this.showPhotos() ? picturesInView(this.pictures(), this.basemaps.view()) : []));
   /** The tab an incident opens on. Search sends a note's reader straight to the notes; anything else starts on the details. */
   protected readonly incidentTab = signal<'details' | 'notes'>('details');
   protected readonly tab = signal<Tab>('layers');
@@ -147,7 +147,16 @@ export class Battlemap {
   /** The types of point on the map, for the legend; none while the layer is switched off. */
   protected readonly legendPoiTypes = computed(() => (this.showPois() ? [...new Set(this.pois().map((p) => p.type))] : []));
   /** The charts drawer, opened from the top bar. */
-  protected readonly chartsOpen = signal(false);
+  /** The tools in the rail at the left. A new one is a new entry here and a new case in the fly-out in the template. */
+  protected readonly leftTabs: readonly LeftTab[] = [
+    { id: 'charts', label: 'Charts' },
+    { id: 'roll', label: 'Nominal roll' },
+  ];
+  /** The tool that is flown out at the left, or `null` when none is. */
+  protected readonly flyout = signal<string | null>(null);
+  /** What the fly-out holds. It stays through the slide out, so the panel does not vanish before it has gone. */
+  protected readonly flyoutShown = signal<string | null>(null);
+  private flyoutTimer?: ReturnType<typeof setTimeout>;
   /** The operation timeline, opened from the arrow on the timeline's top edge. */
   protected readonly timelineOpen = signal(false);
   /** Play is moving the timeline's window on. */
@@ -309,7 +318,7 @@ export class Battlemap {
   /** Opens a photo (found by search, or taken near an incident) and brings its place into view. */
   protected openPictureAt(picture: { id: number; lat: number | null; lon: number | null }): void {
     this.selectPicture(picture.id);
-    if (picture.lat !== null && picture.lon !== null) this.basemaps.flyTo(picture.lat, picture.lon, 14);
+    if (picture.lat !== null && picture.lon !== null) this.basemaps.flyTo(picture.lat, picture.lon, PHOTO_FULL_ZOOM);
   }
 
   /** Opens the base chosen from the search results and brings it into view. */
@@ -395,8 +404,15 @@ export class Battlemap {
     this.setFilters({ ...this.filters(), from: range.from, to: range.to });
   }
 
-  protected setChartsOpen(open: boolean): void {
-    this.chartsOpen.set(open);
+  /** Flies a tool out from the left, or puts it away. */
+  protected setFlyout(id: string | null): void {
+    clearTimeout(this.flyoutTimer);
+    this.flyout.set(id);
+    if (id !== null) {
+      this.flyoutShown.set(id);
+    } else {
+      this.flyoutTimer = setTimeout(() => this.flyoutShown.set(null), FLYOUT_SLIDE_MS);
+    }
     this.syncUrl();
   }
 
@@ -520,7 +536,9 @@ export class Battlemap {
         this.selectedPerson.set(this.person()!);
       }
 
-      this.chartsOpen.set(this.charts() === '1');
+      const tool = this.charts() === '1' ? 'charts' : this.roll() === '1' ? 'roll' : null;
+      this.flyout.set(tool);
+      this.flyoutShown.set(tool);
       this.followed.set(this.followedFromLink());
 
       const field = this.field();
@@ -585,9 +603,10 @@ export class Battlemap {
               this.basemaps.bindClick(POINT_LAYER, (p) => this.select(Number(p['id'])));
               // Pictures are drawn on top, so they are registered last and win where they overlap a contact.
               this.basemaps.bindClick(PHOTO_POINTS, (p) => this.selectPicture(Number(p['id'])));
+              this.basemaps.bindClick(PHOTO_IMAGES, (p) => this.selectPicture(Number(p['id'])));
               this.basemaps.bindClick(PHOTO_CLUSTERS, (p, at) => void zoomIntoCluster(map, Number(p['cluster_id']), at));
               // A click where none of those is under the pointer is a click on empty map.
-              this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_CLUSTERS], () => this.clearMapSelection());
+              this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS], () => this.clearMapSelection());
               this.status.set('ready');
             }
           },
@@ -688,7 +707,8 @@ export class Battlemap {
           poi: this.selectedPoiId(),
           picture: this.selectedPictureId(),
           person: this.selectedPerson(),
-          charts: this.chartsOpen() ? '1' : null,
+          charts: this.flyout() === 'charts' ? '1' : null,
+          roll: this.flyout() === 'roll' ? '1' : null,
           track: null,
           follow: this.followed().size ? [...this.followed()].sort((a, b) => a - b).join(',') : null,
           ...(tree ? toParams(this.filters(), tree) : {}),

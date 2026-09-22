@@ -59,19 +59,33 @@ describe('Battle Map timeline', () => {
 });
 
 describe('Battle Map charts', () => {
-  it('opens and closes the charts drawer from the top bar', async () => {
+  it('flies the charts out from their tab at the left, and puts them away with their own close button', async () => {
     const r = await render({ contacts: CONTACTS });
+    const tab = () => r.el.querySelector<HTMLButtonElement>('#left-tab-charts')!;
+    const flyout = () => r.el.querySelector('#left-flyout')!;
     expect(r.el.querySelector('app-analytics-panel')).toBeNull();
-    expect(button(r, 'Charts').getAttribute('aria-pressed')).toBe('false');
+    expect(tab().getAttribute('aria-selected')).toBe('false');
+    expect(flyout().classList.contains('is-open')).toBe(false);
 
-    button(r, 'Charts').click();
+    tab().click();
     await settle(r.fixture);
     expect(r.el.querySelector('app-analytics-panel')).not.toBeNull();
-    expect(button(r, 'Charts').getAttribute('aria-pressed')).toBe('true');
+    expect(tab().getAttribute('aria-selected')).toBe('true');
+    expect(flyout().classList.contains('is-open')).toBe(true);
 
     r.el.querySelector<HTMLButtonElement>('.ap__close')!.click();
     await settle(r.fixture);
+    expect(flyout().classList.contains('is-open')).toBe(false);
+    expect(tab().getAttribute('aria-selected')).toBe('false');
+    await wait(350);                                                     // the panel is put away once it has slid out of sight
+    await settle(r.fixture);
     expect(r.el.querySelector('app-analytics-panel')).toBeNull();
+  });
+
+  it('has no Charts button in the top bar any more', async () => {
+    const r = await render({ contacts: CONTACTS });
+
+    expect([...r.el.querySelectorAll('.bm__bar button')].some((b) => b.textContent?.trim() === 'Charts')).toBe(false);
   });
 
   it('opens straight onto the charts from a shared link', async () => {

@@ -75,6 +75,9 @@ describe('photo layers', () => {
       setLayoutProperty: vi.fn(),
       setFilter: vi.fn(),
       easeTo: vi.fn(),
+      on: vi.fn(),
+      hasImage: vi.fn(() => false),
+      addImage: vi.fn(),
     };
   }
 
@@ -86,7 +89,7 @@ describe('photo layers', () => {
 
     expect(map.addSource).toHaveBeenCalledTimes(1);
     expect(map.sources.get(PHOTO_SOURCE)).toMatchObject({ type: 'geojson', cluster: true });
-    expect([...map.layers.keys()]).toEqual([PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS, PHOTO_SELECTED]);
+    expect([...map.layers.keys()]).toEqual([PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS, 'avw-photos-images', PHOTO_SELECTED]);
     expect(map.layers.get(PHOTO_CLUSTERS)!['filter']).toEqual(['has', 'point_count']);
     expect(map.layers.get(PHOTO_POINTS)!['filter']).toEqual(['!', ['has', 'point_count']]);
   });

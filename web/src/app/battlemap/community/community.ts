@@ -98,6 +98,8 @@ export interface HonourSummary {
   death: string | null;
   ageAtDeath: number | null;
   portraitUrl: string | null;
+  /** How a roll writes the name: "White, James Mungo". */
+  sortName?: string | null;
 }
 
 export interface HonourTour {
@@ -116,11 +118,33 @@ export interface HonourPerson extends HonourSummary {
   tributes: number;
 }
 
+/** What to restrict the roll to; a blank or missing value is no restriction. */
+export interface HonourFilters {
+  service?: string;
+  rank?: string;
+  corps?: string;
+}
+
+/** One choice in a drop-down, and how many people it would leave. */
+export interface HonourFacetOption {
+  value: string;
+  count: number;
+}
+
+/** The choices for each drop-down, each counted with the search and the other two choices but not its own. */
+export interface HonourFacets {
+  services: HonourFacetOption[];
+  ranks: HonourFacetOption[];
+  corps: HonourFacetOption[];
+}
+
 export interface HonourPage {
   items: HonourSummary[];
   total: number;
   page: number;
   pageSize: number;
+  /** Present only when asked for. */
+  facets?: HonourFacets | null;
 }
 
 export interface TributeView {
@@ -287,10 +311,20 @@ export class CommunityService {
     return firstValueFrom(this.http.post<CasualtyRow>(`/api/contacts/${contactId}/casualty-submissions`, input));
   }
 
-  honourRoll(q: string, page = 1, pageSize = 20): Promise<HonourPage> {
+  /** The roll by surname, for what was typed and the chosen service, rank and corps, with the choices for those drop-downs if `facets` is set. */
+  honourRoll(q: string, page = 1, pageSize = 20, filters: HonourFilters = {}, facets = false): Promise<HonourPage> {
     let params = new HttpParams().set('page', page).set('pageSize', pageSize);
     if (q.trim()) {
       params = params.set('q', q.trim());
+    }
+    for (const key of ['service', 'rank', 'corps'] as const) {
+      const value = filters[key]?.trim();
+      if (value) {
+        params = params.set(key, value);
+      }
+    }
+    if (facets) {
+      params = params.set('facets', true);
     }
     return firstValueFrom(this.http.get<HonourPage>('/api/honour-roll', { params }));
   }

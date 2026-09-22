@@ -23,6 +23,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
     public DbSet<Tribute> Tributes => Set<Tribute>();
     public DbSet<CasualtySubmission> CasualtySubmissions => Set<CasualtySubmission>();
     public DbSet<CasualtyLink> CasualtyLinks => Set<CasualtyLink>();
+    public DbSet<HonourRollPerson> HonourRoll => Set<HonourRollPerson>();
 
     /// <summary>Shared ASP.NET Data Protection keys, so every API replica can read the auth cookie.</summary>
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -166,6 +167,27 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.ServiceNumber).HasMaxLength(32);
             e.HasKey(x => new { x.ServiceNumber, x.ContactId });
             e.HasIndex(x => x.ContactId);
+        });
+
+        b.Entity<HonourRollPerson>(e =>
+        {
+            e.ToTable("honour_roll");
+            e.HasKey(x => x.ServiceNumber);
+            e.Property(x => x.ServiceNumber).HasMaxLength(32);
+            e.Property(x => x.Name).HasMaxLength(300);
+            e.Property(x => x.SortName).HasMaxLength(300);
+            e.Property(x => x.SortKey).HasMaxLength(300);
+            e.Property(x => x.Rank).HasMaxLength(100);
+            e.Property(x => x.Corps).HasMaxLength(150);
+            e.Property(x => x.Service).HasMaxLength(20);
+            e.Property(x => x.BirthPlace).HasMaxLength(150);
+            e.Property(x => x.BirthState).HasMaxLength(100);
+            e.Property(x => x.BirthCountry).HasMaxLength(100);
+            e.Property(x => x.SearchText).HasMaxLength(500);
+            e.HasIndex(x => x.SortKey);
+            e.HasIndex(x => x.Service);
+            e.HasIndex(x => x.Rank);
+            e.HasIndex(x => x.Corps);
         });
 
         b.Entity<Category>(e =>

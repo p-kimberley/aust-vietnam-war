@@ -13,6 +13,7 @@ export function fakeCommunity(over: Record<string, unknown> = {}): Record<string
     mediaDetail: vi.fn(() => Promise.reject(new Error('no such picture'))),
     casualties: vi.fn(() => Promise.resolve([])),
     person: vi.fn(() => Promise.reject(new Error('no such person'))),
+    honourRoll: vi.fn(() => Promise.resolve({ items: [], total: 0, page: 1, pageSize: 20 })),
     tributes: vi.fn(() => Promise.resolve({ items: [], total: 0, page: 1, pageSize: 20 })),
     ...over,
   } as Record<string, ReturnType<typeof vi.fn>>;

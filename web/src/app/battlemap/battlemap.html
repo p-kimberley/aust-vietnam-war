@@ -1,4 +1,4 @@
-<div class="bm" [class.bm--timeline-open]="timelineOpen()" [class.bm--film]="filmItems().length > 0" [class.bm--film-wide]="filmItems().length > 0 && filmWide()">
+<div class="bm" [class.bm--timeline-open]="timelineOpen()">
   <div #canvas class="bm__canvas" role="application" aria-label="Battle Map"></div>
 
   <header class="bm__bar">
@@ -6,7 +6,6 @@
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
       <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" (pickPerson)="openPerson($event)" (pickNote)="openNote($event)" (pickPicture)="openPictureAt($event)" />
-      <button type="button" class="bm__charts" [attr.aria-pressed]="chartsOpen()" (click)="setChartsOpen(!chartsOpen())">Charts</button>
       @if (followed().size) {
         <button type="button" class="bm__charts" (click)="stopFollowing()" [attr.aria-label]="'Stop following ' + followed().size + (followed().size === 1 ? ' unit' : ' units')">
           Following {{ followed().size }} {{ followed().size === 1 ? 'unit' : 'units' }} ✕
@@ -41,9 +40,27 @@
     </div>
   }
 
-  @if (status() === 'ready' && chartsOpen()) {
-    <div class="bm__analytics">
-      <app-analytics-panel [ids]="visibleIds()" [filtered]="activeCount() > 0" (closed)="setChartsOpen(false)" />
+  @if (status() === 'ready') {
+    <div class="bm__tabs">
+      <app-left-tabs [tabs]="leftTabs" [active]="flyout()" panelId="left-flyout" (activeChange)="setFlyout($event)" />
+    </div>
+    <div
+      id="left-flyout"
+      class="bm__flyout"
+      role="tabpanel"
+      [class.is-open]="flyout() !== null"
+      [class.bm__flyout--roll]="flyoutShown() === 'roll'"
+      [attr.aria-labelledby]="flyoutShown() ? 'left-tab-' + flyoutShown() : null"
+      (keydown.escape)="setFlyout(null)"
+    >
+      @switch (flyoutShown()) {
+        @case ('charts') {
+          <app-analytics-panel [ids]="visibleIds()" [filtered]="activeCount() > 0" (closed)="setFlyout(null)" />
+        }
+        @case ('roll') {
+          <app-nominal-roll (closed)="setFlyout(null)" (openIncident)="openContact($event)" />
+        }
+      }
     </div>
   }
 
@@ -62,12 +79,6 @@
   } @else if (status() === 'ready' && selectedPictureId(); as pictureId) {
     <div class="bm__incident">
       <app-picture-panel [pictureId]="pictureId" (closed)="selectPicture(null)" (openIncident)="openContact($event)" />
-    </div>
-  }
-
-  @if (status() === 'ready') {
-    <div class="bm__film">
-      <app-filmstrip [items]="filmItems()" [selectedId]="selectedPictureId()" [(expanded)]="filmWide" (picked)="openPictureAt($event)" />
     </div>
   }
 
