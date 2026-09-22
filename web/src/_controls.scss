@@ -1,5 +1,5 @@
 /*
- * Native controls in the vintage skin: checkboxes, radio buttons, drop-downs, the file button and scrollbars. They stay
+ * Native controls in the vintage skin: checkboxes, radio buttons, drop-downs, range sliders, the file button and scrollbars. They stay
  * the browser's own elements, so keyboard use, screen readers, autofill and form submission are untouched; only how they
  * look changes, from the design tokens in styles.scss (the mockups' style guide: field fill, olive edge, brass hardware).
  *
@@ -159,6 +159,65 @@ optgroup {
   background: var(--surface-raised);
 }
 
+/* ---- range sliders (for example a layer's opacity) ---- */
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--control-size);
+  margin: 0;
+  background: none;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  height: 0.3rem;
+  background: var(--field);
+  border: 1px solid var(--control-edge);
+  border-radius: 999px;
+}
+
+input[type='range']::-moz-range-track {
+  height: 0.3rem;
+  background: var(--field);
+  border: 1px solid var(--control-edge);
+  border-radius: 999px;
+}
+
+/* The thumb is drawn a track-height higher than centred, since -webkit-slider-thumb positions from the track's top edge. */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--control-size);
+  height: var(--control-size);
+  margin-top: calc((0.3rem - var(--control-size)) / 2);
+  background: var(--control-on);
+  border: 2px solid var(--control-on);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+
+input[type='range']::-moz-range-thumb {
+  width: calc(var(--control-size) - 0.25rem);
+  height: calc(var(--control-size) - 0.25rem);
+  background: var(--control-on);
+  border: 2px solid var(--control-on);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+
+input[type='range']:hover:not(:disabled)::-webkit-slider-thumb,
+input[type='range']:hover:not(:disabled)::-moz-range-thumb {
+  border-color: var(--control-edge-hover);
+}
+
+input[type='range']:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 /* ---- the file button ---- */
 
 input[type='file']::file-selector-button {
@@ -196,6 +255,7 @@ input[type='file']:hover::file-selector-button {
 @media (forced-colors: active) {
   input[type='checkbox'],
   input[type='radio'],
+  input[type='range'],
   select {
     appearance: auto;
   }

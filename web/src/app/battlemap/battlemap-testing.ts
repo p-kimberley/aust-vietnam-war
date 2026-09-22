@@ -104,6 +104,9 @@ export class FakeBasemapService {
   setBasemap = vi.fn();
   setTerrain = vi.fn();
   setOverlay = vi.fn();
+  private readonly overlayOpacities = new Map<string, number>();
+  overlayOpacity = vi.fn((id: string) => this.overlayOpacities.get(id) ?? 1);
+  setOverlayOpacity = vi.fn((id: string, opacity: number) => void this.overlayOpacities.set(id, opacity));
   flyTo = vi.fn();
   fitTo = vi.fn();
   /** What runs when the map is clicked where none of the layers has anything. */

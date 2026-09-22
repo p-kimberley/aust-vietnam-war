@@ -14,6 +14,7 @@ import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { DateRange, Timeline, TimelineFocus } from './analytics/timeline';
 import { BasemapPicker } from './basemap-picker';
+import { LayerRow } from './layer-row';
 import { LeftTab, LeftTabs } from './left-tabs';
 import { MapLegend } from './map-legend';
 import { NominalRoll } from './nominal-roll';
@@ -77,7 +78,7 @@ const FIT_MAX_ZOOM = 13;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, BasemapPicker, LeftTabs, MapLegend, NominalRoll, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, BasemapPicker, LayerRow, LeftTabs, MapLegend, NominalRoll, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService, MapSelectionService, MapViewStateService, UnitFollowService, ContactFilteringService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',

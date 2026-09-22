@@ -38,6 +38,8 @@ export class BasemapService implements OnDestroy {
   readonly basemapId = signal<string | undefined>(undefined);
   readonly terrainEnabled = signal(false);
   readonly overlayIds = signal<readonly string[]>([]);
+  /** Opacity chosen for an overlay, keyed by id; an overlay not here is at its configured default. */
+  private readonly overlayOpacities = signal<ReadonlyMap<string, number>>(new globalThis.Map());
 
   /** Loads MapLibre GL on demand (it is large and browser-only) and creates the map. */
   async create(container: HTMLElement, config: MapConfig, start: MapStart, hooks: MapHooks): Promise<Map> {
@@ -123,6 +125,21 @@ export class BasemapService implements OnDestroy {
     else next.delete(id);
     this.overlayIds.set([...next]);
     this.applyOverlays(map);
+  }
+
+  /** The opacity an overlay shows at now: what the reader chose, or its configured default (fully opaque unless set otherwise). */
+  overlayOpacity(id: string): number {
+    return this.overlayOpacities().get(id) ?? this.config?.overlays.find((o) => o.id === id)?.opacity ?? 1;
+  }
+
+  /** Fades an overlay in or out, from fully transparent (0) to fully opaque (1); takes effect at once if it is showing. */
+  setOverlayOpacity(id: string, opacity: number): void {
+    this.overlayOpacities.update((m) => new globalThis.Map(m).set(id, opacity));
+    const map = this.map;
+    const layerId = OVERLAY_PREFIX + id;
+    if (map?.getLayer(layerId)) {
+      map.setPaintProperty(layerId, 'raster-opacity', opacity);
+    }
   }
 
   /** Calls `handler` with a feature's properties, and where it was clicked, when it is clicked on `layerId`. Survives style changes. */
@@ -250,7 +267,7 @@ export class BasemapService implements OnDestroy {
     });
     // Beneath the first symbol layer so place labels stay readable over the raster.
     const firstSymbol = map.getStyle()?.layers.find((l) => l.type === 'symbol')?.id;
-    map.addLayer({ id, type: 'raster', source: id, paint: { 'raster-opacity': overlay.opacity } }, firstSymbol);
+    map.addLayer({ id, type: 'raster', source: id, paint: { 'raster-opacity': this.overlayOpacity(overlay.id) } }, firstSymbol);
   }
 }
 

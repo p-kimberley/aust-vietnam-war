@@ -138,6 +138,78 @@ describe('Battlemap', () => {
     expect(basemaps.setOverlay).toHaveBeenCalledWith('topo', true);
   });
 
+  describe('layer options, hidden behind an arrow until asked for', () => {
+    const rowFor = (el: HTMLElement, text: string) => [...el.querySelectorAll('app-layer-row')].find((r) => r.textContent?.includes(text))! as HTMLElement;
+    const open = (row: HTMLElement, fixture: { detectChanges(): void }) => {
+      row.querySelector<HTMLButtonElement>('.toggle')!.click();
+      fixture.detectChanges();
+    };
+
+    it('fades the 1ATF topo overlay from fully opaque, without touching it until the arrow is opened', async () => {
+      const { el, basemaps, fixture } = await render({});
+      const row = rowFor(el, '1ATF topo');
+      expect(row.querySelector('.toggle')!.getAttribute('aria-expanded')).toBe('false');
+
+      open(row, fixture);
+      const slider = row.querySelector<HTMLInputElement>('input[type=range]')!;
+      expect(slider.value).toBe('1');
+
+      slider.value = '0';
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
+      fixture.detectChanges();
+
+      expect(basemaps.setOverlayOpacity).toHaveBeenCalledWith('topo', 0);
+    });
+
+    it('hides the marker size choice behind Incident markers, above Heatmap, until the arrow opens it', async () => {
+      const { el, fixture } = await render({});
+      const contacts = [...el.querySelectorAll('fieldset')].find((f) => f.querySelector('legend')?.textContent === 'Contacts')!;
+      const rows = [...contacts.querySelectorAll('app-layer-row')];
+      expect(rows.map((r) => r.querySelector('.row__primary')?.textContent?.trim())).toEqual(['Incident markers', 'Heatmap']);
+
+      const markers = rowFor(el, 'Incident markers');
+      expect(markers.querySelector('.options')!.classList.contains('is-open')).toBe(false);
+      expect(markers.querySelector('.toggle')!.getAttribute('aria-expanded')).toBe('false');
+
+      open(markers, fixture);
+
+      expect(markers.querySelector('.options')!.classList.contains('is-open')).toBe(true);
+      expect(markers.querySelector('select')).not.toBeNull();
+    });
+
+    it('hides which field the heatmap shows behind its own arrow', async () => {
+      const { el, fixture } = await render({});
+      const row = rowFor(el, 'Heatmap');
+      expect(row.querySelector('.options')!.classList.contains('is-open')).toBe(false);
+
+      open(row, fixture);
+
+      expect(row.querySelector('.options')!.classList.contains('is-open')).toBe(true);
+      expect(row.querySelector('select')!.value).not.toBe('');
+    });
+
+    it('offers 3D terrain as a Basemap option, only where terrain is configured', async () => {
+      const { el, fixture } = await render({});
+      const basemapFieldset = [...el.querySelectorAll('fieldset')].find((f) => f.querySelector('legend')?.textContent === 'Basemap')!;
+      const row = basemapFieldset.querySelector<HTMLElement>('app-layer-row')!;
+      expect(row.querySelector('.options')!.classList.contains('is-open')).toBe(false);
+
+      open(row, fixture);
+
+      expect(row.querySelector('.options')!.classList.contains('is-open')).toBe(true);
+      expect(row.querySelector('input[type=checkbox]')).not.toBeNull();
+      expect(row.textContent).toContain('3D terrain');
+    });
+
+    it('leaves Basemap with no arrow when the deployment has no terrain configured', async () => {
+      const { el } = await render({ config: { ...config, terrain: null } });
+      const basemapFieldset = [...el.querySelectorAll('fieldset')].find((f) => f.querySelector('legend')?.textContent === 'Basemap')!;
+      const pickerRow = [...basemapFieldset.querySelectorAll('app-layer-row')].find((r) => r.querySelector('app-basemap-picker'))!;
+
+      expect(pickerRow.querySelector('.toggle')).toBeNull();
+    });
+  });
+
   it('starts from the view in the URL', async () => {
     const { basemaps } = await render({
       inputs: { at: '10.6,107.2,11', basemap: 'dark', terrain: '1', overlays: 'topo' },

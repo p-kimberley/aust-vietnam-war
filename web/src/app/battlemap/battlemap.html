@@ -136,26 +136,40 @@
             @if (tab() === 'layers') {
               <fieldset>
                 <legend id="basemap-label">Basemap</legend>
-                <app-basemap-picker labelledBy="basemap-label" [options]="cfg.basemaps" [value]="basemaps.basemapId()" (picked)="setBasemap($event)" />
-
-                @if (canTerrain()) {
-                  <label class="panel__row">
-                    <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
-                    3D terrain
-                  </label>
-                }
+                <app-layer-row label="Basemap options" [expandable]="canTerrain()">
+                  <app-basemap-picker primary labelledBy="basemap-label" [options]="cfg.basemaps" [value]="basemaps.basemapId()" (picked)="setBasemap($event)" />
+                  @if (canTerrain()) {
+                    <label options class="panel__row">
+                      <input type="checkbox" [checked]="basemaps.terrainEnabled()" (change)="setTerrain($any($event.target).checked)" />
+                      3D terrain
+                    </label>
+                  }
+                </app-layer-row>
 
                 @if (cfg.overlays.length) {
                   <p class="panel__subheading">Imagery</p>
                   @for (o of cfg.overlays; track o.id) {
-                    <label>
-                      <input
-                        type="checkbox"
-                        [checked]="basemaps.overlayIds().includes(o.id)"
-                        (change)="setOverlay(o.id, $any($event.target).checked)"
-                      />
-                      {{ o.name }}
-                    </label>
+                    <app-layer-row [label]="o.name + ' options'">
+                      <label primary>
+                        <input
+                          type="checkbox"
+                          [checked]="basemaps.overlayIds().includes(o.id)"
+                          (change)="setOverlay(o.id, $any($event.target).checked)"
+                        />
+                        {{ o.name }}
+                      </label>
+                      <label options class="panel__select">
+                        Opacity
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          [value]="basemaps.overlayOpacity(o.id)"
+                          (input)="basemaps.setOverlayOpacity(o.id, $any($event.target).valueAsNumber)"
+                        />
+                      </label>
+                    </app-layer-row>
                   }
                 }
               </fieldset>
@@ -182,31 +196,35 @@
 
               <fieldset>
                 <legend>Contacts</legend>
-                <label>
-                  <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
-                  Heatmap
-                </label>
-                <label>
-                  <input type="checkbox" [checked]="showMarkers()" (change)="setMarkersVisible($any($event.target).checked)" />
-                  Incident markers
-                </label>
-                <label class="panel__select">
-                  Heatmap shows
-                  <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
-                    @for (f of heatFields; track f.value) {
-                      <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
-                    }
-                  </select>
-                </label>
-                <label class="panel__select">
-                  Marker size
-                  <select [value]="sizeField() ?? 'none'" (change)="setMarkerSize($any($event.target).value)">
-                    <option value="none" [selected]="sizeField() === null">The same for every incident</option>
-                    @for (f of sizeFields; track f.value) {
-                      <option [value]="f.value" [selected]="sizeField() === f.value">{{ f.name }}</option>
-                    }
-                  </select>
-                </label>
+                <app-layer-row label="Incident markers options">
+                  <label primary>
+                    <input type="checkbox" [checked]="showMarkers()" (change)="setMarkersVisible($any($event.target).checked)" />
+                    Incident markers
+                  </label>
+                  <label options class="panel__select">
+                    Marker size
+                    <select [value]="sizeField() ?? 'none'" (change)="setMarkerSize($any($event.target).value)">
+                      <option value="none" [selected]="sizeField() === null">The same for every incident</option>
+                      @for (f of sizeFields; track f.value) {
+                        <option [value]="f.value" [selected]="sizeField() === f.value">{{ f.name }}</option>
+                      }
+                    </select>
+                  </label>
+                </app-layer-row>
+                <app-layer-row label="Heatmap options">
+                  <label primary>
+                    <input type="checkbox" [checked]="showHeatmap()" (change)="setHeatmapVisible($any($event.target).checked)" />
+                    Heatmap
+                  </label>
+                  <label options class="panel__select">
+                    Heatmap shows
+                    <select [value]="heatField()" (change)="setHeatField($any($event.target).value)">
+                      @for (f of heatFields; track f.value) {
+                        <option [value]="f.value" [selected]="heatField() === f.value">{{ f.name }}</option>
+                      }
+                    </select>
+                  </label>
+                </app-layer-row>
               </fieldset>
             } @else {
               @if (contactFilter.catalogue(); as cat) {
