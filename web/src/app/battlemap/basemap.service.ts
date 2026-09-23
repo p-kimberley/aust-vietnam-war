@@ -81,13 +81,20 @@ export class BasemapService implements OnDestroy {
       center: [camera.lon, camera.lat],
       zoom: camera.zoom,
       pitch: this.terrainEnabled() ? TERRAIN_PITCH : 0,
-      attributionControl: { compact: true },
+      // Off here so it can be added below at bottom-left instead of the library's default (bottom-right): every other
+      // control lives at bottom-left too, clear of the side panels, and credits read more naturally beside them than
+      // isolated in the opposite corner.
+      attributionControl: false,
     });
     this.map = map;
 
-    // Bottom-left keeps the bottom-right corner clear for the attribution, which must stay visible under the side panels.
-    map.addControl(new maplibre.NavigationControl({ visualizePitch: true }), 'bottom-left');
+    // MapLibre puts each newly added control at the front of its corner, so these are added in the reverse of the
+    // order they should read in: navigation (which ends in the tilt control) first, then scale, then, rightmost,
+    // attribution. battlemap.css turns the corner into a single row so attribution sits beside the tilt control
+    // rather than stacked under it.
+    map.addControl(new maplibre.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new maplibre.ScaleControl({ unit: 'metric' }), 'bottom-left');
+    map.addControl(new maplibre.NavigationControl({ visualizePitch: true }), 'bottom-left');
 
     // A style load replaces the whole style, so terrain, overlays and data layers are put back each time.
     map.on('style.load', () => {

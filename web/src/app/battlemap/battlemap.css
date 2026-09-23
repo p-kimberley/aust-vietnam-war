@@ -57,15 +57,15 @@
 
 /*
  * The map controls and the legend share one column at the right: the controls at the top, the legend at the bottom just
- * above the credit line. When the screen is short, the controls give way (their body scrolls) rather than run under
- * the legend or the timeline.
+ * above the timeline (a touch closer to it than the column is to the right-hand edge of the viewport). When the screen
+ * is short, the controls give way (their body scrolls) rather than run under the legend or the timeline.
  */
 .bm__right {
   position: absolute;
   z-index: 3;
   top: 3rem;
   right: 0.75rem;
-  bottom: calc(var(--timeline-h) + 2.3rem);
+  bottom: calc(var(--timeline-h) + 0.75rem - 6px);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -188,6 +188,25 @@
 :host ::ng-deep .maplibregl-ctrl-bottom-left,
 :host ::ng-deep .maplibregl-ctrl-bottom-right {
   margin-bottom: var(--timeline-h);
+}
+
+/*
+ * MapLibre stacks a corner's controls one above another by default; this turns bottom-left into a single row instead,
+ * bottom-aligned, so attribution sits level with (and to the right of) the tilt control at the foot of the navigation
+ * group, rather than stacked beneath the whole thing.
+ */
+:host ::ng-deep .maplibregl-ctrl-bottom-left {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  /* The per-control margin that used to hold these off the corner is zeroed out below, so the offset moves here. */
+  padding: 0 0 5px 5px;
+}
+
+:host ::ng-deep .maplibregl-ctrl-bottom-left .maplibregl-ctrl {
+  margin: 0;
+  float: none;
+  clear: none;
 }
 
 .bm__incident {
