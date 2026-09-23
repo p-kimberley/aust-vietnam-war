@@ -59,6 +59,34 @@ describe('ContactFilteringService', () => {
     expect(service.activeCount()).toBe(2);
   });
 
+  it('scopes operation, task, series and unit counts to every other active filter, dates and hours included', () => {
+    const { service } = create();
+
+    // Unfiltered: matches the catalogue's own (whole-dataset) counts.
+    expect(service.operationCounts()).toEqual(new Map([['Coburg', 1], ['Hardihood, Phase 2', 2]]));
+    expect(service.taskCounts()).toEqual(new Map([['Ambush', 1], ['Patrol', 2]]));
+    expect(service.seriesCounts()).toEqual(new Map([['1ATF', 3], ['1RAR', 1]]));
+    expect(service.unitCounts().get(15838)).toBe(1);
+
+    // A date range leaving only the two 1966 contacts (1 and 4's "Hardihood, Phase 2" is in 1971, contact 3's "1RAR" in 1967).
+    service.setFilters({ ...NO_FILTERS, from: '1966-01-01', to: '1966-12-31' });
+
+    expect(service.operationCounts()).toEqual(new Map([['Coburg', 1], ['Hardihood, Phase 2', 1]]));
+    expect(service.taskCounts()).toEqual(new Map([['Ambush', 1], ['Patrol', 1]]));
+    expect(service.seriesCounts()).toEqual(new Map([['1ATF', 2]]));                    // 1RAR's only contact is outside the range
+    expect(service.unitCounts().get(15838)).toBeUndefined();                           // that unit's only contact is outside the range too
+  });
+
+  it('does not zero out the facet a filter is already narrowing, so it can still be widened', () => {
+    const { service } = create();
+
+    service.setFilters({ ...NO_FILTERS, operations: new Set(['Coburg']) });
+
+    // Choosing Coburg leaves only contact 2, but the operation count itself ignores that choice, still counting every contact
+    // that passes the *other* filters (there are none here), so "Hardihood, Phase 2" stays choosable too.
+    expect(service.operationCounts()).toEqual(new Map([['Coburg', 1], ['Hardihood, Phase 2', 2]]));
+  });
+
   it('lists the ids the map shows, for the charts', () => {
     const { service } = create();
 

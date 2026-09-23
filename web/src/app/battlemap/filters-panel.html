@@ -56,7 +56,7 @@
     <div class="section">
       <app-checklist-filter
         label="Operations"
-        [items]="catalogue().operations"
+        [items]="operations()"
         [selected]="state().operations"
         (changed)="setNames('operations', $event)"
       />
@@ -65,7 +65,7 @@
 
   <app-accordion-section heading="Unit task" [badge]="state().tasks.size || null" [open]="open() === 'task'" (toggled)="toggle('task')">
     <div class="section">
-      <app-checklist-filter label="Unit tasks" [items]="catalogue().tasks" [selected]="state().tasks" (changed)="setNames('tasks', $event)" />
+      <app-checklist-filter label="Unit tasks" [items]="tasks()" [selected]="state().tasks" (changed)="setNames('tasks', $event)" />
     </div>
   </app-accordion-section>
 
@@ -73,7 +73,7 @@
     <div class="section">
       <app-checklist-filter
         label="Data sources"
-        [items]="catalogue().series"
+        [items]="series()"
         [selected]="state().series"
         [display]="seriesLabel"
         (changed)="setNames('series', $event)"

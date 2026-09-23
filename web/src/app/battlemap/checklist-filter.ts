@@ -19,11 +19,13 @@ export class ChecklistFilter {
   readonly changed = output<ReadonlySet<string>>();
 
   protected readonly query = signal('');
-  protected readonly searchable = computed(() => this.items().length > this.searchAbove());
+  /** Items a choice could still leave with a contact, plus any already chosen (so clearing one that a filter has since emptied is still possible). */
+  protected readonly reachable = computed(() => this.items().filter((i) => i.count > 0 || this.selected().has(i.name)));
+  protected readonly searchable = computed(() => this.reachable().length > this.searchAbove());
   protected readonly shown = computed(() => {
     const words = this.query().toLowerCase().split(/\s+/).filter(Boolean);
-    if (words.length === 0) return this.items();
-    return this.items().filter((i) => {
+    if (words.length === 0) return this.reachable();
+    return this.reachable().filter((i) => {
       const text = `${i.name} ${this.display()(i.name)}`.toLowerCase();
       return words.every((w) => text.includes(w));
     });

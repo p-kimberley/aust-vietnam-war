@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { AccordionSection } from './accordion-section';
 import { ChecklistFilter } from './checklist-filter';
-import { FilterCatalogue } from './filter-catalogue';
+import { FilterCatalogue, NamedCount } from './filter-catalogue';
 import {
   FilterKey,
   FilterState,
@@ -38,6 +38,13 @@ export class FiltersPanel {
   readonly catalogue = input.required<FilterCatalogue>();
   readonly tree = input.required<UnitTree>();
   readonly unitCounts = input.required<ReadonlyMap<number, number>>();
+  /**
+   * How many contacts each operation, unit task or data source would leave if chosen, every other active filter (dates and
+   * hours included) already applied. Names the catalogue lists but that count is not in are not currently reachable.
+   */
+  readonly operationCounts = input.required<ReadonlyMap<string, number>>();
+  readonly taskCounts = input.required<ReadonlyMap<string, number>>();
+  readonly seriesCounts = input.required<ReadonlyMap<string, number>>();
   /** Contacts passing the filters, and all contacts. */
   readonly shown = input.required<number>();
   readonly total = input.required<number>();
@@ -50,6 +57,10 @@ export class FiltersPanel {
   protected readonly minText = MIN_TEXT_LENGTH;
   protected readonly seriesLabel = seriesLabel;
   protected readonly active = computed(() => activeKeys(this.state()));
+  /** The catalogue's names, with each one's count replaced by how many contacts it would leave given the other active filters. */
+  protected readonly operations = computed(() => withCounts(this.catalogue().operations, this.operationCounts()));
+  protected readonly tasks = computed(() => withCounts(this.catalogue().tasks, this.taskCounts()));
+  protected readonly series = computed(() => withCounts(this.catalogue().series, this.seriesCounts()));
   protected readonly ranges: readonly { key: RangeKey; label: string }[] = [
     { key: 'fr', label: 'Friendly strength' },
     { key: 'frCas', label: 'Friendly casualties' },
@@ -103,4 +114,9 @@ export class FiltersPanel {
   protected setText(value: string): void {
     this.changed.emit({ ...this.state(), text: value });
   }
+}
+
+/** Keeps the catalogue's names and order, but swaps in a scoped count; a name the scoped counts left out is at zero. */
+function withCounts(items: readonly NamedCount[], counts: ReadonlyMap<string, number>): NamedCount[] {
+  return items.map((i) => ({ name: i.name, count: counts.get(i.name) ?? 0 }));
 }

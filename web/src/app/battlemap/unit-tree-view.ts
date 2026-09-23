@@ -37,9 +37,18 @@ export class UnitTreeView implements OnInit {
     this.opened.set(open);
   }
 
+  /**
+   * A node's count is every contact touching its subtree (see {@link UnitTree.countContacts}), so zero there means no
+   * descendant has one either: the whole subtree can be left out. Unless something in it is chosen, so a filter that has
+   * since emptied it can still be seen and cleared.
+   */
+  protected reachable(id: number): boolean {
+    return (this.counts().get(id) ?? 0) > 0 || this.tree().stateOf(id, this.selected()) !== 'none';
+  }
+
   protected visible(id: number): boolean {
     const s = this.search();
-    return !s || s.visible.has(id);
+    return (!s || s.visible.has(id)) && this.reachable(id);
   }
 
   protected children(id: number): readonly number[] {

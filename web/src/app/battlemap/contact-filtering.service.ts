@@ -53,10 +53,45 @@ export class ContactFilteringService {
     const c = this.catalogue();
     return c ? applyFilters(this.allContacts(), { ...this.filters(), operations: new Set(), from: null, to: null }, c, this.textIds()) : this.allContacts();
   });
-  readonly unitCounts = computed(() => this.tree()?.countContacts(this.allContacts()) ?? new Map<number, number>());
+  /**
+   * How many contacts each unit would leave if it, or its subtree, were chosen: every other active filter still applies
+   * (dates and hours included), but not the unit filter itself, so choosing one unit does not make the others' counts
+   * collapse to what only that unit already leaves.
+   */
+  readonly unitCounts = computed(() => {
+    const c = this.catalogue();
+    const t = this.tree();
+    if (!c || !t) {
+      return new Map<number, number>();
+    }
+    const scoped = applyFilters(this.allContacts(), { ...this.filters(), units: new Set() }, c, this.textIds());
+    return t.countContacts(scoped);
+  });
+  /** The same idea as {@link unitCounts}, for the operation, unit task and data source checklists. */
+  readonly operationCounts = computed(() => this.countsBy('op', 'operations'));
+  readonly taskCounts = computed(() => this.countsBy('task', 'tasks'));
+  readonly seriesCounts = computed(() => this.countsBy('series', 'series'));
   readonly activeCount = computed(() => activeKeys(this.filters()).length);
   /** The ids the charts are drawn from: what the map shows. */
   readonly visibleIds = computed(() => this.visible().map((c) => c.id));
+
+  /** Counts, by name, of contacts that pass every filter but `key`, from the 1-based index a contact's `field` records. */
+  private countsBy(field: 'op' | 'task' | 'series', key: 'operations' | 'tasks' | 'series'): ReadonlyMap<string, number> {
+    const c = this.catalogue();
+    if (!c) {
+      return new Map();
+    }
+    const names = c[key];
+    const scoped = applyFilters(this.allContacts(), { ...this.filters(), [key]: new Set<string>() }, c, this.textIds());
+    const counts = new Map<string, number>();
+    for (const contact of scoped) {
+      const name = names[contact[field] - 1]?.name;
+      if (name) {
+        counts.set(name, (counts.get(name) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }
 
   /** Applies a change from the filter panel: sets the filters and, if the text changed, starts a report search. Answers whether the text changed. */
   setFilters(next: FilterState): boolean {

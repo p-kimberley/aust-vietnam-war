@@ -91,7 +91,7 @@ describe('UnitTreeView', () => {
 
     type(search, 'armor');
     fixture.detectChanges();
-    expect(texts(el, '.node__text')).toEqual(['US Army', '16 Armor Battalion', 'D Coy', 'E Coy']);
+    expect(texts(el, '.node__text')).toEqual(['US Army', '16 Armor Battalion', 'D Coy']);   // E Coy has no contacts, so stays out even here
 
     type(search, 'zzz');
     fixture.detectChanges();
@@ -106,6 +106,20 @@ describe('UnitTreeView', () => {
   it('gives each unit its full name as a tooltip', () => {
     const { el } = tv();
     expect(el.querySelector('.node__label')!.getAttribute('title')).toBe('1 Battalion, Royal Australian Regiment');
+  });
+
+  it('leaves out a unit a filter has left with no contacts, but keeps one that is already chosen', () => {
+    const zeroed = new Map(counts);
+    zeroed.set(3234, 0);                                                    // D Coy: a filter has left it with nothing
+
+    const { fixture, el } = create(UnitTreeView, { tree, selected: new Set(), counts: zeroed });
+    el.querySelector<HTMLButtonElement>('.node__toggle')!.click();
+    fixture.detectChanges();
+    expect(texts(el, '.node__text')).toEqual(['1 RAR', 'A Coy', 'US Army']);        // D Coy is left out
+
+    // Selecting D Coy opens the path to it automatically (see "opens the path to what is already selected" above).
+    const withSelection = create(UnitTreeView, { tree, selected: new Set([3234]), counts: zeroed });
+    expect(texts(withSelection.el, '.node__text')).toEqual(['1 RAR', 'A Coy', 'D Coy', 'US Army']);  // shown so it can be cleared
   });
 });
 
@@ -196,6 +210,14 @@ describe('ChecklistFilter', () => {
     expect(cl(new Set(), items.slice(0, 3)).el.querySelector('input[type=search]')).toBeNull();
   });
 
+  it('leaves out a choice that would now leave no contacts, but keeps one that is already chosen', () => {
+    const zeroed = [{ name: 'Coburg', count: 0 }, { name: 'Hardihood, Phase 2', count: 2 }];
+    expect(texts(cl(new Set(), zeroed).el, '.list__text')).toEqual(['Hardihood, Phase 2']);
+
+    // Chosen earlier, then a filter (say, a date range) left it with nothing: still shown, so it can still be cleared.
+    expect(texts(cl(new Set(['Coburg']), zeroed).el, '.list__text')).toEqual(['Coburg', 'Hardihood, Phase 2']);
+  });
+
   it('says so when nothing matches', () => {
     const { fixture, el } = cl();
     type(el.querySelector<HTMLInputElement>('input[type=search]')!, 'zzz', 'input');
@@ -218,9 +240,14 @@ describe('ChecklistFilter', () => {
 });
 
 describe('FiltersPanel', () => {
+  // Matches CATALOGUE's own counts, as a real caller's scoped counts would with no filter yet narrowing anything.
+  const namedCounts = (items: readonly { name: string; count: number }[]) => new Map(items.map((i) => [i.name, i.count]));
+
   function fp(state: FilterState = NO_FILTERS, extra: Record<string, unknown> = {}) {
     const { fixture, el } = create(FiltersPanel, {
-      state, catalogue: CATALOGUE, tree, unitCounts: counts, shown: 4, total: 4, ...extra,
+      state, catalogue: CATALOGUE, tree, unitCounts: counts,
+      operationCounts: namedCounts(CATALOGUE.operations), taskCounts: namedCounts(CATALOGUE.tasks), seriesCounts: namedCounts(CATALOGUE.series),
+      shown: 4, total: 4, ...extra,
     });
     const emitted: FilterState[] = [];
     fixture.componentInstance.changed.subscribe((s) => emitted.push(s));
@@ -263,6 +290,24 @@ describe('FiltersPanel', () => {
     el.querySelector<HTMLButtonElement>('.summary__clear')!.click();
 
     expect(emitted).toEqual([NO_FILTERS]);
+  });
+
+  const operationCounts = (el: HTMLElement) => {
+    const head = [...el.querySelectorAll<HTMLButtonElement>('app-accordion-section .toggle')][2];    // Operation
+    const body = el.querySelector<HTMLElement>('#' + head.getAttribute('aria-controls'))!;
+    return [...body.querySelectorAll('.list__count')].map((c) => c.textContent);
+  };
+
+  it('shows operation, task and source counts as scoped by the caller, not the catalogue’s own whole-dataset counts', () => {
+    const { el } = fp(NO_FILTERS, { operationCounts: new Map([['Coburg', 1], ['Hardihood, Phase 2', 1]]) });
+
+    expect(operationCounts(el)).toEqual(['1', '1']);   // both down from the catalogue's own 1 and 2, as the scoped counts say
+  });
+
+  it('leaves out a name the scoped counts left with nothing, rather than showing it at zero', () => {
+    const { el } = fp(NO_FILTERS, { operationCounts: new Map([['Coburg', 1]]) });
+
+    expect(operationCounts(el)).toEqual(['1']);   // "Hardihood, Phase 2" is not currently reachable, so it is left out entirely
   });
 
   it('sets a date limit, and treats the ends of the data as no limit', () => {
