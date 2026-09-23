@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fakeMap } from './battlemap-testing';
 import { Contact } from './contacts';
 import {
@@ -10,6 +10,7 @@ import {
   TRACK_SOURCE,
   TRACK_STOPS,
   addTrackLayers,
+  animateTracks,
   buildTracks,
   followedFromLink,
   setTrackVisibility,
@@ -183,5 +184,63 @@ describe('track layers', () => {
     setTrackVisibility(map as never, true);
 
     expect(map.setLayoutProperty).not.toHaveBeenCalled();
+  });
+});
+
+describe('animateTracks', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  const dasharrays = (map: ReturnType<typeof fakeMap>) =>
+    map.setPaintProperty.mock.calls.filter(([id]) => id === TRACK_LINE).map(([, , value]) => value);
+
+  it('steps the line through the dash frames in order, looping, while the layer exists', () => {
+    const map = fakeMap();
+    addTrackLayers(map as never, [], true);
+    map.setPaintProperty.mockClear();
+
+    animateTracks(map as never);
+    vi.advanceTimersByTime(60 * 15);                    // one full loop (14 frames) plus one more
+
+    const frames = dasharrays(map);
+    expect(frames).toHaveLength(15);
+    expect(frames[14]).toEqual(frames[0]);               // one full loop (14 frames) later, back where it started
+    expect(new Set(frames.map((f) => JSON.stringify(f))).size).toBeGreaterThan(1);   // not stuck on one frame
+  });
+
+  it('stops stepping once told to', () => {
+    const map = fakeMap();
+    addTrackLayers(map as never, [], true);
+    const stop = animateTracks(map as never);
+    vi.advanceTimersByTime(60 * 3);
+    map.setPaintProperty.mockClear();
+
+    stop();
+    vi.advanceTimersByTime(60 * 10);
+
+    expect(dasharrays(map)).toEqual([]);
+  });
+
+  it('skips a step onto a layer that does not exist yet, without erroring', () => {
+    const map = fakeMap();                              // addTrackLayers never called: no layer to find
+
+    expect(() => animateTracks(map as never)).not.toThrow();
+    expect(() => vi.advanceTimersByTime(60 * 3)).not.toThrow();
+    expect(dasharrays(map)).toEqual([]);
+  });
+
+  it('does nothing for a reader who has asked for less motion', () => {
+    const matchMedia = vi.fn(() => ({ matches: true }) as MediaQueryList);
+    vi.stubGlobal('matchMedia', matchMedia);
+    const map = fakeMap();
+    addTrackLayers(map as never, [], true);
+    map.setPaintProperty.mockClear();
+
+    animateTracks(map as never);
+    vi.advanceTimersByTime(60 * 5);
+
+    expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)');
+    expect(dasharrays(map)).toEqual([]);
+    vi.unstubAllGlobals();
   });
 });

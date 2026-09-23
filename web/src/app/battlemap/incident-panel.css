@@ -155,25 +155,6 @@ h3.incident__when {
   border-radius: 50%;
 }
 
-.unit__step {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-left: auto;
-  font-size: 0.8rem;
-}
-
-.unit__step button {
-  width: 1.6rem;
-  padding: 0.05rem 0;
-  color: var(--paper);
-  font-size: 1.1rem;
-  line-height: 1;
-  background: var(--olive-700);
-  border: 1px solid var(--olive-500);
-  cursor: pointer;
-}
-
 .incident__none {
   margin: 0;
   color: var(--khaki);

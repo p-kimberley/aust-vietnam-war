@@ -83,9 +83,18 @@
   right: calc(min(22rem, 100vw - 1.5rem) + 1.5rem);
 }
 
+/* The followed-units panel (when there is one) and the legend stay together at the bottom of the column. */
+.bm__bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.bm__follow,
 .bm__legend {
   flex: none;
-  margin-top: auto;
 }
 
 .panel {
@@ -173,16 +182,6 @@
   .bm__flyout.is-open {
     transition: none;
   }
-}
-
-.bm__charts {
-  padding: 0.2rem 0.75rem;
-  border: 1px solid var(--olive-500);
-  background: var(--olive-700);
-  color: var(--paper);
-  font: inherit;
-  font-size: 0.85rem;
-  cursor: pointer;
 }
 
 /* MapLibre's own controls and credit line would otherwise sit under the timeline. */

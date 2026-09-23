@@ -5,6 +5,7 @@ import {
   Injector,
   afterNextRender,
   computed,
+  effect,
   inject,
   input,
   signal,
@@ -15,6 +16,7 @@ import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { DateRange, Timeline, TimelineFocus } from './analytics/timeline';
 import { BasemapPicker } from './basemap-picker';
+import { FollowPanel } from './follow-panel';
 import { LayerRow } from './layer-row';
 import { LeftTab, LeftTabs } from './left-tabs';
 import { MapLegend } from './map-legend';
@@ -59,7 +61,7 @@ import { MapConfig, MapConfigService } from './map-config';
 import { Camera, formatAt, parseAt } from './map-url';
 import { MapSelectionService } from './map-selection.service';
 import { MapViewStateService } from './map-view-state.service';
-import { Track, addTrackLayers, buildTracks, followedFromLink, neighbour, setTrackVisibility, setTracks } from './track';
+import { FollowRow, Track, addTrackLayers, animateTracks, buildTracks, followedFromLink, neighbour, setTrackVisibility, setTracks } from './track';
 import { UnitFollowService } from './unit-follow.service';
 
 type Status = 'loading' | 'ready' | 'error';
@@ -82,7 +84,7 @@ const FIT_PADDING_PX = 50;
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, BasemapPicker, LayerRow, LeftTabs, MapLegend, NominalRoll, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
+  imports: [RouterLink, BasemapPicker, FollowPanel, LayerRow, LeftTabs, MapLegend, NominalRoll, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
   providers: [BasemapService, MapSelectionService, MapViewStateService, UnitFollowService, ContactFilteringService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
@@ -182,6 +184,17 @@ export class Battlemap {
   protected readonly tracks = computed<Track[]>(() => buildTracks(this.contactFilter.visible(), this.followUnits.followed()));
   /** What the incident panel shows beside a followed unit: the colour of its line, and how many incidents it has. */
   protected readonly followInfo = computed(() => new Map(this.tracks().map((t) => [t.key, { colour: t.colour, stops: t.stops.length }])));
+  /** One row per followed unit, for the followed-units panel: its name, colour and where the open incident sits in its path. */
+  protected readonly followRows = computed<FollowRow[]>(() => {
+    const selected = this.selection.selectedId();
+    const tree = this.contactFilter.tree();
+    return this.tracks().map((t) => {
+      const at = t.stops.findIndex((c) => c.id === selected);
+      const node = tree?.get(t.key);
+      const label = node?.label ?? `Unit ${t.key}`;
+      return { unit: t.key, label, fullName: node?.name ?? label, colour: t.colour, at: at < 0 ? null : at + 1, total: t.stops.length };
+    });
+  });
 
   constructor() {
     // Told once here, rather than threaded through every call, since it only ever means one thing: bring the map up to date.
@@ -341,11 +354,6 @@ export class Battlemap {
   /** Follows a unit, or stops following it. */
   protected toggleFollow(unit: number): void {
     this.followUnits.toggle(unit);
-    this.syncFollowedToMap();
-  }
-
-  protected stopFollowing(): void {
-    this.followUnits.stop();
     this.syncFollowedToMap();
   }
 
@@ -550,6 +558,17 @@ export class Battlemap {
         },
       );
       this.selection.attach(this.map);
+      // Marches the dashes along whichever units are followed; off again the moment none are, rather than ticking
+      // forever in the background.
+      const map = this.map!;
+      effect(
+        (onCleanup) => {
+          if (this.followUnits.followed().size > 0) {
+            onCleanup(animateTracks(map));
+          }
+        },
+        { injector: this.injector },
+      );
 
       // With no explicit view in the link, bring the incident, base or photo into frame.
       if (target && !hasOwnView) {

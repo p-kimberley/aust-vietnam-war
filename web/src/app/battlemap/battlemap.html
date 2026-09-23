@@ -6,11 +6,6 @@
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
       <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" (pickPerson)="openPerson($event)" (pickNote)="openNote($event)" (pickPicture)="openPictureAt($event)" />
-      @if (followUnits.followed().size) {
-        <button type="button" class="bm__charts" (click)="stopFollowing()" [attr.aria-label]="'Stop following ' + followUnits.followed().size + (followUnits.followed().size === 1 ? ' unit' : ' units')">
-          Following {{ followUnits.followed().size }} {{ followUnits.followed().size === 1 ? 'unit' : 'units' }} ✕
-        </button>
-      }
     }
   </header>
 
@@ -66,7 +61,7 @@
 
   @if (status() === 'ready' && selection.selectedId(); as id) {
     <div class="bm__incident">
-      <app-incident-panel [contactId]="id" [startTab]="selection.incidentTab()" [following]="followUnits.followed()" [trackInfo]="followInfo()" [followFull]="followUnits.full()" (follow)="toggleFollow($event)" (step)="stepFollowed($event.unit, $event.direction)" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
+      <app-incident-panel [contactId]="id" [startTab]="selection.incidentTab()" [following]="followUnits.followed()" [trackInfo]="followInfo()" [followFull]="followUnits.full()" (follow)="toggleFollow($event)" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
     </div>
   } @else if (status() === 'ready' && selection.selectedPerson(); as serviceNumber) {
     <div class="bm__incident">
@@ -250,16 +245,21 @@
           </div>
         </aside>
       }
-      <div class="bm__legend">
-        <app-map-legend
-          [showContacts]="showMarkers()"
-          [sizeField]="sizeFieldName()"
-          [showHeatmap]="showHeatmap()"
-          [heatField]="heatFieldName()"
-          [poiTypes]="legendPoiTypes()"
-          [showPhotos]="showPhotos() && pictures().length > 0"
-          [following]="followUnits.followed().size > 0"
-        />
+      <div class="bm__bottom">
+        @if (followRows().length) {
+          <app-follow-panel class="bm__follow" [rows]="followRows()" (step)="stepFollowed($event.unit, $event.direction)" (unfollow)="toggleFollow($event)" />
+        }
+        <div class="bm__legend">
+          <app-map-legend
+            [showContacts]="showMarkers()"
+            [sizeField]="sizeFieldName()"
+            [showHeatmap]="showHeatmap()"
+            [heatField]="heatFieldName()"
+            [poiTypes]="legendPoiTypes()"
+            [showPhotos]="showPhotos() && pictures().length > 0"
+            [following]="followUnits.followed().size > 0"
+          />
+        </div>
       </div>
     </div>
   }

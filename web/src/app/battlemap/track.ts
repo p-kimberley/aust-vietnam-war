@@ -11,6 +11,31 @@ export const TRACK_STOPS = 'avw-tracks-stops';
 /** More units than this are not followed: their paths overlap in time, so joining their contacts would only tangle. */
 export const MAX_SEPARATE_TRACKS = 6;
 
+/** How often the dashes step forward; fast enough to read as motion, gentle enough not to distract from the map. */
+const DASH_STEP_MS = 60;
+
+/**
+ * `line-dasharray` frames that, cycled in order, march the dashes from a track's oldest stop toward its newest (the
+ * direction each line's coordinates are drawn in; see {@link toTrackGeoJson}). Mapbox's own worked example for this
+ * effect, which this follows exactly: https://docs.mapbox.com/mapbox-gl-js/example/animate-a-line/
+ */
+const DASH_FRAMES: readonly number[][] = [
+  [0, 4, 3],
+  [0.5, 4, 2.5],
+  [1, 4, 2],
+  [1.5, 4, 1.5],
+  [2, 4, 1],
+  [2.5, 4, 0.5],
+  [3, 4, 0],
+  [0, 0.5, 3, 3.5],
+  [0, 1, 3, 3],
+  [0, 1.5, 3, 2.5],
+  [0, 2, 3, 2],
+  [0, 2.5, 3, 1.5],
+  [0, 3, 3, 1],
+  [0, 3.5, 3, 0.5],
+];
+
 // Bright colours that read on both the dark and the light basemaps; map paint properties cannot read CSS variables.
 export const TRACK_COLOURS = ['#ffd166', '#4cc9f0', '#b5e48c', '#f28482', '#cdb4db', '#ff9f1c'] as const;
 const CASING = '#1f2314';
@@ -27,6 +52,18 @@ export interface Track {
 export interface FollowInfo {
   colour: string;
   stops: number;
+}
+
+/** One row of the followed-units panel: a unit's line colour, and where the reader is along its path. */
+export interface FollowRow {
+  unit: number;
+  label: string;
+  /** The unit's full name, shown as a tooltip over the short label. */
+  fullName: string;
+  colour: string;
+  /** 1-based position, among this unit's own incidents, of whichever one is open; `null` while none of them is. */
+  at: number | null;
+  total: number;
 }
 
 export type TrackProperties = { key: number; colour: string; order?: number; count?: number; end?: 'first' | 'last' | 'middle' };
@@ -123,7 +160,8 @@ export function addTrackLayers(map: Map, tracks: readonly Track[], visible: bool
       source: TRACK_SOURCE,
       filter: ['==', ['geometry-type'], 'LineString'],
       layout: { 'line-join': 'round', 'line-cap': 'round', visibility },
-      paint: { 'line-color': colour, 'line-width': 3, 'line-dasharray': [2, 1.2] },
+      // The starting frame of DASH_FRAMES, so the line looks right even before animateTracks has taken its first step.
+      paint: { 'line-color': colour, 'line-width': 3, 'line-dasharray': DASH_FRAMES[0] },
     });
   }
   if (!map.getLayer(TRACK_STOPS)) {
@@ -154,4 +192,25 @@ export function setTrackVisibility(map: Map, visible: boolean): void {
       map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');
     }
   }
+}
+
+/**
+ * Steps the followed units' lines through {@link DASH_FRAMES}, so the dashes read as moving along each path, oldest
+ * stop to newest; does nothing for a reader who has asked for less motion. The layer coming and going (a style change
+ * discards it until the next `style.load`) needs no separate handling: a step onto a missing layer is just skipped.
+ * Call the returned function to stop.
+ */
+export function animateTracks(map: Map): () => void {
+  // Guarded rather than called plainly: jsdom (every spec that follows a unit runs through here) has no matchMedia.
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return () => {};
+  }
+  let frame = 0;
+  const timer = setInterval(() => {
+    frame = (frame + 1) % DASH_FRAMES.length;
+    if (map.getLayer(TRACK_LINE)) {
+      map.setPaintProperty(TRACK_LINE, 'line-dasharray', DASH_FRAMES[frame]);
+    }
+  }, DASH_STEP_MS);
+  return () => clearInterval(timer);
 }

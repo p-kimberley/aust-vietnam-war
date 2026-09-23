@@ -35,8 +35,6 @@ export class IncidentPanel {
   readonly followFull = input(false);
   /** Follows a unit, or stops following it. */
   readonly follow = output<number>();
-  /** Opens the previous or next incident of a followed unit. */
-  readonly step = output<{ unit: number; direction: 1 | -1 }>();
 
   private readonly contacts = inject(ContactsService);
   private readonly heading = viewChild<ElementRef<HTMLElement>>('heading');

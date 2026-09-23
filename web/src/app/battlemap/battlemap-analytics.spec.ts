@@ -118,14 +118,18 @@ describe('Battle Map unit tracks', () => {
   const stops = (r: Rendered) => trackData(r)!.features.filter((f) => f.geometry.type === 'Point').length;
   /** The small button beside the unit's name in the incident panel; the fixture incident involves unit 3, "1 Pl, A Coy". */
   const followButton = (r: Rendered) => r.el.querySelector<HTMLButtonElement>('.unit__follow')!;
-  const chip = (r: Rendered) => [...r.el.querySelectorAll<HTMLButtonElement>('.bm__bar button')].find((b) => b.textContent?.includes('Following'));
+  /** The followed-units panel's own toggle, which names how many are followed; absent while none is. */
+  const chip = (r: Rendered) => r.el.querySelector<HTMLButtonElement>('.follow__toggle');
+  const pager = (r: Rendered) => r.el.querySelector('.follow__pager')!;
+  const cancelButton = (r: Rendered) => r.el.querySelector<HTMLButtonElement>('.follow__cancel')!;
 
   it('starts with nothing followed: the layers are ready but hidden, and the layer list has no unit switch', async () => {
     const r = await render({});
 
     expect(r.el.querySelector('#tabpanel')!.textContent).not.toContain('Follow chosen units');
     expect([...r.el.querySelectorAll('legend')].map((l) => l.textContent)).not.toContain('Units');
-    expect(chip(r)).toBeUndefined();
+    expect(r.el.querySelector('app-follow-panel')).toBeNull();
+    expect(chip(r)).toBeNull();
     expect(r.basemaps.map.layers.has('avw-tracks-line')).toBe(true);
     expect(r.basemaps.map.addLayer.mock.calls.filter(([l]) => (l as { id: string }).id.startsWith('avw-tracks')).every(([l]) => (l as unknown as { layout: { visibility: string } }).layout.visibility === 'none')).toBe(true);
   });
@@ -150,20 +154,35 @@ describe('Battle Map unit tracks', () => {
 
     expect(trackData(r)!.features).toEqual([]);
     expect(r.basemaps.map.setLayoutProperty).toHaveBeenLastCalledWith('avw-tracks-stops', 'visibility', 'none');
-    expect(chip(r)).toBeUndefined();
+    expect(chip(r)).toBeNull();
   });
 
-  it('shows the colour of the line and the number of incidents beside a followed unit, and steps through them', async () => {
+  it('shows the colour of a followed unit in the incident panel, with no pager there any more', async () => {
     const r = await render({ inputs: { incident: '2', follow: '3' } });
     await settle(r.fixture);
 
     expect(r.el.querySelector('.unit__swatch')).not.toBeNull();
-    expect(r.el.querySelector('.unit__step')!.textContent).toContain('2');
+    expect(r.el.querySelector('.unit__step')).toBeNull();
+  });
 
-    r.el.querySelector<HTMLButtonElement>('.unit__step [aria-label="Next incident"]')!.click();
+  it('shows a followed unit’s position along its own path, and steps through it, in the panel above the legend', async () => {
+    const r = await render({ inputs: { incident: '2', follow: '3' } });
+    await settle(r.fixture);
+
+    expect(r.el.querySelector('.bm__follow .follow__swatch')).not.toBeNull();
+    expect(pager(r).textContent?.replace(/\s+/g, ' ').trim()).toContain('1/2');    // contact 2 is the first of the unit's two
+
+    pager(r).querySelector<HTMLButtonElement>('[aria-label="Next incident"]')!.click();
     await settle(r.fixture);
 
     expect(r.basemaps.flyTo).toHaveBeenCalledWith(contacts[1].lat, contacts[1].lon, expect.anything());     // contact 9 follows contact 2
+    expect(pager(r).textContent?.replace(/\s+/g, ' ').trim()).toContain('2/2');
+  });
+
+  it('shows no position for a followed unit while none of its own incidents is open', async () => {
+    const r = await render({ inputs: { follow: '3' } });
+
+    expect(pager(r).textContent?.replace(/\s+/g, ' ').trim()).toContain('–/2');
   });
 
   it('opens with the units in the link followed, and writes them back into the link', async () => {
@@ -173,24 +192,40 @@ describe('Battle Map unit tracks', () => {
     expect(stops(r)).toBe(2);
     expect(chip(r)!.textContent).toContain('Following 1 unit');
 
-    chip(r)!.click();
+    cancelButton(r).click();
     await settle(r.fixture);
     await wait(450);
 
     expect(stops(r)).toBe(0);
+    expect(chip(r)).toBeNull();
     expect(navigate.mock.calls.at(-1)![1]!.queryParams).toMatchObject({ follow: null, track: null });
+  });
+
+  it('cancels just the one unit from the button beside its pager, leaving the others followed', async () => {
+    const r = await render({ inputs: { follow: '3,4' } });                 // unit 3: contacts 2, 9; unit 4: contact 9
+    expect(r.el.querySelectorAll('.follow__list li')).toHaveLength(2);
+
+    cancelButton(r).click();                                               // the first row, unit 3 (rows are sorted ascending)
+    await settle(r.fixture);
+
+    const rows = [...r.el.querySelectorAll('.follow__list li')];
+    expect(rows).toHaveLength(1);
+    expect(chip(r)!.textContent).toContain('Following 1 unit');
+    expect(trackData(r)!.features.some((f) => f.geometry.type === 'Point')).toBe(true);   // unit 4's own path is still drawn
   });
 
   it('still follows, for an older link with track=1, the units the filters chose', async () => {
     const r = await render({ contacts: CONTACTS, queryParams: { units: '3233' }, inputs: { track: '1' } });
 
     expect(stops(r)).toBeGreaterThan(0);
-    expect(chip(r)!.textContent).toContain('Following 4 units');    // unit 3233 and the three beneath it
+    // Unit 3233 and the three beneath it are all followed, but 3233 itself is never on a contact directly (only its
+    // subordinates are), so it draws no path and the panel, which only counts units it can actually show, says 3.
+    expect(chip(r)!.textContent).toContain('Following 3 units');
   });
 
   it('follows no more units than can be drawn, and greys out the button for another', async () => {
     const tooMany = await render({ inputs: { follow: '1,2,3,4,5,6,7' } });
-    expect(chip(tooMany)).toBeUndefined();
+    expect(chip(tooMany)).toBeNull();
     expect(trackData(tooMany)!.features).toEqual([]);
   });
 

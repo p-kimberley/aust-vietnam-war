@@ -59,12 +59,7 @@
                 </svg>
               </button>
               @if (trackInfo().get(u.id); as t) {
-                <span class="unit__swatch" [style.background]="t.colour" aria-hidden="true"></span>
-                <span class="unit__step" role="group" [attr.aria-label]="'Step through the incidents of ' + u.shortName">
-                  <button type="button" aria-label="Previous incident" (click)="step.emit({ unit: u.id, direction: -1 })">‹</button>
-                  <span class="data">{{ t.stops }}</span>
-                  <button type="button" aria-label="Next incident" (click)="step.emit({ unit: u.id, direction: 1 })">›</button>
-                </span>
+                <span class="unit__swatch" [style.background]="t.colour" aria-hidden="true" title="Followed; see the panel above the legend to step through its incidents"></span>
               }
             </li>
           }
