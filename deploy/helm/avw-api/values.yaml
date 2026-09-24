@@ -153,7 +153,8 @@ media:
   keepOriginals: false
   # fsGroup is ignored for inline NFS volumes and for CSI drivers with fsGroupPolicy: None (common for CephFS), leaving
   # a root-owned mount the app cannot write to. Prefer fixing ownership once, or on the storage side. As a last resort
-  # this adds an init container that chowns the mount to runAsUser:fsGroup on every start. It runs as root (with only
+  # this adds an init container that chowns the mount to runAsUser:fsGroup and gives the owner rwx on every start
+  # (its log shows the owner and mode before and after). It runs as root (with only
   # CHOWN and FOWNER), so a namespace enforcing the "restricted" Pod Security level will reject the pods.
   fixPermissions:
     enabled: false

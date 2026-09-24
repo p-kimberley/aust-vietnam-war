@@ -146,11 +146,17 @@ initContainers:
   - name: media-permissions
     image: {{ .Values.media.fixPermissions.image }}
     imagePullPolicy: IfNotPresent
+    # Logs the mount's owner and mode before and after, so a failure can be read from this container's log.
     command:
-      - chown
-      {{- if .Values.media.fixPermissions.recursive }}
-      - -R
-      {{- end }}
+      - sh
+      - -c
+      - |
+        set -e
+        echo "before: $(stat -c '%a %u:%g' "$2")"
+        chown {{ if .Values.media.fixPermissions.recursive }}-R {{ end }}"$1" "$2"
+        chmod {{ if .Values.media.fixPermissions.recursive }}-R u+rwX{{ else }}u+rwx{{ end }} "$2"
+        echo "after:  $(stat -c '%a %u:%g' "$2")"
+      - media-permissions
       - {{ printf "%v:%v" .Values.podSecurityContext.runAsUser (.Values.podSecurityContext.fsGroup | default .Values.podSecurityContext.runAsUser) | quote }}
       - {{ .Values.media.mountPath | quote }}
     securityContext:
