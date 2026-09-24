@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Avw.Migration;
 
-/// <summary>Where the legacy picture files are. Returns null for a file that is not there. Paths that try to leave the folder are never opened.</summary>
+/// <summary>
+/// Where the legacy picture files are. Returns null for a file that is not there, and throws (<see cref="UnauthorizedAccessException"/> or
+/// <see cref="IOException"/>) for one that is there but cannot be read, so the two are not confused. Paths that try to leave the folder
+/// are never opened.
+/// </summary>
 public interface ILegacyFiles
 {
     Stream? Open(string relativePath);
@@ -20,12 +24,54 @@ public sealed class DirectoryFiles(string root) : ILegacyFiles
     {
         var full = Path.GetFullPath(Path.Combine(_root, relativePath.Replace('\\', '/').TrimStart('/')));
         // A path such as ..\..\secret must not reach outside the picture folder, whatever the database says.
-        if (!full.StartsWith(_root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) || !File.Exists(full))
+        if (!full.StartsWith(_root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
         {
             return null;
         }
 
-        return new FileStream(full, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var found = Resolve(full);
+        return found is null ? null : new FileStream(found, FileMode.Open, FileAccess.Read, FileShare.Read);
+    }
+
+    /// <summary>
+    /// The legacy site ran on a file system that ignores case, so the database can spell a folder differently from the disk (BobHall
+    /// against bobhall). An exact match wins; otherwise each part of the path may match the one entry that differs from it only in case.
+    /// </summary>
+    private string? Resolve(string full)
+    {
+        if (File.Exists(full))
+        {
+            return full;
+        }
+
+        var current = _root;
+        foreach (var part in Path.GetRelativePath(_root, full).Split(Path.DirectorySeparatorChar))
+        {
+            var exact = Path.Combine(current, part);
+            if (File.Exists(exact) || Directory.Exists(exact))
+            {
+                current = exact;
+                continue;
+            }
+
+            if (!Directory.Exists(current))
+            {
+                return null;
+            }
+
+            var matches = Directory.EnumerateFileSystemEntries(current)
+                .Where(e => string.Equals(Path.GetFileName(e), part, StringComparison.OrdinalIgnoreCase))
+                .Take(2)
+                .ToList();
+            if (matches.Count != 1)
+            {
+                return null;
+            }
+
+            current = matches[0];
+        }
+
+        return File.Exists(current) ? current : null;
     }
 }
 
@@ -388,7 +434,18 @@ public static class CommunityImporter
                 continue;
             }
 
-            await using var file = files.Open(row.Path.Trim());
+            Stream? opened;
+            try
+            {
+                opened = files.Open(row.Path.Trim());
+            }
+            catch (Exception e) when (e is UnauthorizedAccessException or IOException)
+            {
+                report.Skip("with the file unreadable");
+                continue;
+            }
+
+            await using var file = opened;
             if (file is null)
             {
                 report.Skip("with the file missing");

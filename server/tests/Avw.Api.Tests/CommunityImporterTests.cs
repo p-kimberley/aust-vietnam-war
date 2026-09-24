@@ -372,4 +372,21 @@ public sealed class CommunityImporterTests : IDisposable
         Assert.Null(files.Open("2011"));
         Assert.Null(files.Open("nothing.jpg"));
     }
+
+    [Fact]
+    public void The_folder_reader_finds_a_file_whose_path_differs_only_in_case()
+    {
+        // The legacy database says BobHall where the folder is bobhall; the old site's file system ignored case.
+        var root = Path.Combine(_dir, "uploads");
+        Directory.CreateDirectory(Path.Combine(root, "bobhall"));
+        File.WriteAllText(Path.Combine(root, "bobhall", "Nui Dat.jpg"), "x");
+        var files = new DirectoryFiles(root);
+
+        using (var found = files.Open("BobHall/nui dat.JPG"))
+        {
+            Assert.NotNull(found);
+        }
+
+        Assert.Null(files.Open("BobHall/other.jpg"));
+    }
 }

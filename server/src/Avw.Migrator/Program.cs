@@ -106,6 +106,17 @@ switch (command)
             return 2;
         }
 
+        // An empty or unreadable mount would otherwise only show up as every picture "missing".
+        try
+        {
+            Console.WriteLine($"The media root '{mediaRoot}' holds {Directory.EnumerateFileSystemEntries(mediaRoot).Count()} entries at the top level.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Console.Error.WriteLine($"The media root '{mediaRoot}' cannot be read by this user.");
+            return 2;
+        }
+
         var options = new MediaOptions();
         config.GetSection(MediaOptions.Section).Bind(options);
         using var processor = new MediaProcessor(Options.Create(options));
