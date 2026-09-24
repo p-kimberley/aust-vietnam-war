@@ -139,6 +139,37 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
+{{/* Opt-in root init container that makes the media mount writable by the app user (see media.fixPermissions). */}}
+{{- define "avw-api.mediaPermissionsInit" -}}
+{{- if and .Values.media.enabled .Values.media.fixPermissions.enabled -}}
+initContainers:
+  - name: media-permissions
+    image: {{ .Values.media.fixPermissions.image }}
+    imagePullPolicy: IfNotPresent
+    command:
+      - chown
+      {{- if .Values.media.fixPermissions.recursive }}
+      - -R
+      {{- end }}
+      - {{ printf "%v:%v" .Values.podSecurityContext.runAsUser (.Values.podSecurityContext.fsGroup | default .Values.podSecurityContext.runAsUser) | quote }}
+      - {{ .Values.media.mountPath | quote }}
+    securityContext:
+      runAsUser: 0
+      runAsNonRoot: false
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: [ALL]
+        add: [CHOWN, FOWNER]
+    resources:
+      requests: { cpu: 10m, memory: 16Mi }
+      limits: { memory: 64Mi }
+    volumeMounts:
+      - name: media
+        mountPath: {{ .Values.media.mountPath }}
+{{- end }}
+{{- end -}}
+
 {{- define "avw-api.volumeMounts" -}}
 - name: tmp
   mountPath: /tmp

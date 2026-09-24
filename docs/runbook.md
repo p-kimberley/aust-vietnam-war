@@ -171,7 +171,7 @@ Common problems:
 |---|---|
 | Web pod restarts, log says the host is not allowed | `host` in the web values differs from the ingress host |
 | Sign-in loops | the ingress host is missing from the Keycloak client's redirect URIs, or the API does not receive the forwarded headers |
-| API not ready | MySQL unreachable, or the media volume is read-only or root-squashed (check `fsGroup` and the export options) |
+| API not ready | MySQL unreachable, or the media volume is read-only or root-squashed (check `fsGroup` and the export options). "The media volume is not writable" with the mount owned by root usually means the storage ignores `fsGroup` (inline NFS, or a CSI driver with `fsGroupPolicy: None`): `chown 1654:1654` the share once, or set `media.fixPermissions.enabled=true` (a root init container; not allowed under the "restricted" Pod Security level, and no use on a root-squashed export) |
 | Map loads but shows no contacts | the Elasticsearch key or CA is wrong; the API log names the request |
 | Basemap does not draw | the style URL is not reachable from browsers, or its host is missing from `csp.extraOrigins` when enforcing |
 | Upload answers 503 | too many uploads at once for the scratch volume; raise `scratch.maxConcurrentUploads` and the volume size together |

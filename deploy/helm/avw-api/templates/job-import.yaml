@@ -27,6 +27,7 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- include "avw-api.mediaPermissionsInit" . | nindent 6 }}
       containers:
         - name: import
           image: {{ include "avw-api.image" . }}
