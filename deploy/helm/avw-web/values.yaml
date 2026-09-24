@@ -23,10 +23,13 @@ pdb:
 # blocked (search the logs for "CSP"); switch to `enforce` once that has been quiet through a normal week. `off` sends none.
 csp:
   mode: report-only
-  # Other hosts the map fetches from: the tile server for the basemaps and, if used, the elevation tiles and GeoServer.
+  # Other hosts the map fetches from, matching the avw-api chart's map.basemaps, overlays and terrain. MapLibre fetches raster
+  # tiles too (connect-src), so a host missing here is blocked once the policy is enforced.
   extraOrigins:
-    - https://tiles.hosting.gradata.com.au
-    - https://s3.amazonaws.com
+    - https://tiles.hosting.gradata.com.au      # vector basemaps, glyphs and sprites
+    - https://server.arcgisonline.com           # satellite basemap
+    - https://geoserver.hosting.gradata.com.au  # 1ATF topographic overlay
+    - https://s3.amazonaws.com                  # public elevation tiles, if used
 resources:
   requests: { cpu: 100m, memory: 128Mi }
   limits: { memory: 384Mi }

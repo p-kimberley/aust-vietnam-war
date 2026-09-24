@@ -6,7 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join, sep } from 'node:path';
-import { cspHeader, cspMode, inlineHandlerHashes, inlineScriptHashes, parseOrigins, securityHeaders } from './security-headers';
+import { cspHeader, cspMode, extraOrigins, inlineHandlerHashes, inlineScriptHashes, securityHeaders } from './security-headers';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -16,12 +16,13 @@ const angularApp = new AngularNodeAppEngine();
 /**
  * Security headers on every response. The content security policy starts in report-only mode (CSP_MODE=enforce turns blocking
  * on, off turns it off): violations are posted to the API, which logs them, so a policy that is too tight is found in the logs
- * and not by a reader with a blank map. CSP_EXTRA_ORIGINS lists the other hosts the map fetches from, such as the tile server.
+ * and not by a reader with a blank map. CSP_EXTRA_ORIGINS lists the other hosts the map fetches from, such as the tile server
+ * (outside production it defaults to the hosts the development map config uses).
  * The policy itself is added to each page as it is rendered, because the inline scripts Angular writes differ from page to page.
  */
 const mode = cspMode(process.env['CSP_MODE']);
 const cspBase = {
-  extraOrigins: parseOrigins(process.env['CSP_EXTRA_ORIGINS']),
+  extraOrigins: extraOrigins(process.env['CSP_EXTRA_ORIGINS'], process.env['NODE_ENV'] === 'production'),
   reportUri: '/api/csp-report',
 };
 app.disable('x-powered-by');

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { contentSecurityPolicy, cspHeader, cspMode, inlineHandlerHashes, inlineScriptHashes, parseOrigins, securityHeaders } from './security-headers';
+import { contentSecurityPolicy, cspHeader, cspMode, DEV_EXTRA_ORIGINS, extraOrigins, inlineHandlerHashes, inlineScriptHashes, parseOrigins, securityHeaders } from './security-headers';
 
 const hashOf = (text: string) => createHash('sha256').update(text).digest('base64');
 
@@ -23,6 +23,19 @@ describe('parseOrigins', () => {
     ]);
     expect(parseOrigins("https://a.example/path *; script-src 'unsafe-eval' data: https://ok.example")).toEqual(['https://ok.example']);
     expect(parseOrigins(undefined)).toEqual([]);
+  });
+});
+
+describe('extraOrigins', () => {
+  it('uses the configured list when there is one', () => {
+    expect(extraOrigins('https://tiles.example.com', false)).toEqual(['https://tiles.example.com']);
+    expect(extraOrigins('https://tiles.example.com', true)).toEqual(['https://tiles.example.com']);
+  });
+
+  it('falls back to the development map hosts, but never in production', () => {
+    expect(extraOrigins(undefined, false)).toEqual([...DEV_EXTRA_ORIGINS]);
+    expect(extraOrigins('  ', false)).toEqual([...DEV_EXTRA_ORIGINS]);
+    expect(extraOrigins(undefined, true)).toEqual([]);
   });
 });
 

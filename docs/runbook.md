@@ -118,7 +118,7 @@ After the real import the Studio's Moderation page shows what is waiting (one no
 - **Content security policy for pages.** It starts as `report-only` (`csp.mode` in the web chart). Browsers post anything that
   would have been blocked to `/api/csp-report`, and the API logs one warning line for each (`CSP script-src-elem blocked ...`).
   Watch the API logs through a normal week, including Studio use and a few embedded videos. If they stay quiet set `csp.mode: enforce`.
-  Add hosts the map needs to `csp.extraOrigins` (the tile server and elevation host are set by default). It was checked
+  Add hosts the map needs to `csp.extraOrigins` (the tile server, satellite imagery, GeoServer and elevation hosts are set by default; raster tiles need it too). It was checked
   in Chrome with the policy **enforced**: the home page, stories, feedback form, Battle Map with the incident panel and the charts
   raised no violations. Not checked: the Studio, and articles that embed something other than YouTube or Vimeo.
 - **Fonts.** The three type families are the site's own files (`web/src/fonts.css`), so readers' browsers contact nothing but the

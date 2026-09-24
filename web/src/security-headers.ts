@@ -29,6 +29,26 @@ export function parseOrigins(value: string | undefined): string[] {
 }
 
 /**
+ * The hosts the development map config (server/src/Avw.Api/appsettings.Development.json) fetches from: the tile server, satellite
+ * imagery, the GeoServer overlay and the public elevation tiles. Used only when CSP_EXTRA_ORIGINS is unset outside production, so
+ * `ng serve` reports real problems rather than every tile.
+ */
+export const DEV_EXTRA_ORIGINS: readonly string[] = [
+  'https://tiles.hosting.gradata.com.au',
+  'https://server.arcgisonline.com',
+  'https://geoserver.hosting.gradata.com.au',
+  'https://s3.amazonaws.com',
+];
+
+/** The extra origins from CSP_EXTRA_ORIGINS; when it is unset, the development hosts, except in production, which gets none. */
+export function extraOrigins(value: string | undefined, production: boolean): string[] {
+  if (value !== undefined && value.trim() !== '') {
+    return parseOrigins(value);
+  }
+  return production ? [] : [...DEV_EXTRA_ORIGINS];
+}
+
+/**
  * The hashes of every inline script in a rendered page. Angular writes two: the event dispatch contract that replays clicks made
  * before the page is interactive, and a line that starts it for the kinds of event this page uses. Their text depends on the
  * Angular version and on the page, so they are measured from each response and never written down. Data blocks such as the
