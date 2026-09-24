@@ -1,3 +1,4 @@
+using Avw.Api.Media;
 using Avw.Data;
 using Avw.Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -54,8 +55,8 @@ public sealed class PublicContent(AvwDbContext db, TimeProvider clock)
     public const int MaxPageSize = 50;
     public const int MaxSearchChars = 100;
 
-    /// <summary>Where a media asset is served from: <c>/media/&lt;first two hex&gt;/&lt;sha256&gt;.jpg</c> (see docs/rebuild-plan.md, section 6).</summary>
-    public static string MediaUrl(string sha256) => $"/media/{sha256[..2]}/{sha256}.jpg";
+    /// <summary>Where a media asset is served from: <c>/media/uploads/&lt;first two hex&gt;/&lt;sha256&gt;.jpg</c> (see <see cref="MediaPaths"/>).</summary>
+    public static string MediaUrl(string sha256) => MediaPaths.ImageUrl(sha256);
 
     private IQueryable<Article> Live(ContentKind kind)
     {

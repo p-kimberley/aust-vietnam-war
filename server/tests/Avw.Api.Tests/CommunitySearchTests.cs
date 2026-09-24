@@ -195,7 +195,7 @@ public class CommunitySearchTests
         var byCaption = await Search(db, "patrol");
         var hit = Assert.Single(byCaption.Pictures);
         Assert.Equal(("A patrol at Nui Dat", "AWM", 2, 10.55), (hit.Caption, hit.Credit, hit.ContactId, hit.Lat));
-        Assert.StartsWith("/media/aa/", hit.ThumbUrl);
+        Assert.StartsWith("/media/uploads/aa/", hit.ThumbUrl);
         Assert.EndsWith("-480.jpg", hit.ThumbUrl);
         Assert.Single((await Search(db, "smith")).Pictures);
         Assert.Empty((await Search(db, "wet")).Pictures);                                    // not approved

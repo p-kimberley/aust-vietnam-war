@@ -113,7 +113,7 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
             .Where(x => x.Metres <= radiusMetres)
             .OrderBy(x => x.Metres).ThenBy(x => x.Row.Id)
             .Take(limit)
-            .Select(x => new NearbyPicture(x.Row.Id, x.Row.ContactId, $"/media/{x.Row.Sha256[..2]}/{x.Row.Sha256}-480.jpg", x.Row.Caption, x.Row.Credit, x.Row.Lat, x.Row.Lon, (int)Math.Round(x.Metres)))];
+            .Select(x => new NearbyPicture(x.Row.Id, x.Row.ContactId, MediaPaths.ThumbnailUrl(x.Row.Sha256), x.Row.Caption, x.Row.Credit, x.Row.Lat, x.Row.Lon, (int)Math.Round(x.Metres)))];
     }
 
     public async Task<CmsResult<IncidentMediaView>> UploadAsync(int contactId, Stream file, string? caption, string? credit, string? dateTaken, Person person, CancellationToken ct)
@@ -228,7 +228,7 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
         !string.IsNullOrWhiteSpace(link.AuthorName) ? link.AuthorName : link.Media.UploadedBy?.DisplayName;
 
     private static IncidentMediaView ToView(IncidentMedia link, MediaAsset m, int likes, bool liked, Person? viewer, string? addedBy = null) => new(
-        link.Id, m.Id, link.ContactId, PublicContent.MediaUrl(m.Sha256), $"/media/{m.Sha256[..2]}/{m.Sha256}-480.jpg", m.Width, m.Height,
+        link.Id, m.Id, link.ContactId, PublicContent.MediaUrl(m.Sha256), MediaPaths.ThumbnailUrl(m.Sha256), m.Width, m.Height,
         m.Caption, m.Credit, link.DateTaken, link.Lat, link.Lon, m.Status, likes, liked,
         viewer is not null && m.UploadedById == viewer.Id, viewer is not null && (viewer.IsEditor || link.AttachedById == viewer.Id),
         m.ByteSize, m.ContentType, link.CreatedUtc, addedBy);

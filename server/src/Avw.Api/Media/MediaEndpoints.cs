@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Threading.RateLimiting;
 using Avw.Api.Auth;
 using Avw.Api.Cms;
@@ -10,7 +11,7 @@ using System.Security.Claims;
 
 namespace Avw.Api.Media;
 
-public static class MediaEndpoints
+public static partial class MediaEndpoints
 {
     public const string UploadPolicy = "media-upload";
 
@@ -36,6 +37,18 @@ public static class MediaEndpoints
     {
         var root = Path.GetFullPath(app.Services.GetRequiredService<IOptions<MediaOptions>>().Value.RootPath);
         Directory.CreateDirectory(root);
+
+        // Pictures were once stored at <hex>/<hash>.jpg, without the uploads folder, and article HTML saved then still links there.
+        app.Use((ctx, next) =>
+        {
+            if (OldPicturePath().Match(ctx.Request.Path.Value ?? "") is { Success: true } m)
+            {
+                ctx.Request.Path = $"/media/{MediaPaths.UploadsFolder}/{m.Groups[1].Value}";
+            }
+
+            return next(ctx);
+        });
+
         app.UseStaticFiles(new StaticFileOptions
         {
             FileProvider = new PhysicalFileProvider(root),
@@ -108,6 +121,9 @@ public static class MediaEndpoints
             .WithName("StudioSetMediaStatus")
             .Produces<MediaView>();
     }
+
+    [GeneratedRegex("^/media/([0-9a-f]{2}/[0-9a-f]{64}(?:-[0-9]+)?\\.jpg)$")]
+    private static partial Regex OldPicturePath();
 }
 
 /// <summary>

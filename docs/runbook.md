@@ -101,7 +101,7 @@ MySQL 5.6 dump that contains personal data: keep it off shared machines and neve
 4. Run for real with `--set import.dryRun=false`. A second run must report **0 added** (everything "unchanged").
 5. Pictures: copy the old `incident-media/` folder onto a volume, name it in `import.legacyFiles`, and run again. Files that are
    missing are skipped and reported, so it can be repeated as more arrive. The dump lists 353 pictures. Each is checked, straightened,
-   resized to fit 1920x1080, stored as a JPEG under its content hash with a 480 px thumbnail. Expected from the 2017 dump: 350 added (one is the same
+   resized to fit 1920x1080, stored as a JPEG under its content hash in `uploads/<first two hex>/` on the media volume, with a 480 px thumbnail. The job runs as UID 1654, so that user must be able to read the legacy folder (on a Synology NFS share, squash all users to an account that can, or give Everyone read). Expected from the 2017 dump: 350 added (one is the same
    picture twice on an incident, and 2 were rejected by a moderator and are left out), 337 distinct files, about 42 MB. Most (329) have no incident and appear only on the map's
    picture layer, once that is built.
 6. Portraits for the honour roll are separate: put `<service number>.jpg` files in `portraits/` inside the media volume.

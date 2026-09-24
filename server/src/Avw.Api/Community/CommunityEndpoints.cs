@@ -365,7 +365,7 @@ public static class CommunityEndpoints
 
                 return new ModerationQueue(
                     pendingNotes,
-                    pictures.Select(p => new PendingPicture(p.Id, p.MediaId, p.ContactId, PublicContent.MediaUrl(p.Sha256), $"/media/{p.Sha256[..2]}/{p.Sha256}-480.jpg", p.Caption, p.Credit, p.Uploader)).ToList(),
+                    pictures.Select(p => new PendingPicture(p.Id, p.MediaId, p.ContactId, PublicContent.MediaUrl(p.Sha256), MediaPaths.ThumbnailUrl(p.Sha256), p.Caption, p.Credit, p.Uploader)).ToList(),
                     await casualties.ListAsync(false, ct));
             })
             .WithName("GetModerationQueue").Produces<ModerationQueue>();

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Avw.Api.Map;
+using Avw.Api.Media;
 using Avw.Data;
 using Avw.Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -195,7 +196,7 @@ public sealed class CommunitySearch(AvwDbContext db)
         var (pictures, pictureTotal) = db.Database.IsRelational() ? await PicturesInMySqlAsync(terms, limit, ct) : await PicturesInMemoryAsync(terms, limit, ct);
         return new CommunitySearchResult(
             [.. notes.Select(n => new NoteHit(n.Id, n.ContactId, n.Title, terms.Snippet(n.Body), n.AuthorName, DateTime.SpecifyKind(n.CreatedUtc, DateTimeKind.Utc)))], noteTotal,
-            [.. pictures.Select(p => new PictureHit(p.Id, p.ContactId, $"/media/{p.Sha256[..2]}/{p.Sha256}-480.jpg", p.Caption, p.Credit, p.Lat, p.Lon))], pictureTotal);
+            [.. pictures.Select(p => new PictureHit(p.Id, p.ContactId, MediaPaths.ThumbnailUrl(p.Sha256), p.Caption, p.Credit, p.Lat, p.Lon))], pictureTotal);
     }
 
     // ---------------------------------------------------------------- MySQL

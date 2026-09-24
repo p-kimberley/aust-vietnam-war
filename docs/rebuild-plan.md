@@ -161,7 +161,7 @@ Flow:
 
 1. Stream the upload into `scratch/incoming/{uploadId}.part` with a hard size cap; detect content type by magic bytes.
 2. Process **in the same pod** (Magick.NET): auto-rotate, strip EXIF, resize to 1920×1080, JPEG quality 80 (legacy parity), generate thumbnail and `srcset` variants, compute the content hash.
-3. Copy to a temp name in `media/.incoming/`, flush, then **rename** into `media/aa/<sha256>.jpg` (the temp file is on the same filesystem as its destination, so the rename is atomic). Content-hash names make files immutable and re-uploads no-ops.
+3. Copy to a temp name in `media/.incoming/`, flush, then **rename** into `media/uploads/aa/<sha256>.jpg` (the temp file is on the same filesystem as its destination, so the rename is atomic). Content-hash names make files immutable and re-uploads no-ops.
 4. Insert the database row (approved for editors and admins, otherwise pending) and delete the scratch files.
 
 Details:

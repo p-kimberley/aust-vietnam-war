@@ -58,10 +58,10 @@ public sealed class MediaSweeperTests : IDisposable
     [Fact]
     public void Never_touches_published_pictures_or_files_of_any_age_elsewhere()
     {
-        var picture = Touch("ab/abcdef.jpg", TimeSpan.FromDays(900));
-        var thumb = Touch("ab/abcdef-480.jpg", TimeSpan.FromDays(900));
+        var picture = Touch("uploads/ab/abcdef.jpg", TimeSpan.FromDays(900));
+        var thumb = Touch("uploads/ab/abcdef-480.jpg", TimeSpan.FromDays(900));
         var portrait = Touch("portraits/39426.jpg", TimeSpan.FromDays(900));
-        var nested = Touch("ab/.avw-health-not-at-the-top", TimeSpan.FromDays(900));
+        var nested = Touch("uploads/ab/.avw-health-not-at-the-top", TimeSpan.FromDays(900));
         var other = Touch(".hidden-thing", TimeSpan.FromDays(900));
 
         Assert.Equal(0, Sweep(_root));

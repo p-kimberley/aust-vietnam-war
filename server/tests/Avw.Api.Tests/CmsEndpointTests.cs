@@ -100,7 +100,7 @@ public sealed class CmsEndpointTests : IDisposable
         Assert.Equal(["coral", "long-tan"], page.Items.Select(a => a.Slug));
         Assert.Equal(2, page.Total);
         Assert.Equal("Battles", page.Items[0].CategoryName);
-        Assert.Equal("/media/aa/" + new string('a', 64) + ".jpg", page.Items[1].ImageUrl);
+        Assert.Equal("/media/uploads/aa/" + new string('a', 64) + ".jpg", page.Items[1].ImageUrl);
     }
 
     [Fact]

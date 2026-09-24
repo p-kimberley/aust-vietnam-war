@@ -68,7 +68,7 @@ public sealed class MediaProcessorTests : IDisposable
         var stored = Path.Combine(o.RootPath, result.RelativePath);
         Assert.Equal(result.Sha256, Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(stored))));
         Assert.Equal(result.ByteSize, new FileInfo(stored).Length);
-        using var thumb = new MagickImage(Path.Combine(o.RootPath, result.Sha256[..2], $"{result.Sha256}-480.jpg"));
+        using var thumb = new MagickImage(Path.Combine(o.RootPath, MediaPaths.Thumbnail(result.Sha256)));
         Assert.Equal((480u, 360u), (thumb.Width, thumb.Height));
         Assert.Equal(MagickFormat.Jpeg, Read(o, result).Format);
     }
@@ -132,7 +132,7 @@ public sealed class MediaProcessorTests : IDisposable
         var second = await Run(p, bytes);
 
         Assert.Equal(first.Sha256, second.Sha256);
-        Assert.Single(Directory.GetFiles(Path.Combine(o.RootPath, first.Sha256[..2]), "*-480.jpg"));
+        Assert.Single(Directory.GetFiles(Path.Combine(o.RootPath, MediaPaths.Folder(first.Sha256)), "*-480.jpg"));
     }
 
     [Theory]
@@ -305,12 +305,16 @@ public sealed class MediaEndpointTests : IDisposable
         var m = await Ok(await http.SendAsync(Upload("author", 1, TestImages.Jpeg(), caption: "  A patrol  ")));
 
         Assert.Equal((MediaStatus.Pending, "A patrol", true, 800, 600), (m.Status, m.Caption, m.Mine, m.Width, m.Height));
-        Assert.Matches("^/media/[0-9a-f]{2}/[0-9a-f]{64}\\.jpg$", m.Url);
+        Assert.Matches("^/media/uploads/[0-9a-f]{2}/[0-9a-f]{64}\\.jpg$", m.Url);
         var file = await http.GetAsync(m.Url);
         Assert.Equal((HttpStatusCode.OK, "image/jpeg"), (file.StatusCode, file.Content.Headers.ContentType!.MediaType));
         Assert.Contains("immutable", file.Headers.CacheControl!.ToString());
         Assert.Equal("nosniff", file.Headers.GetValues("X-Content-Type-Options").Single());
         Assert.Equal(HttpStatusCode.OK, (await http.GetAsync(m.ThumbUrl)).StatusCode);
+
+        // Addresses from before the uploads folder, which article HTML may still hold, find the same files.
+        Assert.Equal(HttpStatusCode.OK, (await http.GetAsync(m.Url.Replace("/uploads/", "/"))).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await http.GetAsync(m.ThumbUrl.Replace("/uploads/", "/"))).StatusCode);
     }
 
     [Fact]

@@ -20,8 +20,8 @@ public sealed class MediaException(MediaError error, string message) : Exception
 /// <summary>A processed picture that is now in the media folder.</summary>
 public sealed record ProcessedImage(string Sha256, int Width, int Height, long ByteSize)
 {
-    /// <summary>Path below the media root, for example <c>ab/abcdef….jpg</c>.</summary>
-    public string RelativePath => $"{Sha256[..2]}/{Sha256}.jpg";
+    /// <summary>Path below the media root, for example <c>uploads/ab/abcdef….jpg</c>.</summary>
+    public string RelativePath => MediaPaths.Image(Sha256);
 }
 
 /// <summary>
@@ -75,10 +75,9 @@ public sealed class MediaProcessor : IDisposable
 
             var sha = await HashAsync(main, ct);
             var size = new FileInfo(main).Length;
-            var folder = Path.Combine(_options.RootPath, sha[..2]);
-            Directory.CreateDirectory(folder);
-            Publish(main, Path.Combine(folder, $"{sha}.jpg"));
-            Publish(thumb, Path.Combine(folder, $"{sha}-{_options.ThumbnailWidth}.jpg"));
+            Directory.CreateDirectory(Path.Combine(_options.RootPath, MediaPaths.Folder(sha)));
+            Publish(main, Path.Combine(_options.RootPath, MediaPaths.Image(sha)));
+            Publish(thumb, Path.Combine(_options.RootPath, MediaPaths.Thumbnail(sha, _options.ThumbnailWidth)));
             return new ProcessedImage(sha, width, height, size);
         }
         finally

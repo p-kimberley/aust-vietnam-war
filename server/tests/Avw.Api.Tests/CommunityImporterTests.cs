@@ -248,7 +248,7 @@ public sealed class CommunityImporterTests : IDisposable
         Assert.Equal(("A patrol", "AWM photo", MediaStatus.Approved), (link.Media.Caption, link.Media.Credit, link.Media.Status));
         Assert.Equal(UserSync.HashEmail("old.digger@example.com"), link.AuthorEmailHash);
         Assert.Null(link.AttachedById);
-        Assert.True(File.Exists(Path.Combine(_dir, "media", link.Media.Sha256[..2], link.Media.Sha256 + ".jpg")));
+        Assert.True(File.Exists(Path.Combine(_dir, "media", MediaPaths.Image(link.Media.Sha256))));
         Assert.Equal(CommunityImporter.LegacyUserSubject, (await _db.Users.SingleAsync()).Subject);
     }
 

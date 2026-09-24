@@ -157,7 +157,7 @@ public sealed class MediaService(AvwDbContext db, MediaProcessor processor, IOpt
     }
 
     private MediaView Map(long id, string sha, int width, int height, string? caption, string? credit, MediaStatus status, string name, bool mine, DateTime created) =>
-        new(id, PublicContent.MediaUrl(sha), $"/media/{sha[..2]}/{sha}-{_options.ThumbnailWidth}.jpg", width, height, caption, credit, status, name, mine, created);
+        new(id, PublicContent.MediaUrl(sha), MediaPaths.ThumbnailUrl(sha, _options.ThumbnailWidth), width, height, caption, credit, status, name, mine, created);
 
     private static string? Blank(string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
 }
