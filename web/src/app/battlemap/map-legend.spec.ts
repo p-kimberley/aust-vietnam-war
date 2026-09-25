@@ -42,7 +42,7 @@ describe('MapLegend', () => {
   it('explains the contact markers and the ring round the open incident', () => {
     const { entries } = setup({ showHeatmap: false });
 
-    expect(entries()).toEqual(['Contact', 'Incident open in the panel']);
+    expect(entries()).toEqual(['Contact']);
   });
 
   it('says what larger markers mean, only when the size is chosen by something', () => {
@@ -99,7 +99,7 @@ describe('MapLegend', () => {
     expect(none.entries()).toEqual(['Nothing is switched on.']);
 
     const both = setup({ showContacts: false, showHeatmap: false, showPhotos: true, following: true });
-    expect(both.entries()).toEqual(['Community photo', 'Group of photos', 'Photos on top of each other', 'Path of a followed unit']);
+    expect(both.entries()).toEqual(['Community photo', 'Group of photos', 'Path of a followed unit']);
   });
 });
 

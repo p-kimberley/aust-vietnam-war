@@ -26,13 +26,58 @@
 /* The picture, as large as the dialog allows, on a near-black ground like a light box. */
 .stage {
   position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: rgb(10 12 6);
+}
+
+/* The previous, open and next pictures, each the size of the stage, side by side; the track moves to change picture. */
+.stage__track {
+  position: absolute;
+  inset: 0;
+  /* Up and down still scroll the page on a touch screen; sideways is the track's. */
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.stage__track.is-sliding {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.stage--swipe .stage__track {
+  cursor: grab;
+}
+
+.stage--swipe .stage__track:active {
+  cursor: grabbing;
+}
+
+.stage__slot {
+  position: absolute;
+  inset: 0;
   display: grid;
-  /* One cell exactly the size of the stage, so the picture can be fitted to it. */
+  /* One cell exactly the size of the slot, so the picture can be fitted to it. */
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   place-items: center;
-  min-height: 0;
   padding: 1rem;
-  background: rgb(10 12 6);
+}
+
+.stage__slot--previous {
+  transform: translateX(-100%);
+}
+
+.stage__slot--next {
+  transform: translateX(100%);
+}
+
+.stage.is-full .stage__slot {
+  padding: 2.5rem 1rem 3.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage__track.is-sliding {
+    transition: none;
+  }
 }
 
 .stage__img {
@@ -47,7 +92,6 @@
   position: fixed;
   z-index: 1001;
   inset: 0;
-  padding: 2.5rem 1rem 3.5rem;
 }
 
 .stage__button {

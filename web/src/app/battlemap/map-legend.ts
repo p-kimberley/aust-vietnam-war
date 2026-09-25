@@ -32,13 +32,6 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
                 </svg>
                 <span>Contact</span>
               </li>
-              <li>
-                <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="5" fill="#c23a26" stroke="#efe7cc" stroke-width="1.5" />
-                  <circle cx="12" cy="12" r="9" fill="none" stroke="#e3b92e" stroke-width="3" />
-                </svg>
-                <span>Incident open in the panel</span>
-              </li>
               @if (sizeField(); as size) {
                 <li>
                   <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
@@ -79,14 +72,6 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
                   <circle cx="12" cy="12" r="9" fill="#e6ddb8" stroke="#22251a" stroke-width="2" />
                 </svg>
                 <span>Group of photos</span>
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-                  <rect x="4" y="9" width="14" height="11" fill="#e6ddb8" stroke="#22251a" stroke-width="1.5" />
-                  <rect x="1.5" y="6.5" width="14" height="11" fill="#efe7cc" stroke="#22251a" stroke-width="1.5" />
-                  <circle cx="17.5" cy="6.5" r="5" fill="#e3b92e" stroke="#22251a" stroke-width="1.5" />
-                </svg>
-                <span>Photos on top of each other</span>
               </li>
             }
             @if (following()) {

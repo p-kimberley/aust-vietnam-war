@@ -2,7 +2,7 @@ import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, settle } from './battlemap-testing';
 import { CommunityService, IncidentMediaView } from './community/community';
 import { communityProviders, fakeAuth, fakeCommunity } from './community/community-testing';
@@ -19,7 +19,7 @@ import {
   toPhotoGeoJson,
   zoomIntoCluster,
 } from './photo-layers';
-import { PictureViewer, formatBytes, formatType } from './picture-viewer';
+import { PictureViewer, SLIDE_MS, formatBytes, formatType } from './picture-viewer';
 import { SPIDER_IMAGES, SPIDER_RING, SPIDER_SOURCE } from './photo-spider';
 import type { FeatureCollection } from 'geojson';
 import { STACK_BADGES, STACK_COUNTS } from './photo-stacks';
@@ -508,7 +508,7 @@ describe('PictureViewer: stepping through the photos of a place or an incident',
     fixture.detectChanges();                                                   // not settle: that would wait for the details
     await new Promise((r) => setTimeout(r));
     fixture.detectChanges();
-    expect(el.querySelector('.stage img')?.getAttribute('src')).toBe('/media/6.jpg');
+    expect(el.querySelector('.stage__slot--current img')?.getAttribute('src')).toBe('/media/6.jpg');
 
     answer(all[6]);
     await settle(fixture);
@@ -541,6 +541,187 @@ describe('PictureViewer: stepping through the photos of a place or an incident',
 
     expect(title(el)).toBe('Five');
     expect(arrow(el, 'Next')).toBeNull();
+  });
+});
+
+describe('PictureViewer: sliding and swiping between photos', () => {
+  const all: Record<number, IncidentMediaView> = {
+    5: pic({ id: 5, url: '/media/5.jpg', caption: 'Five' }),
+    6: pic({ id: 6, url: '/media/6.jpg', caption: 'Six' }),
+    7: pic({ id: 7, url: '/media/7.jpg', caption: 'Seven' }),
+  };
+  /** A viewer on the middle photo of three, where motion is allowed, so the photos slide. */
+  async function sliding(start = 6) {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    TestBed.resetTestingModule();
+    const community = fakeCommunity({
+      mediaDetail: vi.fn((id: number) => Promise.resolve(all[id] ?? null)),
+      mediaInArea: vi.fn(() => Promise.resolve([all[5], all[6], all[7]])),
+    });
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), ...communityProviders(community, fakeAuth({}))] });
+    const fixture = TestBed.createComponent(PictureViewer);
+    fixture.componentRef.setInput('pictureId', start);
+    document.body.append(fixture.nativeElement);
+    fixture.detectChanges();
+    const opened: number[] = [];
+    fixture.componentInstance.navigate.subscribe((id) => {
+      opened.push(id);
+      fixture.componentRef.setInput('pictureId', id);
+    });
+    await settle(fixture);
+    const el = fixture.nativeElement as HTMLElement;
+    const track = el.querySelector<HTMLElement>('.stage__track')!;
+    Object.defineProperty(track, 'clientWidth', { value: 1000, configurable: true });
+    const pointer = (type: string, x: number, y = 100) => {
+      const e = new MouseEvent(type, { clientX: x, clientY: y, button: 0, bubbles: true });
+      Object.defineProperty(e, 'pointerId', { value: 1 });
+      track.dispatchEvent(e);
+      fixture.detectChanges();
+    };
+    return { fixture, el, track, pointer, opened };
+  }
+  const slot = (el: HTMLElement, which: string) => el.querySelector(`.stage__slot--${which} img`)?.getAttribute('src');
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it('keeps the photos either side in place beside the open one, ready to slide in', async () => {
+    const { el } = await sliding();
+
+    expect([slot(el, 'previous'), slot(el, 'current'), slot(el, 'next')]).toEqual(['/media/5.jpg', '/media/6.jpg', '/media/7.jpg']);
+  });
+
+  it('slides to the next photo, then opens it with the track back in place', async () => {
+    const { fixture, el, track, opened } = await sliding();
+    vi.useFakeTimers();
+
+    el.querySelector<HTMLButtonElement>('[aria-label="Next photo"]')!.click();
+    fixture.detectChanges();
+    expect(track.classList).toContain('is-sliding');
+    expect(track.style.transform).toBe('translateX(calc(-100% + 0px))');
+    expect(opened).toEqual([]);
+
+    vi.advanceTimersByTime(SLIDE_MS);
+    fixture.detectChanges();
+    expect(opened).toEqual([7]);
+    expect(track.classList).not.toContain('is-sliding');
+    expect(track.style.transform).toBe('translateX(calc(0% + 0px))');
+  });
+
+  it('slides the other way for the previous photo, and takes no second step while sliding', async () => {
+    const { fixture, el, track, opened } = await sliding();
+    vi.useFakeTimers();
+
+    el.querySelector<HTMLButtonElement>('[aria-label="Previous photo"]')!.click();
+    el.querySelector<HTMLButtonElement>('[aria-label="Previous photo"]')!.click();
+    fixture.detectChanges();
+    expect(track.style.transform).toBe('translateX(calc(100% + 0px))');
+
+    vi.advanceTimersByTime(SLIDE_MS * 2);
+    expect(opened).toEqual([5]);
+  });
+
+  it('follows a finger sideways, and slides on to the next photo when let go far enough along', async () => {
+    const { fixture, track, pointer, opened } = await sliding();
+    vi.useFakeTimers();
+
+    pointer('pointerdown', 600);
+    pointer('pointermove', 590);
+    pointer('pointermove', 450);
+    expect(track.style.transform).toBe('translateX(calc(0% + -150px))');
+    expect(track.classList).not.toContain('is-sliding');
+
+    vi.advanceTimersByTime(200);                                               // a slow drag, not a flick
+    pointer('pointermove', 350);
+    pointer('pointerup', 350);
+    expect(track.style.transform).toBe('translateX(calc(-100% + 0px))');
+    vi.advanceTimersByTime(SLIDE_MS);
+    fixture.detectChanges();
+    expect(opened).toEqual([7]);
+  });
+
+  it('springs back when let go too soon', async () => {
+    const { track, pointer, opened } = await sliding();
+    vi.useFakeTimers();
+
+    pointer('pointerdown', 600);
+    pointer('pointermove', 590);
+    vi.advanceTimersByTime(200);
+    pointer('pointermove', 520);
+    pointer('pointerup', 520);
+
+    expect(track.style.transform).toBe('translateX(calc(0% + 0px))');
+    expect(track.classList).toContain('is-sliding');
+    vi.advanceTimersByTime(SLIDE_MS);
+    expect(opened).toEqual([]);
+  });
+
+  it('takes a quick flick as a swipe, however short', async () => {
+    const { pointer, opened } = await sliding();
+    vi.useFakeTimers();
+
+    pointer('pointerdown', 400);
+    pointer('pointermove', 410);
+    vi.advanceTimersByTime(20);
+    pointer('pointermove', 480);                                                // 70 px in 20 ms
+    pointer('pointerup', 480);
+    vi.advanceTimersByTime(SLIDE_MS);
+
+    expect(opened).toEqual([5]);
+  });
+
+  it('resists a drag past the last photo, and goes nowhere', async () => {
+    const { track, pointer, opened } = await sliding(7);
+    vi.useFakeTimers();
+
+    pointer('pointerdown', 600);
+    pointer('pointermove', 590);
+    pointer('pointermove', 300);
+    expect(track.style.transform).toBe('translateX(calc(0% + -90px))');       // 300 px of finger, 30% of it
+
+    pointer('pointerup', 300);
+    vi.advanceTimersByTime(SLIDE_MS);
+    expect(opened).toEqual([]);
+  });
+
+  it('leaves an up-and-down move to the page', async () => {
+    const { track, pointer } = await sliding();
+
+    pointer('pointerdown', 600, 100);
+    pointer('pointermove', 603, 140);
+    pointer('pointermove', 500, 200);
+
+    expect(track.style.transform).toBe('translateX(calc(0% + 0px))');
+  });
+
+  it('does not close when a drag is let go off the photo, over the dim round it', async () => {
+    const { fixture, el, pointer } = await sliding();
+    let closed = 0;
+    fixture.componentInstance.closed.subscribe(() => closed++);
+
+    pointer('pointerdown', 600);
+    pointer('pointermove', 590);
+    pointer('pointermove', 560);
+    pointer('pointerup', 560);
+    el.querySelector<HTMLElement>('.viewer')!.click();
+    expect(closed).toBe(0);
+
+    await new Promise((r) => setTimeout(r));
+    el.querySelector<HTMLElement>('.viewer')!.click();
+    expect(closed).toBe(1);
+  });
+
+  it('changes photo at once, without sliding, for anyone who asked for less motion', async () => {
+    const { fixture, el, track, opened } = await sliding();
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+
+    el.querySelector<HTMLButtonElement>('[aria-label="Next photo"]')!.click();
+    fixture.detectChanges();
+
+    expect(opened).toEqual([7]);
+    expect(track.classList).not.toContain('is-sliding');
   });
 });
 

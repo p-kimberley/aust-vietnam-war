@@ -35,6 +35,14 @@ function boxAround(lat: number, lon: number, metres: number): [number, number, n
   return [lat - dLat, lon - dLon, lat + dLat, lon + dLon];
 }
 
+/** How long a slide to the next or previous picture takes. */
+export const SLIDE_MS = 300;
+/** A swipe changes picture once it has gone this share of the stage's width, or when it is a flick this fast (pixels a millisecond). */
+const SWIPE_SHARE = 0.2;
+const FLICK_SPEED = 0.5;
+/** Past the first or last picture, the track moves only this share of the way the finger does, to show there is nothing there. */
+const EDGE_RESISTANCE = 0.3;
+
 const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
@@ -44,6 +52,8 @@ const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), [tabi
  *
  * The arrows either side of the picture (and the left and right arrow keys) step through the pictures that go with it: the others of
  * its incident, then any placed at the same spot. The set is worked out when the dialog opens and kept while stepping through it.
+ * The pictures slide from one to the next, and the picture can be swiped (or dragged with the mouse) to the next or previous one; it
+ * follows the finger, and springs back if let go too soon. Anyone who asks for less motion gets the change at once instead.
  *
  * Escape leaves full screen first, then closes the dialog; Tab stays inside it; focus goes back where it was when it closes.
  */
@@ -98,6 +108,15 @@ export class PictureViewer implements OnDestroy {
     return s ? { url: s.url, caption: s.caption, credit: null } : null;
   });
   private setTicket = 0;
+  /** Where the track is: 0 on the open picture, -1 sliding to the next, 1 to the previous; and how far a finger has dragged it, in pixels. */
+  protected readonly shift = signal(0);
+  protected readonly drag = signal(0);
+  /** The track is animating to where it is going (a slide or a spring back), rather than following a finger. */
+  protected readonly sliding = signal(false);
+  protected readonly trackTransform = computed(() => `translateX(calc(${this.shift() * 100}% + ${this.drag()}px))`);
+  private slideTimer?: ReturnType<typeof setTimeout>;
+  /** A drag has just ended, so the click that follows it is not a click on the dim round the dialog. */
+  private dragged = false;
   /** What a like has changed since the picture was loaded. */
   private readonly changed = signal<{ id: number; likes: number; likedByMe: boolean } | null>(null);
   protected readonly message = signal('');
@@ -122,12 +141,6 @@ export class PictureViewer implements OnDestroy {
         void this.loadSiblings(p);
       }
     });
-    // The pictures either side are fetched ahead, so a step shows at once.
-    effect(() => {
-      for (const s of [this.previous(), this.next()]) {
-        if (s && typeof Image !== 'undefined') new Image().src = s.url;
-      }
-    });
   }
 
   /** The others of the picture's incident, then those placed within {@link SAME_PLACE_METRES} of it, each once, with it among them. */
@@ -148,12 +161,36 @@ export class PictureViewer implements OnDestroy {
     this.siblings.set(set.length > 1 ? set : []);
   }
 
-  /** Steps to the previous or next picture of the set. Focus stays on the arrow, or moves to the other one at the end of the set. */
+  /**
+   * Steps to the previous or next picture of the set, sliding to it. The parent opens it in the same pass that puts the track back,
+   * so the picture slid in is the one then shown. Focus stays on the arrow, or moves to the other one at the end of the set.
+   */
   protected step(to: Sibling | null): void {
-    if (!to) {
+    if (!to || this.sliding()) {
       return;
     }
+    if (!this.animates()) {
+      this.arrive(to);
+      return;
+    }
+    this.sliding.set(true);
+    this.shift.set(to === this.next() ? -1 : 1);
+    this.drag.set(0);
+    clearTimeout(this.slideTimer);
+    this.slideTimer = setTimeout(() => this.arrive(to), SLIDE_MS);
+  }
+
+  /** Whether the pictures slide: not for anyone who asked for less motion, nor where that cannot be asked (as in tests). */
+  private animates(): boolean {
+    return typeof globalThis.matchMedia === 'function' && !globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  /** Opens the picture slid to, and puts the track back under it without a transition. */
+  private arrive(to: Sibling): void {
     this.navigate.emit(to.id);
+    this.sliding.set(false);
+    this.shift.set(0);
+    this.drag.set(0);
     afterNextRender(
       () => {
         const active = document.activeElement as HTMLButtonElement | null;
@@ -161,6 +198,75 @@ export class PictureViewer implements OnDestroy {
       },
       { injector: this.injector },
     );
+  }
+
+  /**
+   * Starts following a finger or the mouse across the picture. A mostly sideways move drags the track; let go far enough along (or
+   * with a flick) it slides on to that picture, and otherwise springs back. A mostly up-and-down move is left to the page.
+   */
+  protected onPointerDown(event: PointerEvent): void {
+    if (this.siblings().length < 2 || this.sliding() || event.button !== 0) {
+      return;
+    }
+    const track = event.currentTarget as HTMLElement;
+    const width = track.clientWidth || 1;
+    const start = { x: event.clientX, y: event.clientY };
+    let sideways: boolean | null = null;
+    let last = { x: event.clientX, t: performance.now() };
+    let speed = 0;
+    const move = (e: PointerEvent) => {
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
+      if (sideways === null) {
+        if (Math.hypot(dx, dy) < 6) return;
+        sideways = Math.abs(dx) > Math.abs(dy);
+        if (!sideways) return end();
+        track.setPointerCapture?.(e.pointerId);
+      }
+      const now = performance.now();
+      speed = (e.clientX - last.x) / Math.max(1, now - last.t);
+      last = { x: e.clientX, t: now };
+      const nothingThere = dx > 0 ? !this.previous() : !this.next();
+      this.drag.set(nothingThere ? dx * EDGE_RESISTANCE : dx);
+    };
+    const end = () => {
+      track.removeEventListener('pointermove', move);
+      track.removeEventListener('pointerup', end);
+      track.removeEventListener('pointercancel', end);
+      if (!sideways) return;
+      this.dragged = true;
+      setTimeout(() => (this.dragged = false));
+      const dx = this.drag();
+      const to = dx < 0 ? this.next() : this.previous();
+      const far = Math.abs(dx) > width * SWIPE_SHARE || (Math.abs(speed) > FLICK_SPEED && Math.sign(speed) === Math.sign(dx));
+      if (to && far && dx !== 0) {
+        this.step(to);
+      } else {
+        this.springBack();
+      }
+    };
+    track.addEventListener('pointermove', move);
+    track.addEventListener('pointerup', end);
+    track.addEventListener('pointercancel', end);
+  }
+
+  /** A drag let go too soon: the picture slides back to where it was. */
+  private springBack(): void {
+    if (!this.animates()) {
+      this.drag.set(0);
+      return;
+    }
+    this.sliding.set(true);
+    this.drag.set(0);
+    clearTimeout(this.slideTimer);
+    this.slideTimer = setTimeout(() => this.sliding.set(false), SLIDE_MS);
+  }
+
+  /** A click on the dim round the dialog closes it, unless it is the end of a drag that strayed off the picture. */
+  protected backdropClicked(): void {
+    if (!this.dragged) {
+      this.close();
+    }
   }
 
   protected close(): void {
@@ -255,6 +361,7 @@ export class PictureViewer implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    clearTimeout(this.slideTimer);
     if (typeof document !== 'undefined' && document.fullscreenElement) {
       void document.exitFullscreen?.();
     }
