@@ -191,16 +191,13 @@ interface FilterList {
       gap: 0.4rem;
       padding: 0.5rem 0.75rem 0;
     }
+    /* The site's drop-down (its arrow, padding and edge), in the olive and paper of the chart picker. */
     .filter {
       flex: 1 1 7rem;
       min-width: 0;
-      padding: 0.3rem 0.4rem;
-      color: var(--ink);
-      font: inherit;
-      font-size: 0.8rem;
-      background: var(--paper);
-      border: 1px solid var(--rule);
-      border-radius: var(--radius);
+      color: var(--paper);
+      font-size: 0.85rem;
+      background-color: var(--olive-700);
     }
     .count {
       display: flex;
