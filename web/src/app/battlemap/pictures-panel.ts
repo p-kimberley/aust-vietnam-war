@@ -172,9 +172,6 @@ type Mode = 'browse' | 'add';
           @if (t.hit.contactId !== null) {
             <dt>Incident</dt>
             <dd class="data">{{ t.hit.contactId }}</dd>
-          } @else if (t.hit.lat !== null && t.hit.lon !== null) {
-            <dt>Placed</dt>
-            <dd class="data">{{ t.hit.lat.toFixed(5) }}, {{ t.hit.lon.toFixed(5) }}</dd>
           }
         </dl>
       </div>

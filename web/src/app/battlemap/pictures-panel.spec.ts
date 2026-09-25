@@ -137,7 +137,7 @@ describe('PicturesPanel: details of an image in a tooltip', () => {
     return dt ? text(dt.nextElementSibling) : undefined;
   };
 
-  it('shows the whole caption, the credit, the date taken and where it was placed, once the mouse rests on a card', async () => {
+  it('shows the whole caption, the credit and the date taken, but not where it was placed, once the mouse rests on a card', async () => {
     const { fixture, el, cards } = await listed();
     vi.useFakeTimers();
     try {
@@ -150,7 +150,7 @@ describe('PicturesPanel: details of an image in a tooltip', () => {
       const tip = el.querySelector('.tip')!;
       expect(tip.getAttribute('role')).toBe('tooltip');
       expect(text(tip.querySelector('.tip__caption'))).toBe(long);
-      expect([field(el, 'Credit'), field(el, 'Taken'), field(el, 'Placed')]).toEqual(['AWM', '2 Oct 1967', '10.50000, 107.20000']);
+      expect([field(el, 'Credit'), field(el, 'Taken'), field(el, 'Placed')]).toEqual(['AWM', '2 Oct 1967', undefined]);
       expect(cards[0].getAttribute('aria-describedby')).toBe('pics-tip');
 
       cards[0].dispatchEvent(new MouseEvent('mouseleave'));
