@@ -6,7 +6,6 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
  */
 const PATHS = {
   plus: 'M12 5v14M5 12h14',
-  'image-plus': 'M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7M16 5h6M19 2v6M3 16l5-5 5 5M14 14l2-2 5 5M9 8.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0',
   upload: 'M12 15V3M7 8l5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4',
   send: 'M22 2 11 13M22 2l-7 20-4-9-9-4z',
   refresh: 'M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6',

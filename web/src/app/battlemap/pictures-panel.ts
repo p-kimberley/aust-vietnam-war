@@ -18,7 +18,7 @@ type Mode = 'browse' | 'add';
  * The community's images, in the panel that flies out from the left (the Images tab). It lists the newest and narrows to those whose
  * caption or credit has the words typed; choosing one opens it in the picture viewer, leaving the map where it is.
  *
- * "Add an image" swaps the list for a form, and "Back to the images" swaps it back. A member can add an image anywhere on the map:
+ * "Upload" swaps the list for a form, and "Back to the images" swaps it back. A member can add an image anywhere on the map:
  * they choose the file, drag the pin from the panel onto the map (or put
  * it in the middle of the view), move it about until it is right, and send it. An editor looks at it before it appears, unless they
  * are an editor themselves.
@@ -52,12 +52,12 @@ type Mode = 'browse' | 'add';
               (input)="onInput($any($event.target).value)"
             />
           </div>
-          <button type="button" class="button primary add-button" (click)="setMode('add')"><app-icon name="image-plus" />Add an image</button>
+          <button type="button" class="button primary add-button" (click)="setMode('add')"><app-icon name="upload" />Upload</button>
         </div>
         <div class="bar">
           <p class="count data" role="status" aria-live="polite">{{ summary() }}</p>
           <label class="sort">
-            Sort
+            <span class="sort__label">Sort</span>
             <select (change)="setSort($any($event.target).value)">
               @for (o of sortOptions(); track o.value) {
                 <option [value]="o.value" [selected]="o.value === sortShown()">{{ o.label }}</option>
@@ -273,29 +273,41 @@ type Mode = 'browse' | 'add';
       gap: 0.5rem;
       margin: 0.4rem 0.75rem;
     }
+    /* The count keeps to one line; the drop-down takes what room is left. */
     .count {
+      flex: none;
       margin: 0;
       color: var(--khaki);
       font-size: 0.78rem;
+      white-space: nowrap;
     }
     .sort {
       display: flex;
+      flex: 0 1 auto;
       align-items: center;
       gap: 0.35rem;
+      min-width: 0;
       color: var(--khaki);
       font-size: 0.78rem;
     }
-    .sort select {
-      padding: 0.2rem 0.3rem;
-      color: var(--ink);
-      font: inherit;
-      background: var(--paper);
-      border: 1px solid var(--rule);
-      border-radius: var(--radius);
+    /* Named for screen readers; the order it shows says what it is. */
+    .sort__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
-    .sort select:focus-visible {
-      outline: 2px solid var(--smoke-yellow);
-      outline-offset: 2px;
+    /* The site's drop-down, in the olive and paper of the chart picker, a little smaller to sit beside the count. */
+    .sort select {
+      min-width: 0;
+      text-overflow: ellipsis;
+      min-height: 1.9rem;
+      padding-block: 0.2rem;
+      color: var(--paper);
+      font-size: 0.8rem;
+      background-color: var(--olive-700);
     }
     .error {
       margin: 0.4rem 0;
@@ -539,8 +551,8 @@ export class PicturesPanel implements OnDestroy {
     ...(this.query().trim() ? [{ value: 'relevance' as const, label: 'Best match' }] : []),
     { value: 'newest' as const, label: 'Newest added' },
     { value: 'oldest' as const, label: 'Oldest added' },
-    { value: 'taken-newest' as const, label: 'Date taken, latest first' },
-    { value: 'taken-oldest' as const, label: 'Date taken, earliest first' },
+    { value: 'taken-newest' as const, label: 'Date taken, latest' },
+    { value: 'taken-oldest' as const, label: 'Date taken, earliest' },
   ]);
 
   protected setSort(value: string): void {

@@ -137,8 +137,8 @@ describe('PicturesPanel: sort order', () => {
     expect(options(el)).toEqual([
       ['newest', 'Newest added'],
       ['oldest', 'Oldest added'],
-      ['taken-newest', 'Date taken, latest first'],
-      ['taken-oldest', 'Date taken, earliest first'],
+      ['taken-newest', 'Date taken, latest'],
+      ['taken-oldest', 'Date taken, earliest'],
     ]);
     expect(text(el.querySelector('.hit__credit'))).toBe('AWM · 18 Aug 1966');
   });
@@ -194,14 +194,14 @@ describe('PicturesPanel: switching between the list and the form', () => {
     expect(text(el.querySelector('h2'))).toBe('Images');
     expect(button(el, 'Find')).toBeUndefined();
     expect(el.querySelector('input[type=search]')).not.toBeNull();
-    expect(button(el, 'Add an image')).toBeDefined();
+    expect(button(el, 'Upload')).toBeDefined();
   });
 
   it('swaps the list for the form, and back again', async () => {
     const { fixture, el } = mount({}, { authenticated: true, roles: ['member'] });
     await settle(fixture);
 
-    button(el, 'Add an image').click();
+    button(el, 'Upload').click();
     fixture.detectChanges();
     expect(el.querySelector('form')).not.toBeNull();
     expect(el.querySelector('input[type=search]')).toBeNull();
@@ -218,7 +218,7 @@ describe('PicturesPanel: adding a picture', () => {
   async function adding(over: Record<string, unknown> = {}, roles: Role[] = ['member']) {
     const r = mount(over, { authenticated: true, roles });
     await settle(r.fixture);
-    button(r.el, 'Add an image').click();
+    button(r.el, 'Upload').click();
     await settle(r.fixture);
     return r;
   }
@@ -236,7 +236,7 @@ describe('PicturesPanel: adding a picture', () => {
   it('asks a visitor to sign in first', async () => {
     const { fixture, el } = mount();
     await settle(fixture);
-    button(el, 'Add an image').click();
+    button(el, 'Upload').click();
     await settle(fixture);
 
     expect(text(el)).toContain('Sign in to add an image');
