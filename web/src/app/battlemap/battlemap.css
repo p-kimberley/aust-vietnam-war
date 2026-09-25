@@ -346,8 +346,14 @@
     gap: 0.6rem;
   }
 
+  /* Open, the search box (and its list of results) is over everything else on the map, the rails and fly-outs included. */
   .bm__bar--search {
-    z-index: 5;
+    z-index: 10;
+  }
+
+  /* The Search button sits at the right of the top row, across from the way home. */
+  .bm__search-toggle {
+    margin-left: auto;
   }
 
   .bm__back,
