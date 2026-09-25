@@ -343,7 +343,7 @@ describe('NotesTab', () => {
 });
 
 describe('PicturesTab', () => {
-  it('shows pictures with their captions, credits and likes, linking to the full picture', async () => {
+  it('shows pictures with their captions, credits and likes, each opening in the viewer', async () => {
     const community = fakeCommunity({ media: vi.fn(() => Promise.resolve([picture(), picture({ id: 11, status: 'Pending', caption: null, likes: 0 })])) });
     const { fixture, el } = mount(PicturesTab, community, fakeAuth(), { contactId: 2 });
     const counted: number[] = [];
@@ -351,7 +351,8 @@ describe('PicturesTab', () => {
     await settle(fixture);
 
     const first = el.querySelector('figure')!;
-    expect(first.querySelector('a')?.getAttribute('href')).toBe('/media/aa/full.jpg');
+    expect(first.querySelector('a')).toBeNull();                                   // not in another tab
+    expect(first.querySelector('.open')?.getAttribute('aria-label')).toBe('View A patrol');
     expect(first.querySelector('img')?.getAttribute('src')).toBe('/media/aa/full-480.jpg');
     expect(first.querySelector('img')?.getAttribute('alt')).toBe('A patrol');
     expect(text(first)).toContain('AWM, 18 Aug 1966');
@@ -424,6 +425,20 @@ describe('PicturesTab', () => {
   });
 });
 
+describe('PicturesTab viewer', () => {
+  it("opens one of the incident's own pictures in the viewer, without moving the map", async () => {
+    const community = fakeCommunity({ media: vi.fn(() => Promise.resolve([picture()])) });
+    const { fixture, el } = mount(PicturesTab, community, fakeAuth(), { contactId: 2 });
+    const chosen: unknown[] = [];
+    fixture.componentInstance.openPicture.subscribe((n) => chosen.push(n));
+    await settle(fixture);
+
+    el.querySelector<HTMLButtonElement>('figure .open')!.click();
+
+    expect(chosen).toEqual([{ id: picture().id, lat: null, lon: null }]);
+  });
+});
+
 describe('PicturesTab nearby photos', () => {
   const nearby = (over: Record<string, unknown> = {}) => ({
     id: 21, contactId: null, thumbUrl: '/media/bb/x-480.jpg', caption: 'A bunker by the road', credit: 'AWM', lat: 10.56, lon: 107.17, distanceMetres: 563, ...over,
@@ -445,7 +460,7 @@ describe('PicturesTab nearby photos', () => {
     const community = fakeCommunity({ nearbyMedia: vi.fn(() => Promise.resolve([nearby()])) });
     const { fixture, el } = mount(PicturesTab, community, fakeAuth(), { contactId: 2 });
     const chosen: number[] = [];
-    fixture.componentInstance.openNearby.subscribe((n) => chosen.push(n.id));
+    fixture.componentInstance.openPicture.subscribe((n) => chosen.push(n.id));
     await settle(fixture);
 
     el.querySelector<HTMLButtonElement>('.nearby button')!.click();

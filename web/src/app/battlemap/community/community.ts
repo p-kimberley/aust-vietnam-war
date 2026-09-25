@@ -72,6 +72,31 @@ export interface IncidentMediaView {
   addedBy: string | null;
 }
 
+/** A picture to open in the picture viewer, with its place when the map should go there too. */
+export interface PictureRef {
+  id: number;
+  lat: number | null;
+  lon: number | null;
+}
+
+/** A picture found in the pictures panel, from `GET /api/community-media/search`. */
+export interface PictureHit {
+  id: number;
+  contactId: number | null;
+  thumbUrl: string;
+  caption: string | null;
+  credit: string | null;
+  lat: number | null;
+  lon: number | null;
+}
+
+export interface PicturePage {
+  items: PictureHit[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 /** A picture taken near an incident (not one of its own), from `GET /api/contacts/{id}/nearby-media`. */
 export interface NearbyPicture {
   id: number;
@@ -288,6 +313,29 @@ export class CommunityService {
       }
     }
     return firstValueFrom(this.http.post<IncidentMediaView>(`/api/contacts/${contactId}/media`, form));
+  }
+
+  /** Approved pictures a page at a time: those whose caption or credit has the words typed, or with none typed, the newest. */
+  searchPictures(q: string, page = 1, pageSize = 24): Promise<PicturePage> {
+    let params = new HttpParams().set('page', page).set('pageSize', pageSize);
+    if (q.trim()) {
+      params = params.set('q', q.trim());
+    }
+    return firstValueFrom(this.http.get<PicturePage>('/api/community-media/search', { params }));
+  }
+
+  /** Adds a picture at a place on the map, belonging to no incident. */
+  placeMedia(file: File, place: { lat: number; lon: number }, caption: string, credit: string, dateTaken: string): Promise<IncidentMediaView> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    form.append('lat', place.lat.toFixed(6));
+    form.append('lon', place.lon.toFixed(6));
+    for (const [key, value] of [['caption', caption], ['credit', credit], ['dateTaken', dateTaken]] as const) {
+      if (value) {
+        form.append(key, value);
+      }
+    }
+    return firstValueFrom(this.http.post<IncidentMediaView>('/api/community-media', form));
   }
 
   removeMedia(id: number): Promise<void> {

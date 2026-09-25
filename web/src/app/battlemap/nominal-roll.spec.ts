@@ -366,7 +366,7 @@ describe('the nominal roll in the Battle Map fly-out', () => {
   it('is the second tab, and flies out the roll when it is pressed', async () => {
     const r = await render({ community: community() });
     const tabs = [...r.el.querySelectorAll('.bm__tabs [role=tab]')].map((t) => text(t));
-    expect(tabs).toEqual(['Charts', 'Nominal roll']);
+    expect(tabs).toEqual(['Charts', 'Nominal roll', 'Pictures']);
     expect(r.el.querySelector('app-nominal-roll')).toBeNull();
 
     r.el.querySelector<HTMLButtonElement>('#left-tab-roll')!.click();

@@ -299,7 +299,7 @@ describe('the photo thumbnails on the Battle Map', () => {
     r.basemaps.handlers.get(PHOTO_IMAGES)!({ id: 6 });
     await settle(r.fixture);
 
-    expect(r.el.querySelector('app-picture-panel')).not.toBeNull();
+    expect(r.el.querySelector('app-picture-viewer')).not.toBeNull();
     expect(r.basemaps.map.setFilter).toHaveBeenCalledWith(PHOTO_SELECTED, ['==', ['get', 'id'], 6]);
   });
 

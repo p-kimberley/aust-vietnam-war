@@ -1,3 +1,4 @@
+import { PicturePlacementService } from './picture-placement.service';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
@@ -85,6 +86,11 @@ export function fakeMap() {
     setLayoutProperty: vi.fn(),
     getCenter: () => ({ lat: 10.55, lng: 107.17 }),
     getZoom: () => 8,
+    // A flat screen, 1000 pixels to the degree, so tests can reason about pixels.
+    project: ([lon, lat]: [number, number]) => ({ x: lon * 1000, y: -lat * 1000 }),
+    unproject: ([x, y]: [number, number]) => ({ lng: x / 1000, lat: -y / 1000 }),
+    /** What is drawn under a point: nothing, unless a test says otherwise. */
+    queryRenderedFeatures: vi.fn((_at?: unknown, _options?: unknown): { properties: Record<string, unknown> }[] => []),
   };
 }
 
@@ -206,7 +212,7 @@ export async function render(opts: RenderOptions = {}) {
   stubEchartIn(AnalyticsPanel);
   TestBed.overrideComponent(Battlemap, {
     set: {
-      providers: [{ provide: BasemapService, useValue: basemaps }, MapSelectionService, MapViewStateService, UnitFollowService, ContactFilteringService],
+      providers: [{ provide: BasemapService, useValue: basemaps }, MapSelectionService, MapViewStateService, UnitFollowService, ContactFilteringService, PicturePlacementService],
     },
   });
   const fixture = TestBed.createComponent(Battlemap);

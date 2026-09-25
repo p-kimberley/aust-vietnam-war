@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, output, resource, signal, viewChild } from '@angular/core';
 import { NotesTab } from './community/notes-tab';
 import { PeopleTab } from './community/people-tab';
-import { NearbyPicture } from './community/community';
+import { PictureRef } from './community/community';
 import { PicturesTab } from './community/pictures-tab';
 import { ContactsService } from './contacts.service';
 import { formatDtg } from './contacts';
@@ -24,7 +24,7 @@ export class IncidentPanel {
   readonly startTab = input<'details' | 'notes' | 'pictures' | 'people'>('details');
   readonly closed = output<void>();
   /** Opens a photo taken near this incident, on the map. */
-  readonly openPicture = output<NearbyPicture>();
+  readonly openPicture = output<PictureRef>();
   /** Opens a person on the honour roll, by service number. */
   readonly openPerson = output<string>();
   /** The units whose paths are drawn on the map. */

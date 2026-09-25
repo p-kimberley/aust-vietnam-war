@@ -25,10 +25,23 @@ import { BasemapService, parseOverlayOpacities } from './basemap.service';
 import { IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
 import { POI_POINTS, addPoiLayers, setPoiVisibility } from './poi-layers';
-import { CommunityService, IncidentMediaView } from './community/community';
+import { CommunityService, IncidentMediaView, PictureRef } from './community/community';
 import { HonourPanel } from './community/honour-panel';
-import { PHOTO_CLUSTERS, PHOTO_IMAGES, PHOTO_POINTS, PHOTO_FULL_ZOOM, addPhotoLayers, setPhotoVisibility, zoomIntoCluster } from './photo-layers';
-import { PicturePanel } from './picture-panel';
+import {
+  PHOTO_CLUSTERS,
+  PHOTO_IMAGES,
+  PHOTO_POINTS,
+  PHOTO_FULL_ZOOM,
+  addPhotoLayers,
+  clusterPictures,
+  setPhotoVisibility,
+  setPhotos,
+  zoomIntoCluster,
+} from './photo-layers';
+import { PhotoSpider, SPIDER_IMAGES, isStack } from './photo-spider';
+import { PicturePlacementService } from './picture-placement.service';
+import { PictureViewer } from './picture-viewer';
+import { PicturesPanel } from './pictures-panel';
 import { PoiPanel } from './poi-panel';
 import { SearchBox } from './search-box';
 import {
@@ -73,19 +86,44 @@ const FLYOUT_SLIDE_MS = 300;
 const FIT_MAX_ZOOM = 13;
 /** Air round the fitted contacts, beyond the panels and the timeline, so they do not land flush against an edge. */
 const FIT_PADDING_PX = 50;
+/** How far round the pointer, in pixels, a click looks for pictures lying on top of each other. */
+const STACK_PROBE_PX = 3;
+
+/** The middle of some places: where a stack of pictures springs apart from. */
+function centreOf(places: readonly { lon: number; lat: number }[]): { lon: number; lat: number } {
+  const n = places.length || 1;
+  return { lon: places.reduce((s, p) => s + p.lon, 0) / n, lat: places.reduce((s, p) => s + p.lat, 0) / n };
+}
 
 /**
  * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
  * draws a heatmap and incident markers on a MapLibre GL map. Filters run in the browser over the loaded contacts (the
  * dataset is small); only the incident-report word search goes to the server. The view is kept in the URL (`?at=`,
  * `?basemap=`, `?terrain=`, `?field=`, `?size=`, `?overlays=`, `?opacity=`, `?bases=`, `?photos=`, `?markers=`, `?heatmap=`,
- * `?incident=`, `?poi=`, `?picture=` and the filter parameters described in `filters.ts`) so a link reproduces what the
+ * `?incident=`, `?poi=`, `?picture=`, the tool open at the left (`?charts=`, `?roll=`, `?pictures=`) and the filter parameters described in `filters.ts`) so a link reproduces what the
  * sender was looking at; every one of them is left out when it is at its default, so a plain `/battlemap` link stays short.
  */
 @Component({
   selector: 'app-battlemap',
-  imports: [RouterLink, BasemapPicker, FollowPanel, LayerRow, LeftTabs, MapLegend, NominalRoll, IncidentPanel, PoiPanel, PicturePanel, HonourPanel, FiltersPanel, SearchBox, AnalyticsPanel, Timeline],
-  providers: [BasemapService, MapSelectionService, MapViewStateService, UnitFollowService, ContactFilteringService],
+  imports: [
+    RouterLink,
+    BasemapPicker,
+    FollowPanel,
+    LayerRow,
+    LeftTabs,
+    MapLegend,
+    NominalRoll,
+    IncidentPanel,
+    PoiPanel,
+    PictureViewer,
+    PicturesPanel,
+    HonourPanel,
+    FiltersPanel,
+    SearchBox,
+    AnalyticsPanel,
+    Timeline,
+  ],
+  providers: [BasemapService, MapSelectionService, MapViewStateService, UnitFollowService, ContactFilteringService, PicturePlacementService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './battlemap.html',
   styleUrl: './battlemap.css',
@@ -108,6 +146,7 @@ export class Battlemap {
   readonly picture = input<string>();
   readonly charts = input<string>();
   readonly roll = input<string>();
+  readonly pictures = input<string>();
   readonly track = input<string>();
   readonly follow = input<string>();
   readonly person = input<string>();
@@ -124,11 +163,14 @@ export class Battlemap {
   private readonly urlState = inject(MapViewStateService);
   protected readonly followUnits = inject(UnitFollowService);
   protected readonly contactFilter = inject(ContactFilteringService);
+  private readonly placement = inject(PicturePlacementService);
   private readonly canvas = viewChild.required<ElementRef<HTMLElement>>('canvas');
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
 
   private map?: MapLibreMap;
+  /** Spreads out pictures that lie on top of each other, so each can be chosen. */
+  private spider?: PhotoSpider;
 
   protected readonly status = signal<Status>('loading');
   protected readonly message = signal('');
@@ -136,7 +178,7 @@ export class Battlemap {
   protected readonly pois = signal<readonly Poi[]>([]);
   protected readonly showPois = signal(true);
   /** Community pictures that have a place on the map. */
-  protected readonly pictures = signal<readonly IncidentMediaView[]>([]);
+  protected readonly mapPictures = signal<readonly IncidentMediaView[]>([]);
   protected readonly showPhotos = signal(true);
   protected readonly tab = signal<Tab>('layers');
   protected readonly panelOpen = signal(true);
@@ -156,6 +198,7 @@ export class Battlemap {
   protected readonly leftTabs: readonly LeftTab[] = [
     { id: 'charts', label: 'Charts' },
     { id: 'roll', label: 'Nominal roll' },
+    { id: 'pictures', label: 'Pictures' },
   ];
   /** The tool that is flown out at the left, or `null` when none is. */
   protected readonly flyout = signal<string | null>(null);
@@ -208,8 +251,9 @@ export class Battlemap {
     this.syncUrl();
   }
 
-  /** A click on empty map closes whatever the map opened: the incident, the base or the photo. */
+  /** A click on empty map closes whatever the map opened (the incident, the base or the photo), and closes up spread-out pictures. */
   protected clearMapSelection(): void {
+    this.spider?.close();
     this.selection.clear();
     this.syncUrl();
   }
@@ -220,10 +264,89 @@ export class Battlemap {
     this.syncUrl();
   }
 
-  /** Opens the panel for a community picture (or closes it), in place of whatever else is open. */
+  /** Opens a community picture in the viewer (or closes it), over whatever else is open. */
   protected selectPicture(id: number | null): void {
     this.selection.selectPicture(id);
+    this.spider?.setSelected(id);
     this.syncUrl();
+  }
+
+  /** The picture viewer's "Open the incident": the viewer closes, and the incident opens beneath it. */
+  protected openIncidentFromPicture(contactId: number): void {
+    this.selectPicture(null);
+    this.openContact(contactId);
+  }
+
+  /**
+   * A picture was clicked on the map. The dot and the thumbnail are two layers, and both answer one click, so the click is handled
+   * once, after both have been told. Where more than one picture lies under the pointer they spring apart so that each can be
+   * chosen; otherwise the one picture opens.
+   */
+  private photoClicked(id: number, at: { lon: number; lat: number } | undefined): void {
+    if (this.photoClickQueued) {
+      return;
+    }
+    this.photoClickQueued = true;
+    queueMicrotask(() => {
+      this.photoClickQueued = false;
+      const stack = at ? this.picturesUnder(at) : [];
+      if (stack.length > 1 && this.spider) {
+        this.spider.spread(centreOf(stack), stack);
+      } else {
+        this.selectPicture(id);
+      }
+    });
+  }
+  private photoClickQueued = false;
+
+  /** A numbered group of pictures was clicked: pictures that all lie in one spot spring apart; a group spread wider zooms in to break it up. */
+  private async clusterClicked(clusterId: number, at: { lon: number; lat: number }): Promise<void> {
+    const map = this.map;
+    if (!map) {
+      return;
+    }
+    const pictures = await clusterPictures(map, clusterId).catch(() => []);
+    if (isStack(pictures) && this.spider) {
+      this.spider.spread(centreOf(pictures), pictures, clusterId);
+    } else {
+      await zoomIntoCluster(map, clusterId, at);
+    }
+  }
+
+  /** The pictures (dots or thumbnails) drawn under a point on the map, with their places. */
+  private picturesUnder(at: { lon: number; lat: number }): { id: number; lon: number; lat: number }[] {
+    const ids = new Set(this.featuresAt(at, [PHOTO_POINTS, PHOTO_IMAGES]).map((f) => Number(f.properties?.['id'])));
+    return this.mapPictures()
+      .filter((p) => ids.has(p.id))
+      .map((p) => ({ id: p.id, lon: p.lon!, lat: p.lat! }));
+  }
+
+  /** A picture, or a spread-out one, is under the point: a click there is for the picture, not the incident or base beneath it. */
+  private pictureAt(at: { lon: number; lat: number } | undefined): boolean {
+    return !!at && this.featuresAt(at, [PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS, SPIDER_IMAGES]).length > 0;
+  }
+
+  private featuresAt(at: { lon: number; lat: number }, layers: readonly string[]): { properties?: Record<string, unknown> | null }[] {
+    const map = this.map;
+    const present = layers.filter((id) => map?.getLayer(id));
+    if (!map || present.length === 0 || typeof map.queryRenderedFeatures !== 'function') {
+      return [];
+    }
+    const p = map.project([at.lon, at.lat]);
+    const r = STACK_PROBE_PX;
+    return map.queryRenderedFeatures([[p.x - r, p.y - r], [p.x + r, p.y + r]], { layers: present });
+  }
+
+  /** A picture was added from the pictures panel. One an editor added is public at once, so it goes on the map now. */
+  protected pictureAdded(picture: IncidentMediaView): void {
+    if (picture.status !== 'Approved' || picture.lat === null || picture.lon === null) {
+      return;
+    }
+    this.mapPictures.update((list) => [picture, ...list.filter((p) => p.id !== picture.id)]);
+    if (this.map) {
+      this.spider?.close();
+      setPhotos(this.map, this.mapPictures());
+    }
   }
 
   /** Opens a person's page on the honour roll (or closes it), in place of whatever else is open. */
@@ -245,8 +368,8 @@ export class Battlemap {
     this.selection.incidentTab.set('notes');
   }
 
-  /** Opens a photo (found by search, or taken near an incident) and brings its place into view. */
-  protected openPictureAt(picture: { id: number; lat: number | null; lon: number | null }): void {
+  /** Opens a photo in the viewer (found by search or in the pictures panel, or taken near an incident) and brings its place into view behind it. */
+  protected openPictureAt(picture: PictureRef): void {
     this.selectPicture(picture.id);
     if (picture.lat !== null && picture.lon !== null) this.basemaps.flyTo(picture.lat, picture.lon, PHOTO_FULL_ZOOM);
   }
@@ -260,6 +383,7 @@ export class Battlemap {
 
   protected setPhotosVisible(visible: boolean): void {
     this.showPhotos.set(visible);
+    if (!visible) this.spider?.close();
     if (this.map) setPhotoVisibility(this.map, visible);
     this.syncUrl();
   }
@@ -437,7 +561,7 @@ export class Battlemap {
         }),
       ]);
       this.pois.set(pois);
-      this.pictures.set(pictures.filter((p) => p.lat !== null && p.lon !== null));
+      this.mapPictures.set(pictures.filter((p) => p.lat !== null && p.lon !== null));
       this.config.set(config);
       this.contactFilter.allContacts.set(contacts);
 
@@ -453,11 +577,11 @@ export class Battlemap {
       }
 
       // A link may open onto a person on the honour roll, unless it already names an incident or a base.
-      if (this.person() && !this.incident() && !this.poi() && !this.picture()) {
+      if (this.person() && !this.incident() && !this.poi()) {
         this.selection.selectedPerson.set(this.person()!);
       }
 
-      const tool = this.charts() === '1' ? 'charts' : this.roll() === '1' ? 'roll' : null;
+      const tool = this.charts() === '1' ? 'charts' : this.roll() === '1' ? 'roll' : this.pictures() === '1' ? 'pictures' : null;
       this.flyout.set(tool);
       this.flyoutShown.set(tool);
       this.followUnits.followed.set(followedFromLink(this.follow(), this.track(), this.contactFilter.filters().units));
@@ -489,13 +613,13 @@ export class Battlemap {
         this.selection.selectedPoiId.set(openedPoi.id);
       }
 
-      // A link may open onto a picture on the map, unless it already names an incident or a base.
+      // A link may open a picture in the viewer, over anything else it names. It need not be on the map: one waiting for approval
+      // (linked from the Studio) is shown to its uploader and to editors, and the viewer says so when there is no such picture.
       const requestedPicture = Number(this.picture());
-      const openedPicture =
-        !opened && !openedPoi && Number.isInteger(requestedPicture) ? this.pictures().find((p) => p.id === requestedPicture) : undefined;
-      if (openedPicture) {
-        this.selection.selectedPictureId.set(openedPicture.id);
+      if (Number.isInteger(requestedPicture) && requestedPicture > 0) {
+        this.selection.selectedPictureId.set(requestedPicture);
       }
+      const openedPicture = this.mapPictures().find((p) => p.id === requestedPicture);
 
       const target = opened ?? openedPoi ?? openedPicture;
       const hasOwnView = !!parseAt(this.at());
@@ -524,18 +648,24 @@ export class Battlemap {
             });
             addTrackLayers(map, this.tracks(), this.followUnits.followed().size > 0);
             // Pictures last, so they draw over the contacts.
-            addPhotoLayers(map, this.pictures(), { visible: this.showPhotos(), selectedId: this.selection.selectedPictureId() });
+            addPhotoLayers(map, this.mapPictures(), { visible: this.showPhotos(), selectedId: this.selection.selectedPictureId() });
+            // Spread-out pictures over everything, pictures included. A new style starts with none spread.
+            this.spider ??= new PhotoSpider(map);
+            this.spider.addLayers();
+            this.spider.setSelected(this.selection.selectedPictureId());
             if (firstStyle) {
               firstStyle = false;
-              // Registered in this order so that, where a contact sits on a base, the contact (drawn on top) wins.
-              this.basemaps.bindClick(POI_POINTS, (p) => this.selectPoi(Number(p['id'])));
-              this.basemaps.bindClick(POINT_LAYER, (p) => this.select(Number(p['id'])));
-              // Pictures are drawn on top, so they are registered last and win where they overlap a contact.
-              this.basemaps.bindClick(PHOTO_POINTS, (p) => this.selectPicture(Number(p['id'])));
-              this.basemaps.bindClick(PHOTO_IMAGES, (p) => this.selectPicture(Number(p['id'])));
-              this.basemaps.bindClick(PHOTO_CLUSTERS, (p, at) => void zoomIntoCluster(map, Number(p['cluster_id']), at));
+              // Registered in this order so that, where a contact sits on a base, the contact (drawn on top) wins. A picture is drawn
+              // over both, and the viewer opens over the panels without closing them, so where a picture is under the pointer the
+              // click is the picture's alone.
+              this.basemaps.bindClick(POI_POINTS, (p, at) => this.pictureAt(at) || this.selectPoi(Number(p['id'])));
+              this.basemaps.bindClick(POINT_LAYER, (p, at) => this.pictureAt(at) || this.select(Number(p['id'])));
+              this.basemaps.bindClick(PHOTO_POINTS, (p, at) => this.photoClicked(Number(p['id']), at));
+              this.basemaps.bindClick(PHOTO_IMAGES, (p, at) => this.photoClicked(Number(p['id']), at));
+              this.basemaps.bindClick(PHOTO_CLUSTERS, (p, at) => void this.clusterClicked(Number(p['cluster_id']), at!));
+              this.basemaps.bindClick(SPIDER_IMAGES, (p) => this.selectPicture(Number(p['id'])));
               // A click where none of those is under the pointer is a click on empty map.
-              this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS], () => this.clearMapSelection());
+              this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS, SPIDER_IMAGES], () => this.clearMapSelection());
               this.status.set('ready');
               // With no explicit view in the link and nothing else to fly to, animate to fit whatever the filters leave.
               // Deferred to after this is rendered: mapPadding reads the panels' real width, and they do not exist (the
@@ -558,6 +688,7 @@ export class Battlemap {
         },
       );
       this.selection.attach(this.map);
+      this.placement.attach(this.map);
       // Marches the dashes along whichever units are followed; off again the moment none are, rather than ticking
       // forever in the background.
       const map = this.map!;
@@ -573,6 +704,12 @@ export class Battlemap {
       // With no explicit view in the link, bring the incident, base or photo into frame.
       if (target && !hasOwnView) {
         this.basemaps.flyTo(target.lat!, target.lon!, 11);
+      } else if (!hasOwnView && this.selection.selectedPictureId() !== null) {
+        // A picture that is not on the map yet (one waiting for approval, linked from the Studio): find out where it goes.
+        const detail = await this.community.mediaDetail(this.selection.selectedPictureId()!).catch(() => null);
+        if (detail?.lat != null && detail.lon != null) {
+          this.basemaps.flyTo(detail.lat, detail.lon, PHOTO_FULL_ZOOM);
+        }
       }
     } catch (e) {
       console.error('Battle Map failed to start', e);
@@ -637,6 +774,7 @@ export class Battlemap {
         person: this.selection.selectedPerson(),
         charts: this.flyout() === 'charts' ? '1' : null,
         roll: this.flyout() === 'roll' ? '1' : null,
+        pictures: this.flyout() === 'pictures' ? '1' : null,
         track: null,
         follow: this.followUnits.followed().size ? [...this.followUnits.followed()].sort((a, b) => a - b).join(',') : null,
         ...(tree ? toParams(this.contactFilter.filters(), tree) : {}),

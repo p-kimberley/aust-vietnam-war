@@ -183,7 +183,7 @@ describe('Battle Map: finding notes and photos', () => {
     searchBox(r).pickPicture.emit({ id: 703, contactId: null, thumbUrl: '', caption: 'A patrol', credit: null, lat: 10.5979, lon: 107.0504 });
     await settle(r.fixture);
 
-    expect(r.el.querySelector('app-picture-panel')).not.toBeNull();
+    expect(r.el.querySelector('app-picture-viewer')).not.toBeNull();
     expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.5979, 107.0504, 15);
   });
 
@@ -193,21 +193,21 @@ describe('Battle Map: finding notes and photos', () => {
     searchBox(r).pickPicture.emit({ id: 704, contactId: 9, thumbUrl: '', caption: null, credit: null, lat: null, lon: null });
     await settle(r.fixture);
 
-    expect(r.el.querySelector('app-picture-panel')).not.toBeNull();
+    expect(r.el.querySelector('app-picture-viewer')).not.toBeNull();
     expect(r.basemaps.flyTo).not.toHaveBeenCalled();
   });
 
   it('opens a photo taken near an incident from the incident\'s pictures', async () => {
     const community = { nearbyMedia: vi.fn(() => Promise.resolve([{ id: 21, contactId: null, thumbUrl: '/media/bb/x-480.jpg', caption: 'A bunker', credit: null, lat: 10.56, lon: 107.17, distanceMetres: 563 }])) };
     const r = await render({ community, inputs: { incident: '2' } });
-    [...r.el.querySelectorAll<HTMLButtonElement>('[role=tab]')].find((t) => text(t)?.startsWith('Pictures'))!.click();
+    [...r.el.querySelectorAll<HTMLButtonElement>('app-incident-panel [role=tab]')].find((t) => text(t)?.startsWith('Pictures'))!.click();
     await settle(r.fixture);
 
     r.el.querySelector<HTMLButtonElement>('app-incident-panel .nearby button')!.click();
     await settle(r.fixture);
 
-    expect(r.el.querySelector('app-picture-panel')).not.toBeNull();
-    expect(r.el.querySelector('app-incident-panel')).toBeNull();
+    expect(r.el.querySelector('app-picture-viewer')).not.toBeNull();
+    expect(r.el.querySelector('app-incident-panel')).not.toBeNull();                 // still there beneath the viewer
     expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.56, 107.17, 15);
   });
 });

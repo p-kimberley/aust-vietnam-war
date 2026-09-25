@@ -8,9 +8,10 @@ import { setSelectedPoi } from './poi-layers';
 export type IncidentTab = 'details' | 'notes';
 
 /**
- * Which one thing is open at the right of the map — an incident, a point of interest, a community picture, or a person on the
- * honour roll — never more than one at a time. Picking one closes whatever else was open, both in the panel and, where the map
- * marks a selection (a contact, a base or a photo), on the map itself.
+ * Which one thing is open at the right of the map — an incident, a point of interest, or a person on the honour roll — never more
+ * than one at a time. Picking one closes whatever else was open, both in the panel and, where the map marks a selection (a contact
+ * or a base), on the map itself. A community picture opens in a dialog over all of that and leaves it as it was, so closing the
+ * picture goes back to the incident it was opened from.
  *
  * Provided per map component, like `BasemapService`: one instance per map. Call `attach` once the map exists (selecting before
  * then just holds the state; there is nothing yet to highlight).
@@ -27,9 +28,7 @@ export class MapSelectionService {
   readonly incidentTab = signal<IncidentTab>('details');
 
   /** Something is open at the right, so what else sits there moves aside. */
-  readonly anyOpen = computed(
-    () => this.selectedId() !== null || this.selectedPoiId() !== null || this.selectedPictureId() !== null || this.selectedPerson() !== null,
-  );
+  readonly anyOpen = computed(() => this.selectedId() !== null || this.selectedPoiId() !== null || this.selectedPerson() !== null);
 
   attach(map: MapLibreMap): void {
     this.map = map;
@@ -42,13 +41,11 @@ export class MapSelectionService {
     if (id !== null) {
       this.selectedPoiId.set(null);
       this.selectedPerson.set(null);
-      this.selectedPictureId.set(null);
     }
     if (this.map) {
       setSelectedContact(this.map, id);
       if (id !== null) {
         setSelectedPoi(this.map, null);
-        setSelectedPhoto(this.map, null);
       }
     }
   }
@@ -59,31 +56,20 @@ export class MapSelectionService {
     if (id !== null) {
       this.selectedId.set(null);
       this.selectedPerson.set(null);
-      this.selectedPictureId.set(null);
     }
     if (this.map) {
       setSelectedPoi(this.map, id);
       if (id !== null) {
         setSelectedContact(this.map, null);
-        setSelectedPhoto(this.map, null);
       }
     }
   }
 
-  /** Opens the panel for a community picture (or closes it), closing whatever else was open. */
+  /** Opens a community picture in its dialog (or closes it), ringing it on the map. What is open at the right stays open. */
   selectPicture(id: number | null): void {
     this.selectedPictureId.set(id);
-    if (id !== null) {
-      this.selectedId.set(null);
-      this.selectedPoiId.set(null);
-      this.selectedPerson.set(null);
-    }
     if (this.map) {
       setSelectedPhoto(this.map, id);
-      if (id !== null) {
-        setSelectedContact(this.map, null);
-        setSelectedPoi(this.map, null);
-      }
     }
   }
 
@@ -93,11 +79,9 @@ export class MapSelectionService {
     if (serviceNumber !== null) {
       this.selectedId.set(null);
       this.selectedPoiId.set(null);
-      this.selectedPictureId.set(null);
       if (this.map) {
         setSelectedContact(this.map, null);
         setSelectedPoi(this.map, null);
-        setSelectedPhoto(this.map, null);
       }
     }
   }

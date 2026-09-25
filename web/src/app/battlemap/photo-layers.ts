@@ -191,3 +191,20 @@ export async function zoomIntoCluster(map: Map, clusterId: number, at: { lon: nu
   const zoom = await source.getClusterExpansionZoom(clusterId);
   map.easeTo({ center: [at.lon, at.lat], zoom: zoom + 0.5, duration: 600 });
 }
+
+/** Puts a new set of pictures on the map (after one is added), keeping the thumbnails of those already known. */
+export function setPhotos(map: Map, pictures: readonly IncidentMediaView[]): void {
+  registerPhotoThumbnails(map, pictures);
+  map.getSource<GeoJSONSource>(PHOTO_SOURCE)?.setData(toPhotoGeoJson(pictures));
+}
+
+/** The pictures grouped under a numbered disc, with their places. */
+export async function clusterPictures(map: Map, clusterId: number): Promise<{ id: number; lon: number; lat: number }[]> {
+  const source = map.getSource<GeoJSONSource>(PHOTO_SOURCE);
+  if (!source) return [];
+  const leaves = await source.getClusterLeaves(clusterId, Infinity, 0);
+  return leaves.map((f) => {
+    const [lon, lat] = (f.geometry as Point).coordinates;
+    return { id: Number(f.properties?.['id']), lon, lat };
+  });
+}

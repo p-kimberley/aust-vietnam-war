@@ -1,0 +1,90 @@
+<div class="viewer" (click)="close()">
+  <div #box class="box" role="dialog" aria-modal="true" aria-labelledby="viewer-title" (click)="$event.stopPropagation()" (keydown)="onKeydown($event)">
+    @if (shown(); as p) {
+      <div #stage class="stage" [class.is-full]="fullscreen()">
+        <img class="stage__img" [src]="p.url" [alt]="p.caption || 'A photo placed on the map'" />
+        @if (fullscreen()) {
+          <button type="button" class="stage__button stage__exit" aria-label="Exit full screen" (click)="closeFullscreen()">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3v6H3M15 3v6h6M9 21v-6H3M15 21v-6h6" /></svg>
+          </button>
+          @if (p.caption || p.credit) {
+            <p class="stage__caption">{{ p.caption }}@if (p.credit) { <span class="data"> · {{ p.credit }}</span> }</p>
+          }
+        } @else {
+          <button type="button" #fullButton class="stage__button" aria-label="View the photo full screen" title="Full screen" (click)="openFullscreen()">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" /></svg>
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="stage stage--empty"></div>
+    }
+
+    <aside class="side">
+      <header class="side__head">
+        <h2 id="viewer-title">{{ shown()?.caption || 'Photo' }}</h2>
+        <button type="button" #closeButton class="side__close" aria-label="Close the photo" (click)="close()">×</button>
+      </header>
+
+      <div class="side__body">
+        @if (picture.isLoading()) {
+          <p role="status">Loading…</p>
+        } @else if (picture.error()) {
+          <p role="alert">This photo could not be loaded.</p>
+          <button type="button" class="side__button" (click)="picture.reload()">Try again</button>
+        } @else if (shown(); as p) {
+          @if (p.status !== 'Approved') {
+            <p class="side__badge">{{ p.status === 'Pending' ? 'Waiting for approval' : 'Not accepted' }}</p>
+          }
+          <dl class="meta">
+            @if (p.credit) {
+              <dt>Credit</dt>
+              <dd>{{ p.credit }}</dd>
+            }
+            @if (p.dateTaken) {
+              <dt>Taken</dt>
+              <dd class="data">{{ p.dateTaken | date: 'd MMM y' }}</dd>
+            }
+            @if (p.addedBy) {
+              <dt>Added by</dt>
+              <dd>{{ p.addedBy }}</dd>
+            }
+            <dt>Added</dt>
+            <dd class="data">{{ p.addedUtc | date: 'd MMM y' }}</dd>
+            @if (p.lat !== null && p.lon !== null) {
+              <dt>Location</dt>
+              <dd class="data">{{ p.lat.toFixed(5) }}, {{ p.lon.toFixed(5) }}</dd>
+            }
+            <dt>Image</dt>
+            <dd class="data">{{ p.width }} × {{ p.height }} px · {{ formatBytes(p.byteSize) }} · {{ formatType(p.contentType) }}</dd>
+            @if (p.contactId !== null) {
+              <dt>Incident</dt>
+              <dd class="data">{{ p.contactId }}</dd>
+            }
+            <dt>Likes</dt>
+            <dd class="data">{{ likes(p) }}</dd>
+          </dl>
+
+          @if (message()) {
+            <p class="side__error" role="alert">{{ message() }}</p>
+          }
+          <div class="side__actions">
+            <button type="button" class="side__button" (click)="openFullscreen()">View full screen</button>
+            @if (auth.isAuthenticated() && p.status === 'Approved') {
+              <button type="button" class="side__button" [attr.aria-pressed]="liked(p)" (click)="like(p)">
+                {{ liked(p) ? '♥ Liked' : '♡ Like this photo' }}
+              </button>
+            } @else if (!auth.isAuthenticated()) {
+              <p class="side__hint"><button type="button" class="side__link" (click)="auth.login()">Sign in</button> to like a photo.</p>
+            }
+            @if (p.contactId !== null) {
+              <button type="button" class="side__button" (click)="openIncident.emit(p.contactId)">Open the incident</button>
+            }
+          </div>
+        } @else {
+          <p role="status">This photo was not found.</p>
+        }
+      </div>
+    </aside>
+  </div>
+</div>

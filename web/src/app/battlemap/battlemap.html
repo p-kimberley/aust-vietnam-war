@@ -44,7 +44,7 @@
       class="bm__flyout"
       role="tabpanel"
       [class.is-open]="flyout() !== null"
-      [class.bm__flyout--roll]="flyoutShown() === 'roll'"
+      [class.bm__flyout--roll]="flyoutShown() === 'roll' || flyoutShown() === 'pictures'"
       [attr.aria-labelledby]="flyoutShown() ? 'left-tab-' + flyoutShown() : null"
       (keydown.escape)="setFlyout(null)"
     >
@@ -54,6 +54,9 @@
         }
         @case ('roll') {
           <app-nominal-roll (closed)="setFlyout(null)" (openIncident)="openContact($event)" />
+        }
+        @case ('pictures') {
+          <app-pictures-panel (closed)="setFlyout(null)" (openPicture)="openPictureAt($event)" (added)="pictureAdded($event)" />
         }
       }
     </div>
@@ -71,10 +74,10 @@
     <div class="bm__incident">
       <app-poi-panel [poiId]="poiId" (closed)="selectPoi(null)" />
     </div>
-  } @else if (status() === 'ready' && selection.selectedPictureId(); as pictureId) {
-    <div class="bm__incident">
-      <app-picture-panel [pictureId]="pictureId" (closed)="selectPicture(null)" (openIncident)="openContact($event)" />
-    </div>
+  }
+
+  @if (status() === 'ready' && selection.selectedPictureId(); as pictureId) {
+    <app-picture-viewer [pictureId]="pictureId" (closed)="selectPicture(null)" (openIncident)="openIncidentFromPicture($event)" />
   }
 
   @if (status() === 'ready') {
@@ -179,12 +182,12 @@
                 </fieldset>
               }
 
-              @if (pictures().length) {
+              @if (mapPictures().length) {
                 <fieldset>
                   <legend>Photos</legend>
                   <label>
                     <input type="checkbox" [checked]="showPhotos()" (change)="setPhotosVisible($any($event.target).checked)" />
-                    Community photos ({{ pictures().length }})
+                    Community photos ({{ mapPictures().length }})
                   </label>
                 </fieldset>
               }
@@ -256,7 +259,7 @@
             [showHeatmap]="showHeatmap()"
             [heatField]="heatFieldName()"
             [poiTypes]="legendPoiTypes()"
-            [showPhotos]="showPhotos() && pictures().length > 0"
+            [showPhotos]="showPhotos() && mapPictures().length > 0"
             [following]="followUnits.followed().size > 0"
           />
         </div>

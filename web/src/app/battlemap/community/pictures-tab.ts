@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
-import { CommunityService, IncidentMediaView, NearbyPicture } from './community';
+import { CommunityService, IncidentMediaView, NearbyPicture, PictureRef } from './community';
 
 /** Pictures members have added to one incident, with likes, and a form to add another. */
 @Component({
@@ -33,6 +33,14 @@ import { CommunityService, IncidentMediaView, NearbyPicture } from './community'
     }
     .pic {
       margin: 0;
+    }
+    .open {
+      display: block;
+      width: 100%;
+      padding: 0;
+      background: none;
+      border: 0;
+      cursor: zoom-in;
     }
     .nearby {
       display: grid;
@@ -83,9 +91,9 @@ import { CommunityService, IncidentMediaView, NearbyPicture } from './community'
         @for (m of list; track m.id) {
           <li>
             <figure class="pic">
-              <a [href]="m.url" target="_blank" rel="noopener">
+              <button type="button" class="open" [attr.aria-label]="'View ' + (m.caption || 'this picture')" (click)="openPicture.emit({ id: m.id, lat: null, lon: null })">
                 <img [src]="m.thumbUrl" [alt]="m.caption || 'A picture of this incident'" loading="lazy" />
-              </a>
+              </button>
               <figcaption>
                 @if (m.caption) {
                   {{ m.caption }}<br />
@@ -122,7 +130,7 @@ import { CommunityService, IncidentMediaView, NearbyPicture } from './community'
       <ul class="nearby">
         @for (n of nearby(); track n.id) {
           <li>
-            <button type="button" (click)="openNearby.emit(n)">
+            <button type="button" (click)="openPicture.emit(n)">
               <img [src]="n.thumbUrl" [alt]="n.caption || 'A photo taken near this incident'" loading="lazy" />
               <span>{{ n.caption || 'Photo' }}</span>
               <span class="meta">{{ distance(n.distanceMetres) }} away</span>
@@ -148,8 +156,11 @@ import { CommunityService, IncidentMediaView, NearbyPicture } from './community'
 export class PicturesTab {
   readonly contactId = input.required<number>();
   readonly counted = output<number>();
-  /** A photo taken near the incident was chosen; the map shows it. */
-  readonly openNearby = output<NearbyPicture>();
+  /**
+   * A picture was chosen, to be shown in the picture viewer. One taken nearby comes with its place, for the map to go to; one of the
+   * incident's own does not, since the incident is already in view.
+   */
+  readonly openPicture = output<PictureRef>();
 
   protected readonly auth = inject(AuthService);
   private readonly api = inject(CommunityService);
