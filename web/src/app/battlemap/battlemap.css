@@ -68,14 +68,16 @@
  */
 .bm {
   --rail: 2.4rem;
+  /* The gap between the legend and the timeline, which the fly-outs leave above the legend too. */
+  --legend-gap: calc(0.75rem - 6px);
 }
 
 .bm__right {
   position: absolute;
   z-index: 3;
   top: calc(3rem + 12px);
-  right: 0.75rem;
-  bottom: calc(var(--timeline-h) + 0.75rem - 6px);
+  right: calc(0.75rem - 7px);
+  bottom: calc(var(--timeline-h) + var(--legend-gap));
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -157,7 +159,8 @@
   z-index: 3;
   top: calc(3rem + 12px);
   left: 2.4rem;
-  bottom: calc(var(--timeline-h) + 0.75rem);
+  /* Ends above the top of the legend, by the gap the legend leaves above the timeline (as the right-hand panel does). */
+  bottom: calc(var(--timeline-h) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
   width: min(40rem, calc(100vw - 3.15rem));
   display: flex;
   flex-direction: column;
@@ -206,7 +209,7 @@
   right: var(--rail);
   /* Ends just above the legend, as the legend's own column does: a tall panel scrolls rather than cover it. */
   /* --bottom-h, the height of the legend and the followed units, is kept up to date on the page's element (battlemap.ts). */
-  bottom: calc(var(--timeline-h) + 0.75rem - 6px + var(--bottom-h, 0px) + 0.5rem);
+  bottom: calc(var(--timeline-h) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
   width: min(18rem, calc(100vw - 3.15rem));
   display: flex;
   flex-direction: column;
