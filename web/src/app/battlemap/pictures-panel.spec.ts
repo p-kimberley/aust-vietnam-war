@@ -60,7 +60,7 @@ describe('PicturesPanel: finding pictures', () => {
     expect(searchPictures).toHaveBeenCalledWith('', 1, PICTURES_PAGE_SIZE);
     expect([...el.querySelectorAll('.hit__caption')].map(text)).toEqual(['Picture 1', 'Untitled']);
     expect(el.querySelector('.hit img')?.getAttribute('src')).toBe('/media/1-480.jpg');
-    expect(text(el.querySelector('.count'))).toBe('Showing 2 of 30 pictures');
+    expect(text(el.querySelector('.count'))).toBe('Showing 2 of 30 images');
   });
 
   it('searches once typing pauses, and only the latest search counts', async () => {
@@ -78,7 +78,7 @@ describe('PicturesPanel: finding pictures', () => {
       fixture.detectChanges();
 
       expect(searchPictures.mock.calls.map((c) => c[0])).toEqual(['', 'bunker']);
-      expect(text(el.querySelector('.count'))).toBe('1 picture');
+      expect(text(el.querySelector('.count'))).toBe('1 image');
     } finally {
       vi.useRealTimers();
     }
@@ -103,7 +103,7 @@ describe('PicturesPanel: finding pictures', () => {
   it('says when nothing matches, and when the search fails', async () => {
     const empty = mount();
     await settle(empty.fixture);
-    expect(text(empty.el.querySelector('.count'))).toBe('No pictures have been added yet.');
+    expect(text(empty.el.querySelector('.count'))).toBe('No images have been added yet.');
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const broken = mount({ searchPictures: vi.fn(() => Promise.reject(new Error('down'))) });
@@ -124,12 +124,39 @@ describe('PicturesPanel: finding pictures', () => {
   });
 });
 
+describe('PicturesPanel: switching between the list and the form', () => {
+  it('lists the images with a button to add one, and no Find button', async () => {
+    const { fixture, el } = mount();
+    await settle(fixture);
+
+    expect(text(el.querySelector('h2'))).toBe('Images');
+    expect(button(el, 'Find')).toBeUndefined();
+    expect(el.querySelector('input[type=search]')).not.toBeNull();
+    expect(button(el, 'Add an image')).toBeDefined();
+  });
+
+  it('swaps the list for the form, and back again', async () => {
+    const { fixture, el } = mount({}, { authenticated: true, roles: ['member'] });
+    await settle(fixture);
+
+    button(el, 'Add an image').click();
+    fixture.detectChanges();
+    expect(el.querySelector('form')).not.toBeNull();
+    expect(el.querySelector('input[type=search]')).toBeNull();
+
+    button(el, '← Back to the images').click();
+    fixture.detectChanges();
+    expect(el.querySelector('form')).toBeNull();
+    expect(el.querySelector('input[type=search]')).not.toBeNull();
+  });
+});
+
 describe('PicturesPanel: adding a picture', () => {
   const file = new File([new Uint8Array([1, 2, 3])], 'nui-dat.jpg', { type: 'image/jpeg' });
   async function adding(over: Record<string, unknown> = {}, roles: Role[] = ['member']) {
     const r = mount(over, { authenticated: true, roles });
     await settle(r.fixture);
-    button(r.el, 'Add a picture').click();
+    button(r.el, 'Add an image').click();
     await settle(r.fixture);
     return r;
   }
@@ -147,10 +174,10 @@ describe('PicturesPanel: adding a picture', () => {
   it('asks a visitor to sign in first', async () => {
     const { fixture, el } = mount();
     await settle(fixture);
-    button(el, 'Add a picture').click();
+    button(el, 'Add an image').click();
     await settle(fixture);
 
-    expect(text(el)).toContain('Sign in to add a picture');
+    expect(text(el)).toContain('Sign in to add an image');
     expect(el.querySelector('form')).toBeNull();
   });
 
@@ -261,10 +288,10 @@ describe('PicturesPanel: adding a picture', () => {
     placement.place.set({ lat: 10.49, lon: 107.2 });
     fixture.detectChanges();
 
-    button(el, 'Add the picture').click();
+    button(el, 'Add the image').click();
     await settle(fixture);
 
-    expect(text(el.querySelector('.sent'))).toContain('Your picture is on the map.');
+    expect(text(el.querySelector('.sent'))).toContain('Your image is on the map.');
   });
 
   it('says why a picture could not be sent, keeping what was entered', async () => {
@@ -292,21 +319,21 @@ describe('PicturesPanel: adding a picture', () => {
 describe('the pictures panel in the Battle Map fly-out', () => {
   it('flies out from its tab, and is written into the link', async () => {
     const r = await render();
-    [...r.el.querySelectorAll<HTMLButtonElement>('.bm__tabs [role=tab]')].find((t) => text(t) === 'Pictures')!.click();
+    [...r.el.querySelectorAll<HTMLButtonElement>('.bm__tabs [role=tab]')].find((t) => text(t) === 'Images')!.click();
     await settle(r.fixture);
 
     expect(r.el.querySelector('#left-flyout app-pictures-panel')).not.toBeNull();
     expect(r.el.querySelector('#left-flyout')?.classList).toContain('bm__flyout--roll');
   });
 
-  it('opens on the pictures from pictures=1', async () => {
-    const r = await render({ inputs: { pictures: '1' } });
+  it('opens on the images from images=1', async () => {
+    const r = await render({ inputs: { images: '1' } });
 
     expect(r.el.querySelector('#left-flyout app-pictures-panel')).not.toBeNull();
   });
 
   it('opens a picture chosen in the panel in the viewer, and goes to its place', async () => {
-    const r = await render({ community: { searchPictures: vi.fn(() => Promise.resolve({ items: [hit(3)], total: 1, page: 1, pageSize: 24 })) }, inputs: { pictures: '1' } });
+    const r = await render({ community: { searchPictures: vi.fn(() => Promise.resolve({ items: [hit(3)], total: 1, page: 1, pageSize: 24 })) }, inputs: { images: '1' } });
     await settle(r.fixture);
 
     r.el.querySelector<HTMLButtonElement>('app-pictures-panel .hit')!.click();
@@ -317,7 +344,7 @@ describe('the pictures panel in the Battle Map fly-out', () => {
   });
 
   it("puts an editor's picture on the map as soon as it is added, but not one waiting for approval", async () => {
-    const r = await render({ inputs: { pictures: '1' } });
+    const r = await render({ inputs: { images: '1' } });
     const panel = () => r.fixture.debugElement.query((d) => d.name === 'app-pictures-panel').componentInstance as PicturesPanel;
     const photos = r.basemaps.map.dataFor(PHOTO_SOURCE);
 

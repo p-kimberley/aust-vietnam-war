@@ -13,10 +13,11 @@ type Status = 'loading' | 'ready' | 'error';
 type Mode = 'browse' | 'add';
 
 /**
- * The community's pictures, in the panel that flies out from the left. It starts with the newest and narrows to those whose caption
- * or credit has the words typed; choosing one opens it in the picture viewer and takes the map to it.
+ * The community's images, in the panel that flies out from the left (the Images tab). It lists the newest and narrows to those whose
+ * caption or credit has the words typed; choosing one opens it in the picture viewer and takes the map to it.
  *
- * A member can add a picture here too, anywhere on the map: they choose the file, drag the pin from the panel onto the map (or put
+ * "Add an image" swaps the list for a form, and "Back to the images" swaps it back. A member can add an image anywhere on the map:
+ * they choose the file, drag the pin from the panel onto the map (or put
  * it in the middle of the view), move it about until it is right, and send it. An editor looks at it before it appears, unless they
  * are an editor themselves.
  */
@@ -26,38 +27,34 @@ type Mode = 'browse' | 'add';
   template: `
     <section class="pics" aria-labelledby="pics-title">
       <header class="head">
-        <h2 id="pics-title">Pictures</h2>
-        <button type="button" class="close" aria-label="Close the pictures" (click)="closed.emit()">×</button>
+        <h2 id="pics-title">Images</h2>
+        <button type="button" class="close" aria-label="Close the images" (click)="closed.emit()">×</button>
       </header>
-
-      <div class="modes" role="group" aria-label="Pictures">
-        <button type="button" class="mode" [attr.aria-pressed]="mode() === 'browse'" (click)="setMode('browse')">Find</button>
-        <button type="button" class="mode" [attr.aria-pressed]="mode() === 'add'" (click)="setMode('add')">Add a picture</button>
-      </div>
 
       @if (mode() === 'browse') {
         <div class="find">
+          <button type="button" class="button primary add-button" (click)="setMode('add')">Add an image</button>
           <input
             type="search"
             class="input"
             autocomplete="off"
             maxlength="100"
             placeholder="Search captions and credits"
-            aria-label="Search the pictures by caption or credit"
+            aria-label="Search the images by caption or credit"
             [value]="query()"
             (input)="onInput($any($event.target).value)"
           />
         </div>
         <p class="count data" role="status" aria-live="polite">{{ summary() }}</p>
         @if (status() === 'error') {
-          <p class="error" role="alert">The pictures could not be searched. Try again in a moment.</p>
+          <p class="error" role="alert">The images could not be searched. Try again in a moment.</p>
           <button type="button" class="button more" (click)="reload()">Try again</button>
         }
-        <ul class="grid" aria-label="Pictures found">
+        <ul class="grid" aria-label="Images found">
           @for (p of pictures(); track p.id) {
             <li>
               <button type="button" class="hit" (click)="open(p)">
-                <img [src]="p.thumbUrl" [alt]="p.caption || 'A picture'" loading="lazy" />
+                <img [src]="p.thumbUrl" [alt]="p.caption || 'An image'" loading="lazy" />
                 <span class="hit__caption">{{ p.caption || 'Untitled' }}</span>
                 @if (p.credit) {
                   <span class="hit__credit">{{ p.credit }}</span>
@@ -71,16 +68,17 @@ type Mode = 'browse' | 'add';
         }
       } @else {
         <div class="add">
+          <button type="button" class="back" (click)="setMode('browse')"><span aria-hidden="true">←</span> Back to the images</button>
           @if (!auth.isAuthenticated()) {
-            <p class="hint"><button type="button" class="link" (click)="auth.login()">Sign in</button> to add a picture.</p>
+            <p class="hint"><button type="button" class="link" (click)="auth.login()">Sign in</button> to add an image.</p>
           } @else {
             <form (submit)="$event.preventDefault(); send()">
               <label class="field">
-                <span>Picture (JPEG, PNG or WebP)</span>
+                <span>Image (JPEG, PNG or WebP)</span>
                 <input #fileInput type="file" accept="image/jpeg,image/png,image/webp" (change)="choose($any($event.target))" />
               </label>
               @if (preview(); as url) {
-                <img class="preview" [src]="url" alt="The picture chosen" />
+                <img class="preview" [src]="url" alt="The image chosen" />
               }
 
               <fieldset class="place">
@@ -101,7 +99,7 @@ type Mode = 'browse' | 'add';
                     @if (placement.place(); as at) {
                       Placed at <span class="data">{{ at.lat.toFixed(5) }}, {{ at.lon.toFixed(5) }}</span>. Drag the pin on the map to move it.
                     } @else {
-                      Drag the pin onto the map where the picture was taken, or press it to put it in the middle of the map.
+                      Drag the pin onto the map where the image was taken, or press it to put it in the middle of the map.
                     }
                   </p>
                 </div>
@@ -110,19 +108,19 @@ type Mode = 'browse' | 'add';
               <label class="field"><span>Caption</span><input class="input" type="text" maxlength="500" [value]="caption()" (input)="caption.set($any($event.target).value)" /></label>
               <label class="field"><span>Credit</span><input class="input" type="text" maxlength="200" [value]="credit()" (input)="credit.set($any($event.target).value)" /></label>
               <label class="field"><span>Date taken (optional)</span><input class="input" type="date" [value]="taken()" (input)="taken.set($any($event.target).value)" /></label>
-              <p class="hint">{{ isEditor() ? 'Pictures from editors appear at once.' : 'An editor looks at new pictures before they appear on the map.' }}</p>
+              <p class="hint">{{ isEditor() ? 'Images from editors appear at once.' : 'An editor looks at new images before they appear on the map.' }}</p>
               @if (sendError()) {
                 <p class="error" role="alert">{{ sendError() }}</p>
               }
               <div class="actions">
-                <button type="submit" class="button primary" [disabled]="!canSend()">{{ sending() ? 'Sending…' : isEditor() ? 'Add the picture' : 'Send for approval' }}</button>
+                <button type="submit" class="button primary" [disabled]="!canSend()">{{ sending() ? 'Sending…' : isEditor() ? 'Add the image' : 'Send for approval' }}</button>
                 <button type="button" class="button" [disabled]="sending()" (click)="reset()">Start again</button>
               </div>
             </form>
           }
           @if (sent(); as done) {
             <div class="sent" role="status">
-              <p>{{ done.status === 'Approved' ? 'Your picture is on the map.' : 'Thank you. Your picture will appear on the map once an editor has looked at it.' }}</p>
+              <p>{{ done.status === 'Approved' ? 'Your image is on the map.' : 'Thank you. Your image will appear on the map once an editor has looked at it.' }}</p>
               <button type="button" class="button" (click)="openPicture.emit({ id: done.id, lat: done.lat, lon: done.lon })">View it</button>
             </div>
           }
@@ -167,7 +165,7 @@ type Mode = 'browse' | 'add';
     }
     .close,
     .button,
-    .mode,
+    .back,
     .link {
       color: var(--paper);
       font: inherit;
@@ -201,23 +199,20 @@ type Mode = 'browse' | 'add';
       text-decoration: underline;
       border: 0;
     }
-    .modes {
-      display: flex;
-      gap: 0.4rem;
-      padding: 0.6rem 0.75rem 0;
-    }
-    .mode {
-      flex: 1;
-      padding: 0.3rem 0.5rem;
-      font-size: 0.85rem;
-    }
-    .mode[aria-pressed='true'] {
-      color: var(--ink);
-      background: var(--brass);
-      border-color: var(--brass);
-    }
     .find {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
       padding: 0.6rem 0.75rem 0;
+    }
+    .add-button {
+      align-self: flex-start;
+    }
+    .back {
+      align-self: flex-start;
+      margin-bottom: 0.6rem;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.85rem;
     }
     .input {
       box-sizing: border-box;
@@ -392,7 +387,7 @@ type Mode = 'browse' | 'add';
     }
     .close:focus-visible,
     .button:focus-visible,
-    .mode:focus-visible,
+    .back:focus-visible,
     .link:focus-visible,
     .hit:focus-visible,
     .pin:focus-visible,
@@ -427,14 +422,14 @@ export class PicturesPanel implements OnDestroy {
   protected readonly status = signal<Status>('loading');
   protected readonly summary = computed(() => {
     if (this.status() === 'loading' && this.pictures().length === 0) {
-      return 'Loading the pictures…';
+      return 'Loading the images…';
     }
     const total = this.total();
     const shown = this.pictures().length;
     if (total === 0) {
-      return this.status() === 'error' ? '' : this.query().trim() ? 'No pictures match.' : 'No pictures have been added yet.';
+      return this.status() === 'error' ? '' : this.query().trim() ? 'No images match.' : 'No images have been added yet.';
     }
-    return shown < total ? `Showing ${shown} of ${total} pictures` : `${total} ${total === 1 ? 'picture' : 'pictures'}`;
+    return shown < total ? `Showing ${shown} of ${total} images` : `${total} ${total === 1 ? 'image' : 'images'}`;
   });
 
   // ---- adding
@@ -571,7 +566,7 @@ export class PicturesPanel implements OnDestroy {
       this.added.emit(picture);
       this.clearForm();
     } catch (e) {
-      this.sendError.set(problemMessage(e, 'The picture could not be added.'));
+      this.sendError.set(problemMessage(e, 'The image could not be added.'));
     } finally {
       this.sending.set(false);
     }

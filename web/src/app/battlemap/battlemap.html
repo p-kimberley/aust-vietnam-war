@@ -44,7 +44,7 @@
       class="bm__flyout"
       role="tabpanel"
       [class.is-open]="flyout() !== null"
-      [class.bm__flyout--roll]="flyoutShown() === 'roll' || flyoutShown() === 'pictures'"
+      [class.bm__flyout--roll]="flyoutShown() === 'roll' || flyoutShown() === 'images'"
       [attr.aria-labelledby]="flyoutShown() ? 'left-tab-' + flyoutShown() : null"
       (keydown.escape)="setFlyout(null)"
     >
@@ -55,7 +55,7 @@
         @case ('roll') {
           <app-nominal-roll (closed)="setFlyout(null)" (openIncident)="openContact($event)" />
         }
-        @case ('pictures') {
+        @case ('images') {
           <app-pictures-panel (closed)="setFlyout(null)" (openPicture)="openPictureAt($event)" (added)="pictureAdded($event)" />
         }
       }

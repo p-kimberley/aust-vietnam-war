@@ -102,7 +102,7 @@ function centreOf(places: readonly { lon: number; lat: number }[]): { lon: numbe
  * draws a heatmap and incident markers on a MapLibre GL map. Filters run in the browser over the loaded contacts (the
  * dataset is small); only the incident-report word search goes to the server. The view is kept in the URL (`?at=`,
  * `?basemap=`, `?terrain=`, `?field=`, `?size=`, `?overlays=`, `?opacity=`, `?bases=`, `?photos=`, `?markers=`, `?heatmap=`,
- * `?incident=`, `?poi=`, `?picture=`, the tool open at the left (`?charts=`, `?roll=`, `?pictures=`) and the filter parameters described in `filters.ts`) so a link reproduces what the
+ * `?incident=`, `?poi=`, `?picture=`, the tool open at the left (`?charts=`, `?roll=`, `?images=`) and the filter parameters described in `filters.ts`) so a link reproduces what the
  * sender was looking at; every one of them is left out when it is at its default, so a plain `/battlemap` link stays short.
  */
 @Component({
@@ -148,7 +148,7 @@ export class Battlemap {
   readonly picture = input<string>();
   readonly charts = input<string>();
   readonly roll = input<string>();
-  readonly pictures = input<string>();
+  readonly images = input<string>();
   readonly track = input<string>();
   readonly follow = input<string>();
   readonly person = input<string>();
@@ -200,7 +200,7 @@ export class Battlemap {
   protected readonly leftTabs: readonly LeftTab[] = [
     { id: 'charts', label: 'Charts' },
     { id: 'roll', label: 'Nominal roll' },
-    { id: 'pictures', label: 'Pictures' },
+    { id: 'images', label: 'Images' },
   ];
   /** The tool that is flown out at the left, or `null` when none is. */
   protected readonly flyout = signal<string | null>(null);
@@ -597,7 +597,7 @@ export class Battlemap {
         this.selection.selectedPerson.set(this.person()!);
       }
 
-      const tool = this.charts() === '1' ? 'charts' : this.roll() === '1' ? 'roll' : this.pictures() === '1' ? 'pictures' : null;
+      const tool = this.charts() === '1' ? 'charts' : this.roll() === '1' ? 'roll' : this.images() === '1' ? 'images' : null;
       this.flyout.set(tool);
       this.flyoutShown.set(tool);
       this.followUnits.followed.set(followedFromLink(this.follow(), this.track(), this.contactFilter.filters().units));
@@ -797,7 +797,7 @@ export class Battlemap {
         person: this.selection.selectedPerson(),
         charts: this.flyout() === 'charts' ? '1' : null,
         roll: this.flyout() === 'roll' ? '1' : null,
-        pictures: this.flyout() === 'pictures' ? '1' : null,
+        images: this.flyout() === 'images' ? '1' : null,
         track: null,
         follow: this.followUnits.followed().size ? [...this.followUnits.followed()].sort((a, b) => a - b).join(',') : null,
         ...(tree ? toParams(this.contactFilter.filters(), tree) : {}),

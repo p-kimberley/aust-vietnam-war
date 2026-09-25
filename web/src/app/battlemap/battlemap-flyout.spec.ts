@@ -19,7 +19,7 @@ describe('the tabs and fly-out at the left', () => {
   it('has a vertical tab for each tool at the top left, and nothing flown out to begin with', async () => {
     const r = await render({ contacts: CONTACTS });
 
-    expect([...r.el.querySelectorAll('.bm__tabs [role=tab]')].map(text)).toEqual(['Charts', 'Nominal roll', 'Pictures']);
+    expect([...r.el.querySelectorAll('.bm__tabs [role=tab]')].map(text)).toEqual(['Charts', 'Nominal roll', 'Images']);
     expect(r.el.querySelector('.bm__tabs [role=tablist]')!.getAttribute('aria-orientation')).toBe('vertical');
     expect(flyout(r).classList.contains('is-open')).toBe(false);
     expect(flyout(r).getAttribute('role')).toBe('tabpanel');
