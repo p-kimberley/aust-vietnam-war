@@ -2,6 +2,7 @@ import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Feature, FeatureCollection, LineString, Point } from 'geojson';
 import type { GeoJSONSource, Map } from 'maplibre-gl';
 import { PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_IMAGES, PHOTO_POINTS } from './photo-layers';
+import { STACK_BADGES, STACK_COUNTS, stackFilter } from './photo-stacks';
 import { PHOTO_IMAGE_PREFIX } from './photo-thumbnails';
 
 export const SPIDER_SOURCE = 'avw-photos-spider';
@@ -222,7 +223,7 @@ export class PhotoSpider {
     if (this.map.getLayer(SPIDER_RING)) this.map.setFilter(SPIDER_RING, selectedFilter(id));
   }
 
-  /** Hides the markers of the spread pictures (or their group's disc) where they were, or shows them all again. */
+  /** Hides the markers of the spread pictures (or their group's disc, or their stack's badge) where they were, or shows them all again. */
   private hideOriginals(): void {
     const map = this.map;
     const single: ExpressionSpecification = ['!', ['has', 'point_count']];
@@ -231,5 +232,7 @@ export class PhotoSpider {
       this.hiddenCluster !== null ? ['all', ['has', 'point_count'], ['!=', ['get', 'cluster_id'], this.hiddenCluster]] : ['has', 'point_count'];
     for (const id of [PHOTO_POINTS, PHOTO_IMAGES]) if (map.getLayer(id)) map.setFilter(id, markers);
     for (const id of [PHOTO_CLUSTERS, PHOTO_COUNTS]) if (map.getLayer(id)) map.setFilter(id, group);
+    // A spread stack says how many it holds by being spread; its badge would only get in the way.
+    for (const id of [STACK_BADGES, STACK_COUNTS]) if (map.getLayer(id)) map.setFilter(id, stackFilter(this.ids));
   }
 }

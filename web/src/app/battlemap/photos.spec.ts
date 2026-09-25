@@ -22,6 +22,7 @@ import {
 import { PictureViewer, formatBytes, formatType } from './picture-viewer';
 import { SPIDER_IMAGES, SPIDER_RING, SPIDER_SOURCE } from './photo-spider';
 import type { FeatureCollection } from 'geojson';
+import { STACK_BADGES, STACK_COUNTS } from './photo-stacks';
 
 const text = (el: Element | null) => el?.textContent?.replace(/\s+/g, ' ').trim();
 
@@ -90,9 +91,9 @@ describe('photo layers', () => {
     addPhotoLayers(map as never, PICS, { visible: true, selectedId: null });
     addPhotoLayers(map as never, PICS, { visible: true, selectedId: null });
 
-    expect(map.addSource).toHaveBeenCalledTimes(1);
+    expect(map.addSource).toHaveBeenCalledTimes(2);                      // the pictures, and the badges on stacks of them
     expect(map.sources.get(PHOTO_SOURCE)).toMatchObject({ type: 'geojson', cluster: true });
-    expect([...map.layers.keys()]).toEqual([PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS, 'avw-photos-images', PHOTO_SELECTED]);
+    expect([...map.layers.keys()]).toEqual([PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS, 'avw-photos-images', PHOTO_SELECTED, STACK_BADGES, STACK_COUNTS]);
     expect(map.layers.get(PHOTO_CLUSTERS)!['filter']).toEqual(['has', 'point_count']);
     expect(map.layers.get(PHOTO_POINTS)!['filter']).toEqual(['!', ['has', 'point_count']]);
   });
@@ -430,6 +431,12 @@ describe('PictureViewer', () => {
 });
 
 describe('Battle Map community photos', () => {
+  /** What is drawn under the pointer: these pictures, and no stack badge. */
+  const under = (r: Awaited<ReturnType<typeof render>>, features: { properties: Record<string, unknown> }[]) =>
+    r.basemaps.map.queryRenderedFeatures.mockImplementation((_p?: unknown, o?: unknown) =>
+      (o as { layers: string[] }).layers.every((l) => l === STACK_BADGES) ? [] : features,
+    );
+
   const withPictures = { community: { mediaOnMap: vi.fn(() => Promise.resolve(PICS)) } };
 
   it('draws the placed pictures, on top of the contacts, and offers a switch with their number', async () => {
@@ -483,7 +490,7 @@ describe('Battle Map community photos', () => {
 
   it('handles one click once, though both the dot and the thumbnail answer it', async () => {
     const r = await render(withPictures);
-    r.basemaps.map.queryRenderedFeatures.mockReturnValue([{ properties: { id: 5 } }]);
+    under(r, [{ properties: { id: 5 } }]);
 
     r.basemaps.handlers.get(PHOTO_POINTS)!({ id: 5 }, { lon: 107.17, lat: 10.56 });
     r.basemaps.handlers.get(PHOTO_IMAGES)!({ id: 5 }, { lon: 107.17, lat: 10.56 });
@@ -495,7 +502,7 @@ describe('Battle Map community photos', () => {
 
   it('leaves the incident beneath a picture alone when the picture is clicked', async () => {
     const r = await render(withPictures);
-    r.basemaps.map.queryRenderedFeatures.mockReturnValue([{ properties: { id: 5 } }]);
+    under(r, [{ properties: { id: 5 } }]);
 
     r.basemaps.clickHandler!({ id: 9 }, { lon: 107.17, lat: 10.56 });
     await settle(r.fixture);
@@ -505,7 +512,7 @@ describe('Battle Map community photos', () => {
 
   it('springs apart pictures lying on top of each other, and opens the one then chosen', async () => {
     const r = await render(withPictures);
-    r.basemaps.map.queryRenderedFeatures.mockReturnValue([{ properties: { id: 5 } }, { properties: { id: 6 } }]);
+    under(r, [{ properties: { id: 5 } }, { properties: { id: 6 } }]);
 
     r.basemaps.handlers.get(PHOTO_IMAGES)!({ id: 5 }, { lon: 107.17, lat: 10.56 });
     await settle(r.fixture);
@@ -523,14 +530,15 @@ describe('Battle Map community photos', () => {
 
   it('closes up the spread pictures on a click on the empty map', async () => {
     const r = await render(withPictures);
-    r.basemaps.map.queryRenderedFeatures.mockReturnValue([{ properties: { id: 5 } }, { properties: { id: 6 } }]);
+    under(r, [{ properties: { id: 5 } }, { properties: { id: 6 } }]);
     r.basemaps.handlers.get(PHOTO_IMAGES)!({ id: 5 }, { lon: 107.17, lat: 10.56 });
     await settle(r.fixture);
 
     r.basemaps.backgroundClick!();
 
     expect(r.basemaps.map.dataFor(SPIDER_SOURCE).mock.calls.at(-1)![0]).toEqual({ type: 'FeatureCollection', features: [] });
-    expect(r.basemaps.map.setFilter).toHaveBeenLastCalledWith(PHOTO_COUNTS, ['has', 'point_count']);
+    expect(r.basemaps.map.setFilter).toHaveBeenCalledWith(PHOTO_COUNTS, ['has', 'point_count']);
+    expect(r.basemaps.map.setFilter).toHaveBeenLastCalledWith(STACK_COUNTS, ['has', 'count']);
   });
 
   it('opens the incident a picture belongs to from the viewer, closing the viewer', async () => {

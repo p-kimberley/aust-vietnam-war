@@ -2,6 +2,7 @@ import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Feature, FeatureCollection, Point } from 'geojson';
 import type { GeoJSONSource, Map } from 'maplibre-gl';
 import { IncidentMediaView } from './community/community';
+import { addStackLayers, setStackVisibility, setStacks } from './photo-stacks';
 import { PHOTO_IMAGE_PREFIX, registerPhotoThumbnails } from './photo-thumbnails';
 
 export const PHOTO_SOURCE = 'avw-photos';
@@ -170,12 +171,26 @@ export function addPhotoLayers(map: Map, pictures: readonly IncidentMediaView[],
       },
     });
   }
+
+  // Over the thumbnails: the number of pictures in each stack, on its corner.
+  addStackLayers(map, state.visible);
+}
+
+/** The pictures that have a place, with it. */
+function placed(pictures: readonly IncidentMediaView[]): { id: number; lon: number; lat: number }[] {
+  return pictures.filter((p) => p.lat !== null && p.lon !== null).map((p) => ({ id: p.id, lon: p.lon!, lat: p.lat! }));
+}
+
+/** Works out again which pictures lie on top of each other, for the badges: after a zoom, or when the pictures change. */
+export function refreshStacks(map: Map, pictures: readonly IncidentMediaView[]): void {
+  setStacks(map, placed(pictures));
 }
 
 export function setPhotoVisibility(map: Map, visible: boolean): void {
   for (const id of [PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS, PHOTO_IMAGES]) {
     if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility(visible));
   }
+  setStackVisibility(map, visible);
   if (!visible && map.getLayer(PHOTO_SELECTED)) map.setFilter(PHOTO_SELECTED, selectedFilter(null));
 }
 
@@ -196,6 +211,7 @@ export async function zoomIntoCluster(map: Map, clusterId: number, at: { lon: nu
 export function setPhotos(map: Map, pictures: readonly IncidentMediaView[]): void {
   registerPhotoThumbnails(map, pictures);
   map.getSource<GeoJSONSource>(PHOTO_SOURCE)?.setData(toPhotoGeoJson(pictures));
+  refreshStacks(map, pictures);
 }
 
 /** The pictures grouped under a numbered disc, with their places. */

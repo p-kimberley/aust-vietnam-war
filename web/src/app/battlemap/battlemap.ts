@@ -34,11 +34,13 @@ import {
   PHOTO_FULL_ZOOM,
   addPhotoLayers,
   clusterPictures,
+  refreshStacks,
   setPhotoVisibility,
   setPhotos,
   zoomIntoCluster,
 } from './photo-layers';
 import { PhotoSpider, SPIDER_IMAGES, isStack } from './photo-spider';
+import { STACK_BADGES, STACK_COUNTS, stackIds } from './photo-stacks';
 import { PicturePlacementService } from './picture-placement.service';
 import { PictureViewer } from './picture-viewer';
 import { PicturesPanel } from './pictures-panel';
@@ -299,6 +301,17 @@ export class Battlemap {
   }
   private photoClickQueued = false;
 
+  /** A stack's badge was clicked: its pictures spring apart. */
+  private stackClicked(ids: unknown): void {
+    const wanted = new Set(stackIds(ids));
+    const stack = this.mapPictures()
+      .filter((p) => wanted.has(p.id))
+      .map((p) => ({ id: p.id, lon: p.lon!, lat: p.lat! }));
+    if (stack.length > 1) {
+      this.spider?.spread(centreOf(stack), stack);
+    }
+  }
+
   /** A numbered group of pictures was clicked: pictures that all lie in one spot spring apart; a group spread wider zooms in to break it up. */
   private async clusterClicked(clusterId: number, at: { lon: number; lat: number }): Promise<void> {
     const map = this.map;
@@ -322,8 +335,11 @@ export class Battlemap {
   }
 
   /** A picture, or a spread-out one, is under the point: a click there is for the picture, not the incident or base beneath it. */
-  private pictureAt(at: { lon: number; lat: number } | undefined): boolean {
-    return !!at && this.featuresAt(at, [PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS, SPIDER_IMAGES]).length > 0;
+  private pictureAt(
+    at: { lon: number; lat: number } | undefined,
+    layers: readonly string[] = [PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS, SPIDER_IMAGES, STACK_BADGES],
+  ): boolean {
+    return !!at && this.featuresAt(at, layers).length > 0;
   }
 
   private featuresAt(at: { lon: number; lat: number }, layers: readonly string[]): { properties?: Record<string, unknown> | null }[] {
@@ -649,6 +665,7 @@ export class Battlemap {
             addTrackLayers(map, this.tracks(), this.followUnits.followed().size > 0);
             // Pictures last, so they draw over the contacts.
             addPhotoLayers(map, this.mapPictures(), { visible: this.showPhotos(), selectedId: this.selection.selectedPictureId() });
+            refreshStacks(map, this.mapPictures());
             // Spread-out pictures over everything, pictures included. A new style starts with none spread.
             this.spider ??= new PhotoSpider(map);
             this.spider.addLayers();
@@ -660,12 +677,18 @@ export class Battlemap {
               // click is the picture's alone.
               this.basemaps.bindClick(POI_POINTS, (p, at) => this.pictureAt(at) || this.selectPoi(Number(p['id'])));
               this.basemaps.bindClick(POINT_LAYER, (p, at) => this.pictureAt(at) || this.select(Number(p['id'])));
-              this.basemaps.bindClick(PHOTO_POINTS, (p, at) => this.photoClicked(Number(p['id']), at));
-              this.basemaps.bindClick(PHOTO_IMAGES, (p, at) => this.photoClicked(Number(p['id']), at));
+              this.basemaps.bindClick(PHOTO_POINTS, (p, at) => this.pictureAt(at, [STACK_BADGES]) || this.photoClicked(Number(p['id']), at));
+              this.basemaps.bindClick(PHOTO_IMAGES, (p, at) => this.pictureAt(at, [STACK_BADGES]) || this.photoClicked(Number(p['id']), at));
+              // The badge sits on a thumbnail's corner; a click on it is for the whole stack.
+              this.basemaps.bindClick(STACK_BADGES, (p) => this.stackClicked(p['ids']));
               this.basemaps.bindClick(PHOTO_CLUSTERS, (p, at) => void this.clusterClicked(Number(p['cluster_id']), at!));
               this.basemaps.bindClick(SPIDER_IMAGES, (p) => this.selectPicture(Number(p['id'])));
               // A click where none of those is under the pointer is a click on empty map.
-              this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS, SPIDER_IMAGES], () => this.clearMapSelection());
+              this.basemaps.bindBackgroundClick([POI_POINTS, POINT_LAYER, PHOTO_POINTS, PHOTO_IMAGES, PHOTO_CLUSTERS, SPIDER_IMAGES, STACK_BADGES], () =>
+                this.clearMapSelection(),
+              );
+              // Which pictures hide each other depends on the zoom, so the stack badges are worked out again when it settles.
+              map.on('zoomend', () => refreshStacks(map, this.mapPictures()));
               this.status.set('ready');
               // With no explicit view in the link and nothing else to fly to, animate to fit whatever the filters leave.
               // Deferred to after this is rendered: mapPadding reads the panels' real width, and they do not exist (the

@@ -99,7 +99,7 @@ describe('MapLegend', () => {
     expect(none.entries()).toEqual(['Nothing is switched on.']);
 
     const both = setup({ showContacts: false, showHeatmap: false, showPhotos: true, following: true });
-    expect(both.entries()).toEqual(['Community photo', 'Group of photos', 'Path of a followed unit']);
+    expect(both.entries()).toEqual(['Community photo', 'Group of photos', 'Photos on top of each other', 'Path of a followed unit']);
   });
 });
 

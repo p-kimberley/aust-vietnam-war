@@ -1,3 +1,4 @@
+import { STACK_BADGES, STACK_COUNTS } from './photo-stacks';
 import { describe, expect, it, vi } from 'vitest';
 import { render, settle } from './battlemap-testing';
 import type { IncidentMediaView } from './community/community';
@@ -76,7 +77,7 @@ describe('the photo image layer', () => {
   it('is a layer of images above the plain markers and below the ring', () => {
     const map = add();
 
-    expect([...map.layers.keys()]).toEqual([PHOTO_CLUSTERS, 'avw-photos-counts', PHOTO_POINTS, PHOTO_IMAGES, PHOTO_SELECTED]);
+    expect([...map.layers.keys()]).toEqual([PHOTO_CLUSTERS, 'avw-photos-counts', PHOTO_POINTS, PHOTO_IMAGES, PHOTO_SELECTED, STACK_BADGES, STACK_COUNTS]);
     expect(map.layers.get(PHOTO_IMAGES)).toMatchObject({ type: 'symbol', source: PHOTO_SOURCE, minzoom: 14, filter: ['!', ['has', 'point_count']] });
   });
 
