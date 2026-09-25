@@ -304,6 +304,39 @@ describe('Battle Map search', () => {
     expect(r.el.querySelector('app-poi-panel')).not.toBeNull();
   });
 
+  it('on a phone, opens the search box from the Search button with the cursor in it, and puts it away once something is picked', async () => {
+    const r = await render({});
+    const bar = r.el.querySelector('.bm__bar')!;
+    const toggle = r.el.querySelector<HTMLButtonElement>('.bm__search-toggle')!;
+    expect(toggle.getAttribute('aria-label')).toBe('Search');
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(bar.classList).not.toContain('bm__bar--search');
+
+    toggle.click();
+    await settle(r.fixture);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(bar.classList).toContain('bm__bar--search');
+    const box = r.el.querySelector<HTMLInputElement>('app-search-box input')!;
+    expect(document.activeElement).toBe(box);
+
+    box.value = 'hawk';
+    box.dispatchEvent(new Event('input', { bubbles: true }));
+    await settle(r.fixture);
+    r.el.querySelector<HTMLElement>('[role=option]')!.click();
+    await settle(r.fixture);
+
+    expect(r.el.querySelector('app-poi-panel')).not.toBeNull();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(bar.classList).not.toContain('bm__bar--search');
+  });
+
+  it('keeps the name of the link home when it shrinks to an arrow', async () => {
+    const r = await render({});
+
+    expect(text(r.el.querySelector('.bm__back'))).toBe("← Australia's Vietnam War");
+    expect(r.el.querySelector('.bm__back app-icon')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('does not show the search box until the map is ready', async () => {
     const warn = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const r = await render({ contacts: new Error('down') });

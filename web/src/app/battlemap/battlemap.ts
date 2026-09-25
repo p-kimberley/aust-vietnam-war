@@ -47,6 +47,7 @@ import { PictureViewer } from './picture-viewer';
 import { PicturesPanel } from './pictures-panel';
 import { PoiPanel } from './poi-panel';
 import { SearchBox } from './search-box';
+import { Icon } from './icon';
 import {
   HEAT_LAYER,
   MarkerSizing,
@@ -79,7 +80,7 @@ import { MapSelectionService } from './map-selection.service';
 import { MapViewStateService } from './map-view-state.service';
 import { FollowRow, Track, addTrackLayers, animateTracks, buildTracks, followedFromLink, neighbour, setTrackVisibility, setTracks } from './track';
 import { UnitFollowService } from './unit-follow.service';
-import { storedFlag } from './stored-flag';
+import { narrowScreen, storedFlag } from './stored-flag';
 
 type Status = 'loading' | 'ready' | 'error';
 type Tab = 'layers' | 'filters';
@@ -124,6 +125,7 @@ function centreOf(places: readonly { lon: number; lat: number }[]): { lon: numbe
     HonourPanel,
     FiltersPanel,
     SearchBox,
+    Icon,
     AnalyticsPanel,
     Timeline,
   ],
@@ -172,6 +174,14 @@ export class Battlemap {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
 
+  /** Shows or tucks away the search box on a phone, putting the cursor in it when it opens. */
+  protected toggleSearch(): void {
+    this.searchOpen.update((open) => !open);
+    if (this.searchOpen()) {
+      afterNextRender(() => this.searchBox()?.focus(), { injector: this.injector });
+    }
+  }
+
   private map?: MapLibreMap;
   /** Spreads out pictures that lie on top of each other, so each can be chosen. */
   private spider?: PhotoSpider;
@@ -185,9 +195,9 @@ export class Battlemap {
   protected readonly mapPictures = signal<readonly IncidentMediaView[]>([]);
   protected readonly showPhotos = signal(true);
   protected readonly tab = signal<Tab>('layers');
-  /** Whether the Layers and Filters panel is showing; the browser remembers it from one visit to the next. */
-  protected readonly panelOpen = storedFlag('battlemap.panelOpen', true);
-  protected readonly showHeatmap = signal(true);
+  /** Whether the Layers and Filters panel is showing: shut at first on a phone, so the map shows; the browser remembers it from one visit to the next. */
+  protected readonly panelOpen = storedFlag('battlemap.panelOpen', !narrowScreen());
+  protected readonly showHeatmap = signal(false);
   protected readonly showMarkers = signal(true);
   protected readonly heatField = signal<HeatField>(DEFAULT_HEAT_FIELD);
   protected readonly heatFields = HEAT_FIELDS;
@@ -209,7 +219,12 @@ export class Battlemap {
   protected readonly flyout = signal<string | null>(null);
   /** What the fly-out holds. It stays through the slide out, so the panel does not vanish before it has gone. */
   protected readonly flyoutShown = signal<string | null>(null);
+  /** One tool is being swapped for another while the fly-out is open, so its width may glide; opening or shutting it takes its width at once. */
+  protected readonly flyoutSwitching = signal(false);
   private flyoutTimer?: ReturnType<typeof setTimeout>;
+  /** On a phone the search box is tucked away under a Search button until asked for; elsewhere it always shows. */
+  protected readonly searchOpen = signal(false);
+  private readonly searchBox = viewChild(SearchBox);
   /** The operation timeline, opened from the arrow on the timeline's top edge. */
   protected readonly timelineOpen = signal(false);
   /** Play is moving the timeline's window on. */
@@ -491,6 +506,7 @@ export class Battlemap {
   /** Flies a tool out from the left, or puts it away. */
   protected setFlyout(id: string | null): void {
     clearTimeout(this.flyoutTimer);
+    this.flyoutSwitching.set(id !== null && this.flyout() !== null);
     this.flyout.set(id);
     if (id !== null) {
       this.flyoutShown.set(id);
@@ -622,7 +638,7 @@ export class Battlemap {
       this.showPois.set(this.bases() !== '0');
       this.showPhotos.set(this.photos() !== '0');
       this.showMarkers.set(this.markers() !== '0');
-      this.showHeatmap.set(this.heatmap() !== '0');
+      this.showHeatmap.set(this.heatmap() === '1');
 
       // A shared link may open straight onto an incident. Ignore ids that are not real contacts.
       const requested = Number(this.incident());
@@ -801,7 +817,7 @@ export class Battlemap {
         bases: this.showPois() ? null : '0',
         photos: this.showPhotos() ? null : '0',
         markers: this.showMarkers() ? null : '0',
-        heatmap: this.showHeatmap() ? null : '0',
+        heatmap: this.showHeatmap() ? '1' : null,
         incident: this.selection.selectedId(),
         poi: this.selection.selectedPoiId(),
         picture: this.selection.selectedPictureId(),
@@ -858,7 +874,7 @@ export class Battlemap {
     setPhotoVisibility(map, this.showPhotos());
     this.showMarkers.set(one('markers') !== '0');
     setContactVisibility(map, POINT_LAYER, this.showMarkers());
-    this.showHeatmap.set(one('heatmap') !== '0');
+    this.showHeatmap.set(one('heatmap') === '1');
     setContactVisibility(map, HEAT_LAYER, this.showHeatmap());
     const field = one('field');
     this.heatField.set(field && isHeatField(field) ? field : DEFAULT_HEAT_FIELD);

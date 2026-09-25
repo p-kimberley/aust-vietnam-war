@@ -10,6 +10,7 @@ const PATHS = {
   send: 'M22 2 11 13M22 2l-7 20-4-9-9-4z',
   refresh: 'M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6',
   'chevron-down': 'm6 9 6 6 6-6',
+  'chevron-up': 'm18 15-6-6-6 6',
   'arrow-left': 'M19 12H5M11 18l-6-6 6-6',
   x: 'M18 6 6 18M6 6l12 12',
   check: 'M20 6 9 17l-5-5',

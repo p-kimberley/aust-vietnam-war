@@ -2,7 +2,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, settle } from './battlemap-testing';
-import { STORED_FLAG_PREFIX, storedFlag } from './stored-flag';
+import { NARROW_SCREEN, STORED_FLAG_PREFIX, storedFlag } from './stored-flag';
 
 describe('storedFlag', () => {
   beforeEach(() => {
@@ -68,14 +68,48 @@ describe('the Battle Map remembers what was left shut', () => {
   it('starts the next visit with them as they were left', async () => {
     const r = await render({ stored: { [STORED_FLAG_PREFIX + 'battlemap.panelOpen']: 'false', [STORED_FLAG_PREFIX + 'battlemap.legendOpen']: 'false' } });
 
-    expect(r.el.querySelector('.panel__toggle')?.textContent?.trim()).toBe('Show');
+    expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('false');
     expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('starts a first visit with both open', async () => {
     const r = await render();
 
-    expect(r.el.querySelector('.panel__toggle')?.textContent?.trim()).toBe('Hide');
+    expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('true');
     expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('shows the panel button as an arrow that points the way it will move the panel, named for what it does', async () => {
+    const r = await render();
+    const toggle = r.el.querySelector<HTMLButtonElement>('.panel__toggle')!;
+    expect(toggle.getAttribute('aria-label')).toBe('Hide map controls');
+    expect(toggle.querySelector('app-icon path')?.getAttribute('d')).toBe('m18 15-6-6-6 6');
+
+    toggle.click();
+    await settle(r.fixture);
+
+    expect(toggle.getAttribute('aria-label')).toBe('Show map controls');
+    expect(toggle.querySelector('app-icon path')?.getAttribute('d')).toBe('m6 9 6 6 6-6');
+  });
+
+  describe('on a phone', () => {
+    beforeEach(() => {
+      vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === NARROW_SCREEN }));
+      return () => vi.unstubAllGlobals();
+    });
+
+    it('starts a first visit with both shut, so the map shows', async () => {
+      const r = await render();
+
+      expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('false');
+      expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('still opens them if they were left open', async () => {
+      const r = await render({ stored: { [STORED_FLAG_PREFIX + 'battlemap.panelOpen']: 'true', [STORED_FLAG_PREFIX + 'battlemap.legendOpen']: 'true' } });
+
+      expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('true');
+      expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('true');
+    });
   });
 });

@@ -5,12 +5,14 @@ import {
   ChartGroup,
   ChartInfo,
   ChartResult,
+  DARK,
   GROUP_LABEL,
   chartOption,
   chartTable,
   isEmpty,
 } from './analytics';
 import { EChart } from './echart';
+import { narrowScreen } from '../stored-flag';
 
 /** How long the panel waits after the filters change before asking for new figures, so dragging a slider is not a flood of requests. */
 export const REFRESH_DELAY_MS = 300;
@@ -86,7 +88,7 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
         <p class="ap__note">{{ note }}</p>
       }
 
-      @if (result() && !empty()) {
+      @if (result() && !empty() && !narrow) {
         <details class="ap__table" (toggle)="tableOpen.set($any($event.target).open)">
           <summary>Show the figures as a table</summary>
           @if (tableOpen()) {
@@ -246,6 +248,8 @@ export class AnalyticsPanel implements OnDestroy {
   protected readonly result = signal<ChartResult | null>(null);
   protected readonly error = signal('');
   protected readonly loading = signal(false);
+  /** On a phone the chart has the room to itself: no zoom slider, and no table of the figures. */
+  protected readonly narrow = narrowScreen();
   protected readonly tableOpen = signal(false);
 
   protected readonly groups = computed(() =>
@@ -258,7 +262,7 @@ export class AnalyticsPanel implements OnDestroy {
   });
   protected readonly option = computed(() => {
     const r = this.result();
-    return r && !isEmpty(r) ? chartOption(r) : null;
+    return r && !isEmpty(r) ? chartOption(r, DARK, { slider: !this.narrow }) : null;
   });
   protected readonly table = computed(() => {
     const r = this.result();

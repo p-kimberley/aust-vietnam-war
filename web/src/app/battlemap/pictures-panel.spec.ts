@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, settle } from './battlemap-testing';
 import { IncidentMediaView, PictureHit } from './community/community';
 import { communityProviders, fakeAuth, fakeCommunity } from './community/community-testing';
+import { fakeScrolling } from './load-more-testing';
 import { PHOTO_SOURCE } from './photo-layers';
 import { Place, PicturePlacementService } from './picture-placement.service';
 import { PICTURES_DELAY_MS, PICTURES_PAGE_SIZE, PicturesPanel, TIP_DELAY_MS } from './pictures-panel';
@@ -84,7 +85,8 @@ describe('PicturesPanel: finding pictures', () => {
     }
   });
 
-  it('adds the next page with Show more', async () => {
+  it('adds the next page as the end of the list is scrolled into view', async () => {
+    const scrolling = fakeScrolling();
     const searchPictures = vi
       .fn()
       .mockResolvedValueOnce({ items: [hit(1)], total: 2, page: 1, pageSize: 1 })
@@ -92,12 +94,13 @@ describe('PicturesPanel: finding pictures', () => {
     const { fixture, el } = mount({ searchPictures });
     await settle(fixture);
 
-    button(el, 'Show more').click();
+    scrolling.reachEnd();
     await settle(fixture);
 
     expect(searchPictures).toHaveBeenLastCalledWith('', 2, PICTURES_PAGE_SIZE, null);
     expect(el.querySelectorAll('.hit')).toHaveLength(2);
-    expect(button(el, 'Show more')).toBeUndefined();
+    expect(el.querySelector('.loading-more')).toBeNull();
+    vi.unstubAllGlobals();
   });
 
   it('says when nothing matches, and when the search fails', async () => {

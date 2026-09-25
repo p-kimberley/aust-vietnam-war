@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { HonourPerson, IncidentMediaView, NoteView, TributeView } from './community';
 import { communityProviders, fakeAuth, fakeCommunity } from './community-testing';
+import { fakeScrolling } from '../load-more-testing';
 import { HonourPanel } from './honour-panel';
 import { NotesTab } from './notes-tab';
 import { PeopleTab } from './people-tab';
@@ -625,18 +626,20 @@ describe('HonourPanel', () => {
     expect(auth.login).toHaveBeenCalled();
   });
 
-  it('shows more poppies a page at a time', async () => {
+  it('shows more poppies a page at a time, as the end of the list is scrolled into view', async () => {
+    const scrolling = fakeScrolling();
     const tributes = vi.fn((_sn: string, page: number) => Promise.resolve({ items: [tribute({ id: page, message: `Page ${page}` })], total: 2, page, pageSize: 1 }));
     const { fixture, el } = panel(fakeCommunity({ person: vi.fn(() => Promise.resolve(person)), tributes }));
     await settle(fixture);
     expect(el.querySelectorAll('article.card')).toHaveLength(1);
 
-    button(el, 'Show more').click();
+    scrolling.reachEnd();
     await settle(fixture);
 
     expect(tributes).toHaveBeenLastCalledWith('5715978', 2);
     expect(el.querySelectorAll('article.card')).toHaveLength(2);
-    expect(button(el, 'Show more')).toBeUndefined();
+    expect(el.querySelector('.loading-more')).toBeNull();
+    vi.unstubAllGlobals();
   });
 
   it('says so when the person cannot be found', async () => {

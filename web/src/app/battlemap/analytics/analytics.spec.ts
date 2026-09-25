@@ -4,6 +4,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CHART, CHARTS } from '../battlemap-testing';
+import { NARROW_SCREEN } from '../stored-flag';
 import {
   AnalyticsService,
   ChartInfo,
@@ -34,6 +35,13 @@ describe('chartOption', () => {
     expect(o['series'][0].data).toEqual([[utc(1966, 8, 18), 3]]);
     expect(o['dataZoom'].map((z: any) => z.type)).toEqual(['inside', 'slider']);
     expect(o['aria'].enabled).toBe(true);
+  });
+
+  it('leaves the zoom slider off when asked (on a phone), still zooming by dragging or pinching, and gives its room to the chart', () => {
+    const o = chartOption(chart(), DARK, { slider: false }) as Record<string, any>;
+
+    expect(o['dataZoom'].map((z: any) => z.type)).toEqual(['inside']);
+    expect(o['grid'].bottom).toBe(28);
   });
 
   it('stacks stacked charts, and draws bars for bar charts', () => {
@@ -252,6 +260,19 @@ describe('AnalyticsPanel', () => {
     const rows = [...el(f).querySelectorAll('tbody tr')].map((r) => [...r.children].map((c) => c.textContent?.trim()));
     expect(rows).toEqual([['1966-03-03', '3'], ['1966-03-05', '7']]);
     expect(el(f).querySelector('thead')?.textContent).toContain('Enemy killed');
+  });
+
+  it('on a phone, leaves out the table of figures', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === NARROW_SCREEN }));
+    try {
+      const f = setup();
+      await settle(f);
+
+      expect(el(f).querySelector('app-echart')).not.toBeNull();
+      expect(el(f).querySelector('details')).toBeNull();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('closes on request', async () => {

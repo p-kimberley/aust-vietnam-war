@@ -139,8 +139,11 @@ export function seriesColour(name: string, index: number, theme: ChartTheme = DA
   return theme.named[name] ?? theme.palette[index % theme.palette.length];
 }
 
-/** Turns a chart from the API into an ECharts option. Pure, so it can be tested without a browser. */
-export function chartOption(chart: ChartResult, theme: ChartTheme = DARK): ChartOption {
+/**
+ * Turns a chart from the API into an ECharts option. Pure, so it can be tested without a browser. A time chart zooms by dragging or
+ * pinching it, and also has a slider along its foot unless `slider` is false (on a phone, where the room is better spent on the chart).
+ */
+export function chartOption(chart: ChartResult, theme: ChartTheme = DARK, { slider = true }: { slider?: boolean } = {}): ChartOption {
   const stacked = chart.shape === 'StackedArea' || chart.shape === 'StackedBar';
   const bar = chart.shape === 'Bar' || chart.shape === 'StackedBar';
   const area = chart.shape === 'Area' || chart.shape === 'StackedArea';
@@ -172,7 +175,7 @@ export function chartOption(chart: ChartResult, theme: ChartTheme = DARK): Chart
       borderColor: theme.grid,
       textStyle: { color: theme.text },
     },
-    grid: { left: 8, right: 16, top: 44, bottom: chart.x === 'Time' ? 64 : 28, containLabel: true },
+    grid: { left: 8, right: 16, top: 44, bottom: chart.x === 'Time' && slider ? 64 : 28, containLabel: true },
     xAxis: {
       ...xAxis,
       name: chart.xLabel,
@@ -191,7 +194,10 @@ export function chartOption(chart: ChartResult, theme: ChartTheme = DARK): Chart
     },
     dataZoom:
       chart.x === 'Time'
-        ? [{ type: 'inside', filterMode: 'none' }, { type: 'slider', height: 18, bottom: 8, filterMode: 'none', textStyle: { color: theme.muted } }]
+        ? [
+            { type: 'inside', filterMode: 'none' },
+            ...(slider ? [{ type: 'slider', height: 18, bottom: 8, filterMode: 'none', textStyle: { color: theme.muted } }] : []),
+          ]
         : undefined,
     series: chart.series.map((s) => ({
       name: s.name,

@@ -139,6 +139,11 @@ export class SearchBox {
     this.timer = setTimeout(() => void this.run(words, seq), DELAY_MS);
   }
 
+  /** Puts the cursor in the field. */
+  focus(): void {
+    this.field()?.nativeElement.focus();
+  }
+
   /** Empties the field and puts the cursor back in it. */
   protected clear(): void {
     this.onInput('');

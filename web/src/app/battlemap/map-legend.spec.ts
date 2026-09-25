@@ -109,11 +109,17 @@ describe('the legend on the Battle Map', () => {
   const column = (r: Awaited<ReturnType<typeof render>>) => r.el.querySelector('.bm__right')!;
   const entries = (r: Awaited<ReturnType<typeof render>>) => [...r.el.querySelectorAll('.legend__list li')].map(text);
 
-  it('sits on the map once it is ready, listing what is showing', async () => {
+  it('sits on the map once it is ready, listing what is showing (the heatmap only once it is switched on)', async () => {
     const r = await render({});
 
     expect(legend(r)).not.toBeNull();
     expect(entries(r)).toEqual(expect.arrayContaining(['Contact', 'Fire Support Base', 'Landing Zone']));
+    expect(entries(r).some((e) => e?.startsWith('Heatmap:'))).toBe(false);
+  });
+
+  it('lists the heatmap once it is switched on', async () => {
+    const r = await render({ inputs: { heatmap: '1' } });
+
     expect(entries(r).some((e) => e?.startsWith('Heatmap:'))).toBe(true);
   });
 
@@ -124,7 +130,7 @@ describe('the legend on the Battle Map', () => {
   });
 
   it('follows the layers: a layer switched off loses its entries', async () => {
-    const r = await render({});
+    const r = await render({ inputs: { heatmap: '1' } });
     const box = (label: string) => [...r.el.querySelectorAll<HTMLLabelElement>('#tabpanel label')].find((l) => l.textContent?.includes(label))!.querySelector('input')!;
 
     box('Bases and landing zones').click();
@@ -136,7 +142,7 @@ describe('the legend on the Battle Map', () => {
   });
 
   it('names the heatmap field and the marker size as they are chosen', async () => {
-    const r = await render({ inputs: { field: 'enCas', size: 'frWia' } });
+    const r = await render({ inputs: { heatmap: '1', field: 'enCas', size: 'frWia' } });
 
     expect(text(r.el.querySelector('.legend__label'))).toBe('Heatmap: enemy casualties');
     expect(entries(r)).toContain('Larger for more: friendly force wounded');

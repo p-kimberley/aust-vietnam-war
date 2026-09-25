@@ -4,19 +4,48 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/assumptions-and-open-questions.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/assumptions-and-open-questions.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics-panel.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/community/community.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/community/community.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/community/honour-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/community/honour-panel.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/icon.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/icon.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/pictures-panel.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/pictures-panel.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/pictures-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/pictures-panel.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/search-box.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/search-box.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/search.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/search.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
+  </component>
   <component name="ComposerSettings">
     <execution />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1887" />
+    <option name="cachedIndexableFilesCount" value="5227" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -44,7 +73,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/p-kimberley/aust-vietnam-war.git&quot;,
-    &quot;accountId&quot;: &quot;44225489-099c-4944-b2ce-7d856f00a64c&quot;
+    &quot;accountId&quot;: &quot;28774213-5c40-4084-b068-437c77da570d&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -53,61 +82,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0526180729424632" />
-      <entry key="MS500" value="1.7870764911465713" />
-      <entry key="S2" value="2.9234029244586868" />
-      <entry key="S5" value="3.4875456071492237" />
-      <entry key="S10" value="4.013747639841583" />
-      <entry key="S30" value="8.26266169928271" />
-      <entry key="S60" value="13.288264630729175" />
-      <entry key="M2" value="17.888647111981722" />
-      <entry key="M5" value="21.773825456765334" />
-      <entry key="M10" value="23.31503238495206" />
-      <entry key="M15" value="23.860034166221165" />
-      <entry key="M30" value="24.42151271460484" />
-      <entry key="H1" value="24.70859632083592" />
-      <entry key="H2" value="24.85375384618061" />
-      <entry key="H4" value="24.92674030246077" />
-      <entry key="D1" value="24.987771029129753" />
-      <entry key="W1" value="24.99825253773052" />
+      <entry key="MS100" value="1.000001080402265" />
+      <entry key="MS500" value="1.0643781132570824" />
+      <entry key="S2" value="1.6396419533360205" />
+      <entry key="S5" value="2.3303433846029877" />
+      <entry key="S10" value="3.0040236186775138" />
+      <entry key="S30" value="4.635296445997806" />
+      <entry key="S60" value="5.810239610612905" />
+      <entry key="M2" value="6.726112338640863" />
+      <entry key="M5" value="7.438002143784712" />
+      <entry key="M10" value="7.709310148983747" />
+      <entry key="M15" value="7.803976095511711" />
+      <entry key="M30" value="7.900852726538326" />
+      <entry key="H1" value="7.950138717466453" />
+      <entry key="H2" value="7.974998200017415" />
+      <entry key="H4" value="7.994584458067607" />
+      <entry key="D1" value="21.798946823553447" />
+      <entry key="W1" value="65.90579297621565" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="9.018211619683697E-183" />
-      <entry key="MS500" value="3.899636120767763E-37" />
-      <entry key="S2" value="7.902345635983125E-10" />
-      <entry key="S5" value="2.286137820618444E-4" />
-      <entry key="S10" value="0.015119979565523373" />
-      <entry key="S30" value="0.24727700659123025" />
-      <entry key="S60" value="0.4972695512408037" />
-      <entry key="M2" value="0.7051734192670647" />
-      <entry key="M5" value="0.8695976820998237" />
-      <entry key="M10" value="0.9325222153384995" />
-      <entry key="M15" value="0.9544930954238754" />
-      <entry key="M30" value="0.9769816249161883" />
-      <entry key="H1" value="0.9884238083515535" />
-      <entry key="H2" value="0.9941950554853672" />
-      <entry key="H4" value="0.9970933032998303" />
-      <entry key="D1" value="0.9995149627774327" />
-      <entry key="W1" value="0.9999306945601375" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="7.87419418510233E-256" />
+      <entry key="M10" value="2.8060994610138665E-128" />
+      <entry key="M15" value="9.234258763416828E-86" />
+      <entry key="M30" value="3.038792319889074E-43" />
+      <entry key="H1" value="5.5125242129981375E-22" />
+      <entry key="H2" value="2.347876532741474E-11" />
+      <entry key="H4" value="4.8454891731810525E-6" />
+      <entry key="D1" value="0.13008371700053242" />
+      <entry key="W1" value="0.7472405298258957" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.003817226954989" />
-      <entry key="MS500" value="1.7730081108898037" />
-      <entry key="S2" value="2.9180506596287197" />
-      <entry key="S5" value="3.4847075961626737" />
-      <entry key="S10" value="4.018555672794943" />
-      <entry key="S30" value="8.471317550979748" />
-      <entry key="S60" value="13.74676972559052" />
-      <entry key="M2" value="18.56589857718077" />
-      <entry key="M5" value="22.629438642226994" />
-      <entry key="M10" value="24.240010652960265" />
-      <entry key="M15" value="24.80936844150989" />
-      <entry key="M30" value="25.395848350392615" />
-      <entry key="H1" value="25.69568014039129" />
-      <entry key="H2" value="25.847274614259966" />
-      <entry key="H4" value="25.923495383200763" />
-      <entry key="D1" value="25.987229471161307" />
-      <entry key="W1" value="25.998175154210855" />
+      <entry key="MS100" value="0.9138324105370463" />
+      <entry key="MS500" value="1.0450190581355232" />
+      <entry key="S2" value="1.631479737249178" />
+      <entry key="S5" value="2.325532976859351" />
+      <entry key="S10" value="3.000765612827458" />
+      <entry key="S30" value="4.6328599971317574" />
+      <entry key="S60" value="5.808299522844449" />
+      <entry key="M2" value="6.724822067373687" />
+      <entry key="M5" value="7.437379869036029" />
+      <entry key="M10" value="7.708978162312142" />
+      <entry key="M15" value="7.803749872987498" />
+      <entry key="M30" value="7.900737096681002" />
+      <entry key="H1" value="7.950080259521293" />
+      <entry key="H2" value="7.974968808613597" />
+      <entry key="H4" value="7.994574563901172" />
+      <entry key="D1" value="21.929020153048675" />
+      <entry key="W1" value="66.6530267537376" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -118,26 +147,48 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;watcher.settings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "KUBERNETES_SUPPRESS_CONFIG_CLUSTER_SUGGESTION": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "develop",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/pkimb/WebstormProjects/aust-vietnam-war/.ai/site-home-images",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Users\\pkimb\\WebstormProjects\\aust-vietnam-war\\web\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.ai\site-home-images" />
+      <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.ai" />
+      <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.ai\map-styles" />
+      <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.samples\screenshots" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.samples\elasticsearch" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-PS-243.26053.13" />
-        <option value="bundled-php-predefined-a98d8de5180a-1ec7b7818973-com.jetbrains.php.sharedIndexes-PS-243.26053.13" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-WS-262.10315.144" />
       </set>
     </attachedChunks>
   </component>
@@ -151,10 +202,28 @@
       <updated>1743286857962</updated>
       <workItem from="1743286859107" duration="316000" />
       <workItem from="1743287186146" duration="6347000" />
+      <workItem from="1789823069230" duration="1992000" />
+      <workItem from="1789826907280" duration="57186000" />
+      <workItem from="1790238719146" duration="12841000" />
+      <workItem from="1790331544884" duration="11149000" />
+      <workItem from="1790370537759" duration="2599000" />
     </task>
+    <task id="LOCAL-00001" summary="Add api as submodule">
+      <option name="closed" value="true" />
+      <created>1789815657768</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1789815657768</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add api as submodule" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add api as submodule" />
   </component>
 </project>

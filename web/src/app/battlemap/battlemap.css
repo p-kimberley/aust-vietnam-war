@@ -20,8 +20,9 @@
   display: flex;
   align-items: baseline;
   gap: 1rem;
-  padding: 0.6rem 1rem;
-  background: linear-gradient(var(--olive-900), transparent);
+  /* The shade reaches past the search box and fades out below it, so the box never sits on bare map. */
+  padding: 0.6rem 1rem 2rem;
+  background: linear-gradient(var(--olive-900), color-mix(in srgb, var(--olive-900) 75%, transparent) 60%, transparent);
   pointer-events: none;
 }
 
@@ -31,6 +32,12 @@
 
 .bm__back {
   color: var(--khaki);
+}
+
+/* The arrow and the Search button are for phones only (see the narrow-screen styles). */
+.bm__back-icon,
+.bm__search-toggle {
+  display: none;
 }
 
 .bm__title {
@@ -63,7 +70,7 @@
 .bm__right {
   position: absolute;
   z-index: 3;
-  top: 3rem;
+  top: calc(3rem + 12px);
   right: 0.75rem;
   bottom: calc(var(--timeline-h) + 0.75rem - 6px);
   display: flex;
@@ -136,14 +143,14 @@
 .bm__tabs {
   position: absolute;
   z-index: 4;
-  top: calc(3rem + 10px);
+  top: calc(3rem + 12px);
   left: 0;
 }
 
 .bm__flyout {
   position: absolute;
   z-index: 3;
-  top: calc(3rem + 10px);
+  top: calc(3rem + 12px);
   left: 2.4rem;
   bottom: calc(var(--timeline-h) + 0.75rem);
   width: min(40rem, calc(100vw - 3.15rem));
@@ -162,6 +169,16 @@
 .bm__flyout.is-open {
   transform: none;
   visibility: visible;
+  transition:
+    transform 0.25s ease,
+    visibility 0s;
+}
+
+/*
+ * The width glides only from one open tool to another. Opening, the fly-out takes the new tool's width at once: gliding from the
+ * last one's width while sliding in would reflow what is in it as it comes (the images shrinking as they arrive).
+ */
+.bm__flyout.is-open.bm__flyout--switching {
   transition:
     transform 0.25s ease,
     width 0.25s ease,
@@ -218,18 +235,89 @@
   width: min(22rem, calc(100vw - 1.5rem));
 }
 
+/*
+ * On a phone the top row is two icon buttons (home, Search) with the Layers and Filters panel beside them; the search box
+ * drops in underneath when asked for, over whatever is there. The timeline is left off, so the map has the height.
+ */
 @media (max-width: 45rem) {
+  .bm,
+  .bm--timeline-open {
+    --timeline-h: 0px;
+  }
+
+  .bm__timeline {
+    display: none;
+  }
+
   .bm__bar {
+    --bm-button: 2.7rem;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 0.6rem;
   }
 
+  .bm__bar--search {
+    z-index: 5;
+  }
+
   .bm__back,
-  .bm__title {
+  .bm__search-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: var(--bm-button);
+    height: var(--bm-button);
+    padding: 0;
+    color: var(--khaki);
+    background: color-mix(in srgb, var(--olive-900) 97%, transparent);
+    border: 1px solid var(--olive-500);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  .bm__bar--search .bm__search-toggle {
+    color: var(--smoke-yellow);
+    border-color: var(--smoke-yellow);
+  }
+
+  .bm__back-icon {
+    display: block;
+    margin: 0;
+  }
+
+  .bm__search-toggle app-icon {
+    margin: 0;
+  }
+
+  /* Still the link's name for a screen reader. */
+  .bm__back-words {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
     white-space: nowrap;
   }
 
-  .bm__back {
-    font-size: 0.85rem;
+  .bm__bar app-search-box {
+    display: none;
+  }
+
+  .bm__bar--search app-search-box {
+    display: block;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  /* The panel takes the rest of the top row, level with the two buttons. */
+  .bm__right {
+    top: 0.6rem;
+    left: calc(1rem + 2 * 2.7rem + 2 * 0.6rem);
+    align-items: stretch;
+  }
+
+  .bm__right .panel,
+  .bm__right .panel--wide {
+    width: auto;
   }
 
   .bm__title {
@@ -290,11 +378,15 @@
 }
 
 .panel__toggle {
-  padding: 0.25rem 0.5rem;
-  font-family: var(--font-body);
-  font-size: 0.8rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0.3rem;
   border: 1px solid var(--olive-500);
   border-radius: var(--radius);
+}
+
+.panel__toggle app-icon {
+  margin: 0;
 }
 
 .badge {

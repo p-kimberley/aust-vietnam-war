@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { typeName } from './poi';
 import { poiIconUrl } from './poi-icons';
-import { storedFlag } from './stored-flag';
+import { narrowScreen, storedFlag } from './stored-flag';
 
 /** The order the types of point are listed in; any other type follows. */
 const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
@@ -220,8 +220,8 @@ export class MapLegend {
   /** A unit is being followed. */
   readonly following = input(false);
 
-  /** Whether the legend is open; the browser remembers it from one visit to the next. */
-  protected readonly open = storedFlag('battlemap.legendOpen', true);
+  /** Whether the legend is open: shut at first on a phone, so the map shows; the browser remembers it from one visit to the next. */
+  protected readonly open = storedFlag('battlemap.legendOpen', !narrowScreen());
 
   protected readonly points = computed(() =>
     [...new Set(this.poiTypes())]

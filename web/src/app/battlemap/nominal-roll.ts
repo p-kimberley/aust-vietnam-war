@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, output
 import { CommunityService, HonourFacets, HonourFacetOption, HonourFilters, HonourSummary } from './community/community';
 import { HonourPanel } from './community/honour-panel';
 import { Icon } from './icon';
+import { LoadMore } from './load-more';
 
 /** How many people one request brings back, and each "Show more" adds. */
 export const ROLL_PAGE_SIZE = 20;
@@ -30,12 +31,12 @@ interface FilterList {
  */
 @Component({
   selector: 'app-nominal-roll',
-  imports: [HonourPanel, Icon],
+  imports: [HonourPanel, Icon, LoadMore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (selected(); as serviceNumber) {
       <div class="detail">
-        <button type="button" class="back" (click)="selected.set(null)"><app-icon name="arrow-left" />Back to the roll</button>
+        <button type="button" class="back" (click)="selected.set(null)"><app-icon name="arrow-left" />Back</button>
         <div class="detail__panel">
           <app-honour-panel [serviceNumber]="serviceNumber" (closed)="selected.set(null)" (openIncident)="openIncident.emit($event)" />
         </div>
@@ -102,11 +103,13 @@ interface FilterList {
               </button>
             </li>
           }
+          <!-- Inside the list, because the list is what scrolls: it comes into view only as the reader nears the end. -->
+          @if (people().length < total() && status() !== 'error') {
+            <li class="loading-more data" role="presentation" appLoadMore [busy]="status() === 'loading'" (appLoadMore)="showMore()">
+              <span role="status">{{ status() === 'loading' ? 'Loading more…' : '' }}</span>
+            </li>
+          }
         </ul>
-
-        @if (people().length < total() && status() !== 'error') {
-          <button type="button" class="more" [disabled]="status() === 'loading'" (click)="showMore()"><app-icon name="chevron-down" />Show more</button>
-        }
       </section>
     }
   `,
@@ -275,6 +278,13 @@ interface FilterList {
     .more {
       margin: 0.5rem 0.75rem 0.75rem;
       padding: 0.35rem 0.75rem;
+    }
+    /* Where the list ends: coming into view asks for the next page. */
+    .loading-more {
+      min-height: 1.5rem;
+      margin: 0.25rem 0.25rem 0.5rem;
+      color: var(--khaki);
+      font-size: 0.8rem;
     }
     .close:focus-visible,
     .back:focus-visible,

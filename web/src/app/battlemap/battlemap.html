@@ -1,11 +1,23 @@
 <div class="bm" [class.bm--timeline-open]="timelineOpen()">
   <div #canvas class="bm__canvas" role="application" aria-label="Battle Map"></div>
 
-  <header class="bm__bar">
-    <a class="bm__back" routerLink="/">← Australia's Vietnam War</a>
+  <!-- On a phone the link home shrinks to an arrow, and the search box waits under a Search button (see the narrow-screen styles). -->
+  <header class="bm__bar" [class.bm__bar--search]="searchOpen()">
+    <a class="bm__back" routerLink="/"><app-icon class="bm__back-icon" name="arrow-left" /><span class="bm__back-words"><span aria-hidden="true">← </span>Australia's Vietnam War</span></a>
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
-      <app-search-box [pois]="pois()" (pickContact)="openContact($event)" (pickPoi)="openPoi($event)" (pickPerson)="openPerson($event)" (pickNote)="openNote($event)" (pickPicture)="openPictureAt($event)" />
+      <button type="button" class="bm__search-toggle" aria-label="Search" aria-controls="bm-search" [attr.aria-expanded]="searchOpen()" (click)="toggleSearch()">
+        <app-icon name="search" />
+      </button>
+      <app-search-box
+        id="bm-search"
+        [pois]="pois()"
+        (pickContact)="searchOpen.set(false); openContact($event)"
+        (pickPoi)="searchOpen.set(false); openPoi($event)"
+        (pickPerson)="searchOpen.set(false); openPerson($event)"
+        (pickNote)="searchOpen.set(false); openNote($event)"
+        (pickPicture)="searchOpen.set(false); openPictureAt($event)"
+      />
     }
   </header>
 
@@ -44,6 +56,7 @@
       class="bm__flyout"
       role="tabpanel"
       [class.is-open]="flyout() !== null"
+      [class.bm__flyout--switching]="flyoutSwitching()"
       [class.bm__flyout--roll]="flyoutShown() === 'roll' || flyoutShown() === 'images'"
       [attr.aria-labelledby]="flyoutShown() ? 'left-tab-' + flyoutShown() : null"
       (keydown.escape)="setFlyout(null)"
@@ -124,9 +137,10 @@
               class="panel__toggle"
               [attr.aria-expanded]="panelOpen()"
               aria-controls="tabpanel"
+              [attr.aria-label]="panelOpen() ? 'Hide map controls' : 'Show map controls'"
               (click)="panelOpen.set(!panelOpen())"
             >
-              {{ panelOpen() ? 'Hide' : 'Show' }}
+              <app-icon [name]="panelOpen() ? 'chevron-up' : 'chevron-down'" />
             </button>
           </div>
 

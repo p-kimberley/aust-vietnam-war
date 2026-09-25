@@ -31,3 +31,11 @@ export function storedFlag(key: string, initial: boolean): WritableSignal<boolea
   effect(() => write(key, flag()));
   return flag;
 }
+
+/** The width below which the map is laid out for a phone (the `max-width` in battlemap.css), where panels would cover it. */
+export const NARROW_SCREEN = '(max-width: 45rem)';
+
+/** Whether the screen is phone-narrow; false where it cannot be told (jsdom has no matchMedia). */
+export function narrowScreen(): boolean {
+  return typeof globalThis.matchMedia === 'function' && globalThis.matchMedia(NARROW_SCREEN).matches;
+}

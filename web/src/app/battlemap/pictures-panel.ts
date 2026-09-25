@@ -5,6 +5,7 @@ import { problemMessage } from '../studio/studio-api';
 import { CommunityService, IncidentMediaView, PictureHit, PictureRef, PictureSort } from './community/community';
 import { PicturePlacementService } from './picture-placement.service';
 import { Icon } from './icon';
+import { LoadMore } from './load-more';
 
 /** How many pictures one request brings back, and each "Show more" adds. */
 export const PICTURES_PAGE_SIZE = 24;
@@ -27,7 +28,7 @@ type Mode = 'browse' | 'add';
  */
 @Component({
   selector: 'app-pictures-panel',
-  imports: [DatePipe, Icon],
+  imports: [DatePipe, Icon, LoadMore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="pics" aria-labelledby="pics-title">
@@ -48,7 +49,7 @@ type Mode = 'browse' | 'add';
               class="input search__input"
               autocomplete="off"
               maxlength="100"
-              placeholder="Search captions and credits"
+              placeholder="Search"
               aria-label="Search the images by caption or credit"
               [value]="query()"
               (input)="onInput($any($event.target).value)"
@@ -92,10 +93,13 @@ type Mode = 'browse' | 'add';
               </button>
             </li>
           }
+          <!-- Inside the grid, because the grid is what scrolls: it comes into view only as the reader nears the end. -->
+          @if (pictures().length < total() && status() !== 'error') {
+            <li class="loading-more" role="presentation" appLoadMore [busy]="status() === 'loading'" (appLoadMore)="showMore()">
+              <span role="status">{{ status() === 'loading' ? 'Loading more…' : '' }}</span>
+            </li>
+          }
         </ul>
-        @if (pictures().length < total() && status() !== 'error') {
-          <button type="button" class="button more" [disabled]="status() === 'loading'" (click)="showMore()"><app-icon name="chevron-down" />Show more</button>
-        }
       } @else {
         <div class="add">
           <button type="button" class="back" (click)="setMode('browse')"><app-icon name="arrow-left" />Back to the images</button>
@@ -394,6 +398,14 @@ type Mode = 'browse' | 'add';
     }
     .more {
       margin: 0.5rem 0.75rem 0.75rem;
+    }
+    /* Where the list ends: coming into view asks for the next page. */
+    .loading-more {
+      grid-column: 1 / -1;
+      min-height: 1.5rem;
+      margin: 0.25rem 0;
+      color: var(--khaki);
+      font-size: 0.8rem;
     }
     .add {
       min-height: 0;

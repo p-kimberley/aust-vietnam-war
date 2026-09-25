@@ -315,7 +315,7 @@ describe('Battlemap', () => {
   const checkboxFor = (el: HTMLElement, text: string) =>
     [...el.querySelectorAll('label')].find((l) => l.textContent?.includes(text))!.querySelector<HTMLInputElement>('input[type=checkbox]')!;
 
-  it('puts a layer switched off in the link, but leaves it out while every layer is at its default', async () => {
+  it('puts a layer switched away from its default in the link (the heatmap starts off), but leaves it out while every layer is at its default', async () => {
     const { el, fixture } = await render({});
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 
@@ -328,7 +328,7 @@ describe('Battlemap', () => {
     const params = navigate.mock.calls.at(-1)![1]!.queryParams!;
     expect(params['bases']).toBe('0');
     expect(params['markers']).toBe('0');
-    expect(params['heatmap']).toBe('0');
+    expect(params['heatmap']).toBe('1');
     expect(params['photos']).toBeNull();
 
     checkboxFor(el, 'Bases and landing zones').click();
@@ -356,11 +356,19 @@ describe('Battlemap', () => {
   });
 
   it('restores which layers are switched on from the link', async () => {
-    const { el } = await render({ inputs: { bases: '0', photos: '0', markers: '0', heatmap: '0' } });
+    const { el } = await render({ inputs: { bases: '0', photos: '0', markers: '0', heatmap: '1' } });
 
     expect(checkboxFor(el, 'Bases and landing zones').checked).toBe(false);
     expect(checkboxFor(el, 'Incident markers').checked).toBe(false);
-    expect(checkboxFor(el, 'Heatmap').checked).toBe(false);
+    expect(checkboxFor(el, 'Heatmap').checked).toBe(true);
+  });
+
+  it('starts with the heatmap off', async () => {
+    expect(checkboxFor((await render({})).el, 'Heatmap').checked).toBe(false);
+  });
+
+  it('keeps the heatmap off for an older link that switched it off', async () => {
+    expect(checkboxFor((await render({ inputs: { heatmap: '0' } })).el, 'Heatmap').checked).toBe(false);
   });
 
   it('keeps a changed overlay opacity in the link, but not one left at its configured default', async () => {

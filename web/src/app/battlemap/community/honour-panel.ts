@@ -4,11 +4,12 @@ import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, HonourPerson, TributeView } from './community';
 import { Icon } from '../icon';
+import { LoadMore } from '../load-more';
 
 /** A person on the honour roll: who they were, where they served, the incidents they are linked to, and the poppies left for them. */
 @Component({
   selector: 'app-honour-panel',
-  imports: [DatePipe, Icon],
+  imports: [DatePipe, Icon, LoadMore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './community.css',
   styles: `
@@ -167,7 +168,7 @@ import { Icon } from '../icon';
             }
           }
           @if (more()) {
-            <button type="button" (click)="loadMore()" [disabled]="busy()"><app-icon name="chevron-down" />Show more</button>
+            <p class="hint loading-more" role="status" appLoadMore [busy]="busy()" (appLoadMore)="loadMore()">{{ busy() ? 'Loading more…' : '' }}</p>
           }
         } @else {
           <p class="hint" role="status">Loading…</p>
@@ -248,6 +249,8 @@ export class HonourPanel {
       this.items.update((list) => [...list, ...next.items]);
       this.more.set(this.items().length < next.total);
     } catch (e) {
+      // Stop asking as the reader scrolls, or a failing request would be tried again and again.
+      this.more.set(false);
       this.message.set(problemMessage(e));
     } finally {
       this.busy.set(false);

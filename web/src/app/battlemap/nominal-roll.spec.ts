@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, settle } from './battlemap-testing';
 import type { HonourFacets, HonourPage, HonourPerson, HonourSummary } from './community/community';
 import { communityProviders, fakeAuth, fakeCommunity } from './community/community-testing';
+import { fakeScrolling } from './load-more-testing';
 import { NominalRoll, ROLL_DELAY_MS, ROLL_PAGE_SIZE } from './nominal-roll';
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -160,20 +161,22 @@ describe('NominalRoll', () => {
     expect(rows().map((r) => text(r.querySelector('.person__name')))).toEqual(['Fast']);
   });
 
-  it('offers more when there are more, and adds the next page to the list', async () => {
+  it('adds the next page as the end of the list is scrolled into view', async () => {
+    const scrolling = fakeScrolling();
     const honourRoll = vi.fn((_q: string, n: number) => Promise.resolve(page(n === 1 ? [summary(1), summary(2)] : [summary(3)], 3, n)));
     const { community, el, settleRoll, rows, fixture } = roll({ honourRoll });
     await settleRoll();
     expect(text(el.querySelector('.count'))).toBe('Showing 2 of 3 people');
 
-    el.querySelector<HTMLButtonElement>('.more')!.click();
+    scrolling.reachEnd();
     fixture.detectChanges();
     await settleRoll();
 
     expect(community['honourRoll']).toHaveBeenLastCalledWith('', 2, ROLL_PAGE_SIZE, NONE, false);          // a further page does not ask for the drop-down choices again
     expect(rows()).toHaveLength(3);
     expect(text(el.querySelector('.count'))).toBe('3 people');
-    expect(el.querySelector('.more')).toBeNull();
+    expect(el.querySelector('.loading-more')).toBeNull();
+    vi.unstubAllGlobals();
   });
 
   it('writes each name as a roll does, surname first, and falls back to the plain name', async () => {
@@ -330,7 +333,7 @@ describe('NominalRoll', () => {
       fixture.detectChanges();
       await settleRoll();
 
-      [...el.querySelectorAll('button')].find((b) => text(b)?.includes('Back to the roll'))!.click();
+      [...el.querySelectorAll('button')].find((b) => text(b) === 'Back')!.click();
       fixture.detectChanges();
 
       expect(el.querySelector('app-honour-panel')).toBeNull();
