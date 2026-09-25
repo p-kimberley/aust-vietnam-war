@@ -37,6 +37,13 @@ PHOTOS = [
     ('fsb-ziggy', 'Fire Support Base Ziggy.jpg', (0.55, 0.50), (0, 0, 0.05, 0.02)),
     ('long-hais-centurions', 'Isa (at the foot of the Long Hais) -Target practice for Centurion tanks.jpg', (0.40, 0.55), (0, 0, 0, 0)),
     ('hammersley', 'Op. Hammersley Feb 1970 - After the B52 strike- troops go back in..jpg', (0.50, 0.58), (0, 0, 0, 0)),
+    # Bob Ebdon's slides (2RAR Int Section, 1970) carry a typed caption below and his name in the corner: both are cut off
+    # here, and the home page shows them as the caption instead.
+    ('hootchie', '06d274e4627d5e36221e3f9d64069586a88ca04b5e8a6ad882f5e442611e649f.jpg', (0.45, 0.55), (0, 0, 0, 0.115)),
+    ('beach-apc', '2c59c574d491f3651f1942fadf3e3a8bc50b71cd51d5b03dc4cf767b258786e4.jpg', (0.60, 0.55), (0, 0, 0, 0)),
+    ('fsb-tess', '4a69185b9a6595429ae49184e86e243d024363ea903d3fd567146b495d05d54c.jpg', (0.50, 0.55), (0, 0, 0, 0.115)),
+    ('beach-armour', '569bfa6d8a0ad9682e89401c3c9fe6293c3a2263939847a176950456c79348df.jpg', (0.45, 0.55), (0, 0, 0, 0)),
+    ('chinook', '9597c1268b40df023c66f87a6c1efeaa54fae20997c93143b63db7209b0f8524.jpg', (0.35, 0.45), (0, 0, 0, 0.115)),
 ]
 
 

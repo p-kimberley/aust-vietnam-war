@@ -7,10 +7,15 @@ import { Icon } from '../battlemap/icon';
  */
 export const BACKDROPS: readonly { name: string; caption: string | null }[] = [
   { name: 'hammersley', caption: 'Operation Hammersley, February 1970: troops go back in after a B52 strike' },
+  { name: 'fsb-tess', caption: 'FSB Tess, 2RAR Intelligence Section, 1970. Photo: Bob Ebdon' },
   { name: 'patrol', caption: null },
+  { name: 'beach-armour', caption: null },
   { name: 'fsb-ziggy', caption: 'Fire Support Base Ziggy' },
+  { name: 'hootchie', caption: 'Ray Prout, C Company, shared a hootchie. 2RAR Intelligence Section, 1970. Photo: Bob Ebdon' },
   { name: 'jungle-armour', caption: null },
+  { name: 'beach-apc', caption: null },
   { name: 'long-hais-centurions', caption: 'Centurion tanks at the foot of the Long Hais' },
+  { name: 'chinook', caption: 'A Chinook with a water bag. 2RAR Intelligence Section, 1970. Photo: Bob Ebdon' },
 ];
 
 /** How long each photograph stays before the next fades in. */
@@ -18,8 +23,9 @@ export const BACKDROP_INTERVAL_MS = 10_000;
 
 /**
  * A slow carousel of photographs behind the banner: each fades into the next every ten seconds. The photographs are decoration
- * (hidden from screen readers; the captions say what they show), and a button pauses them. For a reader who has asked for
- * less motion, the first stays still until they press play. Each photograph is only fetched when it is next in line.
+ * (hidden from screen readers; the captions say what they show). Buttons step back and forward, and pause them. For a reader
+ * who has asked for less motion, the first stays still until they press play. A photograph is only fetched once it is one step
+ * away from the one showing.
  */
 @Component({
   selector: 'app-home-backdrop',
@@ -28,7 +34,7 @@ export const BACKDROP_INTERVAL_MS = 10_000;
   template: `
     <div class="bd" aria-hidden="true">
       @for (s of slides; track s.name; let i = $index) {
-        @if (i <= ready()) {
+        @if (loaded().has(i)) {
           <img
             class="bd__img"
             [class.is-on]="i === current()"
@@ -46,8 +52,14 @@ export const BACKDROP_INTERVAL_MS = 10_000;
       @if (slides[current()].caption; as caption) {
         <p class="bd__caption">{{ caption }}</p>
       }
-      <button type="button" class="bd__pause" [attr.aria-label]="paused() ? 'Play the banner photographs' : 'Pause the banner photographs'" (click)="toggle()">
+      <button type="button" class="bd__button" aria-label="Previous photograph" (click)="step(-1)">
+        <app-icon name="chevron-left" />
+      </button>
+      <button type="button" class="bd__button bd__pause" [attr.aria-label]="paused() ? 'Play the banner photographs' : 'Pause the banner photographs'" (click)="toggle()">
         <app-icon [name]="paused() ? 'play' : 'pause'" />
+      </button>
+      <button type="button" class="bd__button" aria-label="Next photograph" (click)="step(1)">
+        <app-icon name="chevron-right" />
       </button>
     </div>
   `,
@@ -93,13 +105,15 @@ export const BACKDROP_INTERVAL_MS = 10_000;
       gap: 0.6rem;
     }
     .bd__caption {
-      margin: 0;
+      flex: 1;
+      min-width: 0;
+      margin: 0 0.4rem 0 0;
       color: var(--khaki);
       font-size: 0.78rem;
       text-align: right;
       text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
     }
-    .bd__pause {
+    .bd__button {
       display: inline-grid;
       flex: none;
       place-items: center;
@@ -112,14 +126,14 @@ export const BACKDROP_INTERVAL_MS = 10_000;
       border-radius: 50%;
       cursor: pointer;
     }
-    .bd__pause:hover {
+    .bd__button:hover {
       background: rgb(31 35 20 / 0.85);
     }
-    .bd__pause:focus-visible {
+    .bd__button:focus-visible {
       outline: 2px solid var(--smoke-yellow);
       outline-offset: 2px;
     }
-    .bd__pause app-icon {
+    .bd__button app-icon {
       margin: 0;
     }
     /* On a phone the words fill the width, so the photograph is dimmed evenly behind them. */
@@ -138,8 +152,8 @@ export const BACKDROP_INTERVAL_MS = 10_000;
 export class HomeBackdrop {
   protected readonly slides = BACKDROPS;
   protected readonly current = signal(0);
-  /** The last photograph that may be fetched: the one showing and the one after it. */
-  protected readonly ready = signal(Math.min(1, BACKDROPS.length - 1));
+  /** The photographs that may be fetched: every one that has been one step from the one showing. */
+  protected readonly loaded = signal<ReadonlySet<number>>(neighbours(0));
   protected readonly paused = signal(false);
   private timer?: ReturnType<typeof setInterval>;
 
@@ -165,14 +179,28 @@ export class HomeBackdrop {
     }
   }
 
-  private start(): void {
-    clearInterval(this.timer);
-    this.timer = setInterval(() => this.next(), BACKDROP_INTERVAL_MS);
+  /** Back or forward a photograph, by hand: the next one waits its full ten seconds from here. */
+  protected step(by: 1 | -1): void {
+    this.show(this.current() + by);
+    if (!this.paused()) {
+      this.start();
+    }
   }
 
-  private next(): void {
-    const at = (this.current() + 1) % BACKDROPS.length;
-    this.current.set(at);
-    this.ready.update((r) => Math.max(r, Math.min(at + 1, BACKDROPS.length - 1)));
+  private start(): void {
+    clearInterval(this.timer);
+    this.timer = setInterval(() => this.show(this.current() + 1), BACKDROP_INTERVAL_MS);
   }
+
+  private show(index: number): void {
+    const at = (index + BACKDROPS.length) % BACKDROPS.length;
+    this.current.set(at);
+    this.loaded.update((l) => new Set([...l, ...neighbours(at)]));
+  }
+}
+
+/** A photograph and the ones either side of it, round the ends: what should be fetched while it shows. */
+function neighbours(at: number): Set<number> {
+  const n = BACKDROPS.length;
+  return new Set([at, (at + 1) % n, (at - 1 + n) % n]);
 }

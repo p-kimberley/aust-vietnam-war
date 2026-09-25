@@ -48,14 +48,36 @@ describe('the home page backdrop', () => {
     expect(showing()).toBe(0);
   });
 
-  it('fetches only the photograph showing and the next, at a size to suit the screen', async () => {
+  it('fetches only the photograph showing and the ones either side, at a size to suit the screen', async () => {
     const { settle, imgs } = await setup();
-    expect(imgs().map((i) => i.getAttribute('src'))).toEqual([`/home/${BACKDROPS[0].name}-1920.jpg`, `/home/${BACKDROPS[1].name}-1920.jpg`]);
+    const last = BACKDROPS.length - 1;
+    expect(imgs().map((i) => i.getAttribute('src'))).toEqual([0, 1, last].map((i) => `/home/${BACKDROPS[i].name}-1920.jpg`));
     expect(imgs()[0].getAttribute('srcset')).toContain('-960.jpg 960w');
 
     await vi.advanceTimersByTimeAsync(BACKDROP_INTERVAL_MS);
     await settle();
-    expect(imgs()).toHaveLength(3);
+    expect(imgs()).toHaveLength(4);
+  });
+
+  it('steps back and forward from its buttons, round the ends, and waits a full ten seconds after', async () => {
+    const { el, settle, showing } = await setup();
+    const button = (label: string) => el.querySelector<HTMLButtonElement>(`[aria-label="${label}"]`)!;
+
+    button('Previous photograph').click();
+    await settle();
+    expect(el.querySelector('img.is-on')?.getAttribute('src')).toBe(`/home/${BACKDROPS[BACKDROPS.length - 1].name}-1920.jpg`);
+
+    button('Next photograph').click();
+    button('Next photograph').click();
+    await settle();
+    expect(el.querySelector('img.is-on')?.getAttribute('src')).toBe(`/home/${BACKDROPS[1].name}-1920.jpg`);
+
+    await vi.advanceTimersByTimeAsync(BACKDROP_INTERVAL_MS - 1);
+    await settle();
+    expect(el.querySelector('img.is-on')?.getAttribute('src')).toBe(`/home/${BACKDROPS[1].name}-1920.jpg`);
+    await vi.advanceTimersByTimeAsync(1);
+    await settle();
+    expect(el.querySelector('img.is-on')?.getAttribute('src')).toBe(`/home/${BACKDROPS[2].name}-1920.jpg`);
   });
 
   it('keeps the photographs from screen readers, and pauses and plays them from a named button', async () => {
