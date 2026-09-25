@@ -67,12 +67,6 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
                 </svg>
                 <span>Community photo</span>
               </li>
-              <li>
-                <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" fill="#e6ddb8" stroke="#22251a" stroke-width="2" />
-                </svg>
-                <span>Group of photos</span>
-              </li>
             }
             @if (following()) {
               <li>
