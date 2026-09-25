@@ -3,7 +3,7 @@
 
   <!-- On a phone the link home shrinks to an arrow, and the search box waits under a Search button (see the narrow-screen styles). -->
   <header class="bm__bar" [class.bm__bar--search]="searchOpen()">
-    <a class="bm__back" routerLink="/"><app-icon class="bm__back-icon" name="arrow-left" /><span class="bm__back-words"><span aria-hidden="true">← </span>Australia's Vietnam War</span></a>
+    <a class="bm__back" routerLink="/" aria-label="Back to Australia's Vietnam War"><app-icon class="bm__back-icon" name="arrow-left" /><span class="bm__back-words"><span aria-hidden="true">← </span>Back</span></a>
     <h1 class="bm__title">Battle Map</h1>
     @if (status() === 'ready') {
       <button type="button" class="bm__search-toggle" aria-label="Search" aria-controls="bm-search" [attr.aria-expanded]="searchOpen()" (click)="toggleSearch()">

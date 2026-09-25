@@ -209,7 +209,7 @@
 
 /*
  * MapLibre stacks a corner's controls one above another by default; this turns bottom-left into a single row instead,
- * bottom-aligned, so attribution sits level with (and to the right of) the tilt control at the foot of the navigation
+ * bottom-aligned, so the scale sits level with (and to the right of) the tilt control at the foot of the navigation
  * group, rather than stacked beneath the whole thing.
  */
 :host ::ng-deep .maplibregl-ctrl-bottom-left {

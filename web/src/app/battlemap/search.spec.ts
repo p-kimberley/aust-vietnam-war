@@ -330,10 +330,11 @@ describe('Battle Map search', () => {
     expect(bar.classList).not.toContain('bm__bar--search');
   });
 
-  it('keeps the name of the link home when it shrinks to an arrow', async () => {
+  it('shows the link home as Back, named in full for a screen reader, and keeps that name when it shrinks to an arrow', async () => {
     const r = await render({});
 
-    expect(text(r.el.querySelector('.bm__back'))).toBe("← Australia's Vietnam War");
+    expect(text(r.el.querySelector('.bm__back'))).toBe('← Back');
+    expect(r.el.querySelector('.bm__back')?.getAttribute('aria-label')).toBe("Back to Australia's Vietnam War");
     expect(r.el.querySelector('.bm__back app-icon')?.getAttribute('aria-hidden')).toBe('true');
   });
 
