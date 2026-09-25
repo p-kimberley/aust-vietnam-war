@@ -123,15 +123,9 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
             return CmsResult<IncidentMediaView>.Fail(CmsError.NotFound, "There is no such incident.");
         }
 
-        DateOnly? taken = null;
-        if (!string.IsNullOrWhiteSpace(dateTaken))
+        if (!TryParseTaken(dateTaken, out var taken))
         {
-            if (!DateOnly.TryParseExact(dateTaken.Trim(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var parsed))
-            {
-                return CmsResult<IncidentMediaView>.Invalid("dateTaken", "Give the date as year-month-day, for example 1966-08-18.");
-            }
-
-            taken = parsed;
+            return CmsResult<IncidentMediaView>.Invalid("dateTaken", "Give the date as year-month-day, for example 1966-08-18.");
         }
 
         var uploaded = await media.UploadAsync(file, PlainText.Clean(caption), PlainText.Clean(credit), new Actor(person.Id, person.IsEditor), ct);
@@ -160,6 +154,80 @@ public sealed class IncidentMediaService(AvwDbContext db, MediaService media, IC
         }
 
         return await ViewAsync(link.Id, person, ct);
+    }
+
+    /// <summary>
+    /// Adds a picture at a place on the map chosen by whoever uploads it, belonging to no incident. It waits for an editor like any other
+    /// picture (an editor's own is public at once). Uploading the same file again for no incident returns the picture already there.
+    /// </summary>
+    public async Task<CmsResult<IncidentMediaView>> PlaceAsync(Stream file, string? caption, string? credit, string? dateTaken, string? lat, string? lon, Person person, CancellationToken ct)
+    {
+        if (!TryParseDegrees(lat, 90, out var latitude) || !TryParseDegrees(lon, 180, out var longitude))
+        {
+            return CmsResult<IncidentMediaView>.Invalid("place", "Put the picture somewhere on the map.");
+        }
+
+        if (!TryParseTaken(dateTaken, out var taken))
+        {
+            return CmsResult<IncidentMediaView>.Invalid("dateTaken", "Give the date as year-month-day, for example 1966-08-18.");
+        }
+
+        var uploaded = await media.UploadAsync(file, PlainText.Clean(caption), PlainText.Clean(credit), new Actor(person.Id, person.IsEditor), ct);
+        if (!uploaded.Ok)
+        {
+            return CmsResult<IncidentMediaView>.Fail(uploaded.Error, uploaded.Message ?? "The picture could not be added.", uploaded.Field);
+        }
+
+        var mediaId = uploaded.Value!.Id;
+        var link = await db.IncidentMedia.FirstOrDefaultAsync(m => m.ContactId == null && m.MediaId == mediaId, ct);
+        if (link is null)
+        {
+            link = new IncidentMedia
+            {
+                MediaId = mediaId, AttachedById = person.Id, DateTaken = taken, Lat = latitude, Lon = longitude, CreatedUtc = clock.GetUtcNow().UtcDateTime,
+            };
+            db.IncidentMedia.Add(link);
+            await db.SaveChangesAsync(ct);
+            if (uploaded.Value.Status == MediaStatus.Pending)
+            {
+                var at = FormattableString.Invariant($"{latitude:0.#####},{longitude:0.#####}");
+                notifier.Notify(new Notification("A picture is waiting for approval (placed on the map)", $"{person.Name} placed a picture on the map at {at}.\n\nPicture: {{site}}/battlemap?picture={link.Id}\nModerate it in the Studio: {{site}}/studio/moderation"));
+            }
+        }
+
+        return await ViewAsync(link.Id, person, ct);
+    }
+
+    /// <summary>A date the picture was taken, as year-month-day; nothing given is no date, and anything else is refused.</summary>
+    private static bool TryParseTaken(string? text, out DateOnly? taken)
+    {
+        taken = null;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return true;
+        }
+
+        if (!DateOnly.TryParseExact(text.Trim(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var parsed))
+        {
+            return false;
+        }
+
+        taken = parsed;
+        return true;
+    }
+
+    /// <summary>A latitude or longitude in decimal degrees, no further from zero than <paramref name="limit"/>, rounded to six places (about 10 cm).</summary>
+    private static bool TryParseDegrees(string? text, double limit, out double degrees)
+    {
+        degrees = 0;
+        if (!double.TryParse(text?.Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var parsed)
+            || !double.IsFinite(parsed) || Math.Abs(parsed) > limit)
+        {
+            return false;
+        }
+
+        degrees = Math.Round(parsed, 6);
+        return true;
     }
 
     /// <summary>Takes a picture off an incident (the file stays in the library). The person who added it, or an editor, may.</summary>

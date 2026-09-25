@@ -284,6 +284,86 @@ public sealed class CommunityEndpointTests : IDisposable
         Assert.NotEqual(HttpStatusCode.Created, anonymous.StatusCode);
     }
 
+    private HttpRequestMessage PlaceRequest(long uid, byte[] bytes, string? lat, string? lon, string role = "member", string? caption = "Nui Dat from the air")
+    {
+        var form = new MultipartFormDataContent();
+        var file = new ByteArrayContent(bytes);
+        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        form.Add(file, "file", "photo.jpg");
+        foreach (var (name, value) in new[] { ("caption", caption), ("lat", lat), ("lon", lon) })
+        {
+            if (value is not null)
+            {
+                form.Add(new StringContent(value), name);
+            }
+        }
+
+        var req = Req(HttpMethod.Post, "/api/community-media", role, uid);
+        req.Content = form;
+        return req;
+    }
+
+    [Fact]
+    public async Task A_picture_placed_anywhere_on_the_map_belongs_to_no_incident_and_waits_for_approval()
+    {
+        var up = await Read<IncidentMediaView>(await Http().SendAsync(PlaceRequest(1, TestImages.Jpeg(), "10.4961234", "107.2023456")), HttpStatusCode.Created);
+
+        Assert.Equal((null, 10.496123, 107.202346, MediaStatus.Pending, true), (up.ContactId, up.Lat, up.Lon, up.Status, up.Mine));
+        Assert.Contains("placed a picture", Assert.Single(_notifier.Sent).Body);
+        Assert.Empty(await Read<List<IncidentMediaView>>(await Anon("/api/community-media?minLat=10&minLon=107&maxLat=11&maxLon=108")));
+        Assert.Equal(HttpStatusCode.OK, (await As(1, HttpMethod.Get, $"/api/incident-media/{up.Id}")).StatusCode);       // its uploader can see it
+
+        await As(3, HttpMethod.Post, $"/api/studio/media/{up.MediaId}/status", new MediaStatusRequest(MediaStatus.Approved));
+        Assert.Equal(up.Id, Assert.Single(await Read<List<IncidentMediaView>>(await Anon("/api/community-media?minLat=10&minLon=107&maxLat=11&maxLon=108"))).Id);
+    }
+
+    [Fact]
+    public async Task Placing_the_same_file_twice_returns_the_first_picture()
+    {
+        var bytes = TestImages.Jpeg(640, 480);
+        var first = await Read<IncidentMediaView>(await Http().SendAsync(PlaceRequest(3, bytes, "10.5", "107.2", "editor")), HttpStatusCode.Created);
+        var again = await Read<IncidentMediaView>(await Http().SendAsync(PlaceRequest(3, bytes, "11", "108", "editor")), HttpStatusCode.Created);
+
+        Assert.Equal((first.Id, 10.5, 107.2), (again.Id, again.Lat, again.Lon));
+    }
+
+    [Theory]
+    [InlineData(null, "107.2")]
+    [InlineData("10.5", null)]
+    [InlineData("91", "107.2")]
+    [InlineData("10.5", "-180.5")]
+    [InlineData("north", "107.2")]
+    [InlineData("NaN", "107.2")]
+    public async Task Refuses_a_placed_picture_without_a_real_place(string? lat, string? lon)
+    {
+        var res = await Http().SendAsync(PlaceRequest(1, TestImages.Jpeg(), lat, lon));
+
+        Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+        Assert.Equal("place", JsonDocument.Parse(await res.Content.ReadAsStringAsync()).RootElement.GetProperty("field").GetString());
+    }
+
+    [Fact]
+    public async Task Only_a_member_can_place_a_picture() =>
+        Assert.NotEqual(HttpStatusCode.Created, (await Http().SendAsync(PlaceRequest(0, TestImages.Jpeg(), "10.5", "107.2", role: null!))).StatusCode);
+
+    [Fact]
+    public async Task Pages_through_approved_pictures_newest_first_or_by_the_words_of_their_captions()
+    {
+        SeedPlacedPictures();
+
+        var all = await Read<PicturePage>(await Anon("/api/community-media/search?pageSize=2"));
+        Assert.Equal((4, 2), (all.Total, all.Items.Count));
+        Assert.Equal("No incident", all.Items[0].Caption);
+        var second = await Read<PicturePage>(await Anon("/api/community-media/search?pageSize=2&page=2"));
+        Assert.Equal(2, second.Items.Count);
+        Assert.Empty(all.Items.Select(i => i.Id).Intersect(second.Items.Select(i => i.Id)));
+
+        var track = await Read<PicturePage>(await Anon("/api/community-media/search?q=track"));
+        Assert.Equal("On the track", Assert.Single(track.Items).Caption);
+        Assert.Equal(1, track.Total);
+        Assert.Equal(HttpStatusCode.BadRequest, (await Anon("/api/community-media/search?q=" + new string('x', 101))).StatusCode);
+    }
+
     private void SeedPlacedPictures()
     {
         Seed();

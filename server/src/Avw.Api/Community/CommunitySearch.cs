@@ -13,6 +13,9 @@ public sealed record NoteHit(long Id, int ContactId, string Title, IReadOnlyList
 
 public sealed record PictureHit(long Id, int? ContactId, string ThumbUrl, string? Caption, string? Credit, double? Lat, double? Lon);
 
+/// <summary>One page of approved pictures, for the map's picture panel.</summary>
+public sealed record PicturePage(IReadOnlyList<PictureHit> Items, int Total, int Page, int PageSize);
+
 public sealed record CommunitySearchResult(IReadOnlyList<NoteHit> Notes, int NoteTotal, IReadOnlyList<PictureHit> Pictures, int PictureTotal);
 
 /// <summary>
@@ -199,6 +202,36 @@ public sealed class CommunitySearch(AvwDbContext db)
             [.. pictures.Select(p => new PictureHit(p.Id, p.ContactId, MediaPaths.ThumbnailUrl(p.Sha256), p.Caption, p.Credit, p.Lat, p.Lon))], pictureTotal);
     }
 
+    public const int MaxPageSize = 48;
+
+    /// <summary>
+    /// Approved pictures a page at a time: those whose caption or credit has every word typed, best match first, or with nothing typed,
+    /// all of them, newest first.
+    /// </summary>
+    public async Task<PicturePage> PicturePageAsync(string? text, int page, int pageSize, CancellationToken ct)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, MaxPageSize);
+        var skip = (page - 1) * pageSize;
+        var terms = SearchTerms.Parse(text);
+        List<PictureRow> rows;
+        int total;
+        if (terms.IsEmpty)
+        {
+            var approved = db.IncidentMedia.AsNoTracking().Where(m => m.Media.Status == MediaStatus.Approved);
+            total = await approved.CountAsync(ct);
+            rows = await approved.OrderByDescending(m => m.CreatedUtc).ThenByDescending(m => m.Id).Skip(skip).Take(pageSize)
+                .Select(m => new PictureRow { Id = m.Id, ContactId = m.ContactId, Sha256 = m.Media.Sha256, Caption = m.Media.Caption, Credit = m.Media.Credit, Lat = m.Lat, Lon = m.Lon })
+                .ToListAsync(ct);
+        }
+        else
+        {
+            (rows, total) = db.Database.IsRelational() ? await PicturesInMySqlAsync(terms, pageSize, ct, skip) : await PicturesInMemoryAsync(terms, pageSize, ct, skip);
+        }
+
+        return new PicturePage([.. rows.Select(p => new PictureHit(p.Id, p.ContactId, MediaPaths.ThumbnailUrl(p.Sha256), p.Caption, p.Credit, p.Lat, p.Lon))], total, page, pageSize);
+    }
+
     // ---------------------------------------------------------------- MySQL
 
     private async Task<(List<NoteRow>, int)> NotesInMySqlAsync(SearchTerms terms, int limit, CancellationToken ct)
@@ -221,7 +254,7 @@ public sealed class CommunitySearch(AvwDbContext db)
         return (rows, total);
     }
 
-    private async Task<(List<PictureRow>, int)> PicturesInMySqlAsync(SearchTerms terms, int limit, CancellationToken ct)
+    private async Task<(List<PictureRow>, int)> PicturesInMySqlAsync(SearchTerms terms, int limit, CancellationToken ct, int skip = 0)
     {
         var q = terms.Boolean;
         var approved = MediaStatus.Approved.ToString();
@@ -231,7 +264,7 @@ public sealed class CommunitySearch(AvwDbContext db)
             JOIN incident_media m ON m.MediaId = a.Id
             WHERE a.Status = {approved} AND MATCH(a.Caption, a.Credit) AGAINST ({q} IN BOOLEAN MODE)
             ORDER BY MATCH(a.Caption, a.Credit) AGAINST ({q} IN BOOLEAN MODE) DESC, m.Id
-            LIMIT {limit}
+            LIMIT {limit} OFFSET {skip}
             """).ToListAsync(ct);
         var total = await db.Database.SqlQuery<int>($"""
             SELECT COUNT(*) AS `Value`
@@ -255,11 +288,11 @@ public sealed class CommunitySearch(AvwDbContext db)
         return ([.. hits.Take(limit).Select(x => new NoteRow { Id = x.Note.Id, ContactId = x.Note.ContactId, Title = x.Version.Title, Body = x.Version.Body, AuthorName = x.Note.AuthorName, CreatedUtc = x.Note.CreatedUtc })], hits.Count);
     }
 
-    private async Task<(List<PictureRow>, int)> PicturesInMemoryAsync(SearchTerms terms, int limit, CancellationToken ct)
+    private async Task<(List<PictureRow>, int)> PicturesInMemoryAsync(SearchTerms terms, int limit, CancellationToken ct, int skip = 0)
     {
         var links = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).Where(m => m.Media.Status == MediaStatus.Approved).ToListAsync(ct);
         var hits = links.Where(m => terms.Matches(m.Media.Caption + " " + m.Media.Credit)).OrderBy(m => m.Id).ToList();
-        return ([.. hits.Take(limit).Select(m => new PictureRow { Id = m.Id, ContactId = m.ContactId, Sha256 = m.Media.Sha256, Caption = m.Media.Caption, Credit = m.Media.Credit, Lat = m.Lat, Lon = m.Lon })], hits.Count);
+        return ([.. hits.Skip(skip).Take(limit).Select(m => new PictureRow { Id = m.Id, ContactId = m.ContactId, Sha256 = m.Media.Sha256, Caption = m.Media.Caption, Credit = m.Media.Credit, Lat = m.Lat, Lon = m.Lon })], hits.Count);
     }
 }
 

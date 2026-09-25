@@ -216,24 +216,10 @@ public static class CommunityEndpoints
                     return Forbidden();
                 }
 
-                if (!ctx.Request.HasFormContentType)
+                var (form, refused) = await ReadPictureFormAsync(ctx, ct);
+                if (form is null)
                 {
-                    return Results.Problem(detail: "Send the picture as a multipart form.", statusCode: StatusCodes.Status415UnsupportedMediaType);
-                }
-
-                IFormCollection form;
-                try
-                {
-                    form = await ctx.Request.ReadFormAsync(ct);
-                }
-                catch (InvalidDataException)
-                {
-                    return Results.Problem(detail: "That file is too large.", statusCode: StatusCodes.Status413PayloadTooLarge, extensions: new Dictionary<string, object?> { ["field"] = "file" });
-                }
-
-                if (form.Files.Count != 1)
-                {
-                    return Results.Problem(detail: "Send exactly one picture.", statusCode: StatusCodes.Status400BadRequest, extensions: new Dictionary<string, object?> { ["field"] = "file" });
+                    return refused!;
                 }
 
                 await using var stream = form.Files[0].OpenReadStream();
@@ -242,6 +228,45 @@ public static class CommunityEndpoints
             .DisableAntiforgery()
             .RequireAuthorization(Policies.Member).RequireRateLimiting(MediaEndpoints.UploadPolicy)
             .WithName("AddIncidentMedia").Accepts<IFormFile>("multipart/form-data").Produces<IncidentMediaView>(StatusCodes.Status201Created);
+
+        // A picture put anywhere on the map, belonging to no incident: the form carries its place as `lat` and `lon` in decimal degrees.
+        g.MapPost("/community-media", async (HttpContext ctx, IncidentMediaService media, ClaimsPrincipal user, CancellationToken ct) =>
+            {
+                if (Person.From(user) is not { } person)
+                {
+                    return Forbidden();
+                }
+
+                var (form, refused) = await ReadPictureFormAsync(ctx, ct);
+                if (form is null)
+                {
+                    return refused!;
+                }
+
+                await using var stream = form.Files[0].OpenReadStream();
+                return CmsEndpoints.Respond(await media.PlaceAsync(stream, form["caption"], form["credit"], form["dateTaken"], form["lat"], form["lon"], person, ct), created: true);
+            })
+            .DisableAntiforgery()
+            .RequireAuthorization(Policies.Member).RequireRateLimiting(MediaEndpoints.UploadPolicy)
+            .WithName("PlaceCommunityMedia").Accepts<IFormFile>("multipart/form-data").Produces<IncidentMediaView>(StatusCodes.Status201Created);
+
+        // Approved pictures a page at a time, for the map's picture panel: those matching the words typed, or with none, the newest.
+        g.MapGet("/community-media/search", async (string? q, int? page, int? pageSize, CommunitySearch search, HttpContext ctx, CancellationToken ct) =>
+            {
+                var text = q?.Trim() ?? "";
+                if (text.Length > MapEndpoints.MaxSearchLength)
+                {
+                    return Results.ValidationProblem(new Dictionary<string, string[]> { ["q"] = [$"Search text must be at most {MapEndpoints.MaxSearchLength} characters."] });
+                }
+
+                ctx.Response.Headers.CacheControl = "public, max-age=60";
+                return Results.Ok(await search.PicturePageAsync(text, page ?? 1, pageSize ?? 24, ct));
+            })
+            .RequireRateLimiting(CommunitySearchPolicy)
+            .WithName("SearchCommunityMedia")
+            .Produces<PicturePage>()
+            .ProducesValidationProblem()
+            .Produces(StatusCodes.Status429TooManyRequests);
 
         // One picture as the viewer sees it, for the map's picture panel. Per person (their like), so never cached.
         g.MapGet("/incident-media/{id:long}", async (long id, IncidentMediaService media, ClaimsPrincipal user, HttpContext ctx, CancellationToken ct) =>
@@ -270,6 +295,32 @@ public static class CommunityEndpoints
                 Person.From(user) is { } person ? CmsEndpoints.Respond(await media.ToggleLikeAsync(id, person, ct)) : Forbidden())
             .RequireAuthorization(Policies.Member).RequireRateLimiting(WritePolicy)
             .WithName("ToggleMediaLike").Produces<LikeResult>();
+    }
+
+    /// <summary>Reads a form carrying one picture, or says why it cannot be read.</summary>
+    private static async Task<(IFormCollection? Form, IResult? Refused)> ReadPictureFormAsync(HttpContext ctx, CancellationToken ct)
+    {
+        if (!ctx.Request.HasFormContentType)
+        {
+            return (null, Results.Problem(detail: "Send the picture as a multipart form.", statusCode: StatusCodes.Status415UnsupportedMediaType));
+        }
+
+        IFormCollection form;
+        try
+        {
+            form = await ctx.Request.ReadFormAsync(ct);
+        }
+        catch (InvalidDataException)
+        {
+            return (null, Results.Problem(detail: "That file is too large.", statusCode: StatusCodes.Status413PayloadTooLarge, extensions: new Dictionary<string, object?> { ["field"] = "file" }));
+        }
+
+        if (form.Files.Count != 1)
+        {
+            return (null, Results.Problem(detail: "Send exactly one picture.", statusCode: StatusCodes.Status400BadRequest, extensions: new Dictionary<string, object?> { ["field"] = "file" }));
+        }
+
+        return (form, null);
     }
 
     // ---------------------------------------------------------------- honour roll
