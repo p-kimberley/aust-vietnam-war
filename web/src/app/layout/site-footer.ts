@@ -30,7 +30,7 @@ import { SiteNav } from '../content/content';
       color: var(--khaki);
       border-top: 4px solid var(--brass);
       margin-top: 4rem;
-      padding-block: 1.5rem;
+      padding-block: 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
       font-size: 0.9rem;
     }
     .foot__inner {

@@ -21,7 +21,7 @@
   align-items: baseline;
   gap: 1rem;
   /* The shade reaches past the search box and fades out below it, so the box never sits on bare map. */
-  padding: 0.6rem 1rem 2rem;
+  padding: calc(0.6rem + var(--safe-top)) calc(1rem + var(--safe-right)) 2rem calc(1rem + var(--safe-left));
   background: linear-gradient(var(--olive-900), color-mix(in srgb, var(--olive-900) 75%, transparent) 60%, transparent);
   pointer-events: none;
 }
@@ -68,6 +68,14 @@
  */
 .bm {
   --rail: 2.4rem;
+  /*
+   * The room the device keeps at its edges (the notch, the status bar and the home indicator of a phone run as an installed app,
+   * where the page reaches the screen's edges: viewport-fit=cover in index.html). Zero in a browser tab and on a desktop.
+   */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
   /* The gap between the legend and the timeline, which the fly-outs leave above the legend too. */
   --legend-gap: calc(0.75rem - 6px);
 }
@@ -75,9 +83,9 @@
 .bm__right {
   position: absolute;
   z-index: 3;
-  top: calc(3rem + 12px);
-  right: calc(0.75rem - 7px);
-  bottom: calc(var(--timeline-h) + var(--legend-gap));
+  top: calc(3rem + 12px + var(--safe-top));
+  right: calc(0.75rem - 7px + var(--safe-right));
+  bottom: calc(var(--timeline-h) + var(--safe-bottom) + var(--legend-gap));
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -143,24 +151,27 @@
   left: 0;
   right: 0;
   bottom: 0;
+  /* Stands on the home indicator's room, not under it. */
+  box-sizing: content-box;
   height: var(--timeline-h);
+  padding-bottom: var(--safe-bottom);
 }
 
 /* The rail of tabs at the top left, and the panel that flies out from beside it. */
 .bm__tabs {
   position: absolute;
   z-index: 4;
-  top: calc(3rem + 12px);
-  left: 0;
+  top: calc(3rem + 12px + var(--safe-top));
+  left: var(--safe-left);
 }
 
 .bm__flyout {
   position: absolute;
   z-index: 3;
-  top: calc(3rem + 12px);
-  left: 2.4rem;
+  top: calc(3rem + 12px + var(--safe-top));
+  left: calc(2.4rem + var(--safe-left));
   /* Runs down to the timeline: the legend is across the map at the right. (On a phone, where it is not, it ends above the legend.) */
-  bottom: calc(var(--timeline-h) + 0.75rem);
+  bottom: calc(var(--timeline-h) + var(--safe-bottom) + 0.75rem);
   width: min(40rem, calc(100vw - 3.15rem));
   display: flex;
   flex-direction: column;
@@ -198,18 +209,18 @@
 .bm__rtabs {
   position: absolute;
   z-index: 5;
-  top: calc(3rem + 12px);
-  right: 0;
+  top: calc(3rem + 12px + var(--safe-top));
+  right: var(--safe-right);
 }
 
 .bm__rflyout {
   position: absolute;
   z-index: 4;
-  top: calc(3rem + 12px);
-  right: var(--rail);
+  top: calc(3rem + 12px + var(--safe-top));
+  right: calc(var(--rail) + var(--safe-right));
   /* Ends just above the legend, as the legend's own column does: a tall panel scrolls rather than cover it. */
   /* --bottom-h, the height of the legend and the followed units, is kept up to date on the page's element (battlemap.ts). */
-  bottom: calc(var(--timeline-h) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
+  bottom: calc(var(--timeline-h) + var(--safe-bottom) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
   width: min(18rem, calc(100vw - 3.15rem));
   display: flex;
   flex-direction: column;
@@ -294,7 +305,7 @@
 /* MapLibre's own controls and credit line would otherwise sit under the timeline. */
 :host ::ng-deep .maplibregl-ctrl-bottom-left,
 :host ::ng-deep .maplibregl-ctrl-bottom-right {
-  margin-bottom: var(--timeline-h);
+  margin-bottom: calc(var(--timeline-h) + var(--safe-bottom));
 }
 
 /*
@@ -307,7 +318,7 @@
   align-items: flex-end;
   gap: 0.5rem;
   /* The per-control margin that used to hold these off the corner is zeroed out below, so the offset moves here. */
-  padding: 0 0 5px 5px;
+  padding: 0 0 5px calc(5px + var(--safe-left));
 }
 
 :host ::ng-deep .maplibregl-ctrl-bottom-left .maplibregl-ctrl {
@@ -363,9 +374,9 @@
 .bm__incident {
   position: absolute;
   z-index: 3;
-  top: 3rem;
-  right: calc(var(--rail) + 0.75rem);
-  bottom: calc(var(--timeline-h) + 0.75rem);
+  top: calc(3rem + var(--safe-top));
+  right: calc(var(--rail) + 0.75rem + var(--safe-right));
+  bottom: calc(var(--timeline-h) + var(--safe-bottom) + 0.75rem);
   width: min(22rem, calc(100vw - 3.9rem));
 }
 
@@ -386,7 +397,7 @@
   .bm__bar {
     --bm-button: 2.7rem;
     /* The two buttons sit as far from the sides as from the top. */
-    padding-inline: 0.6rem;
+    padding-inline: calc(0.6rem + var(--safe-left)) calc(0.6rem + var(--safe-right));
     flex-wrap: wrap;
     align-items: center;
     gap: 0.6rem;
@@ -452,7 +463,7 @@
 
   .bm__rflyout,
   .bm__rflyout--wide {
-    left: var(--rail);
+    left: calc(var(--rail) + var(--safe-left));
     width: auto;
   }
 
@@ -465,7 +476,7 @@
   .bm__rtabs,
   .bm__flyout,
   .bm__rflyout {
-    top: calc(3rem + 16px);
+    top: calc(3rem + 16px + var(--safe-top));
   }
 
   .bm__incident {
@@ -473,13 +484,13 @@
     left: 0.75rem;
     width: auto;
     height: 55dvh;
-    bottom: calc(var(--timeline-h) + 0.75rem);
+    bottom: calc(var(--timeline-h) + var(--safe-bottom) + 0.75rem);
   }
 
   .bm__flyout,
   .bm__flyout--roll {
-    right: var(--rail);
-    bottom: calc(var(--timeline-h) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
+    right: calc(var(--rail) + var(--safe-right));
+    bottom: calc(var(--timeline-h) + var(--safe-bottom) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
     width: auto;
   }
 

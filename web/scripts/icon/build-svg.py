@@ -96,5 +96,8 @@ def icon(size: float, margin: float, tolerance: float, stroke: float, poppy_r: f
 
 if __name__ == '__main__':
     (WEB / 'public' / 'icon.svg').write_text(icon(64, 7, 0.2, 1.1, 6.5, -4, 5, True))
-    (HERE / 'small.svg').write_text(icon(64, 3, 0.8, 2.6, 12.5, -6, 4, False))
-    print('public/icon.svg, scripts/icon/small.svg')
+    small = icon(64, 3, 0.8, 2.6, 12.5, -6, 4, False)
+    (HERE / 'small.svg').write_text(small)
+    # The site header shows it too, at about the size of a favicon.
+    (WEB / 'public' / 'icon-small.svg').write_text(small)
+    print('public/icon.svg, public/icon-small.svg, scripts/icon/small.svg')

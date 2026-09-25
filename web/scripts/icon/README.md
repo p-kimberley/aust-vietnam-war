@@ -6,7 +6,8 @@ The outline of Vietnam with a remembrance poppy over Phuoc Tuy province, where t
 - `build-svg.py` draws both SVGs from `vietnam-ne50m.json`, Natural Earth's 1:50m border of Vietnam (public domain; only the
   mainland is drawn, simplified to suit the size).
 - `public/icon.svg` is the icon itself, for browsers that take an SVG icon, and the source of the larger PNGs.
-- `small.svg` (here) is a bolder version with a larger poppy and a plainer outline, for 16 to 48 pixels.
+- `small.svg` (here) is a bolder version with a larger poppy and a plainer outline, for 16 to 48 pixels; `public/icon-small.svg`
+  is the same, for the site header's brand mark.
 - `public/favicon.ico` holds `small.svg` at 16, 32 and 48 pixels; `apple-touch-icon.png` (180, square: iOS rounds it),
   `icon-192.png` and `icon-512.png` (for `site.webmanifest`) are `icon.svg`.
 

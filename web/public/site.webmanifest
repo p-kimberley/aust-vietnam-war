@@ -1,12 +1,17 @@
 {
+  "id": "/",
   "name": "Australia's Vietnam War",
   "short_name": "Vietnam War",
+  "description": "An interactive record of Australia's involvement in the Vietnam War, 1965-1971: the Battle Map, the honour roll and the stories behind them.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
   ],
   "theme_color": "#1f2314",
-  "background_color": "#1f2314",
-  "display": "browser"
+  "background_color": "#1f2314"
 }
