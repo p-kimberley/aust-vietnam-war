@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, output, resource, viewChild } from '@angular/core';
 import { PoiService, poiLabel, typeName } from './poi';
+import { Icon } from './icon';
 
 /** "About this point": the name, type, year established and history of a fire support base or landing zone. */
 @Component({
   selector: 'app-poi-panel',
+  imports: [Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './poi-panel.html',
   styleUrl: './poi-panel.css',

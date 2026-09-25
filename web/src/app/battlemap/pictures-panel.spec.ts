@@ -206,7 +206,7 @@ describe('PicturesPanel: switching between the list and the form', () => {
     expect(el.querySelector('form')).not.toBeNull();
     expect(el.querySelector('input[type=search]')).toBeNull();
 
-    button(el, '← Back to the images').click();
+    button(el, 'Back to the images').click();
     fixture.detectChanges();
     expect(el.querySelector('form')).toBeNull();
     expect(el.querySelector('input[type=search]')).not.toBeNull();

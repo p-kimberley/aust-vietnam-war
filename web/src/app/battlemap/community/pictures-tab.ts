@@ -3,11 +3,12 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, IncidentMediaView, NearbyPicture, PictureRef } from './community';
+import { Icon } from '../icon';
 
 /** Pictures members have added to one incident, with likes, and a form to add another. */
 @Component({
   selector: 'app-incident-pictures',
-  imports: [DatePipe],
+  imports: [DatePipe, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './community.css',
   styles: `
@@ -107,12 +108,12 @@ import { CommunityService, IncidentMediaView, NearbyPicture, PictureRef } from '
               </figcaption>
               <div class="actions">
                 @if (auth.isAuthenticated() && m.status === 'Approved') {
-                  <button type="button" class="like" [attr.aria-pressed]="m.likedByMe" [attr.aria-label]="(m.likedByMe ? 'Unlike' : 'Like') + ' this picture'" (click)="like(m)">♥ {{ m.likes }}</button>
+                  <button type="button" class="like" [attr.aria-pressed]="m.likedByMe" [attr.aria-label]="(m.likedByMe ? 'Unlike' : 'Like') + ' this picture'" (click)="like(m)"><app-icon name="heart" [filled]="m.likedByMe" />{{ m.likes }}</button>
                 } @else if (m.likes) {
-                  <span class="meta">♥ {{ m.likes }}</span>
+                  <span class="meta"><app-icon name="heart" />{{ m.likes }}</span>
                 }
                 @if (m.canRemove) {
-                  <button type="button" class="danger" (click)="remove(m)" [disabled]="busy()">Remove</button>
+                  <button type="button" class="danger" (click)="remove(m)" [disabled]="busy()"><app-icon name="trash" />Remove</button>
                 }
               </div>
             </figure>
@@ -148,7 +149,7 @@ import { CommunityService, IncidentMediaView, NearbyPicture, PictureRef } from '
         <label>Credit <input #credit type="text" maxlength="200" /></label>
         <label>Date taken (optional) <input #taken type="date" /></label>
         <p class="hint">{{ isEditor() ? 'Pictures from editors appear at once.' : 'An editor looks at new pictures before they appear.' }}</p>
-        <div class="actions"><button type="submit" class="primary" [disabled]="busy()">{{ busy() ? 'Uploading…' : 'Add picture' }}</button></div>
+        <div class="actions"><button type="submit" class="primary" [disabled]="busy()"><app-icon name="upload" />{{ busy() ? 'Uploading…' : 'Add picture' }}</button></div>
       </form>
     }
   `,

@@ -4,7 +4,7 @@
       <strong>{{ shown() }}</strong> of {{ total() }} contacts
     </p>
     @if (active().length) {
-      <button type="button" class="summary__clear" (click)="clearAll()">Clear all</button>
+      <button type="button" class="summary__clear" (click)="clearAll()"><app-icon name="x" />Clear all</button>
     }
   </div>
 

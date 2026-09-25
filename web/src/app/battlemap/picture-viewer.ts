@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, Injector, OnDestroy, af
 import { AuthService } from '../core/auth.service';
 import { problemMessage } from '../studio/studio-api';
 import { CommunityService, IncidentMediaView } from './community/community';
+import { Icon } from './icon';
 
 /** A file size for a person: bytes below a kilobyte, then kilobytes, then megabytes, to one decimal place. */
 export function formatBytes(bytes: number): string {
@@ -59,7 +60,7 @@ const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), [tabi
  */
 @Component({
   selector: 'app-picture-viewer',
-  imports: [DatePipe],
+  imports: [DatePipe, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '(document:fullscreenchange)': 'onFullscreenChange()' },
   templateUrl: './picture-viewer.html',

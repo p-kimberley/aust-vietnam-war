@@ -9,7 +9,7 @@
       <p role="status">Loading…</p>
     } @else if (poi.error()) {
       <p role="alert">This point could not be loaded.</p>
-      <button type="button" class="poi__retry" (click)="poi.reload()">Try again</button>
+      <button type="button" class="poi__retry" (click)="poi.reload()"><app-icon name="refresh" />Try again</button>
     } @else if (poi.value(); as p) {
       <h3 class="poi__name">{{ p.name }}</h3>
       <p class="poi__line"><strong>Type</strong> {{ typeName(p.type) }}</p>

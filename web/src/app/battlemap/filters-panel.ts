@@ -18,6 +18,7 @@ import {
 import { RangeFilter } from './range-filter';
 import { UnitTree } from './unit-tree';
 import { UnitTreeView } from './unit-tree-view';
+import { Icon } from './icon';
 
 export type TextStatus = 'idle' | 'searching' | 'ready' | 'error';
 
@@ -28,7 +29,7 @@ export type TextStatus = 'idle' | 'searching' | 'ready' | 'error';
  */
 @Component({
   selector: 'app-filters-panel',
-  imports: [AccordionSection, UnitTreeView, RangeFilter, ChecklistFilter],
+  imports: [AccordionSection, UnitTreeView, RangeFilter, ChecklistFilter, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './filters-panel.html',
   styleUrl: './filters-panel.css',

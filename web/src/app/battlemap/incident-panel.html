@@ -23,7 +23,7 @@
       <p role="status">Loading…</p>
     } @else if (incident.error()) {
       <p role="alert">This incident could not be loaded.</p>
-      <button type="button" class="incident__retry" (click)="incident.reload()">Try again</button>
+      <button type="button" class="incident__retry" (click)="incident.reload()"><app-icon name="refresh" />Try again</button>
     } @else if (incident.value(); as d) {
       <h3 class="incident__when data">{{ formatDtg(d.dtg) }}</h3>
       @if (d.operation) {

@@ -2,10 +2,12 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CASUALTY_TYPES, CommunityService, HonourSummary } from './community';
+import { Icon } from '../icon';
 
 /** The people on the honour roll who became casualties in this incident, and a form to tell us about one. */
 @Component({
   selector: 'app-incident-people',
+  imports: [Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './community.css',
   template: `
@@ -60,7 +62,7 @@ import { CASUALTY_TYPES, CommunityService, HonourSummary } from './community';
           </select>
         </label>
         <label>What you know, and where you know it from <textarea #comment rows="4" maxlength="2000" required></textarea></label>
-        <div class="actions"><button type="submit" class="primary" [disabled]="busy()">Send</button></div>
+        <div class="actions"><button type="submit" class="primary" [disabled]="busy()"><app-icon name="send" />Send</button></div>
       </form>
     }
   `,

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, NoteView, VersionView } from './community';
+import { Icon } from '../icon';
 
 /** The most a member may write in a new note (the server enforces the same). */
 const NOTE_BODY_LIMIT = 5000;
@@ -10,7 +11,7 @@ const NOTE_BODY_LIMIT = 5000;
 /** Community notes about one incident: read them, add one, edit your own, comment, and (for editors) approve or reject. */
 @Component({
   selector: 'app-incident-notes',
-  imports: [DatePipe],
+  imports: [DatePipe, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './community.css',
   template: `
@@ -41,8 +42,8 @@ const NOTE_BODY_LIMIT = 5000;
               <label>Title <input #title type="text" maxlength="200" required [value]="n.title" /></label>
               <label>Note <textarea #body rows="6" [attr.maxlength]="bodyLimit(n)" required [value]="n.body"></textarea></label>
               <div class="actions">
-                <button type="submit" class="primary" [disabled]="busy()">Save</button>
-                <button type="button" (click)="editing.set(null)">Cancel</button>
+                <button type="submit" class="primary" [disabled]="busy()"><app-icon name="check" />Save</button>
+                <button type="button" (click)="editing.set(null)"><app-icon name="x" />Cancel</button>
               </div>
             </form>
           } @else {
@@ -51,16 +52,16 @@ const NOTE_BODY_LIMIT = 5000;
 
           @if (n.canEdit && editing() !== n.id) {
             <div class="actions">
-              <button type="button" (click)="editing.set(n.id)">Edit</button>
-              <button type="button" (click)="toggleHistory(n)">{{ history()[n.id] ? 'Hide history' : 'History' }}</button>
-              <button type="button" class="danger" (click)="remove(n)" [disabled]="busy()">Delete</button>
+              <button type="button" (click)="editing.set(n.id)"><app-icon name="pencil" />Edit</button>
+              <button type="button" (click)="toggleHistory(n)"><app-icon name="clock" />{{ history()[n.id] ? 'Hide history' : 'History' }}</button>
+              <button type="button" class="danger" (click)="remove(n)" [disabled]="busy()"><app-icon name="trash" />Delete</button>
             </div>
           }
           @if (isEditor() && n.status !== 'Approved') {
             <div class="actions">
-              <button type="button" class="primary" (click)="moderate(n, 'Approved')" [disabled]="busy()">Approve</button>
+              <button type="button" class="primary" (click)="moderate(n, 'Approved')" [disabled]="busy()"><app-icon name="check" />Approve</button>
               @if (n.status !== 'Rejected') {
-                <button type="button" (click)="moderate(n, 'Rejected')" [disabled]="busy()">Reject</button>
+                <button type="button" (click)="moderate(n, 'Rejected')" [disabled]="busy()"><app-icon name="x" />Reject</button>
               }
             </div>
           }
@@ -89,7 +90,7 @@ const NOTE_BODY_LIMIT = 5000;
           @if (auth.isAuthenticated() && (n.commentsOpen || isEditor())) {
             <form (submit)="$event.preventDefault(); comment(n, remark)">
               <label>Add a comment <textarea #remark rows="2" maxlength="1000" required></textarea></label>
-              <div class="actions"><button type="submit" [disabled]="busy()">Comment</button></div>
+              <div class="actions"><button type="submit" [disabled]="busy()"><app-icon name="message" />Comment</button></div>
             </form>
           } @else if (!n.commentsOpen) {
             <p class="hint">Comments are closed on this note.</p>
@@ -111,7 +112,7 @@ const NOTE_BODY_LIMIT = 5000;
         <label>Title <input #newTitle type="text" maxlength="200" required /></label>
         <label>Note <textarea #newBody rows="5" maxlength="5000" required></textarea></label>
         <p class="hint">{{ isEditor() ? 'Notes from editors appear at once.' : 'An editor reads new notes before they appear.' }}</p>
-        <div class="actions"><button type="submit" class="primary" [disabled]="busy()">Add note</button></div>
+        <div class="actions"><button type="submit" class="primary" [disabled]="busy()"><app-icon name="note" />Add note</button></div>
       </form>
     }
   `,

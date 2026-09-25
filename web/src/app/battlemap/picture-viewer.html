@@ -51,7 +51,7 @@
           <p role="status">Loading…</p>
         } @else if (picture.error()) {
           <p role="alert">This photo could not be loaded.</p>
-          <button type="button" class="side__button" (click)="picture.reload()">Try again</button>
+          <button type="button" class="side__button" (click)="picture.reload()"><app-icon name="refresh" />Try again</button>
         } @else if (shown(); as p) {
           @if (p.status !== 'Approved') {
             <p class="side__badge">{{ p.status === 'Pending' ? 'Waiting for approval' : 'Not accepted' }}</p>
@@ -89,18 +89,18 @@
             <p class="side__error" role="alert">{{ message() }}</p>
           }
           <div class="side__actions">
-            <button type="button" class="side__button" (click)="openFullscreen()">View full screen</button>
+            <button type="button" class="side__button" (click)="openFullscreen()"><app-icon name="expand" />View full screen</button>
             @if (auth.isAuthenticated() && p.status === 'Approved') {
               <button type="button" class="side__button" [attr.aria-pressed]="liked(p)" (click)="like(p)">
-                {{ liked(p) ? '♥ Liked' : '♡ Like this photo' }}
+                <app-icon name="heart" [filled]="liked(p)" />{{ liked(p) ? 'Liked' : 'Like this photo' }}
               </button>
             } @else if (!auth.isAuthenticated()) {
               <p class="side__hint"><button type="button" class="side__link" (click)="auth.login()">Sign in</button> to like a photo.</p>
             }
             @if (p.contactId !== null) {
-              <button type="button" class="side__button" (click)="openIncident.emit(p.contactId)">Go to incident</button>
+              <button type="button" class="side__button" (click)="openIncident.emit(p.contactId)"><app-icon name="target" />Go to incident</button>
             } @else if (p.lat !== null && p.lon !== null) {
-              <button type="button" class="side__button" (click)="locate.emit({ lat: p.lat, lon: p.lon })">Locate on map</button>
+              <button type="button" class="side__button" (click)="locate.emit({ lat: p.lat, lon: p.lon })"><app-icon name="pin" />Locate on map</button>
             }
           </div>
         } @else {

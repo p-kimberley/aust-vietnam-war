@@ -4,6 +4,7 @@ import { AuthService } from '../core/auth.service';
 import { problemMessage } from '../studio/studio-api';
 import { CommunityService, IncidentMediaView, PictureHit, PictureRef, PictureSort } from './community/community';
 import { PicturePlacementService } from './picture-placement.service';
+import { Icon } from './icon';
 
 /** How many pictures one request brings back, and each "Show more" adds. */
 export const PICTURES_PAGE_SIZE = 24;
@@ -24,7 +25,7 @@ type Mode = 'browse' | 'add';
  */
 @Component({
   selector: 'app-pictures-panel',
-  imports: [DatePipe],
+  imports: [DatePipe, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="pics" aria-labelledby="pics-title">
@@ -51,7 +52,7 @@ type Mode = 'browse' | 'add';
               (input)="onInput($any($event.target).value)"
             />
           </div>
-          <button type="button" class="button primary add-button" (click)="setMode('add')">Add an image</button>
+          <button type="button" class="button primary add-button" (click)="setMode('add')"><app-icon name="image-plus" />Add an image</button>
         </div>
         <div class="bar">
           <p class="count data" role="status" aria-live="polite">{{ summary() }}</p>
@@ -66,7 +67,7 @@ type Mode = 'browse' | 'add';
         </div>
         @if (status() === 'error') {
           <p class="error" role="alert">The images could not be searched. Try again in a moment.</p>
-          <button type="button" class="button more" (click)="reload()">Try again</button>
+          <button type="button" class="button more" (click)="reload()"><app-icon name="refresh" />Try again</button>
         }
         <ul class="grid" aria-label="Images found">
           @for (p of pictures(); track p.id) {
@@ -82,11 +83,11 @@ type Mode = 'browse' | 'add';
           }
         </ul>
         @if (pictures().length < total() && status() !== 'error') {
-          <button type="button" class="button more" [disabled]="status() === 'loading'" (click)="showMore()">Show more</button>
+          <button type="button" class="button more" [disabled]="status() === 'loading'" (click)="showMore()"><app-icon name="chevron-down" />Show more</button>
         }
       } @else {
         <div class="add">
-          <button type="button" class="back" (click)="setMode('browse')"><span aria-hidden="true">←</span> Back to the images</button>
+          <button type="button" class="back" (click)="setMode('browse')"><app-icon name="arrow-left" />Back to the images</button>
           @if (!auth.isAuthenticated()) {
             <p class="hint"><button type="button" class="link" (click)="auth.login()">Sign in</button> to add an image.</p>
           } @else {
@@ -131,15 +132,15 @@ type Mode = 'browse' | 'add';
                 <p class="error" role="alert">{{ sendError() }}</p>
               }
               <div class="actions">
-                <button type="submit" class="button primary" [disabled]="!canSend()">{{ sending() ? 'Sending…' : isEditor() ? 'Add the image' : 'Send for approval' }}</button>
-                <button type="button" class="button" [disabled]="sending()" (click)="reset()">Start again</button>
+                <button type="submit" class="button primary" [disabled]="!canSend()"><app-icon name="upload" />{{ sending() ? 'Sending…' : isEditor() ? 'Add the image' : 'Send for approval' }}</button>
+                <button type="button" class="button" [disabled]="sending()" (click)="reset()"><app-icon name="rotate-ccw" />Start again</button>
               </div>
             </form>
           }
           @if (sent(); as done) {
             <div class="sent" role="status">
               <p>{{ done.status === 'Approved' ? 'Your image is on the map.' : 'Thank you. Your image will appear on the map once an editor has looked at it.' }}</p>
-              <button type="button" class="button" (click)="openPicture.emit({ id: done.id, lat: done.lat, lon: done.lon })">View it</button>
+              <button type="button" class="button" (click)="openPicture.emit({ id: done.id, lat: done.lat, lon: done.lon })"><app-icon name="eye" />View it</button>
             </div>
           }
         </div>

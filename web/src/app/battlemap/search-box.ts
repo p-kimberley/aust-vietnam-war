@@ -3,6 +3,7 @@ import { HonourSummary } from './community/community';
 import { formatDtg } from './contacts';
 import { Poi, poiLabel, typeName } from './poi';
 import { CommunitySearchResult, ContactHit, FindResult, MIN_SEARCH_LENGTH, NoteHit, PictureHit, SearchService, matchPois } from './search';
+import { Icon } from './icon';
 
 type Status = 'idle' | 'searching' | 'ready' | 'error';
 
@@ -46,6 +47,7 @@ function joinList(items: readonly string[]): string {
  */
 @Component({
   selector: 'app-search-box',
+  imports: [Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './search-box.html',
   styleUrl: './search-box.css',

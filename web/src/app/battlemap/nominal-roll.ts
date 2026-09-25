@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, output, signal } from '@angular/core';
 import { CommunityService, HonourFacets, HonourFacetOption, HonourFilters, HonourSummary } from './community/community';
 import { HonourPanel } from './community/honour-panel';
+import { Icon } from './icon';
 
 /** How many people one request brings back, and each "Show more" adds. */
 export const ROLL_PAGE_SIZE = 20;
@@ -29,12 +30,12 @@ interface FilterList {
  */
 @Component({
   selector: 'app-nominal-roll',
-  imports: [HonourPanel],
+  imports: [HonourPanel, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (selected(); as serviceNumber) {
       <div class="detail">
-        <button type="button" class="back" (click)="selected.set(null)"><span aria-hidden="true">←</span> Back to the roll</button>
+        <button type="button" class="back" (click)="selected.set(null)"><app-icon name="arrow-left" />Back to the roll</button>
         <div class="detail__panel">
           <app-honour-panel [serviceNumber]="serviceNumber" (closed)="selected.set(null)" (openIncident)="openIncident.emit($event)" />
         </div>
@@ -73,13 +74,13 @@ interface FilterList {
         <p class="count data" role="status" aria-live="polite">
           {{ summary() }}
           @if (restricted()) {
-            <button type="button" class="clear" (click)="clearFilters()">Clear filters</button>
+            <button type="button" class="clear" (click)="clearFilters()"><app-icon name="x" />Clear filters</button>
           }
         </p>
 
         @if (status() === 'error') {
           <p class="error" role="alert">The roll could not be searched. Try again in a moment.</p>
-          <button type="button" class="more" (click)="reload()">Try again</button>
+          <button type="button" class="more" (click)="reload()"><app-icon name="refresh" />Try again</button>
         }
 
         <ul class="list" aria-label="People on the roll">
@@ -104,7 +105,7 @@ interface FilterList {
         </ul>
 
         @if (people().length < total() && status() !== 'error') {
-          <button type="button" class="more" [disabled]="status() === 'loading'" (click)="showMore()">Show more</button>
+          <button type="button" class="more" [disabled]="status() === 'loading'" (click)="showMore()"><app-icon name="chevron-down" />Show more</button>
         }
       </section>
     }

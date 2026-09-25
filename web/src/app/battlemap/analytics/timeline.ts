@@ -16,6 +16,7 @@ import {
 import { Contact, formatDtg } from '../contacts';
 import { ChartOption, DARK, ChartTheme } from './analytics';
 import { EChart, ZoomRange } from './echart';
+import { Icon } from '../icon';
 
 const HOUR = 3600 * 1000;
 const DAY = 24 * HOUR;
@@ -450,7 +451,7 @@ let nextTimelineId = 0;
  */
 @Component({
   selector: 'app-timeline',
-  imports: [EChart],
+  imports: [EChart, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="tl" aria-label="Timeline">
@@ -516,10 +517,10 @@ let nextTimelineId = 0;
 
       <div class="tl__strip">
         <div class="tl__controls">
-          <button type="button" class="tl__play" [attr.aria-pressed]="playing()" (click)="togglePlay()">{{ playing() ? 'Pause' : 'Play' }}</button>
+          <button type="button" class="tl__play" [attr.aria-pressed]="playing()" (click)="togglePlay()"><app-icon [name]="playing() ? 'pause' : 'play'" />{{ playing() ? 'Pause' : 'Play' }}</button>
           <span class="tl__range data" aria-live="polite">{{ label() }}</span>
           @if (from() || to()) {
-            <button type="button" class="tl__reset" (click)="reset()">Reset zoom</button>
+            <button type="button" class="tl__reset" (click)="reset()"><app-icon name="zoom-out" />Reset zoom</button>
           } @else {
             <span class="tl__hint">Drag across the bars to zoom</span>
           }

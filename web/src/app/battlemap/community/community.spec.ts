@@ -374,7 +374,8 @@ describe('PicturesTab', () => {
     await settle(fixture);
 
     expect(community['toggleLike']).toHaveBeenCalledWith(10);
-    expect(text(el.querySelector('.like'))).toBe('♥ 4');
+    expect(text(el.querySelector('.like'))).toBe('4');
+    expect(el.querySelector('.like app-icon')?.getAttribute('name')).toBe('heart');
     expect(el.querySelector('.like')?.getAttribute('aria-pressed')).toBe('true');
   });
 

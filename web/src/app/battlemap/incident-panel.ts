@@ -6,6 +6,7 @@ import { PicturesTab } from './community/pictures-tab';
 import { ContactsService } from './contacts.service';
 import { formatDtg } from './contacts';
 import { FollowInfo } from './track';
+import { Icon } from './icon';
 
 /**
  * "About this incident": the full record for one contact, loaded when it is selected on the map, with tabs for what the
@@ -13,7 +14,7 @@ import { FollowInfo } from './track';
  */
 @Component({
   selector: 'app-incident-panel',
-  imports: [NotesTab, PicturesTab, PeopleTab],
+  imports: [NotesTab, PicturesTab, PeopleTab, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './incident-panel.html',
   styleUrl: './incident-panel.css',
