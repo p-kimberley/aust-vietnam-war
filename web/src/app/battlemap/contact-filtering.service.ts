@@ -54,6 +54,14 @@ export class ContactFilteringService {
     return c ? applyFilters(this.allContacts(), { ...this.filters(), operations: new Set(), from: null, to: null }, c, this.textIds()) : this.allContacts();
   });
   /**
+   * The contacts that pass every filter but the choice of operations: what the legend lists operations from, so that choosing
+   * one there does not take the others out of the list.
+   */
+  readonly operationChoiceScope = computed(() => {
+    const c = this.catalogue();
+    return c ? applyFilters(this.allContacts(), { ...this.filters(), operations: new Set() }, c, this.textIds()) : this.allContacts();
+  });
+  /**
    * How many contacts each unit would leave if it, or its subtree, were chosen: every other active filter still applies
    * (dates and hours included), but not the unit filter itself, so choosing one unit does not make the others' counts
    * collapse to what only that unit already leaves.

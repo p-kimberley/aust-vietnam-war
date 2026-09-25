@@ -63,10 +63,13 @@
 }
 
 /*
- * The map controls and the legend share one column at the right: the controls at the top, the legend at the bottom just
- * above the timeline (a touch closer to it than the column is to the right-hand edge of the viewport). When the screen
- * is short, the controls give way (their body scrolls) rather than run under the legend or the timeline.
+ * The legend (and the followed units, when there are any) sit at the bottom right, just above the timeline; the Layers and
+ * Filters panel ends above them (see .bm__rflyout). They move aside, at the fly-outs' pace, for an open incident.
  */
+.bm {
+  --rail: 2.4rem;
+}
+
 .bm__right {
   position: absolute;
   z-index: 3;
@@ -79,6 +82,7 @@
   gap: 0.5rem;
   max-width: calc(100vw - 1.5rem);
   pointer-events: none;
+  transition: right 0.25s ease;
 }
 
 .bm__right > * {
@@ -86,8 +90,8 @@
 }
 
 /* With an incident open the column sits beside it; on narrow screens the incident takes the space. */
-.bm__right--shifted {
-  right: calc(min(22rem, 100vw - 1.5rem) + 1.5rem);
+.bm__right.bm__right--shifted {
+  right: calc(var(--rail) + min(22rem, 100vw - 3.9rem) + 1.5rem);
 }
 
 /* The followed-units panel (when there is one) and the legend stay together at the bottom of the column. */
@@ -104,14 +108,13 @@
   flex: none;
 }
 
+/* Layers or Filters, in the fly-out at the right. */
 .panel {
   display: flex;
-  flex: 0 1 auto;
   flex-direction: column;
   min-height: 0;
-  width: min(16rem, calc(100vw - 1.5rem));
-  /* Layers and the wider Filters glide between their widths, at the pace of the other panels. */
-  transition: width 0.25s ease;
+  max-height: 100%;
+  pointer-events: auto;
   background: color-mix(in srgb, var(--olive-900) 97%, transparent);
   border: 1px solid var(--olive-500);
   border-radius: var(--radius);
@@ -187,6 +190,56 @@
     visibility 0s;
 }
 
+/* The rail of tabs at the top right (Layers, Filters), and the panel that flies out from beside it, as the left one does. */
+/* Above its panel, which slides out from under the tabs. */
+.bm__rtabs {
+  position: absolute;
+  z-index: 5;
+  top: calc(3rem + 12px);
+  right: 0;
+}
+
+.bm__rflyout {
+  position: absolute;
+  z-index: 4;
+  top: calc(3rem + 12px);
+  right: var(--rail);
+  /* Ends just above the legend, as the legend's own column does: a tall panel scrolls rather than cover it. */
+  /* --bottom-h, the height of the legend and the followed units, is kept up to date on the page's element (battlemap.ts). */
+  bottom: calc(var(--timeline-h) + 0.75rem - 6px + var(--bottom-h, 0px) + 0.5rem);
+  width: min(18rem, calc(100vw - 3.15rem));
+  display: flex;
+  flex-direction: column;
+  /* The box runs to the timeline, but only the panel in it takes the pointer: the map below a short panel still works. */
+  pointer-events: none;
+  transform: translateX(calc(100% + var(--rail)));
+  visibility: hidden;
+  transition:
+    transform 0.25s ease,
+    width 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.bm__rflyout.is-open {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform 0.25s ease,
+    visibility 0s;
+}
+
+.bm__rflyout.is-open.bm__rflyout--switching {
+  transition:
+    transform 0.25s ease,
+    width 0.25s ease,
+    visibility 0s;
+}
+
+/* The filters need more room than the layers. */
+.bm__rflyout--wide {
+  width: min(22rem, calc(100vw - 3.15rem));
+}
+
 /* The nominal roll needs less room than the charts. */
 .bm__flyout--roll {
   width: min(24rem, calc(100vw - 3.15rem));
@@ -197,6 +250,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .bm__right,
+  .bm__rflyout,
+  .bm__rflyout.is-open,
   .bm__flyout,
   .bm__flyout.is-open {
     transition: none;
@@ -261,14 +317,14 @@
   position: absolute;
   z-index: 3;
   top: 3rem;
-  right: 0.75rem;
+  right: calc(var(--rail) + 0.75rem);
   bottom: calc(var(--timeline-h) + 0.75rem);
-  width: min(22rem, calc(100vw - 1.5rem));
+  width: min(22rem, calc(100vw - 3.9rem));
 }
 
 /*
- * On a phone the top row is two icon buttons (home, Search) with the Layers and Filters panel beside them; the search box
- * drops in underneath when asked for, over whatever is there. The timeline is left off, so the map has the height.
+ * On a phone the top row is two icon buttons (home, Search); the search box drops in underneath when asked for, over whatever
+ * is there. The fly-outs take the width between the two rails, over the legend. The timeline is left off, so the map has the height.
  */
 @media (max-width: 45rem) {
   .bm,
@@ -339,15 +395,9 @@
     max-width: none;
   }
 
-  /* The panel takes the rest of the top row, level with the two buttons. */
-  .bm__right {
-    top: 0.6rem;
-    left: calc(1rem + 2 * 2.7rem + 2 * 0.6rem);
-    align-items: stretch;
-  }
-
-  .bm__right .panel,
-  .bm__right .panel--wide {
+  .bm__rflyout,
+  .bm__rflyout--wide {
+    left: var(--rail);
     width: auto;
   }
 
@@ -365,7 +415,7 @@
 
   .bm__flyout,
   .bm__flyout--roll {
-    right: 0.75rem;
+    right: var(--rail);
     width: auto;
   }
 
@@ -374,92 +424,33 @@
   }
 }
 
-.panel--wide {
-  width: min(21rem, calc(100vw - 1.5rem));
-}
-
 .panel__head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
-  padding: 0 0.5rem 0 0;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   border-bottom: 1px solid var(--olive-700);
 }
 
-.tabs {
-  display: flex;
+.panel__head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--smoke-yellow);
 }
 
-.tab,
-.panel__toggle {
-  padding: 0.5rem 0.75rem;
-  font: inherit;
-  font-family: var(--font-display);
+.panel__close {
   color: var(--khaki);
+  font-size: 1.5rem;
+  line-height: 1;
   background: none;
   border: 0;
-  border-bottom: 2px solid transparent;
   cursor: pointer;
-}
-
-.tab--on {
-  color: var(--smoke-yellow);
-  border-bottom-color: var(--smoke-yellow);
-}
-
-.panel__toggle {
-  display: inline-grid;
-  place-items: center;
-  padding: 0.3rem;
-  border: 1px solid var(--olive-500);
-  border-radius: var(--radius);
-}
-
-.panel__toggle app-icon {
-  margin: 0;
-}
-
-.badge {
-  display: inline-block;
-  min-width: 1.1rem;
-  margin-left: 0.25rem;
-  padding: 0 0.3rem;
-  color: var(--ink);
-  font-family: var(--font-data);
-  font-size: 0.72rem;
-  text-align: center;
-  background: var(--brass);
-  border-radius: 999px;
 }
 
 .panel__note {
   margin: 0;
   color: var(--khaki);
-}
-
-/*
- * The body slides open and shut, at the pace of the legend and the fly-outs: a one-row grid whose row runs from nothing to its
- * full height. It still gives way when the screen is short (its body then scrolls). Shut, it is hidden once it has gone, so
- * nothing in it can be reached.
- */
-.panel__frame {
-  display: grid;
-  flex: 0 1 auto;
-  grid-template-rows: 0fr;
-  min-height: 0;
-  visibility: hidden;
-  transition:
-    grid-template-rows 0.25s ease,
-    visibility 0s linear 0.25s;
-}
-
-.panel__frame.is-open {
-  grid-template-rows: 1fr;
-  visibility: visible;
-  transition:
-    grid-template-rows 0.25s ease,
-    visibility 0s;
 }
 
 .panel__body {
@@ -468,7 +459,7 @@
   overflow-y: auto;
 }
 
-/* What a tab holds is made afresh when the tab is chosen, so it fades in as it arrives. */
+/* What the panel holds is made afresh when Layers and Filters are swapped, so it fades in as it arrives. */
 .panel__body > * {
   animation: panel-tab-in 0.25s ease;
 }
@@ -480,12 +471,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel,
-  .panel__frame,
-  .panel__frame.is-open {
-    transition: none;
-  }
-
   .panel__body > * {
     animation: none;
   }

@@ -95,60 +95,28 @@
   }
 
   @if (status() === 'ready') {
-    <div class="bm__right" [class.bm__right--shifted]="rightPanelOpen()">
+    <!-- The rail of tabs at the right, and the panel that flies out beside it: Layers and Filters, as the left rail's tools are. -->
+    <div class="bm__rtabs">
+      <app-left-tabs side="right" label="Map controls" [tabs]="rightTabs()" [active]="rightTool()" panelId="right-flyout" (activeChange)="setRightTool($any($event))" />
+    </div>
+    <div
+      id="right-flyout"
+      class="bm__rflyout"
+      role="tabpanel"
+      [class.is-open]="rightTool() !== null"
+      [class.bm__rflyout--wide]="rightShown() === 'filters'"
+      [class.bm__rflyout--switching]="rightSwitching()"
+      [attr.aria-labelledby]="rightShown() ? 'right-tab-' + rightShown() : null"
+      (keydown.escape)="setRightTool(null)"
+    >
       @if (config(); as cfg) {
-        <aside
-          class="panel"
-          [class.panel--wide]="tab() === 'filters'"
-          [class.panel--closed]="!panelOpen()"
-          aria-label="Map controls"
-        >
-          <div class="panel__head">
-            <div class="tabs" role="tablist" aria-label="Map controls">
-              <button
-                type="button"
-                role="tab"
-                id="tab-layers"
-                class="tab"
-                aria-controls="tabpanel"
-                [attr.aria-selected]="tab() === 'layers'"
-                [class.tab--on]="tab() === 'layers'"
-                (click)="showTab('layers')"
-              >
-                Layers
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="tab-filters"
-                class="tab"
-                aria-controls="tabpanel"
-                [attr.aria-selected]="tab() === 'filters'"
-                [class.tab--on]="tab() === 'filters'"
-                (click)="showTab('filters')"
-              >
-                Filters
-                @if (contactFilter.activeCount()) {
-                  <span class="badge" aria-label="{{ contactFilter.activeCount() }} active">{{ contactFilter.activeCount() }}</span>
-                }
-              </button>
-            </div>
-            <button
-              type="button"
-              class="panel__toggle"
-              [attr.aria-expanded]="panelOpen()"
-              aria-controls="tabpanel"
-              [attr.aria-label]="panelOpen() ? 'Hide map controls' : 'Show map controls'"
-              (click)="panelOpen.set(!panelOpen())"
-            >
-              <app-icon [name]="panelOpen() ? 'chevron-up' : 'chevron-down'" />
-            </button>
-          </div>
-
-          <!-- Slides open and shut (see .panel__frame); shut, it is hidden from the keyboard and screen readers once it has gone. -->
-          <div class="panel__frame" [class.is-open]="panelOpen()">
-          <div id="tabpanel" class="panel__body" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
-            @if (tab() === 'layers') {
+        <aside class="panel" [attr.aria-labelledby]="'right-title'">
+          <header class="panel__head">
+            <h2 id="right-title">{{ rightShown() === 'filters' ? 'Filters' : 'Layers' }}</h2>
+            <button type="button" class="panel__close" [attr.aria-label]="rightShown() === 'filters' ? 'Close filters' : 'Close layers'" (click)="setRightTool(null)">×</button>
+          </header>
+          <div id="tabpanel" class="panel__body">
+            @if (rightShown() !== 'filters') {
               <fieldset>
                 <legend id="basemap-label">Basemap</legend>
                 <app-layer-row label="Basemap options" [expandable]="canTerrain()">
@@ -270,9 +238,11 @@
               }
             }
           </div>
-          </div>
         </aside>
       }
+    </div>
+
+    <div class="bm__right" [class.bm__right--shifted]="rightPanelOpen()">
       <div class="bm__bottom">
         @if (followRows().length) {
           <app-follow-panel class="bm__follow" [rows]="followRows()" (step)="stepFollowed($event.unit, $event.direction)" (unfollow)="toggleFollow($event)" />
@@ -282,6 +252,8 @@
             [showContacts]="showMarkers()"
             [sizeField]="sizeFieldName()"
             [operations]="legendOperations()"
+            [selectedOperations]="contactFilter.filters().operations"
+            (operationToggled)="toggleOperation($event)"
             [showHeatmap]="showHeatmap()"
             [heatField]="heatFieldName()"
             [poiTypes]="legendPoiTypes()"

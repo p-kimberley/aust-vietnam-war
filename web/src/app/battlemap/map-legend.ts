@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { typeName } from './poi';
 import { poiIconUrl } from './poi-icons';
 import { narrowScreen, storedFlag } from './stored-flag';
@@ -29,7 +29,7 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
             @if (showContacts()) {
               <li>
                 @if (operations().length) {
-                  <span class="legend__group">Contacts by operation</span>
+                  <span class="legend__group">Operations</span>
                 } @else {
                   <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                     <circle cx="12" cy="12" r="6" fill="#c23a26" fill-opacity="0.9" stroke="#efe7cc" stroke-width="1.5" />
@@ -40,13 +40,23 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
               @if (operations().length) {
                 <!-- The same colours as the bars of the Operations list; only operations with markers showing are listed. -->
                 <li class="legend__ops">
-                  <ul class="legend__op-list">
+                  <!-- Each operation chooses itself as a filter, or takes itself off again; while any is chosen the rest are dimmed. -->
+                  <ul class="legend__op-list" aria-label="Operations. Choose any number to show only their contacts.">
                     @for (op of operations(); track op.name) {
-                      <li>
-                        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-                          <circle cx="12" cy="12" r="6" [attr.fill]="op.colour" stroke="#efe7cc" stroke-width="1.5" />
-                        </svg>
-                        <span>{{ op.name }}</span>
+                      <li [class.is-dim]="selectedOperations().size > 0 && !selectedOperations().has(op.name)">
+                        @if (op.choosable) {
+                          <button type="button" class="legend__op" [attr.aria-pressed]="selectedOperations().has(op.name)" (click)="operationToggled.emit(op.name)">
+                            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                              <circle cx="12" cy="12" r="6" [attr.fill]="op.colour" stroke="#efe7cc" stroke-width="1.5" />
+                            </svg>
+                            <span>{{ op.name }}</span>
+                          </button>
+                        } @else {
+                          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="6" [attr.fill]="op.colour" stroke="#efe7cc" stroke-width="1.5" />
+                          </svg>
+                          <span>{{ op.name }}</span>
+                        }
                       </li>
                     }
                   </ul>
@@ -200,6 +210,37 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
       overflow-y: auto;
       list-style: none;
     }
+    .legend__op-list li {
+      transition: opacity 0.25s ease;
+    }
+    .legend__op-list li.is-dim {
+      opacity: 0.4;
+    }
+    .legend__op {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+      padding: 0;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      background: none;
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+    .legend__op:hover span {
+      text-decoration: underline;
+    }
+    .legend__op[aria-pressed='true'] span {
+      color: var(--smoke-yellow);
+    }
+    .legend__op:focus-visible {
+      outline: 2px solid var(--smoke-yellow);
+      outline-offset: -2px;
+    }
     .legend__list img,
     .legend__list svg,
     .legend__blank {
@@ -245,8 +286,15 @@ export class MapLegend {
   readonly showContacts = input(true);
   /** How markers are sized, by the name of the field, or `null` when they are all one size. */
   readonly sizeField = input<string | null>(null);
-  /** When the markers are coloured by operation, the operations showing and their colours; empty when every marker is red. */
-  readonly operations = input<readonly { name: string; colour: string }[]>([]);
+  /**
+   * When the markers are coloured by operation, the operations and their colours; empty when every marker is red. One that is
+   * `choosable` can be chosen as a filter from here.
+   */
+  readonly operations = input<readonly { name: string; colour: string; choosable: boolean }[]>([]);
+  /** The operations chosen as a filter: the rest are dimmed while any is chosen. */
+  readonly selectedOperations = input<ReadonlySet<string>>(new Set());
+  /** An operation was clicked: choose it as a filter, or take it off again. */
+  readonly operationToggled = output<string>();
   readonly showHeatmap = input(true);
   /** The name of the field the heatmap shows. */
   readonly heatField = input('');

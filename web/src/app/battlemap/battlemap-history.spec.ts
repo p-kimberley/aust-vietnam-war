@@ -82,6 +82,6 @@ describe('Back and Forward on the Battle Map', () => {
     const drawn = r.basemaps.map.setData.mock.calls.at(-1)![0] as { features: { properties: { id: number } }[] };
     expect(drawn.features.map((f) => f.properties.id)).toEqual([9, 11]);
     expect(r.basemaps.fitTo.mock.calls.length).toBe(fits);                     // the entry's own camera, not a fit
-    expect(text(r.el.querySelector('#tab-filters .badge'))).toBe('1');
+    expect(text(r.el.querySelector('#right-tab-filters .tab__badge'))).toBe('1');
   });
 });

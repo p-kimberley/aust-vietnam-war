@@ -12,7 +12,7 @@ const names = (r: Rendered) => [...r.el.querySelectorAll('app-timeline [role=opt
 const chart = (r: Rendered) =>
   r.fixture.debugElement.query((d) => d.name === 'app-timeline').query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
 const openFilters = async (r: Rendered) => {
-  r.el.querySelector<HTMLButtonElement>('#tab-filters')!.click();
+  r.el.querySelector<HTMLButtonElement>('#right-tab-filters')!.click();
   await settle(r.fixture);
 };
 /** The ids of the contacts the map was last asked to fit to. */
@@ -117,7 +117,7 @@ describe('an incident and the operation list', () => {
   it('leaves the date filter and the contacts alone', async () => {
     const r = await render({ contacts: CONTACTS, inputs: { incident: '2' } });
 
-    expect(r.el.querySelector('#tab-filters .badge')).toBeNull();
+    expect(r.el.querySelector('#right-tab-filters .tab__badge')).toBeNull();
     expect(r.basemaps.fitTo).not.toHaveBeenCalled();
   });
 });
@@ -182,6 +182,7 @@ describe('zooming the map to the contacts a filter leaves', () => {
     vi.spyOn(r.el, 'getBoundingClientRect').mockReturnValue(rect(0, 0, 800));
     vi.spyOn(r.el.querySelector('.bm__timeline')!, 'getBoundingClientRect').mockReturnValue(rect(0, 750, 800));
     vi.spyOn(r.el.querySelector('.panel')!, 'getBoundingClientRect').mockReturnValue(rect(700, 0, 400));
+    vi.spyOn(r.el.querySelector('.bm__rtabs')!, 'getBoundingClientRect').mockReturnValue(rect(962, 0, 300));
     // Wider than the panel: were it still counted, right would be far larger than the panel alone asks for.
     vi.spyOn(r.el.querySelector('.bm__legend')!, 'getBoundingClientRect').mockReturnValue(rect(100, 400, 800));
     r.basemaps.fitTo.mockClear();

@@ -32,6 +32,29 @@ export function storedFlag(key: string, initial: boolean): WritableSignal<boolea
   return flag;
 }
 
+/**
+ * One of a few named choices the reader expects to find as they left it, such as which of two panels was showing: kept as a
+ * {@link storedFlag} is, and anything kept that is not one of `choices` is ignored.
+ */
+export function storedChoice<T extends string>(key: string, choices: readonly T[], initial: T): WritableSignal<T> {
+  let kept: string | null = null;
+  try {
+    kept = globalThis.localStorage?.getItem(STORED_FLAG_PREFIX + key) ?? null;
+  } catch {
+    // Storage is off: start at the default.
+  }
+  const choice = signal<T>(choices.includes(kept as T) ? (kept as T) : initial);
+  effect(() => {
+    const value = choice();
+    try {
+      globalThis.localStorage?.setItem(STORED_FLAG_PREFIX + key, value);
+    } catch {
+      // Storage is off or full: the choice still works for this visit, it just is not remembered.
+    }
+  });
+  return choice;
+}
+
 /** The width below which the map is laid out for a phone (the `max-width` in battlemap.css), where panels would cover it. */
 export const NARROW_SCREEN = '(max-width: 45rem)';
 

@@ -54,42 +54,77 @@ describe('storedFlag', () => {
 });
 
 describe('the Battle Map remembers what was left shut', () => {
-  it('keeps it when the Layers and Filters panel is hidden or the legend closed', async () => {
+  const tab = (r: Awaited<ReturnType<typeof render>>, id: string) => r.el.querySelector<HTMLButtonElement>(`#right-tab-${id}`)!;
+  const rightOpen = (r: Awaited<ReturnType<typeof render>>) => r.el.querySelector('#right-flyout')!.classList.contains('is-open');
+  const kept = (key: string) => localStorage.getItem(STORED_FLAG_PREFIX + key);
+
+  it('keeps it when the Layers or Filters panel is shut, which of them was showing, and the legend closed', async () => {
     const r = await render();
 
-    r.el.querySelector<HTMLButtonElement>('.panel__toggle')!.click();
+    tab(r, 'filters').click();
+    await settle(r.fixture);
+    expect(kept('battlemap.rightTab')).toBe('filters');
+
+    tab(r, 'filters').click();
     r.el.querySelector<HTMLButtonElement>('.legend__toggle')!.click();
     await settle(r.fixture);
 
-    expect(localStorage.getItem(STORED_FLAG_PREFIX + 'battlemap.panelOpen')).toBe('false');
-    expect(localStorage.getItem(STORED_FLAG_PREFIX + 'battlemap.legendOpen')).toBe('false');
+    expect(kept('battlemap.panelOpen')).toBe('false');
+    expect(kept('battlemap.rightTab')).toBe('filters');
+    expect(kept('battlemap.legendOpen')).toBe('false');
   });
 
   it('starts the next visit with them as they were left', async () => {
     const r = await render({ stored: { [STORED_FLAG_PREFIX + 'battlemap.panelOpen']: 'false', [STORED_FLAG_PREFIX + 'battlemap.legendOpen']: 'false' } });
 
-    expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('false');
+    expect(rightOpen(r)).toBe(false);
+    expect(tab(r, 'layers').getAttribute('aria-selected')).toBe('false');
     expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('starts a first visit with both open', async () => {
+  it('opens the next visit on Filters when that was showing', async () => {
+    const r = await render({ stored: { [STORED_FLAG_PREFIX + 'battlemap.rightTab']: 'filters' } });
+
+    expect(rightOpen(r)).toBe(true);
+    expect(tab(r, 'filters').getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('app-filters-panel')).not.toBeNull();
+  });
+
+  it('ignores a kept panel it does not know', async () => {
+    const r = await render({ stored: { [STORED_FLAG_PREFIX + 'battlemap.rightTab']: 'charts' } });
+
+    expect(tab(r, 'layers').getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('starts a first visit with Layers and the legend open', async () => {
     const r = await render();
 
-    expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('true');
+    expect(rightOpen(r)).toBe(true);
+    expect(tab(r, 'layers').getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('#right-title')?.textContent).toBe('Layers');
     expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('shows the panel button as an arrow that points the way it will move the panel, named for what it does', async () => {
+  it('shuts the panel from its close button, and from its tab', async () => {
     const r = await render();
-    const toggle = r.el.querySelector<HTMLButtonElement>('.panel__toggle')!;
-    expect(toggle.getAttribute('aria-label')).toBe('Hide map controls');
-    expect(toggle.querySelector('app-icon path')?.getAttribute('d')).toBe('m18 15-6-6-6 6');
 
-    toggle.click();
+    r.el.querySelector<HTMLButtonElement>('.panel__close')!.click();
     await settle(r.fixture);
+    expect(rightOpen(r)).toBe(false);
 
-    expect(toggle.getAttribute('aria-label')).toBe('Show map controls');
-    expect(toggle.querySelector('app-icon path')?.getAttribute('d')).toBe('m6 9 6 6 6-6');
+    tab(r, 'layers').click();
+    await settle(r.fixture);
+    expect(rightOpen(r)).toBe(true);
+    tab(r, 'layers').click();
+    await settle(r.fixture);
+    expect(rightOpen(r)).toBe(false);
+  });
+
+  it('gives each rail tab an icon', async () => {
+    const r = await render();
+
+    const icons = [...r.el.querySelectorAll('app-left-tabs [role=tab]')].map((t) => !!t.querySelector('app-icon path')?.getAttribute('d'));
+    expect(icons).toEqual([true, true, true, true, true]);
   });
 
   describe('on a phone', () => {
@@ -101,14 +136,14 @@ describe('the Battle Map remembers what was left shut', () => {
     it('starts a first visit with both shut, so the map shows', async () => {
       const r = await render();
 
-      expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('false');
+      expect(rightOpen(r)).toBe(false);
       expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('still opens them if they were left open', async () => {
       const r = await render({ stored: { [STORED_FLAG_PREFIX + 'battlemap.panelOpen']: 'true', [STORED_FLAG_PREFIX + 'battlemap.legendOpen']: 'true' } });
 
-      expect(r.el.querySelector('.panel__toggle')?.getAttribute('aria-expanded')).toBe('true');
+      expect(rightOpen(r)).toBe(true);
       expect(r.el.querySelector('.legend__toggle')?.getAttribute('aria-expanded')).toBe('true');
     });
   });

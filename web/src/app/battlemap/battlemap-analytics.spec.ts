@@ -41,7 +41,7 @@ describe('Battle Map timeline', () => {
     await settle(r.fixture);
 
     expect(shownIds(r)).toEqual([1, 2]);
-    expect(r.el.querySelector('#tab-filters .badge')?.textContent).toBe('1');
+    expect(r.el.querySelector('#right-tab-filters .tab__badge')?.textContent).toBe('1');
   });
 
   it('follows a date range set in the filter panel, and clears it with "Reset zoom"', async () => {

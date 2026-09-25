@@ -17,7 +17,7 @@ function plotted(basemaps: Awaited<ReturnType<typeof render>>['basemaps']): numb
 }
 
 async function openFilters(r: Awaited<ReturnType<typeof render>>) {
-  r.el.querySelector<HTMLButtonElement>('#tab-filters')!.click();
+  r.el.querySelector<HTMLButtonElement>('#right-tab-filters')!.click();
   await settle(r.fixture);
 }
 
@@ -25,7 +25,7 @@ describe('Battle Map filters', () => {
   it('starts on the layers tab with every contact plotted', async () => {
     const r = await render({ contacts: CONTACTS });
 
-    expect(r.el.querySelector('#tab-layers')!.getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('#right-tab-layers')!.getAttribute('aria-selected')).toBe('true');
     expect(r.el.querySelector('app-filters-panel')).toBeNull();
     expect(r.el.querySelector('.bm__count')).toBeNull();      // the top bar carries no total
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
@@ -36,7 +36,7 @@ describe('Battle Map filters', () => {
 
     await openFilters(r);
 
-    expect(r.el.querySelector('#tab-filters')!.getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('#right-tab-filters')!.getAttribute('aria-selected')).toBe('true');
     expect(text(r.el.querySelector('.summary__count'))).toBe('4 of 4 contacts');
   });
 
@@ -59,12 +59,12 @@ describe('Battle Map filters', () => {
 
     r.el.querySelector<HTMLInputElement>('input[name=mine][value=yes]')!.click();
     await settle(r.fixture);
-    expect(text(r.el.querySelector('#tab-filters .badge'))).toBe('1');
+    expect(text(r.el.querySelector('#right-tab-filters .tab__badge'))).toBe('1');
 
     r.el.querySelector<HTMLButtonElement>('.chip')!.click();
     await settle(r.fixture);
 
-    expect(r.el.querySelector('#tab-filters .badge')).toBeNull();
+    expect(r.el.querySelector('#right-tab-filters .tab__badge')).toBeNull();
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
   });
 
@@ -199,7 +199,7 @@ describe('Battle Map opened from a link with filters', () => {
   it('applies the filters before the first draw and opens the filters tab', async () => {
     const r = await render({ contacts: CONTACTS, queryParams: { mine: 'yes', units: '3233' } });
 
-    expect(r.el.querySelector('#tab-filters')!.getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('#right-tab-filters')!.getAttribute('aria-selected')).toBe('true');
     expect(text(r.el.querySelector('.summary__count'))).toBe('1 of 4 contacts');
     expect(plotted(r.basemaps)).toEqual([2]);
     expect(r.el.querySelector('input[name=mine][value=yes]')).toHaveProperty('checked', true);
@@ -225,12 +225,12 @@ describe('Battle Map opened from a link with filters', () => {
     const r = await render({ contacts: CONTACTS, queryParams: { mine: 'maybe', fr: 'x', units: '999999', ops: 'Not an operation' } });
 
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
-    expect(r.el.querySelector('#tab-layers')!.getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('#right-tab-layers')!.getAttribute('aria-selected')).toBe('true');
   });
 
   it('opens on the layers tab when the link has no filters', async () => {
     const r = await render({ contacts: CONTACTS, queryParams: { at: '10.6,107.2,11' } });
-    expect(r.el.querySelector('#tab-layers')!.getAttribute('aria-selected')).toBe('true');
+    expect(r.el.querySelector('#right-tab-layers')!.getAttribute('aria-selected')).toBe('true');
   });
 });
 
@@ -279,12 +279,12 @@ describe('Battle Map operation timeline', () => {
     await click(r, 'Coburg');
     expect(plotted(r.basemaps)).toEqual([2]);
     expect(named(r, 'Coburg').getAttribute('aria-selected')).toBe('true');
-    expect(r.el.querySelector('#tab-filters .badge')?.textContent).toBe('1');
+    expect(r.el.querySelector('#right-tab-filters .tab__badge')?.textContent).toBe('1');
 
     await click(r, 'Coburg');
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
     expect(named(r, 'Coburg').getAttribute('aria-selected')).toBe('false');
-    expect(r.el.querySelector('#tab-filters .badge')).toBeNull();
+    expect(r.el.querySelector('#right-tab-filters .tab__badge')).toBeNull();
   });
 
   it('takes any number of operations at once, and drops each one as it is clicked off', async () => {

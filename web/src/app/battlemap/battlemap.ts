@@ -83,7 +83,7 @@ import { MapSelectionService } from './map-selection.service';
 import { MapViewStateService } from './map-view-state.service';
 import { FollowRow, Track, addTrackLayers, animateTracks, buildTracks, followedFromLink, neighbour, setTrackVisibility, setTracks } from './track';
 import { UnitFollowService } from './unit-follow.service';
-import { narrowScreen, storedFlag } from './stored-flag';
+import { narrowScreen, storedChoice, storedFlag } from './stored-flag';
 
 type Status = 'loading' | 'ready' | 'error';
 type Tab = 'layers' | 'filters';
@@ -198,7 +198,8 @@ export class Battlemap {
   /** Community pictures that have a place on the map. */
   protected readonly mapPictures = signal<readonly IncidentMediaView[]>([]);
   protected readonly showPhotos = signal(true);
-  protected readonly tab = signal<Tab>('layers');
+  /** Which of Layers and Filters the right-hand panel shows; the browser remembers it from one visit to the next. */
+  protected readonly tab = storedChoice<Tab>('battlemap.rightTab', ['layers', 'filters'], 'layers');
   /** Whether the Layers and Filters panel is showing: shut at first on a phone, so the map shows; the browser remembers it from one visit to the next. */
   protected readonly panelOpen = storedFlag('battlemap.panelOpen', !narrowScreen());
   protected readonly showHeatmap = signal(false);
@@ -216,27 +217,63 @@ export class Battlemap {
   /** Each operation's colour: the same on the markers, in the Operations list and in the legend. */
   private readonly allOperationColours = computed(() => operationColours(this.contactFilter.allContacts(), this.contactFilter.catalogue()?.operations ?? []));
   protected readonly operationColourMap = computed(() => (this.colourByOperation() ? this.allOperationColours() : null));
-  /** The operations with markers showing, for the legend, in the order they started; a last entry for contacts in none. */
+  /**
+   * The operations for the legend, in the order they started: those with contacts that pass every other filter, so that one
+   * chosen there leaves the rest to choose from. A last entry, not choosable, stands for contacts in no operation.
+   */
   protected readonly legendOperations = computed(() => {
     const colours = this.operationColourMap();
     if (!colours) {
       return [];
     }
-    const shown = new Set(this.contactFilter.visible().map((c) => c.op));
+    const shown = new Set(this.contactFilter.operationChoiceScope().map((c) => c.op));
     const names = this.contactFilter.catalogue()?.operations ?? [];
-    const rows = [...colours].filter(([op]) => shown.has(op)).map(([op, colour]) => ({ name: names[op - 1]?.name ?? `Operation ${op}`, colour }));
+    const rows = [...colours]
+      .filter(([op]) => shown.has(op) && names[op - 1])
+      .map(([op, colour]) => ({ name: names[op - 1].name, colour, choosable: true }));
     const none = [...shown].some((op) => !colours.has(op));
-    return none ? [...rows, { name: 'No operation', colour: NO_OPERATION_COLOUR }] : rows;
+    return none ? [...rows, { name: 'No operation', colour: NO_OPERATION_COLOUR, choosable: false }] : rows;
   });
   /** The types of point on the map, for the legend; none while the layer is switched off. */
   protected readonly legendPoiTypes = computed(() => (this.showPois() ? [...new Set(this.pois().map((p) => p.type))] : []));
   /** The charts drawer, opened from the top bar. */
   /** The tools in the rail at the left. A new one is a new entry here and a new case in the fly-out in the template. */
   protected readonly leftTabs: readonly LeftTab[] = [
-    { id: 'charts', label: 'Charts' },
-    { id: 'roll', label: 'Nominal roll' },
-    { id: 'images', label: 'Images' },
+    { id: 'charts', label: 'Charts', icon: 'bar-chart' },
+    { id: 'roll', label: 'Nominal roll', icon: 'users' },
+    { id: 'images', label: 'Images', icon: 'image' },
   ];
+  /** The tools in the rail at the right; Filters carries how many filters are on. */
+  protected readonly rightTabs = computed<readonly LeftTab[]>(() => [
+    { id: 'layers', label: 'Layers', icon: 'layers' },
+    { id: 'filters', label: 'Filters', icon: 'filter', badge: this.contactFilter.activeCount() || null },
+  ]);
+  /** The tool flown out at the right, or `null`: the panel's open state and its tab, both kept by the browser (see above). */
+  protected readonly rightTool = computed<Tab | null>(() => (this.panelOpen() ? this.tab() : null));
+  /** What the right-hand fly-out holds; like the left one's, it stays through the slide out. */
+  protected readonly rightShown = signal<Tab | null>(this.rightTool());
+  /** One right-hand tool is being swapped for the other while open, so the width may glide. */
+  protected readonly rightSwitching = signal(false);
+  private rightTimer?: ReturnType<typeof setTimeout>;
+  /**
+   * The Layers and Filters panel ends just above the legend (see `--bottom-h` in battlemap.css), and the legend grows and shrinks
+   * as it opens, shuts and lists more, so its height is watched once the map is ready.
+   */
+  private readonly watchBottom = effect((onCleanup) => {
+    if (this.status() !== 'ready' || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const host = this.host.nativeElement;
+    const observer = new ResizeObserver(([entry]) => host.style.setProperty('--bottom-h', `${Math.round(entry.target.getBoundingClientRect().height)}px`));
+    afterNextRender(
+      () => {
+        const bottom = host.querySelector('.bm__bottom');
+        if (bottom) observer.observe(bottom);
+      },
+      { injector: this.injector },
+    );
+    onCleanup(() => observer.disconnect());
+  });
   /** The tool that is flown out at the left, or `null` when none is. */
   protected readonly flyout = signal<string | null>(null);
   /** What the fly-out holds. It stays through the slide out, so the panel does not vanish before it has gone. */
@@ -456,9 +493,18 @@ export class Battlemap {
     this.syncUrl();
   }
 
-  protected showTab(tab: Tab): void {
-    this.tab.set(tab);
-    this.panelOpen.set(true);
+  /** Opens Layers or Filters at the right, swaps one for the other, or (with `null`) shuts the panel. */
+  protected setRightTool(tool: Tab | null): void {
+    clearTimeout(this.rightTimer);
+    this.rightSwitching.set(tool !== null && this.rightTool() !== null);
+    if (tool !== null) {
+      this.tab.set(tool);
+      this.panelOpen.set(true);
+      this.rightShown.set(tool);
+    } else {
+      this.panelOpen.set(false);
+      this.rightTimer = setTimeout(() => this.rightShown.set(null), FLYOUT_SLIDE_MS);
+    }
   }
 
   protected setBasemap(id: string): void {
@@ -595,7 +641,7 @@ export class Battlemap {
   private mapPadding(): { top: number; bottom: number; left: number; right: number } {
     const root = this.host.nativeElement.getBoundingClientRect();
     const timeline = this.host.nativeElement.querySelector('.bm__timeline')?.getBoundingClientRect();
-    const panels = [...this.host.nativeElement.querySelectorAll('.panel, .bm__incident')].map((e) => e.getBoundingClientRect().left);
+    const panels = [...this.host.nativeElement.querySelectorAll('.panel, .bm__incident, .bm__rtabs')].map((e) => e.getBoundingClientRect().left);
     const padding = {
       top: 64 + FIT_PADDING_PX,
       left: 32 + FIT_PADDING_PX,
@@ -641,6 +687,7 @@ export class Battlemap {
         }
         if (this.contactFilter.activeCount() > 0) {
           this.tab.set('filters');
+          this.rightShown.set(this.rightTool());
         }
       }
 

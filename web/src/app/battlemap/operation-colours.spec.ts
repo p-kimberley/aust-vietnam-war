@@ -68,6 +68,33 @@ describe('colouring the markers by operation', () => {
     expect(legend.map((li) => li.querySelector('circle')?.getAttribute('fill'))).toEqual([OPERATION_COLOURS[0], OPERATION_COLOURS[1], NO_OPERATION_COLOUR]);
   });
 
+  it('chooses operations as a filter from the legend, any number of them, dimming the rest but keeping them to choose', async () => {
+    const r = await render({ contacts: WITH_OPS, inputs: { colour: 'operation' } });
+    const entries = () => [...r.el.querySelectorAll<HTMLLIElement>('.legend__op-list li')];
+    const button = (name: string) => entries().find((li) => text(li) === name)!.querySelector<HTMLButtonElement>('button')!;
+    const dimmed = () => entries().filter((li) => li.classList.contains('is-dim')).map(text);
+    expect(text(r.el.querySelector('.legend__group'))).toBe('Operations');
+    expect(dimmed()).toEqual([]);
+    expect(entries().find((li) => text(li) === 'No operation')!.querySelector('button')).toBeNull();
+
+    button('Coburg').click();
+    await settle(r.fixture);
+
+    expect([...r.el.querySelectorAll('.legend__op-list li')].map(text)).toEqual(['Hardihood, Phase 2', 'Coburg', 'No operation']);
+    expect(button('Coburg').getAttribute('aria-pressed')).toBe('true');
+    expect(dimmed()).toEqual(['Hardihood, Phase 2', 'No operation']);
+    expect(r.el.querySelector('.row.is-on .row__name')?.textContent).toContain('Coburg');       // the Operations list agrees
+
+    button('Hardihood, Phase 2').click();
+    await settle(r.fixture);
+    expect(dimmed()).toEqual(['No operation']);
+
+    button('Coburg').click();
+    button('Hardihood, Phase 2').click();
+    await settle(r.fixture);
+    expect(dimmed()).toEqual([]);
+  });
+
   it('opens a link with the markers coloured by operation', async () => {
     const r = await render({ contacts: WITH_OPS, inputs: { colour: 'operation' } });
 
