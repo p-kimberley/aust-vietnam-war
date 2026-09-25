@@ -170,8 +170,11 @@
   z-index: 3;
   top: calc(3rem + 12px + var(--safe-top));
   left: calc(2.4rem + var(--safe-left));
-  /* Runs down to the timeline: the legend is across the map at the right. (On a phone, where it is not, it ends above the legend.) */
-  bottom: calc(var(--timeline-h) + var(--safe-bottom) + 0.75rem);
+  /*
+   * Runs down to the level of the legend's foot and the map's own controls, just above the timeline: the legend is across the map
+   * at the right. (On a phone, where it is not, it ends above the legend.)
+   */
+  bottom: calc(var(--timeline-h) + var(--safe-bottom) + var(--legend-gap));
   width: min(40rem, calc(100vw - 3.15rem));
   display: flex;
   flex-direction: column;
@@ -318,7 +321,8 @@
   align-items: flex-end;
   gap: 0.5rem;
   /* The per-control margin that used to hold these off the corner is zeroed out below, so the offset moves here. */
-  padding: 0 0 5px calc(5px + var(--safe-left));
+  /* Their foot is level with the legend's, and the left-hand panels'. */
+  padding: 0 0 var(--legend-gap) calc(5px + var(--safe-left));
 }
 
 :host ::ng-deep .maplibregl-ctrl-bottom-left .maplibregl-ctrl {
