@@ -2,16 +2,18 @@ import { httpResource } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ArticleCardView } from '../content/article-card';
+import { HomeBackdrop } from './home-backdrop';
 import { ArticleCard, Paged } from '../content/content';
 import { SITE_NAME, Seo } from '../core/seo.service';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, ArticleCardView],
+  imports: [RouterLink, ArticleCardView, HomeBackdrop],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="hero">
-      <div class="wrap">
+      <app-home-backdrop />
+      <div class="wrap hero__words">
         <p class="data hero__kicker">1965 – 1971</p>
         <h1>Australia's<br />Vietnam War</h1>
         <p class="hero__lead">
@@ -68,8 +70,15 @@ import { SITE_NAME, Seo } from '../core/seo.service';
       background:
         linear-gradient(180deg, rgb(31 35 20 / 0.92), rgb(53 61 34 / 0.92)),
         repeating-linear-gradient(45deg, var(--olive-700) 0 6px, var(--olive-900) 6px 12px);
+      position: relative;
+      isolation: isolate;
       color: var(--paper);
-      padding-block: clamp(3rem, 10vw, 6rem);
+      padding-block: clamp(3rem, 10vw, 6rem) clamp(4rem, 11vw, 7rem);
+    }
+    /* Over the photographs behind (app-home-backdrop); the striped background shows until the first has loaded. */
+    .hero__words {
+      position: relative;
+      z-index: 1;
     }
     .hero h1 {
       color: var(--paper);
