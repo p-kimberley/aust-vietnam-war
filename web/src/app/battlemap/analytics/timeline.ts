@@ -2,10 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  Injector,
   OnDestroy,
+  afterNextRender,
   afterRenderEffect,
   computed,
   effect,
+  inject,
   input,
   model,
   output,
@@ -24,9 +27,17 @@ const DAY = 24 * HOUR;
 /** The margins round the bars inside the chart's box, in pixels. A drag across the bars is measured against them. */
 export const CHART_GRID = { left: 8, right: 12, top: 6, bottom: 62 } as const;
 
-/** How often the play button moves the window on, and by how many months. */
+/** How often the play button moves the window on. */
 export const PLAY_INTERVAL_MS = 400;
-export const PLAY_STEP_MONTHS = 1;
+/** The speeds play can go at, chosen from the menu beside Play: how many days the window moves on at each step. */
+export const PLAY_SPEEDS = [
+  { id: 'slow', name: 'Slow', days: 1 },
+  { id: 'normal', name: 'Normal', days: 3 },
+  { id: 'fast', name: 'Fast', days: 10 },
+] as const;
+export type PlaySpeed = (typeof PLAY_SPEEDS)[number]['id'];
+export const DEFAULT_PLAY_SPEED: PlaySpeed = 'normal';
+const playDays = (speed: PlaySpeed) => PLAY_SPEEDS.find((s) => s.id === speed)!.days;
 /** A window shorter than this is widened to it when play starts, so there is something to watch. */
 export const PLAY_MIN_MONTHS = 3;
 
@@ -182,9 +193,9 @@ export function zoomToRange(zoom: ZoomRange, min: number, max: number): DateRang
 
 /**
  * The window after one step of play, or `null` once it has run off the end of the timeline. With no range set, play starts
- * from the first few months; otherwise it slides the current window on by a month, keeping its width.
+ * from the first few months; otherwise it slides the current window on by `stepDays`, keeping its width.
  */
-export function nextWindow(range: DateRange, min: number, max: number): DateRange | null {
+export function nextWindow(range: DateRange, min: number, max: number, stepDays: number = playDays(DEFAULT_PLAY_SPEED)): DateRange | null {
   let start: number;
   let end: number;
   if (range.from === null && range.to === null) {
@@ -192,8 +203,8 @@ export function nextWindow(range: DateRange, min: number, max: number): DateRang
     end = addMonths(min, PLAY_MIN_MONTHS);
   } else {
     const zoom = rangeToZoom(range, min, max);
-    start = addMonths(zoom.start, PLAY_STEP_MONTHS);
-    end = addMonths(zoom.end, PLAY_STEP_MONTHS);
+    start = zoom.start + stepDays * DAY;
+    end = zoom.end + stepDays * DAY;
   }
   if (start >= max) {
     return null;
@@ -517,7 +528,31 @@ let nextTimelineId = 0;
 
       <div class="tl__strip">
         <div class="tl__controls">
-          <button type="button" class="tl__play" [attr.aria-pressed]="playing()" (click)="togglePlay()"><app-icon [name]="playing() ? 'pause' : 'play'" />{{ playing() ? 'Pause' : 'Play' }}</button>
+          <!-- Play, with its speed on a split button beside it; the menu shuts when focus leaves the pair. -->
+          <div class="tl__split" (focusout)="speedBlur($event)" (keydown.escape)="closeSpeedMenu(true)">
+            <button type="button" class="tl__play" [attr.aria-pressed]="playing()" (click)="togglePlay()"><app-icon [name]="playing() ? 'pause' : 'play'" />{{ playing() ? 'Pause' : 'Play' }}</button>
+            <button
+              #speedButton
+              type="button"
+              class="tl__speed"
+              aria-label="Playback speed"
+              aria-haspopup="menu"
+              [attr.aria-controls]="speedMenuId"
+              [attr.aria-expanded]="speedMenu()"
+              (click)="speedMenu() ? closeSpeedMenu(false) : openSpeedMenu()"
+            >
+              <app-icon name="settings" />
+            </button>
+            @if (speedMenu()) {
+              <div #speedList class="tl__menu" role="menu" aria-label="Playback speed" [id]="speedMenuId" (keydown)="speedKey($event)">
+                @for (s of speeds; track s.id) {
+                  <button type="button" role="menuitemradio" class="tl__speed-item" [attr.aria-checked]="speed() === s.id" tabindex="-1" (click)="chooseSpeed(s.id)">
+                    <app-icon name="check" class="tl__tick" [class.is-on]="speed() === s.id" />{{ s.name }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
           <span class="tl__range data" aria-live="polite">{{ label() }}</span>
           @if (from() || to()) {
             <button type="button" class="tl__reset" (click)="reset()"><app-icon name="zoom-out" />Reset zoom</button>
@@ -782,6 +817,68 @@ let nextTimelineId = 0;
       color: var(--ink);
       border-color: var(--brass);
     }
+    .tl__split {
+      position: relative;
+      display: flex;
+    }
+    .tl__split .tl__play {
+      flex: 1;
+      border-right-color: color-mix(in srgb, var(--ink) 35%, var(--brass));
+    }
+    .tl__speed {
+      display: inline-grid;
+      place-items: center;
+      padding: 0 0.45rem;
+      color: var(--ink);
+      background: var(--brass);
+      border: 1px solid var(--brass);
+      border-left: 0;
+      cursor: pointer;
+    }
+    .tl__speed app-icon,
+    .tl__tick {
+      margin: 0;
+    }
+    /* Opens upwards: the strip sits at the foot of the screen. */
+    .tl__menu {
+      position: absolute;
+      z-index: 2;
+      bottom: calc(100% + 0.25rem);
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      min-width: 8rem;
+      padding: 0.25rem 0;
+      background: var(--olive-900);
+      border: 1px solid var(--olive-500);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+    .tl__speed-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      color: var(--paper);
+      font: inherit;
+      font-size: 0.85rem;
+      text-align: left;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+    .tl__speed-item:hover,
+    .tl__speed-item:focus-visible {
+      background: var(--olive-700);
+      outline: none;
+    }
+    .tl__tick {
+      visibility: hidden;
+      color: var(--smoke-yellow);
+    }
+    .tl__tick.is-on {
+      visibility: visible;
+    }
     /* Two dates of ten characters and " to " fit the column on one line, so a date is never broken in the middle. */
     .tl__range {
       font-size: 0.74rem;
@@ -867,6 +964,14 @@ export class Timeline implements OnDestroy {
   /** The row the keyboard is on; Space or Enter chooses it. */
   private readonly active = signal(0);
   private timer?: ReturnType<typeof setInterval>;
+  protected readonly speeds = PLAY_SPEEDS;
+  /** How fast play goes; a change while playing takes effect at the next step. */
+  protected readonly speed = signal<PlaySpeed>(DEFAULT_PLAY_SPEED);
+  protected readonly speedMenu = signal(false);
+  protected readonly speedMenuId = `tl-speed-${nextTimelineId++}`;
+  private readonly speedButton = viewChild<ElementRef<HTMLButtonElement>>('speedButton');
+  private readonly speedList = viewChild<ElementRef<HTMLElement>>('speedList');
+  private readonly injector = inject(Injector);
 
   /** The whole span of the timeline, always by calendar month: what decides the axis and the slider's overview, whatever the bars are bucketed by. */
   private readonly monthlyBuckets = computed(() => monthBuckets(this.all(), this.visible()));
@@ -1068,13 +1173,58 @@ export class Timeline implements OnDestroy {
     }
     this.playing.set(true);
     this.timer = setInterval(() => {
-      const next = nextWindow({ from: this.from(), to: this.to() }, lim.min, lim.max);
+      const next = nextWindow({ from: this.from(), to: this.to() }, lim.min, lim.max, playDays(this.speed()));
       if (next) {
         this.rangeChange.emit(next);
       } else {
         this.stop();
       }
     }, PLAY_INTERVAL_MS);
+  }
+
+  /** Opens the speed menu with the chosen speed under the keyboard, as a menu button does. */
+  protected openSpeedMenu(): void {
+    this.speedMenu.set(true);
+    afterNextRender(() => this.speedItems()[PLAY_SPEEDS.findIndex((s) => s.id === this.speed())]?.focus(), { injector: this.injector });
+  }
+
+  /** Shuts the menu; `refocus` puts the keyboard back on its button (after Escape or a choice), not when focus has gone elsewhere. */
+  protected closeSpeedMenu(refocus: boolean): void {
+    if (!this.speedMenu()) {
+      return;
+    }
+    this.speedMenu.set(false);
+    if (refocus) {
+      this.speedButton()?.nativeElement.focus();
+    }
+  }
+
+  protected chooseSpeed(speed: PlaySpeed): void {
+    this.speed.set(speed);
+    this.closeSpeedMenu(true);
+  }
+
+  /** Up and Down move through the speeds, round at the ends; Home and End go to the first and last. */
+  protected speedKey(event: KeyboardEvent): void {
+    const items = this.speedItems();
+    const at = items.indexOf(document.activeElement as HTMLButtonElement);
+    const to = ({ ArrowDown: at + 1, ArrowUp: at - 1, Home: 0, End: items.length - 1 } as Record<string, number>)[event.key];
+    if (to === undefined) {
+      return;
+    }
+    event.preventDefault();
+    items[(to + items.length) % items.length]?.focus();
+  }
+
+  protected speedBlur(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (!next || !(event.currentTarget as HTMLElement).contains(next)) {
+      this.closeSpeedMenu(false);
+    }
+  }
+
+  private speedItems(): HTMLButtonElement[] {
+    return [...(this.speedList()?.nativeElement.querySelectorAll<HTMLButtonElement>('[role=menuitemradio]') ?? [])];
   }
 
   private stop(): void {

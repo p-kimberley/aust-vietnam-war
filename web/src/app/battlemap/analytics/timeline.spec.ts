@@ -6,6 +6,7 @@ import { StubEChart, stubEchartIn } from './echart-stub';
 import {
   DateRange,
   PLAY_INTERVAL_MS,
+  PLAY_SPEEDS,
   Timeline,
   bucketIntervalMs,
   dayMs,
@@ -142,15 +143,24 @@ describe('nextWindow (play)', () => {
     expect(nextWindow({ from: null, to: null }, MIN, MAX)).toEqual({ from: '1966-01-01', to: '1966-03-31' });
   });
 
-  it('slides the window on a month at a time, keeping its width', () => {
-    expect(nextWindow({ from: '1966-01-01', to: '1966-03-31' }, MIN, MAX)).toEqual({ from: '1966-02-01', to: '1966-04-30' });
-    expect(nextWindow({ from: '1966-02-01', to: '1966-04-30' }, MIN, MAX)).toEqual({ from: '1966-03-01', to: '1966-05-31' });
+  it('slides the window on by a few days at a time at normal speed, keeping its width', () => {
+    expect(nextWindow({ from: '1966-01-01', to: '1966-03-31' }, MIN, MAX)).toEqual({ from: '1966-01-04', to: '1966-04-03' });
+    expect(nextWindow({ from: '1966-01-04', to: '1966-04-03' }, MIN, MAX)).toEqual({ from: '1966-01-07', to: '1966-04-06' });
+  });
+
+  it('slides it by as many days as asked', () => {
+    expect(nextWindow({ from: '1966-01-01', to: '1966-03-31' }, MIN, MAX, 1)).toEqual({ from: '1966-01-02', to: '1966-04-01' });
+    expect(nextWindow({ from: '1966-01-01', to: '1966-03-31' }, MIN, MAX, 10)).toEqual({ from: '1966-01-11', to: '1966-04-10' });
+  });
+
+  it('goes about a tenth as fast as a month a step at normal speed', () => {
+    expect(PLAY_SPEEDS.map((s) => [s.name, s.days])).toEqual([['Slow', 1], ['Normal', 3], ['Fast', 10]]);
   });
 
   it('shortens the window at the end of the timeline and then stops', () => {
-    expect(nextWindow({ from: '1966-03-01', to: '1966-05-31' }, MIN, MAX)).toEqual({ from: '1966-04-01', to: '1966-06-30' });
-    expect(nextWindow({ from: '1966-04-01', to: '1966-06-30' }, MIN, MAX)).toEqual({ from: '1966-05-01', to: '1966-06-30' });
-    expect(nextWindow({ from: '1966-06-01', to: '1966-06-30' }, MIN, MAX)).toBeNull();
+    expect(nextWindow({ from: '1966-04-01', to: '1966-06-28' }, MIN, MAX)).toEqual({ from: '1966-04-04', to: '1966-06-30' });
+    expect(nextWindow({ from: '1966-04-04', to: '1966-06-30' }, MIN, MAX)).toEqual({ from: '1966-04-07', to: '1966-06-30' });
+    expect(nextWindow({ from: '1966-06-29', to: '1966-06-30' }, MIN, MAX)).toBeNull();
   });
 });
 
@@ -285,7 +295,7 @@ describe('Timeline', () => {
     expect(emitted.at(-1)).toEqual({ from: '1966-01-01', to: '1966-03-31' });
 
     // The parent applies each window; feed it back as the component's inputs, as the map does.
-    for (let i = 0; i < 10 && emitted.length; i++) {
+    for (let i = 0; i < 80 && emitted.length; i++) {
       const last = emitted.at(-1)!;
       f.componentRef.setInput('from', last.from);
       f.componentRef.setInput('to', last.to);
@@ -293,10 +303,59 @@ describe('Timeline', () => {
       await vi.advanceTimersByTimeAsync(PLAY_INTERVAL_MS);
     }
 
-    expect(emitted.map((r) => r.from)).toEqual(['1966-01-01', '1966-02-01', '1966-03-01', '1966-04-01', '1966-05-01', '1966-06-01']);
+    expect(emitted.slice(0, 4).map((r) => r.from)).toEqual(['1966-01-01', '1966-01-04', '1966-01-07', '1966-01-10']);
     expect(emitted.at(-1)!.to).toBe('1966-06-30');
     f.detectChanges();
     expect(button('Play')).toBeDefined();                                // it stopped by itself
+  });
+
+  it('offers the speeds on a menu beside Play, Normal to start with, and plays at the one chosen', async () => {
+    const { f, emitted, button, el } = setup({ from: '1966-01-01', to: '1966-03-31' });
+    const speed = el.querySelector<HTMLButtonElement>('.tl__speed')!;
+    const items = () => [...el.querySelectorAll<HTMLButtonElement>('[role=menuitemradio]')];
+    expect(speed.getAttribute('aria-label')).toBe('Playback speed');
+    expect(speed.getAttribute('aria-haspopup')).toBe('menu');
+    expect(items()).toHaveLength(0);
+
+    speed.click();
+    f.detectChanges();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(speed.getAttribute('aria-expanded')).toBe('true');
+    expect(items().map((b) => [b.textContent?.trim(), b.getAttribute('aria-checked')])).toEqual([['Slow', 'false'], ['Normal', 'true'], ['Fast', 'false']]);
+    expect(document.activeElement).toBe(items()[1]);
+
+    button('Fast').click();
+    f.detectChanges();
+    expect(items()).toHaveLength(0);
+    expect(document.activeElement).toBe(speed);
+
+    button('Play').click();
+    f.detectChanges();
+    await vi.advanceTimersByTimeAsync(PLAY_INTERVAL_MS);
+    expect(emitted.at(-1)).toEqual({ from: '1966-01-11', to: '1966-04-10' });
+    button('Pause').click();
+  });
+
+  it('moves through the speeds with the arrow keys and shuts the menu on Escape', async () => {
+    const { f, el } = setup();
+    const speed = el.querySelector<HTMLButtonElement>('.tl__speed')!;
+    const items = () => [...el.querySelectorAll<HTMLButtonElement>('[role=menuitemradio]')];
+    speed.click();
+    f.detectChanges();
+    await vi.advanceTimersByTimeAsync(0);
+
+    const key = (k: string) => document.activeElement!.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+    key('ArrowDown');
+    expect(document.activeElement).toBe(items()[2]);
+    key('ArrowDown');
+    expect(document.activeElement).toBe(items()[0]);
+    key('ArrowUp');
+    expect(document.activeElement).toBe(items()[2]);
+
+    key('Escape');
+    f.detectChanges();
+    expect(items()).toHaveLength(0);
+    expect(document.activeElement).toBe(speed);
   });
 
   it('pauses when asked, and when the reader moves the slider', async () => {
