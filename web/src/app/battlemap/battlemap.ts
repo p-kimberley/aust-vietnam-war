@@ -12,6 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import type { Params } from '@angular/router';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { AnalyticsPanel } from './analytics/analytics-panel';
 import { DateRange, Timeline, TimelineFocus } from './analytics/timeline';
@@ -72,7 +73,7 @@ import { ContactsService } from './contacts.service';
 import { FilterCatalogueService } from './filter-catalogue';
 import { FiltersPanel } from './filters-panel';
 import { FilterState, fromParams, hasText, toParams } from './filters';
-import { MapConfig, MapConfigService } from './map-config';
+import { MapConfig, MapConfigService, pickBasemap } from './map-config';
 import { Camera, formatAt, parseAt } from './map-url';
 import { MapSelectionService } from './map-selection.service';
 import { MapViewStateService } from './map-view-state.service';
@@ -717,6 +718,8 @@ export class Battlemap {
         },
       );
       this.selection.attach(this.map);
+      // Back and Forward show the map as it was at that point in the reader's history.
+      this.urlState.onRestore = (params) => this.restore(params);
       this.placement.attach(this.map);
       // Marches the dashes along whichever units are followed; off again the moment none are, rather than ticking
       // forever in the background.
@@ -808,6 +811,94 @@ export class Battlemap {
         follow: this.followUnits.followed().size ? [...this.followUnits.followed()].sort((a, b) => a - b).join(',') : null,
         ...(tree ? toParams(this.contactFilter.filters(), tree) : {}),
       };
-    });
+    }, () => !this.timelinePlaying());
+  }
+
+  /**
+   * Shows the map as a history entry the reader went Back or Forward to has it: the camera, the basemap and layers, the filters,
+   * the followed units, the tool at the left, and whatever was open. The same reading of the URL as when the page opens, applied to
+   * the map that is already there. Nothing is flown to or fitted: the entry's own camera says where to look.
+   */
+  private restore(q: Params): void {
+    const map = this.map;
+    const config = this.config();
+    if (!map || !config) {
+      return;
+    }
+    const one = (key: string): string | undefined => {
+      const v = q[key];
+      return typeof v === 'string' ? v : Array.isArray(v) ? String(v[0]) : undefined;
+    };
+    this.spider?.close();
+    this.timelinePlaying.set(false);
+
+    // Where the map looks, and what it is drawn on.
+    const camera = parseAt(one('at'));
+    if (camera) {
+      map.easeTo({ center: [camera.lon, camera.lat], zoom: camera.zoom, duration: 600 });
+    }
+    const basemap = pickBasemap(config, one('basemap'));
+    if (basemap) this.basemaps.setBasemap(basemap.id);
+    if ((one('terrain') === '1') !== this.basemaps.terrainEnabled()) this.basemaps.setTerrain(one('terrain') === '1');
+    const overlays = (one('overlays') ?? '').split(',');
+    const opacities = parseOverlayOpacities(one('opacity'));
+    for (const o of config.overlays) {
+      const on = overlays.includes(o.id);
+      if (on !== this.basemaps.overlayIds().includes(o.id)) this.basemaps.setOverlay(o.id, on);
+      const opacity = opacities.get(o.id) ?? o.opacity ?? 1;
+      if (opacity !== this.basemaps.overlayOpacity(o.id)) this.basemaps.setOverlayOpacity(o.id, opacity);
+    }
+
+    // The layers.
+    this.showPois.set(one('bases') !== '0');
+    setPoiVisibility(map, this.showPois());
+    this.showPhotos.set(one('photos') !== '0');
+    setPhotoVisibility(map, this.showPhotos());
+    this.showMarkers.set(one('markers') !== '0');
+    setContactVisibility(map, POINT_LAYER, this.showMarkers());
+    this.showHeatmap.set(one('heatmap') !== '0');
+    setContactVisibility(map, HEAT_LAYER, this.showHeatmap());
+    const field = one('field');
+    this.heatField.set(field && isHeatField(field) ? field : DEFAULT_HEAT_FIELD);
+    const size = one('size');
+    this.sizeField.set(size && isSizeField(size) ? size : null);
+    setMarkerSizing(map, this.markerSizing());
+
+    // The filters (a changed report search runs again, and redraws when it answers), and the units followed through them.
+    const catalogue = this.contactFilter.catalogue();
+    const tree = this.contactFilter.tree();
+    if (catalogue && tree) {
+      this.fitRequest = null;
+      this.contactFilter.setFilters(fromParams(q, catalogue, tree));
+    }
+    this.followUnits.followed.set(followedFromLink(one('follow'), one('track'), this.contactFilter.filters().units));
+    this.refreshContacts();
+    setTrackVisibility(map, this.followUnits.followed().size > 0);
+
+    // The tool at the left.
+    const tool = one('charts') === '1' ? 'charts' : one('roll') === '1' ? 'roll' : one('images') === '1' ? 'images' : null;
+    if (tool !== this.flyout()) this.setFlyout(tool);
+
+    // What was open: an incident, a base or a person at the right, and a picture in the viewer over them.
+    const id = (key: string) => {
+      const n = Number(one(key));
+      return Number.isInteger(n) && n > 0 ? n : null;
+    };
+    const incident = id('incident');
+    const poi = id('poi');
+    const person = one('person') ?? null;
+    if (incident !== null && this.contactFilter.allContacts().some((c) => c.id === incident)) {
+      this.selection.select(incident);
+    } else if (poi !== null && this.pois().some((p) => p.id === poi)) {
+      this.selection.selectPoi(poi);
+    } else if (person) {
+      this.selection.openPerson(person);
+    } else {
+      this.selection.clear();
+      this.selection.openPerson(null);
+    }
+    const picture = id('picture');
+    this.selection.selectPicture(picture);
+    this.spider?.setSelected(picture);
   }
 }
