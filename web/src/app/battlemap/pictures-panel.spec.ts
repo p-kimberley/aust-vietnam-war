@@ -7,7 +7,7 @@ import { IncidentMediaView, PictureHit } from './community/community';
 import { communityProviders, fakeAuth, fakeCommunity } from './community/community-testing';
 import { PHOTO_SOURCE } from './photo-layers';
 import { Place, PicturePlacementService } from './picture-placement.service';
-import { PICTURES_DELAY_MS, PICTURES_PAGE_SIZE, PicturesPanel } from './pictures-panel';
+import { PICTURES_DELAY_MS, PICTURES_PAGE_SIZE, PicturesPanel, TIP_DELAY_MS } from './pictures-panel';
 
 const text = (el: Element | null) => el?.textContent?.replace(/\s+/g, ' ').trim();
 
@@ -121,6 +121,71 @@ describe('PicturesPanel: finding pictures', () => {
     el.querySelector<HTMLButtonElement>('.hit')!.click();
 
     expect(chosen).toEqual([{ id: 3, lat: 10.5, lon: 107.2 }]);
+  });
+});
+
+describe('PicturesPanel: details of an image in a tooltip', () => {
+  const long = 'Grounded ship Vung Tau harbour, taken from the beach near the Badcoe Club during the monsoon of 1967';
+  const items = [hit(1, { caption: long, dateTaken: '1967-10-02' }), hit(2, { caption: null, credit: null, contactId: 42 })];
+  async function listed() {
+    const r = mount({ searchPictures: vi.fn(() => Promise.resolve({ items, total: 2, page: 1, pageSize: 24 })) });
+    await settle(r.fixture);
+    return { ...r, cards: [...r.el.querySelectorAll<HTMLButtonElement>('.hit')] };
+  }
+  const field = (el: HTMLElement, name: string) => {
+    const dt = [...el.querySelectorAll('.tip dt')].find((d) => text(d) === name);
+    return dt ? text(dt.nextElementSibling) : undefined;
+  };
+
+  it('shows the whole caption, the credit, the date taken and where it was placed, once the mouse rests on a card', async () => {
+    const { fixture, el, cards } = await listed();
+    vi.useFakeTimers();
+    try {
+      cards[0].dispatchEvent(new MouseEvent('mouseenter'));
+      fixture.detectChanges();
+      expect(el.querySelector('.tip')).toBeNull();                               // not for the mouse passing over
+
+      vi.advanceTimersByTime(TIP_DELAY_MS);
+      fixture.detectChanges();
+      const tip = el.querySelector('.tip')!;
+      expect(tip.getAttribute('role')).toBe('tooltip');
+      expect(text(tip.querySelector('.tip__caption'))).toBe(long);
+      expect([field(el, 'Credit'), field(el, 'Taken'), field(el, 'Placed')]).toEqual(['AWM', '2 Oct 1967', '10.50000, 107.20000']);
+      expect(cards[0].getAttribute('aria-describedby')).toBe('pics-tip');
+
+      cards[0].dispatchEvent(new MouseEvent('mouseleave'));
+      fixture.detectChanges();
+      expect(el.querySelector('.tip')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('shows at once for the keyboard, naming the incident an image belongs to', async () => {
+    const { fixture, el, cards } = await listed();
+
+    cards[1].dispatchEvent(new FocusEvent('focus'));
+    fixture.detectChanges();
+
+    expect(text(el.querySelector('.tip__caption'))).toBe('Untitled');
+    expect(field(el, 'Incident')).toBe('42');
+    expect(field(el, 'Placed')).toBeUndefined();
+    expect(field(el, 'Credit')).toBeUndefined();
+
+    cards[1].dispatchEvent(new FocusEvent('blur'));
+    fixture.detectChanges();
+    expect(el.querySelector('.tip')).toBeNull();
+  });
+
+  it('goes when the list is scrolled, as it would no longer be by its card', async () => {
+    const { fixture, el, cards } = await listed();
+    cards[0].dispatchEvent(new FocusEvent('focus'));
+    fixture.detectChanges();
+
+    el.querySelector('.grid')!.dispatchEvent(new Event('scroll'));
+    fixture.detectChanges();
+
+    expect(el.querySelector('.tip')).toBeNull();
   });
 });
 

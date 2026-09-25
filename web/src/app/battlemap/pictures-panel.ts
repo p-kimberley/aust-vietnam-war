@@ -8,6 +8,8 @@ import { Icon } from './icon';
 
 /** How many pictures one request brings back, and each "Show more" adds. */
 export const PICTURES_PAGE_SIZE = 24;
+/** How long the mouse must rest on an image before its details show. */
+export const TIP_DELAY_MS = 350;
 /** How long typing must pause before the pictures are searched. */
 export const PICTURES_DELAY_MS = 300;
 
@@ -69,10 +71,19 @@ type Mode = 'browse' | 'add';
           <p class="error" role="alert">The images could not be searched. Try again in a moment.</p>
           <button type="button" class="button more" (click)="reload()"><app-icon name="refresh" />Try again</button>
         }
-        <ul class="grid" aria-label="Images found">
+        <ul class="grid" aria-label="Images found" (scroll)="hideTip()">
           @for (p of pictures(); track p.id) {
             <li>
-              <button type="button" class="hit" (click)="open(p)">
+              <button
+                type="button"
+                class="hit"
+                [attr.aria-describedby]="tip()?.hit === p ? 'pics-tip' : null"
+                (click)="open(p)"
+                (mouseenter)="showTip(p, $event, true)"
+                (mouseleave)="hideTip()"
+                (focus)="showTip(p, $event, false)"
+                (blur)="hideTip()"
+              >
                 <img [src]="p.thumbUrl" [alt]="p.caption || 'An image'" loading="lazy" />
                 <span class="hit__caption">{{ p.caption || 'Untitled' }}</span>
                 @if (p.credit || p.dateTaken) {
@@ -146,6 +157,28 @@ type Mode = 'browse' | 'add';
         </div>
       }
     </section>
+    @if (tip(); as t) {
+      <div id="pics-tip" class="tip" role="tooltip" [style.left.px]="t.x" [style.top.px]="t.y" [class.tip--above]="t.above">
+        <p class="tip__caption">{{ t.hit.caption || 'Untitled' }}</p>
+        <dl class="tip__meta">
+          @if (t.hit.credit) {
+            <dt>Credit</dt>
+            <dd>{{ t.hit.credit }}</dd>
+          }
+          @if (t.hit.dateTaken) {
+            <dt>Taken</dt>
+            <dd class="data">{{ t.hit.dateTaken | date: 'd MMM y' }}</dd>
+          }
+          @if (t.hit.contactId !== null) {
+            <dt>Incident</dt>
+            <dd class="data">{{ t.hit.contactId }}</dd>
+          } @else if (t.hit.lat !== null && t.hit.lon !== null) {
+            <dt>Placed</dt>
+            <dd class="data">{{ t.hit.lat.toFixed(5) }}, {{ t.hit.lon.toFixed(5) }}</dd>
+          }
+        </dl>
+      </div>
+    }
     @if (dragging(); as at) {
       <div class="ghost" aria-hidden="true" [style.left.px]="at.x" [style.top.px]="at.y">
         <svg viewBox="0 0 24 32"><path d="M12 1C6 1 1.5 5.5 1.5 11.3 1.5 19 12 31 12 31s10.5-12 10.5-19.7C22.5 5.5 18 1 12 1z" /><circle cx="12" cy="11.5" r="4" /></svg>
@@ -433,6 +466,42 @@ type Mode = 'browse' | 'add';
     .pin.is-dragging {
       opacity: 0.4;
     }
+    /* What is known of an image, over the list: below its card, or above it near the bottom of the screen. Fixed, so the list's
+       scrolling edge does not cut it off. */
+    .tip {
+      position: fixed;
+      z-index: 1000;
+      width: max-content;
+      max-width: 18rem;
+      padding: 0.5rem 0.65rem;
+      color: var(--paper);
+      font-size: 0.8rem;
+      background: var(--olive-900);
+      border: 1px solid var(--smoke-yellow);
+      border-radius: var(--radius);
+      box-shadow: 0 0.4rem 1rem rgb(0 0 0 / 0.45);
+      pointer-events: none;
+    }
+    .tip--above {
+      transform: translateY(-100%);
+    }
+    .tip__caption {
+      margin: 0 0 0.35rem;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .tip__meta {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.15rem 0.6rem;
+      margin: 0;
+    }
+    .tip__meta dt {
+      color: var(--khaki);
+    }
+    .tip__meta dd {
+      margin: 0;
+    }
     /* The pin following the pointer while it is dragged: its tip is at the pointer. */
     .ghost {
       position: fixed;
@@ -701,7 +770,30 @@ export class PicturesPanel implements OnDestroy {
     this.placement.setPreview(url);
   }
 
+  /** The image whose details are showing over the list, and where: below its card, or above it (`y` is then the card's top). */
+  protected readonly tip = signal<{ hit: PictureHit; x: number; y: number; above: boolean } | null>(null);
+  private tipTimer?: ReturnType<typeof setTimeout>;
+
+  /** Shows an image's details by its card: after a moment for the mouse passing over, at once for the keyboard. */
+  protected showTip(hit: PictureHit, event: Event, hover: boolean): void {
+    clearTimeout(this.tipTimer);
+    const card = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const above = card.bottom + 160 > (typeof window === 'undefined' ? Infinity : window.innerHeight);
+    const place = () => this.tip.set({ hit, x: Math.max(8, card.left), y: above ? card.top - 6 : card.bottom + 6, above });
+    if (hover) {
+      this.tipTimer = setTimeout(place, TIP_DELAY_MS);
+    } else {
+      place();
+    }
+  }
+
+  protected hideTip(): void {
+    clearTimeout(this.tipTimer);
+    this.tip.set(null);
+  }
+
   ngOnDestroy(): void {
+    clearTimeout(this.tipTimer);
     clearTimeout(this.timer);
     this.setPreview(null);
     this.placement.clear();
