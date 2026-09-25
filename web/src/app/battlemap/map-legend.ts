@@ -138,17 +138,18 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
       gap: 0.75rem;
       width: 100%;
       padding: 0.3rem 0.6rem;
-      color: var(--smoke-yellow);
+      /* Lettered as the rails' tabs are. */
+      color: var(--khaki);
       font-family: var(--font-display);
       font-size: 0.85rem;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       background: none;
       border: 0;
       cursor: pointer;
     }
     .legend__toggle:hover {
-      color: var(--brass);
+      color: var(--smoke-yellow);
     }
     /* Points up when the legend is shut (it opens upward) and turns down when it is open. */
     .legend__chevron {

@@ -316,6 +316,50 @@
   clear: none;
 }
 
+/*
+ * MapLibre's zoom and tilt buttons and its scale bar, in the site's colours: dark olive boxes with khaki marks, as the panels
+ * and the rails' tabs are. The library draws its icons as dark pictures, so a filter turns them khaki (smoke yellow on hover).
+ */
+:host ::ng-deep .maplibregl-ctrl-group {
+  background: color-mix(in srgb, var(--olive-900) 94%, transparent);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+:host ::ng-deep .maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--olive-700);
+}
+
+:host ::ng-deep .maplibregl-ctrl-group button:not(:disabled):hover {
+  background-color: var(--olive-700);
+}
+
+:host ::ng-deep .maplibregl-ctrl-group button:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--smoke-yellow);
+}
+
+:host ::ng-deep .maplibregl-ctrl-group .maplibregl-ctrl-icon {
+  filter: invert(92%) sepia(14%) saturate(420%) hue-rotate(8deg) brightness(98%);
+}
+
+:host ::ng-deep .maplibregl-ctrl-group button:not(:disabled):hover .maplibregl-ctrl-icon {
+  filter: invert(76%) sepia(62%) saturate(640%) hue-rotate(2deg) brightness(96%);
+}
+
+:host ::ng-deep .maplibregl-ctrl-scale {
+  /* The library sizes the box to the distance it stands for, so the words keep its own small size and padding to fit. */
+  padding: 0 5px;
+  color: var(--khaki);
+  font-family: var(--font-data);
+  font-size: 10px;
+  background: color-mix(in srgb, var(--olive-900) 88%, transparent);
+  border: 1px solid var(--khaki);
+  border-top: 0;
+  border-radius: 0 0 2px 2px;
+}
+
 .bm__incident {
   position: absolute;
   z-index: 3;
@@ -341,6 +385,8 @@
 
   .bm__bar {
     --bm-button: 2.7rem;
+    /* The two buttons sit as far from the sides as from the top. */
+    padding-inline: 0.6rem;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.6rem;
@@ -412,6 +458,14 @@
 
   .bm__title {
     display: none;
+  }
+
+  /* The rails and their fly-outs sit a little lower, clear of the top row's buttons. */
+  .bm__tabs,
+  .bm__rtabs,
+  .bm__flyout,
+  .bm__rflyout {
+    top: calc(3rem + 16px);
   }
 
   .bm__incident {

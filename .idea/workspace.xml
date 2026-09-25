@@ -6,24 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/assumptions-and-open-questions.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/assumptions-and-open-questions.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/scripts/build-home-backdrops.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/scripts/build-home-backdrops.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-analytics.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-analytics.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-filters.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-filters.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-history.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-history.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-view.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-view.spec.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/contact-filtering.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/contact-filtering.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/icon.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/icon.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/left-tabs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/left-tabs.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/operation-colours.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/operation-colours.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/stored-flag.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/pages/home-backdrop.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/pages/home-backdrop.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/pages/home-backdrop.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/pages/home-backdrop.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -201,7 +185,7 @@
       <workItem from="1789826907280" duration="57186000" />
       <workItem from="1790238719146" duration="12841000" />
       <workItem from="1790331544884" duration="11149000" />
-      <workItem from="1790370537759" duration="5952000" />
+      <workItem from="1790370537759" duration="6627000" />
     </task>
     <task id="LOCAL-00001" summary="Add api as submodule">
       <option name="closed" value="true" />
