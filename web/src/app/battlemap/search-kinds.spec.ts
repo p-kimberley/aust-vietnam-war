@@ -112,6 +112,26 @@ describe('the kinds menu', () => {
     expect(el.querySelector('.search__menu')).toBeNull();
   });
 
+  it('ticks a kind when its words are clicked, not only its box, staying open as focus moves to the menu', async () => {
+    const { el, openMenu, fixture, settle, choice } = box();
+    await openMenu();
+    const menu = el.querySelector<HTMLElement>('.search__menu')!;
+    const label = choice('Honour roll').closest('label')!;
+
+    // The words cannot take focus, so the browser gives it to the menu, which can (though Tab passes it by).
+    expect(menu.getAttribute('tabindex')).toBe('-1');
+    el.querySelector('.search')!.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: menu }));
+    fixture.detectChanges();
+    expect(el.querySelector('.search__menu')).not.toBeNull();
+
+    label.click();
+    await settle();
+    expect(choice('Honour roll').checked).toBe(true);
+    label.click();
+    await settle();
+    expect(choice('Honour roll').checked).toBe(false);
+  });
+
   it('is closed again by pressing its button', async () => {
     const { el, openMenu, types, settle } = box();
 

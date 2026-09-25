@@ -44,7 +44,9 @@
   @if (menuOpen() || (open() && query().trim().length >= minLength)) {
     <div class="search__popup">
       @if (menuOpen()) {
-      <div id="search-types" class="search__menu" (keydown)="onMenuKeydown($event)">
+      <!-- Focusable (though not in the Tab order) so that a click on a choice's words keeps focus in the search box and the menu
+           open: the words cannot take focus, and focus leaving the box shuts the menu before the click could tick the box. -->
+      <div id="search-types" class="search__menu" tabindex="-1" (keydown)="onMenuKeydown($event)">
         <fieldset class="search__kinds">
           <legend class="search__legend">Search only</legend>
           @for (k of kindChoices; track k.kind) {

@@ -114,6 +114,11 @@
   border-bottom: 1px solid var(--olive-500);
 }
 
+/* It takes focus only to keep the menu open while a choice is clicked; the choice itself shows focus. */
+.search__menu:focus {
+  outline: none;
+}
+
 .search__kinds {
   display: grid;
   grid-template-columns: 1fr 1fr;

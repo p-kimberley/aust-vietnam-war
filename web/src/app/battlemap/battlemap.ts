@@ -79,6 +79,7 @@ import { MapSelectionService } from './map-selection.service';
 import { MapViewStateService } from './map-view-state.service';
 import { FollowRow, Track, addTrackLayers, animateTracks, buildTracks, followedFromLink, neighbour, setTrackVisibility, setTracks } from './track';
 import { UnitFollowService } from './unit-follow.service';
+import { storedFlag } from './stored-flag';
 
 type Status = 'loading' | 'ready' | 'error';
 type Tab = 'layers' | 'filters';
@@ -184,7 +185,8 @@ export class Battlemap {
   protected readonly mapPictures = signal<readonly IncidentMediaView[]>([]);
   protected readonly showPhotos = signal(true);
   protected readonly tab = signal<Tab>('layers');
-  protected readonly panelOpen = signal(true);
+  /** Whether the Layers and Filters panel is showing; the browser remembers it from one visit to the next. */
+  protected readonly panelOpen = storedFlag('battlemap.panelOpen', true);
   protected readonly showHeatmap = signal(true);
   protected readonly showMarkers = signal(true);
   protected readonly heatField = signal<HeatField>(DEFAULT_HEAT_FIELD);

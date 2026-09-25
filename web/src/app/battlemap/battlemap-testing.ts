@@ -148,6 +148,8 @@ export interface RenderOptions {
   community?: Record<string, unknown>;
   /** Who is signed in; nobody by default. */
   user?: Parameters<typeof fakeAuth>[0];
+  /** What the browser has kept from earlier visits (local storage), as a later visit would find it. */
+  stored?: Record<string, string>;
   /** The raw query parameters the filters are read from. */
   queryParams?: Record<string, string | string[]>;
 }
@@ -171,6 +173,9 @@ export const CHART: ChartResult = {
 };
 
 export async function render(opts: RenderOptions = {}) {
+  // What one test left shut (the panel, the legend) is remembered by the browser; each map starts as a first visit would.
+  localStorage.clear();
+  for (const [key, value] of Object.entries(opts.stored ?? {})) localStorage.setItem(key, value);
   const basemaps = new FakeBasemapService();
   const fail = (e: Error) => Promise.reject(e);
   const filterService = {

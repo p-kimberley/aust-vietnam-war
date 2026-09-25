@@ -7,6 +7,7 @@ import { MapLegend } from './map-legend';
 const text = (e: Element | null | undefined) => e?.textContent?.replace(/\s+/g, ' ').trim();
 
 function setup(inputs: Record<string, unknown> = {}) {
+  localStorage.clear();
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
   const f = TestBed.createComponent(MapLegend);
