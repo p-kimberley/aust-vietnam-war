@@ -3,6 +3,7 @@ import { CommunityService, HonourFacets, HonourFacetOption, HonourFilters, Honou
 import { HonourPanel } from './community/honour-panel';
 import { Icon } from './icon';
 import { LoadMore } from './load-more';
+import { PanelInfo } from './panel-info';
 
 /** How many people one request brings back, and each "Show more" adds. */
 export const ROLL_PAGE_SIZE = 20;
@@ -31,7 +32,7 @@ interface FilterList {
  */
 @Component({
   selector: 'app-nominal-roll',
-  imports: [HonourPanel, Icon, LoadMore],
+  imports: [HonourPanel, Icon, LoadMore, PanelInfo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (selected(); as serviceNumber) {
@@ -45,6 +46,10 @@ interface FilterList {
       <section class="roll" aria-labelledby="roll-title">
         <header class="head">
           <h2 id="roll-title">Nominal roll</h2>
+          <app-panel-info
+            subject="the nominal roll"
+            text="The Australians who died in service in Vietnam. Search by name, narrow the list by service, rank or corps, and open a person to see their details and the incidents linked to them."
+          />
           <button type="button" class="close" aria-label="Close the nominal roll" (click)="closed.emit()">×</button>
         </header>
 
@@ -139,11 +144,16 @@ interface FilterList {
       min-height: 0;
     }
     .head {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0.5rem 0.75rem;
       border-bottom: 1px solid var(--olive-500);
+    }
+    /* The info button sits just after the heading; the close button keeps to the right. */
+    app-panel-info {
+      margin: 0 auto 0 0.25rem;
     }
     h2 {
       margin: 0;

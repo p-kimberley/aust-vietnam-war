@@ -9,6 +9,8 @@ import { EChart, ZoomRange } from './echart';
 export class StubEChart {
   readonly option = input.required<ChartOption>();
   readonly zoomed = output<ZoomRange>();
+  readonly selectable = input(false);
+  readonly selected = output<ZoomRange>();
 }
 
 /** Makes `host` use the stand-in wherever it would have used the real chart. */

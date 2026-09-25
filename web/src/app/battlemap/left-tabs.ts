@@ -98,6 +98,13 @@ export interface LeftTab {
     :host(.is-right) .tab__icon {
       transform: rotate(90deg);
     }
+    /* So does the count, so that it reads along the tab with the label. */
+    .tab__badge {
+      transform: rotate(-90deg);
+    }
+    :host(.is-right) .tab__badge {
+      transform: rotate(90deg);
+    }
     .tab__badge {
       min-width: 1.2rem;
       padding: 0 0.25rem;

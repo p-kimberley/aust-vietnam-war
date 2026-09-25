@@ -6,6 +6,7 @@ import { CommunityService, IncidentMediaView, PictureHit, PictureRef, PictureSor
 import { PicturePlacementService } from './picture-placement.service';
 import { Icon } from './icon';
 import { LoadMore } from './load-more';
+import { PanelInfo } from './panel-info';
 
 /** How many pictures one request brings back, and each "Show more" adds. */
 export const PICTURES_PAGE_SIZE = 24;
@@ -28,12 +29,16 @@ type Mode = 'browse' | 'add';
  */
 @Component({
   selector: 'app-pictures-panel',
-  imports: [DatePipe, Icon, LoadMore],
+  imports: [DatePipe, Icon, LoadMore, PanelInfo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="pics" aria-labelledby="pics-title">
       <header class="head">
         <h2 id="pics-title">Images</h2>
+        <app-panel-info
+          subject="the images"
+          text="Photographs shared by veterans and their families, placed on the map where it is known. Search the captions and credits, open one to see it full size, or sign in to add your own."
+        />
         <button type="button" class="close" aria-label="Close the images" (click)="closed.emit()">×</button>
       </header>
 
@@ -205,11 +210,16 @@ type Mode = 'browse' | 'add';
       border-radius: var(--radius);
     }
     .head {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0.5rem 0.75rem;
       border-bottom: 1px solid var(--olive-500);
+    }
+    /* The info button sits just after the heading; the close button keeps to the right. */
+    app-panel-info {
+      margin: 0 auto 0 0.25rem;
     }
     h2 {
       margin: 0;

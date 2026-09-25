@@ -140,10 +140,10 @@ export function seriesColour(name: string, index: number, theme: ChartTheme = DA
 }
 
 /**
- * Turns a chart from the API into an ECharts option. Pure, so it can be tested without a browser. A time chart zooms by dragging or
- * pinching it, and also has a slider along its foot unless `slider` is false (on a phone, where the room is better spent on the chart).
+ * Turns a chart from the API into an ECharts option. Pure, so it can be tested without a browser. A time chart zooms with the wheel
+ * or a pinch (there is no slider along its foot: the room is better spent on the chart).
  */
-export function chartOption(chart: ChartResult, theme: ChartTheme = DARK, { slider = true }: { slider?: boolean } = {}): ChartOption {
+export function chartOption(chart: ChartResult, theme: ChartTheme = DARK): ChartOption {
   const stacked = chart.shape === 'StackedArea' || chart.shape === 'StackedBar';
   const bar = chart.shape === 'Bar' || chart.shape === 'StackedBar';
   const area = chart.shape === 'Area' || chart.shape === 'StackedArea';
@@ -175,7 +175,7 @@ export function chartOption(chart: ChartResult, theme: ChartTheme = DARK, { slid
       borderColor: theme.grid,
       textStyle: { color: theme.text },
     },
-    grid: { left: 8, right: 16, top: 44, bottom: chart.x === 'Time' && slider ? 64 : 28, containLabel: true },
+    grid: { left: 8, right: 16, top: 44, bottom: 28, containLabel: true },
     xAxis: {
       ...xAxis,
       name: chart.xLabel,
@@ -192,13 +192,8 @@ export function chartOption(chart: ChartResult, theme: ChartTheme = DARK, { slid
       axisLabel: axisText,
       splitLine: { lineStyle: { color: theme.grid } },
     },
-    dataZoom:
-      chart.x === 'Time'
-        ? [
-            { type: 'inside', filterMode: 'none' },
-            ...(slider ? [{ type: 'slider', height: 18, bottom: 8, filterMode: 'none', textStyle: { color: theme.muted } }] : []),
-          ]
-        : undefined,
+    // Dragging across a time chart picks dates (see EChart), so it does not pan; the wheel and a pinch still zoom.
+    dataZoom: chart.x === 'Time' ? [{ type: 'inside', filterMode: 'none', moveOnMouseMove: false }] : undefined,
     series: chart.series.map((s) => ({
       name: s.name,
       type: bar ? 'bar' : 'line',

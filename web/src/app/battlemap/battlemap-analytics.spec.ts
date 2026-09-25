@@ -82,6 +82,20 @@ describe('Battle Map charts', () => {
     expect(r.el.querySelector('app-analytics-panel')).toBeNull();
   });
 
+  it("sets the map's dates, and the timeline's, from a stretch picked on a chart", async () => {
+    const r = await render({ contacts: CONTACTS, inputs: { charts: '1' } });
+    await settle(r.fixture);
+    const panel = r.fixture.debugElement.query((d) => d.name === 'app-analytics-panel');
+    const chart = panel.query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
+
+    chart.selected.emit({ start: Date.UTC(1966, 2, 1), end: Date.UTC(1966, 2, 31) });
+    await settle(r.fixture);
+
+    expect(r.el.querySelector('#right-tab-filters .tab__badge')?.textContent?.trim()).toBe('1');
+    const timeline = r.fixture.debugElement.query((d) => d.name === 'app-timeline').componentInstance;
+    expect([timeline.from(), timeline.to()]).toEqual(['1966-03-01', '1966-03-31']);
+  });
+
   it('has no Charts button in the top bar any more', async () => {
     const r = await render({ contacts: CONTACTS });
 

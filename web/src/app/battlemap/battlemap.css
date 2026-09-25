@@ -159,8 +159,8 @@
   z-index: 3;
   top: calc(3rem + 12px);
   left: 2.4rem;
-  /* Ends above the top of the legend, by the gap the legend leaves above the timeline (as the right-hand panel does). */
-  bottom: calc(var(--timeline-h) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
+  /* Runs down to the timeline: the legend is across the map at the right. (On a phone, where it is not, it ends above the legend.) */
+  bottom: calc(var(--timeline-h) + 0.75rem);
   width: min(40rem, calc(100vw - 3.15rem));
   display: flex;
   flex-direction: column;
@@ -479,6 +479,7 @@
   .bm__flyout,
   .bm__flyout--roll {
     right: var(--rail);
+    bottom: calc(var(--timeline-h) + var(--legend-gap) + var(--bottom-h, 0px) + var(--legend-gap));
     width: auto;
   }
 
@@ -488,6 +489,7 @@
 }
 
 .panel__head {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -495,8 +497,12 @@
   border-bottom: 1px solid var(--olive-700);
 }
 
+/* The info button sits just after the heading; the close button keeps to the right. */
+.panel__head app-panel-info {
+  margin-right: auto;
+}
+
 .panel__head h2 {
-  flex: 1;
   margin: 0;
   font-size: 1.1rem;
   color: var(--smoke-yellow);

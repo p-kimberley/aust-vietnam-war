@@ -24,7 +24,7 @@ const utc = (y: number, m: number, d: number) => Date.UTC(y, m - 1, d);
 const chart = (over: Partial<ChartResult> = {}): ChartResult => ({ ...CHART, ...over });
 
 describe('chartOption', () => {
-  it('draws an area chart on a time axis with a zoom slider, and fixed colours for friendly and enemy', () => {
+  it('draws an area chart on a time axis that zooms by dragging or pinching, with no slider, and fixed colours for friendly and enemy', () => {
     const c = chart({ series: [{ name: 'Enemy killed', points: [[utc(1966, 8, 18), 3]] }, { name: 'Friendly killed', points: [[utc(1966, 8, 18), 17]] }] });
 
     const o = chartOption(c) as Record<string, any>;
@@ -33,15 +33,9 @@ describe('chartOption', () => {
     expect(o['color']).toEqual([DARK.named['Enemy killed'], DARK.named['Friendly killed']]);
     expect(o['series'].map((s: any) => [s.name, s.type, !!s.areaStyle, s.stack])).toEqual([['Enemy killed', 'line', true, undefined], ['Friendly killed', 'line', true, undefined]]);
     expect(o['series'][0].data).toEqual([[utc(1966, 8, 18), 3]]);
-    expect(o['dataZoom'].map((z: any) => z.type)).toEqual(['inside', 'slider']);
-    expect(o['aria'].enabled).toBe(true);
-  });
-
-  it('leaves the zoom slider off when asked (on a phone), still zooming by dragging or pinching, and gives its room to the chart', () => {
-    const o = chartOption(chart(), DARK, { slider: false }) as Record<string, any>;
-
     expect(o['dataZoom'].map((z: any) => z.type)).toEqual(['inside']);
     expect(o['grid'].bottom).toBe(28);
+    expect(o['aria'].enabled).toBe(true);
   });
 
   it('stacks stacked charts, and draws bars for bar charts', () => {
@@ -273,6 +267,33 @@ describe('AnalyticsPanel', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+
+  it("lets a drag across a time chart of the map's contacts pick the map's dates, and says so", async () => {
+    const f = setup();
+    const picked: unknown[] = [];
+    f.componentInstance.rangeSelected.subscribe((r) => picked.push(r));
+    await settle(f);
+    const chart = f.debugElement.query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
+    expect(chart.selectable()).toBe(true);
+    expect(el(f).querySelector('.ap__hint')?.textContent).toContain('Drag across the chart');
+
+    chart.selected.emit({ start: Date.UTC(1967, 1, 18, 9), end: Date.UTC(1967, 7, 3, 20) });
+
+    expect(picked).toEqual([{ from: '1967-02-18', to: '1967-08-03' }]);
+  });
+
+  it("does not offer to pick dates on a chart the map's filters do not change", async () => {
+    const f = setup();
+    await settle(f);
+    const select = el(f).querySelector('select')!;
+    select.value = 'age-at-death';
+    select.dispatchEvent(new Event('change'));
+    await settle(f);
+
+    const chart = f.debugElement.query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
+    expect(chart.selectable()).toBe(false);
+    expect(el(f).querySelector('.ap__hint')).toBeNull();
   });
 
   it('closes on request', async () => {

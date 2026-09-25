@@ -5,13 +5,14 @@ import {
   ChartGroup,
   ChartInfo,
   ChartResult,
-  DARK,
   GROUP_LABEL,
   chartOption,
   chartTable,
   isEmpty,
 } from './analytics';
-import { EChart } from './echart';
+import { EChart, ZoomRange } from './echart';
+import { DateRange, formatDay } from './timeline';
+import { PanelInfo } from '../panel-info';
 import { narrowScreen } from '../stored-flag';
 
 /** How long the panel waits after the filters change before asking for new figures, so dragging a slider is not a flood of requests. */
@@ -28,12 +29,16 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
  */
 @Component({
   selector: 'app-analytics-panel',
-  imports: [EChart, DecimalPipe],
+  imports: [EChart, DecimalPipe, PanelInfo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="ap" aria-labelledby="ap-title">
       <header class="ap__head">
         <h2 id="ap-title">Charts</h2>
+        <app-panel-info
+          subject="the charts"
+          text="Charts of the contacts on the map: casualties, strength, and when and where they happened. They follow the map's filters, so narrow those to chart one stretch of time, unit or operation."
+        />
         <button type="button" class="ap__close" (click)="closed.emit()" aria-label="Close charts">×</button>
       </header>
 
@@ -74,7 +79,7 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
           @if (empty()) {
             <p class="ap__empty">Nothing to chart for these contacts. Widen the filters to see more.</p>
           } @else {
-            <app-echart [option]="option()!" />
+            <app-echart [option]="option()!" [selectable]="canPickDates()" (selected)="pickDates($event)" />
           }
         } @else {
           <p class="data">Loading…</p>
@@ -83,6 +88,10 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
           <span class="ap__busy data">Updating…</span>
         }
       </div>
+
+      @if (canPickDates() && result() && !empty()) {
+        <p class="ap__hint">Drag across the chart to show only those dates on the map.</p>
+      }
 
       @if (result()?.note; as note) {
         <p class="ap__note">{{ note }}</p>
@@ -142,11 +151,15 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
       overflow-y: auto;
     }
     .ap__head {
+      position: relative;
       display: flex;
       align-items: center;
     }
+    /* The info button sits just after the heading; the close button keeps to the right. */
+    app-panel-info {
+      margin: 0 auto 0 0.25rem;
+    }
     .ap__head h2 {
-      flex: 1;
       margin: 0;
       font-size: 1.1rem;
       color: var(--smoke-yellow);
@@ -170,6 +183,12 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
       color: var(--paper);
     }
     .ap__about,
+    .ap__hint {
+      margin: 0;
+      color: var(--khaki);
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
     .ap__note {
       margin: 0;
       font-size: 0.9rem;
@@ -239,6 +258,8 @@ export class AnalyticsPanel implements OnDestroy {
   /** Whether any filter is on. When none is, the charts use every contact and no ids are sent. */
   readonly filtered = input(false);
   readonly closed = output<void>();
+  /** Dates picked by a drag across a time chart: the map's date filter, as the timeline sets it. */
+  readonly rangeSelected = output<DateRange>();
 
   private readonly service = inject(AnalyticsService);
 
@@ -248,7 +269,7 @@ export class AnalyticsPanel implements OnDestroy {
   protected readonly result = signal<ChartResult | null>(null);
   protected readonly error = signal('');
   protected readonly loading = signal(false);
-  /** On a phone the chart has the room to itself: no zoom slider, and no table of the figures. */
+  /** On a phone the chart has the room to itself: no table of the figures. */
   protected readonly narrow = narrowScreen();
   protected readonly tableOpen = signal(false);
 
@@ -256,13 +277,15 @@ export class AnalyticsPanel implements OnDestroy {
     GROUPS.map((group) => ({ group, label: GROUP_LABEL[group], charts: this.charts().filter((c) => c.group === group) })).filter((g) => g.charts.length),
   );
   protected readonly info = computed(() => this.charts().find((c) => c.id === this.selected()) ?? null);
+  /** A time chart of the map's contacts: a drag across it picks the map's dates. (A roll chart does not follow the map's filters.) */
+  protected readonly canPickDates = computed(() => this.result()?.x === 'Time' && (this.info()?.usesFilter ?? false));
   protected readonly empty = computed(() => {
     const r = this.result();
     return r ? isEmpty(r) : false;
   });
   protected readonly option = computed(() => {
     const r = this.result();
-    return r && !isEmpty(r) ? chartOption(r, DARK, { slider: !this.narrow }) : null;
+    return r && !isEmpty(r) ? chartOption(r) : null;
   });
   protected readonly table = computed(() => {
     const r = this.result();
@@ -330,5 +353,10 @@ export class AnalyticsPanel implements OnDestroy {
 
   ngOnDestroy(): void {
     clearTimeout(this.timer);
+  }
+
+  /** A drag across the chart picked a stretch of time: the map shows only those days (whole days, as the date filter has them). */
+  protected pickDates(range: ZoomRange): void {
+    this.rangeSelected.emit({ from: formatDay(range.start), to: formatDay(range.end) });
   }
 }

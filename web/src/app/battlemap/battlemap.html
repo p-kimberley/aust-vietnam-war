@@ -64,7 +64,7 @@
     >
       @switch (flyoutShown()) {
         @case ('charts') {
-          <app-analytics-panel [ids]="contactFilter.visibleIds()" [filtered]="contactFilter.activeCount() > 0" (closed)="setFlyout(null)" />
+          <app-analytics-panel [ids]="contactFilter.visibleIds()" [filtered]="contactFilter.activeCount() > 0" (closed)="setFlyout(null)" (rangeSelected)="setDateRange($event)" />
         }
         @case ('roll') {
           <app-nominal-roll (closed)="setFlyout(null)" (openIncident)="openContact($event)" />
@@ -113,6 +113,17 @@
         <aside class="panel" [attr.aria-labelledby]="'right-title'">
           <header class="panel__head">
             <h2 id="right-title">{{ rightShown() === 'filters' ? 'Filters' : 'Layers' }}</h2>
+            @if (rightShown() === 'filters') {
+              <app-panel-info
+                subject="the filters"
+                text="Narrow the contacts on the map by date, unit, operation, task, source, strength and casualties, mines or words in the report. The charts, the timeline and the counts follow."
+              />
+            } @else {
+              <app-panel-info
+                subject="the layers"
+                text="Choose what the map shows: the basemap and imagery beneath, bases and landing zones, community photos, and the contacts as markers (sized or coloured by what you pick) or as a heatmap."
+              />
+            }
             <button type="button" class="panel__close" [attr.aria-label]="rightShown() === 'filters' ? 'Close filters' : 'Close layers'" (click)="setRightTool(null)">×</button>
           </header>
           <div id="tabpanel" class="panel__body">

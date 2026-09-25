@@ -12,6 +12,7 @@ const PATHS = {
   'chevron-down': 'm6 9 6 6 6-6',
   'chevron-up': 'm18 15-6-6-6 6',
   'chevron-left': 'm15 18-6-6 6-6',
+  info: 'M12 16v-4M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
   'chevron-right': 'm9 18 6-6-6-6',
   'arrow-left': 'M19 12H5M11 18l-6-6 6-6',
   x: 'M18 6 6 18M6 6l12 12',

@@ -48,6 +48,7 @@ import { PicturesPanel } from './pictures-panel';
 import { PoiPanel } from './poi-panel';
 import { SearchBox } from './search-box';
 import { Icon } from './icon';
+import { PanelInfo } from './panel-info';
 import {
   HEAT_LAYER,
   MarkerSizing,
@@ -129,6 +130,7 @@ function centreOf(places: readonly { lon: number; lat: number }[]): { lon: numbe
     FiltersPanel,
     SearchBox,
     Icon,
+    PanelInfo,
     AnalyticsPanel,
     Timeline,
   ],
