@@ -88,7 +88,12 @@ export interface PictureHit {
   credit: string | null;
   lat: number | null;
   lon: number | null;
+  /** When the picture was taken, as `yyyy-mm-dd`, where that is known. */
+  dateTaken?: string | null;
 }
+
+/** How a page of pictures is ordered: best match (for a search), when added, or when taken (those with no date last). */
+export type PictureSort = 'relevance' | 'newest' | 'oldest' | 'taken-newest' | 'taken-oldest';
 
 export interface PicturePage {
   items: PictureHit[];
@@ -320,9 +325,15 @@ export class CommunityService {
     return firstValueFrom(this.http.post<IncidentMediaView>(`/api/contacts/${contactId}/media`, form));
   }
 
-  /** Approved pictures a page at a time: those whose caption or credit has the words typed, or with none typed, the newest. */
-  searchPictures(q: string, page = 1, pageSize = 24): Promise<PicturePage> {
+  /**
+   * Approved pictures a page at a time: those whose caption or credit has the words typed, or with none typed, all of them. Without a
+   * `sort`, a search is best match first and otherwise newest first.
+   */
+  searchPictures(q: string, page = 1, pageSize = 24, sort: PictureSort | null = null): Promise<PicturePage> {
     let params = new HttpParams().set('page', page).set('pageSize', pageSize);
+    if (sort) {
+      params = params.set('sort', sort);
+    }
     if (q.trim()) {
       params = params.set('q', q.trim());
     }

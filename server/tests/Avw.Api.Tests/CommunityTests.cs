@@ -364,6 +364,54 @@ public sealed class CommunityEndpointTests : IDisposable
         Assert.Equal(HttpStatusCode.BadRequest, (await Anon("/api/community-media/search?q=" + new string('x', 101))).StatusCode);
     }
 
+    private void SeedDatedPictures()
+    {
+        Seed();
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AvwDbContext>();
+        var added = new DateTime(2012, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        IncidentMedia Pic(string sha, string caption, int addedDay, DateOnly? taken) => new()
+        {
+            Media = new MediaAsset { Sha256 = sha.PadRight(64, '0'), Width = 800, Height = 600, ByteSize = 1000, Status = MediaStatus.Approved, UploadedById = 1, CreatedUtc = added, Caption = caption },
+            Lat = -10.5, Lon = 107.2, CreatedUtc = added.AddDays(addedDay), DateTaken = taken,
+        };
+
+        db.IncidentMedia.AddRange(
+            Pic("a1", "Patrol one", 1, new DateOnly(1968, 5, 1)),
+            Pic("a2", "Patrol two", 2, null),
+            Pic("a3", "Patrol three", 3, new DateOnly(1966, 8, 18)),
+            Pic("a4", "Patrol four", 4, new DateOnly(1970, 1, 2)));
+        db.SaveChanges();
+    }
+
+    [Theory]
+    [InlineData("", "Patrol four,Patrol three,Patrol two,Patrol one")]
+    [InlineData("newest", "Patrol four,Patrol three,Patrol two,Patrol one")]
+    [InlineData("oldest", "Patrol one,Patrol two,Patrol three,Patrol four")]
+    [InlineData("taken-newest", "Patrol four,Patrol one,Patrol three,Patrol two")]
+    [InlineData("taken-oldest", "Patrol three,Patrol one,Patrol four,Patrol two")]
+    [InlineData("relevance", "Patrol four,Patrol three,Patrol two,Patrol one")]         // nothing typed: nothing to be relevant to, so newest
+    public async Task Orders_the_pictures_as_asked_with_those_not_dated_last_by_date_taken(string sort, string expected)
+    {
+        SeedDatedPictures();
+
+        var page = await Read<PicturePage>(await Anon($"/api/community-media/search?sort={sort}"));
+
+        Assert.Equal(expected, string.Join(',', page.Items.Select(i => i.Caption)));
+        Assert.Equal(new DateOnly(1970, 1, 2), page.Items.Single(i => i.Caption == "Patrol four").DateTaken);
+    }
+
+    [Fact]
+    public async Task Orders_a_search_by_date_taken_too_and_refuses_an_unknown_order()
+    {
+        SeedDatedPictures();
+
+        var page = await Read<PicturePage>(await Anon("/api/community-media/search?q=patrol&sort=taken-oldest"));
+
+        Assert.Equal("Patrol three,Patrol one,Patrol four,Patrol two", string.Join(',', page.Items.Select(i => i.Caption)));
+        Assert.Equal(HttpStatusCode.BadRequest, (await Anon("/api/community-media/search?sort=sideways")).StatusCode);
+    }
+
     private void SeedPlacedPictures()
     {
         Seed();

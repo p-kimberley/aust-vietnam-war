@@ -299,15 +299,29 @@ describe('PictureViewer', () => {
   it('offers the incident only when the picture belongs to one', async () => {
     const none = viewer();
     await settle(none.fixture);
-    expect(text(none.el)).not.toContain('Open the incident');
+    expect(text(none.el)).not.toContain('Go to incident');
 
     const attached = viewer({ mediaDetail: vi.fn(() => Promise.resolve(pic({ contactId: 2 }))) });
     const opened: number[] = [];
     attached.fixture.componentInstance.openIncident.subscribe((id) => opened.push(id));
     await settle(attached.fixture);
-    button(attached.el, 'Open the incident').click();
+    button(attached.el, 'Go to incident').click();
 
     expect(opened).toEqual([2]);
+    expect(button(attached.el, 'Locate on map')).toBeUndefined();              // the incident is the way to its place
+  });
+
+  it('offers to locate a picture on the map when it belongs to no incident, and not when it has no place', async () => {
+    const placed = viewer();
+    const located: unknown[] = [];
+    placed.fixture.componentInstance.locate.subscribe((at) => located.push(at));
+    await settle(placed.fixture);
+    button(placed.el, 'Locate on map').click();
+    expect(located).toEqual([{ lat: 10.56, lon: 107.17 }]);
+
+    const nowhere = viewer({ mediaDetail: vi.fn(() => Promise.resolve(pic({ lat: null, lon: null }))) });
+    await settle(nowhere.fixture);
+    expect(button(nowhere.el, 'Locate on map')).toBeUndefined();
   });
 
   it('says so when there is no such picture, and offers a retry when loading fails', async () => {
@@ -857,6 +871,17 @@ describe('Battle Map community photos', () => {
     expect(r.basemaps.map.setFilter).toHaveBeenLastCalledWith(STACK_COUNTS, ['has', 'count']);
   });
 
+  it('closes the viewer and takes the map to a picture from "Locate on map"', async () => {
+    const r = await render({ ...withPictures, community: { ...withPictures.community, mediaDetail: vi.fn(() => Promise.resolve(pic())) }, inputs: { picture: '5', at: '10,107,9' } });
+    await settle(r.fixture);
+
+    [...r.el.querySelectorAll<HTMLButtonElement>('app-picture-viewer button')].find((b) => b.textContent?.includes('Locate on map'))!.click();
+    await settle(r.fixture);
+
+    expect(r.el.querySelector('app-picture-viewer')).toBeNull();
+    expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.56, 107.17, 15);
+  });
+
   it('opens the incident a picture belongs to from the viewer, closing the viewer', async () => {
     const community = {
       mediaOnMap: vi.fn(() => Promise.resolve(PICS)),
@@ -865,7 +890,7 @@ describe('Battle Map community photos', () => {
     const r = await render({ community, inputs: { picture: '6' } });
     await settle(r.fixture);
 
-    [...r.el.querySelectorAll<HTMLButtonElement>('app-picture-viewer button')].find((b) => b.textContent?.includes('Open the incident'))!.click();
+    [...r.el.querySelectorAll<HTMLButtonElement>('app-picture-viewer button')].find((b) => b.textContent?.includes('Go to incident'))!.click();
     await settle(r.fixture);
 
     expect(r.el.querySelector('app-incident-panel')).not.toBeNull();

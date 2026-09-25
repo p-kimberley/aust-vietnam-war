@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Avw.Api.Map;
@@ -11,7 +12,19 @@ namespace Avw.Api.Community;
 
 public sealed record NoteHit(long Id, int ContactId, string Title, IReadOnlyList<SnippetPart> Snippet, string AuthorName, DateTime CreatedUtc);
 
-public sealed record PictureHit(long Id, int? ContactId, string ThumbUrl, string? Caption, string? Credit, double? Lat, double? Lon);
+public sealed record PictureHit(long Id, int? ContactId, string ThumbUrl, string? Caption, string? Credit, double? Lat, double? Lon, DateOnly? DateTaken = null);
+
+/// <summary>How a page of pictures is ordered. <see cref="Relevance"/> is for a search; with nothing typed it is <see cref="Newest"/>.</summary>
+public enum PictureSort
+{
+    Relevance,
+    /// <summary>Most recently added first.</summary>
+    Newest,
+    Oldest,
+    /// <summary>By the date the picture was taken, latest first; pictures with no date come last.</summary>
+    TakenNewest,
+    TakenOldest,
+}
 
 /// <summary>One page of approved pictures, for the map's picture panel.</summary>
 public sealed record PicturePage(IReadOnlyList<PictureHit> Items, int Total, int Page, int PageSize);
@@ -184,6 +197,8 @@ public sealed class CommunitySearch(AvwDbContext db)
         public string? Credit { get; set; }
         public double? Lat { get; set; }
         public double? Lon { get; set; }
+        /// <summary>A DateTime, not a DateOnly: that is what the MySQL driver gives back for a DATE column in a raw query.</summary>
+        public DateTime? DateTaken { get; set; }
     }
 
     public async Task<CommunitySearchResult> SearchAsync(string? text, int limit, CancellationToken ct)
@@ -208,7 +223,7 @@ public sealed class CommunitySearch(AvwDbContext db)
     /// Approved pictures a page at a time: those whose caption or credit has every word typed, best match first, or with nothing typed,
     /// all of them, newest first.
     /// </summary>
-    public async Task<PicturePage> PicturePageAsync(string? text, int page, int pageSize, CancellationToken ct)
+    public async Task<PicturePage> PicturePageAsync(string? text, PictureSort sort, int page, int pageSize, CancellationToken ct)
     {
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, MaxPageSize);
@@ -220,17 +235,39 @@ public sealed class CommunitySearch(AvwDbContext db)
         {
             var approved = db.IncidentMedia.AsNoTracking().Where(m => m.Media.Status == MediaStatus.Approved);
             total = await approved.CountAsync(ct);
-            rows = await approved.OrderByDescending(m => m.CreatedUtc).ThenByDescending(m => m.Id).Skip(skip).Take(pageSize)
-                .Select(m => new PictureRow { Id = m.Id, ContactId = m.ContactId, Sha256 = m.Media.Sha256, Caption = m.Media.Caption, Credit = m.Media.Credit, Lat = m.Lat, Lon = m.Lon })
+            var found = await Ordered(approved, sort).Skip(skip).Take(pageSize)
+                .Select(m => new { m.Id, m.ContactId, m.Media.Sha256, m.Media.Caption, m.Media.Credit, m.Lat, m.Lon, m.DateTaken })
                 .ToListAsync(ct);
+            rows = [.. found.Select(m => new PictureRow { Id = m.Id, ContactId = m.ContactId, Sha256 = m.Sha256, Caption = m.Caption, Credit = m.Credit, Lat = m.Lat, Lon = m.Lon, DateTaken = AsDateTime(m.DateTaken) })];
         }
         else
         {
-            (rows, total) = db.Database.IsRelational() ? await PicturesInMySqlAsync(terms, pageSize, ct, skip) : await PicturesInMemoryAsync(terms, pageSize, ct, skip);
+            (rows, total) = db.Database.IsRelational() ? await PicturesInMySqlAsync(terms, pageSize, ct, skip, sort) : await PicturesInMemoryAsync(terms, pageSize, ct, skip, sort);
         }
 
-        return new PicturePage([.. rows.Select(p => new PictureHit(p.Id, p.ContactId, MediaPaths.ThumbnailUrl(p.Sha256), p.Caption, p.Credit, p.Lat, p.Lon))], total, page, pageSize);
+        return new PicturePage([.. rows.Select(p => new PictureHit(p.Id, p.ContactId, MediaPaths.ThumbnailUrl(p.Sha256), p.Caption, p.Credit, p.Lat, p.Lon, p.DateTaken is { } d ? DateOnly.FromDateTime(d) : null))], total, page, pageSize);
     }
+
+    private static DateTime? AsDateTime(DateOnly? date) => date?.ToDateTime(TimeOnly.MinValue);
+
+    /// <summary>Pictures in the order asked for; with nothing typed there is no relevance, so that is newest first. Pictures with no date taken come last by date taken.</summary>
+    private static IOrderedQueryable<IncidentMedia> Ordered(IQueryable<IncidentMedia> q, PictureSort sort) => sort switch
+    {
+        PictureSort.Oldest => q.OrderBy(m => m.CreatedUtc).ThenBy(m => m.Id),
+        PictureSort.TakenNewest => q.OrderBy(m => m.DateTaken == null).ThenByDescending(m => m.DateTaken).ThenByDescending(m => m.Id),
+        PictureSort.TakenOldest => q.OrderBy(m => m.DateTaken == null).ThenBy(m => m.DateTaken).ThenBy(m => m.Id),
+        _ => q.OrderByDescending(m => m.CreatedUtc).ThenByDescending(m => m.Id),
+    };
+
+    /// <summary>The ORDER BY for a search, from a fixed list (never from what was typed). <c>{1}</c> is the search text, for relevance.</summary>
+    private static string OrderBySql(PictureSort sort) => sort switch
+    {
+        PictureSort.Newest => "m.CreatedUtc DESC, m.Id DESC",
+        PictureSort.Oldest => "m.CreatedUtc, m.Id",
+        PictureSort.TakenNewest => "m.DateTaken IS NULL, m.DateTaken DESC, m.Id DESC",
+        PictureSort.TakenOldest => "m.DateTaken IS NULL, m.DateTaken, m.Id",
+        _ => "MATCH(a.Caption, a.Credit) AGAINST ({1} IN BOOLEAN MODE) DESC, m.Id",
+    };
 
     // ---------------------------------------------------------------- MySQL
 
@@ -254,18 +291,22 @@ public sealed class CommunitySearch(AvwDbContext db)
         return (rows, total);
     }
 
-    private async Task<(List<PictureRow>, int)> PicturesInMySqlAsync(SearchTerms terms, int limit, CancellationToken ct, int skip = 0)
+    private async Task<(List<PictureRow>, int)> PicturesInMySqlAsync(SearchTerms terms, int limit, CancellationToken ct, int skip = 0, PictureSort sort = PictureSort.Relevance)
     {
         var q = terms.Boolean;
         var approved = MediaStatus.Approved.ToString();
-        var rows = await db.Database.SqlQuery<PictureRow>($"""
-            SELECT m.Id, m.ContactId, a.Sha256, a.Caption, a.Credit, m.Lat, m.Lon
+        // The ORDER BY is one of a fixed few (see OrderBySql); everything that came from the reader is a parameter.
+        var sql = FormattableStringFactory.Create(
+            $$"""
+            SELECT m.Id, m.ContactId, a.Sha256, a.Caption, a.Credit, m.Lat, m.Lon, m.DateTaken
             FROM media_assets a
             JOIN incident_media m ON m.MediaId = a.Id
-            WHERE a.Status = {approved} AND MATCH(a.Caption, a.Credit) AGAINST ({q} IN BOOLEAN MODE)
-            ORDER BY MATCH(a.Caption, a.Credit) AGAINST ({q} IN BOOLEAN MODE) DESC, m.Id
-            LIMIT {limit} OFFSET {skip}
-            """).ToListAsync(ct);
+            WHERE a.Status = {0} AND MATCH(a.Caption, a.Credit) AGAINST ({1} IN BOOLEAN MODE)
+            ORDER BY {{OrderBySql(sort)}}
+            LIMIT {2} OFFSET {3}
+            """,
+            approved, q, limit, skip);
+        var rows = await db.Database.SqlQuery<PictureRow>(sql).ToListAsync(ct);
         var total = await db.Database.SqlQuery<int>($"""
             SELECT COUNT(*) AS `Value`
             FROM media_assets a
@@ -288,11 +329,12 @@ public sealed class CommunitySearch(AvwDbContext db)
         return ([.. hits.Take(limit).Select(x => new NoteRow { Id = x.Note.Id, ContactId = x.Note.ContactId, Title = x.Version.Title, Body = x.Version.Body, AuthorName = x.Note.AuthorName, CreatedUtc = x.Note.CreatedUtc })], hits.Count);
     }
 
-    private async Task<(List<PictureRow>, int)> PicturesInMemoryAsync(SearchTerms terms, int limit, CancellationToken ct, int skip = 0)
+    private async Task<(List<PictureRow>, int)> PicturesInMemoryAsync(SearchTerms terms, int limit, CancellationToken ct, int skip = 0, PictureSort sort = PictureSort.Relevance)
     {
         var links = await db.IncidentMedia.AsNoTracking().Include(m => m.Media).Where(m => m.Media.Status == MediaStatus.Approved).ToListAsync(ct);
-        var hits = links.Where(m => terms.Matches(m.Media.Caption + " " + m.Media.Credit)).OrderBy(m => m.Id).ToList();
-        return ([.. hits.Skip(skip).Take(limit).Select(m => new PictureRow { Id = m.Id, ContactId = m.ContactId, Sha256 = m.Media.Sha256, Caption = m.Media.Caption, Credit = m.Media.Credit, Lat = m.Lat, Lon = m.Lon })], hits.Count);
+        var matching = links.Where(m => terms.Matches(m.Media.Caption + " " + m.Media.Credit)).AsQueryable();
+        var hits = (sort == PictureSort.Relevance ? matching.OrderBy(m => m.Id) : Ordered(matching, sort)).ToList();
+        return ([.. hits.Skip(skip).Take(limit).Select(m => new PictureRow { Id = m.Id, ContactId = m.ContactId, Sha256 = m.Media.Sha256, Caption = m.Media.Caption, Credit = m.Media.Credit, Lat = m.Lat, Lon = m.Lon, DateTaken = AsDateTime(m.DateTaken) })], hits.Count);
     }
 }
 

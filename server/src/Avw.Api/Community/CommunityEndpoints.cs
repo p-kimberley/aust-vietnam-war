@@ -250,8 +250,9 @@ public static class CommunityEndpoints
             .RequireAuthorization(Policies.Member).RequireRateLimiting(MediaEndpoints.UploadPolicy)
             .WithName("PlaceCommunityMedia").Accepts<IFormFile>("multipart/form-data").Produces<IncidentMediaView>(StatusCodes.Status201Created);
 
-        // Approved pictures a page at a time, for the map's picture panel: those matching the words typed, or with none, the newest.
-        g.MapGet("/community-media/search", async (string? q, int? page, int? pageSize, CommunitySearch search, HttpContext ctx, CancellationToken ct) =>
+        // Approved pictures a page at a time, for the map's images panel: those matching the words typed, or with none, all of them, in the
+        // order asked for (`sort`: relevance, newest, oldest, taken-newest or taken-oldest; best match for a search, newest otherwise).
+        g.MapGet("/community-media/search", async (string? q, string? sort, int? page, int? pageSize, CommunitySearch search, HttpContext ctx, CancellationToken ct) =>
             {
                 var text = q?.Trim() ?? "";
                 if (text.Length > MapEndpoints.MaxSearchLength)
@@ -259,8 +260,23 @@ public static class CommunityEndpoints
                     return Results.ValidationProblem(new Dictionary<string, string[]> { ["q"] = [$"Search text must be at most {MapEndpoints.MaxSearchLength} characters."] });
                 }
 
+                PictureSort? order = (sort?.Trim().ToLowerInvariant() ?? "") switch
+                {
+                    "" => text.Length > 0 ? PictureSort.Relevance : PictureSort.Newest,
+                    "relevance" => PictureSort.Relevance,
+                    "newest" => PictureSort.Newest,
+                    "oldest" => PictureSort.Oldest,
+                    "taken-newest" => PictureSort.TakenNewest,
+                    "taken-oldest" => PictureSort.TakenOldest,
+                    _ => null,
+                };
+                if (order is null)
+                {
+                    return Results.ValidationProblem(new Dictionary<string, string[]> { ["sort"] = ["Sort by relevance, newest, oldest, taken-newest or taken-oldest."] });
+                }
+
                 ctx.Response.Headers.CacheControl = "public, max-age=60";
-                return Results.Ok(await search.PicturePageAsync(text, page ?? 1, pageSize ?? 24, ct));
+                return Results.Ok(await search.PicturePageAsync(text, order.Value, page ?? 1, pageSize ?? 24, ct));
             })
             .RequireRateLimiting(CommunitySearchPolicy)
             .WithName("SearchCommunityMedia")

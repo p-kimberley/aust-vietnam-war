@@ -273,10 +273,16 @@ export class Battlemap {
     this.syncUrl();
   }
 
-  /** The picture viewer's "Open the incident": the viewer closes, and the incident opens beneath it. */
+  /** The picture viewer's "Go to incident": the viewer closes, and the incident opens beneath it and is brought into view. */
   protected openIncidentFromPicture(contactId: number): void {
     this.selectPicture(null);
     this.openContact(contactId);
+  }
+
+  /** The picture viewer's "Locate on map": the viewer closes, and the map goes to the picture, close enough to see it as a thumbnail. */
+  protected locatePicture(at: { lat: number; lon: number }): void {
+    this.selectPicture(null);
+    this.basemaps.flyTo(at.lat, at.lon, PHOTO_FULL_ZOOM);
   }
 
   /**

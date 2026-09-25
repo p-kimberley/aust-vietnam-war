@@ -68,8 +68,10 @@ const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), [tabi
 export class PictureViewer implements OnDestroy {
   readonly pictureId = input.required<number>();
   readonly closed = output<void>();
-  /** The picture belongs to an incident, and the person asked to see it. */
+  /** The picture belongs to an incident, and the person asked to go to it. */
   readonly openIncident = output<number>();
+  /** The picture belongs to no incident, and the person asked to see where on the map it is. */
+  readonly locate = output<{ lat: number; lon: number }>();
   /** The previous or next picture of the set was asked for; the parent opens it here. */
   readonly navigate = output<number>();
 

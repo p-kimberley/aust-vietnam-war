@@ -57,7 +57,7 @@ describe('PicturesPanel: finding pictures', () => {
     const { fixture, el } = mount({ searchPictures });
     await settle(fixture);
 
-    expect(searchPictures).toHaveBeenCalledWith('', 1, PICTURES_PAGE_SIZE);
+    expect(searchPictures).toHaveBeenCalledWith('', 1, PICTURES_PAGE_SIZE, null);
     expect([...el.querySelectorAll('.hit__caption')].map(text)).toEqual(['Picture 1', 'Untitled']);
     expect(el.querySelector('.hit img')?.getAttribute('src')).toBe('/media/1-480.jpg');
     expect(text(el.querySelector('.count'))).toBe('Showing 2 of 30 images');
@@ -95,7 +95,7 @@ describe('PicturesPanel: finding pictures', () => {
     button(el, 'Show more').click();
     await settle(fixture);
 
-    expect(searchPictures).toHaveBeenLastCalledWith('', 2, PICTURES_PAGE_SIZE);
+    expect(searchPictures).toHaveBeenLastCalledWith('', 2, PICTURES_PAGE_SIZE, null);
     expect(el.querySelectorAll('.hit')).toHaveLength(2);
     expect(button(el, 'Show more')).toBeUndefined();
   });
@@ -121,6 +121,68 @@ describe('PicturesPanel: finding pictures', () => {
     el.querySelector<HTMLButtonElement>('.hit')!.click();
 
     expect(chosen).toEqual([{ id: 3, lat: 10.5, lon: 107.2 }]);
+  });
+});
+
+describe('PicturesPanel: sort order', () => {
+  const page = { items: [hit(1, { dateTaken: '1966-08-18' })], total: 1, page: 1, pageSize: 24 };
+  const options = (el: HTMLElement) => [...el.querySelectorAll<HTMLOptionElement>('.sort option')].map((o) => [o.value, text(o)]);
+  const chosen = (el: HTMLElement) => el.querySelector<HTMLSelectElement>('.sort select')!.value;
+
+  it('lists newest first to begin with, offering the other orders, and shows when each was taken', async () => {
+    const { fixture, el } = mount({ searchPictures: vi.fn(() => Promise.resolve(page)) });
+    await settle(fixture);
+
+    expect(chosen(el)).toBe('newest');
+    expect(options(el)).toEqual([
+      ['newest', 'Newest added'],
+      ['oldest', 'Oldest added'],
+      ['taken-newest', 'Date taken, latest first'],
+      ['taken-oldest', 'Date taken, earliest first'],
+    ]);
+    expect(text(el.querySelector('.hit__credit'))).toBe('AWM · 18 Aug 1966');
+  });
+
+  it('lists again in the order chosen, from the first page', async () => {
+    const searchPictures = vi.fn(() => Promise.resolve(page));
+    const { fixture, el } = mount({ searchPictures });
+    await settle(fixture);
+
+    const select = el.querySelector<HTMLSelectElement>('.sort select')!;
+    select.value = 'taken-oldest';
+    select.dispatchEvent(new Event('change'));
+    await settle(fixture);
+
+    expect(searchPictures).toHaveBeenLastCalledWith('', 1, PICTURES_PAGE_SIZE, 'taken-oldest');
+    expect(chosen(el)).toBe('taken-oldest');
+  });
+
+  it('offers best match, first, while searching, and goes back to newest when the search is cleared', async () => {
+    vi.useFakeTimers();
+    try {
+      const searchPictures = vi.fn(() => Promise.resolve(page));
+      const { fixture, el } = mount({ searchPictures });
+      const input = el.querySelector<HTMLInputElement>('input[type=search]')!;
+      const type = async (value: string) => {
+        input.value = value;
+        input.dispatchEvent(new Event('input'));
+        await vi.advanceTimersByTimeAsync(PICTURES_DELAY_MS);
+        fixture.detectChanges();
+      };
+
+      await type('patrol');
+      expect(options(el)[0]).toEqual(['relevance', 'Best match']);
+      expect(chosen(el)).toBe('relevance');
+
+      const select = el.querySelector<HTMLSelectElement>('.sort select')!;
+      select.value = 'relevance';
+      select.dispatchEvent(new Event('change'));
+      await type('');
+      expect(searchPictures).toHaveBeenLastCalledWith('', 1, PICTURES_PAGE_SIZE, null);
+      expect(chosen(el)).toBe('newest');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -332,7 +394,7 @@ describe('the pictures panel in the Battle Map fly-out', () => {
     expect(r.el.querySelector('#left-flyout app-pictures-panel')).not.toBeNull();
   });
 
-  it('opens a picture chosen in the panel in the viewer, and goes to its place', async () => {
+  it('opens a picture chosen in the panel in the viewer, leaving the map where it is', async () => {
     const r = await render({ community: { searchPictures: vi.fn(() => Promise.resolve({ items: [hit(3)], total: 1, page: 1, pageSize: 24 })) }, inputs: { images: '1' } });
     await settle(r.fixture);
 
@@ -340,7 +402,7 @@ describe('the pictures panel in the Battle Map fly-out', () => {
     await settle(r.fixture);
 
     expect(r.el.querySelector('app-picture-viewer')).not.toBeNull();
-    expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.5, 107.2, 15);
+    expect(r.basemaps.flyTo).not.toHaveBeenCalled();
   });
 
   it("puts an editor's picture on the map as soon as it is added, but not one waiting for approval", async () => {

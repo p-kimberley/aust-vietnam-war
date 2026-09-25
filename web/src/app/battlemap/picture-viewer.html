@@ -98,7 +98,9 @@
               <p class="side__hint"><button type="button" class="side__link" (click)="auth.login()">Sign in</button> to like a photo.</p>
             }
             @if (p.contactId !== null) {
-              <button type="button" class="side__button" (click)="openIncident.emit(p.contactId)">Open the incident</button>
+              <button type="button" class="side__button" (click)="openIncident.emit(p.contactId)">Go to incident</button>
+            } @else if (p.lat !== null && p.lon !== null) {
+              <button type="button" class="side__button" (click)="locate.emit({ lat: p.lat, lon: p.lon })">Locate on map</button>
             }
           </div>
         } @else {

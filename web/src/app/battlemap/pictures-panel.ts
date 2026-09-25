@@ -1,7 +1,8 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, computed, inject, output, signal, viewChild } from '@angular/core';
 import { AuthService } from '../core/auth.service';
 import { problemMessage } from '../studio/studio-api';
-import { CommunityService, IncidentMediaView, PictureHit, PictureRef } from './community/community';
+import { CommunityService, IncidentMediaView, PictureHit, PictureRef, PictureSort } from './community/community';
 import { PicturePlacementService } from './picture-placement.service';
 
 /** How many pictures one request brings back, and each "Show more" adds. */
@@ -14,7 +15,7 @@ type Mode = 'browse' | 'add';
 
 /**
  * The community's images, in the panel that flies out from the left (the Images tab). It lists the newest and narrows to those whose
- * caption or credit has the words typed; choosing one opens it in the picture viewer and takes the map to it.
+ * caption or credit has the words typed; choosing one opens it in the picture viewer, leaving the map where it is.
  *
  * "Add an image" swaps the list for a form, and "Back to the images" swaps it back. A member can add an image anywhere on the map:
  * they choose the file, drag the pin from the panel onto the map (or put
@@ -23,6 +24,7 @@ type Mode = 'browse' | 'add';
  */
 @Component({
   selector: 'app-pictures-panel',
+  imports: [DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="pics" aria-labelledby="pics-title">
@@ -33,19 +35,35 @@ type Mode = 'browse' | 'add';
 
       @if (mode() === 'browse') {
         <div class="find">
+          <div class="search">
+            <svg class="search__icon" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+              <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M13 13l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <input
+              type="search"
+              class="input search__input"
+              autocomplete="off"
+              maxlength="100"
+              placeholder="Search captions and credits"
+              aria-label="Search the images by caption or credit"
+              [value]="query()"
+              (input)="onInput($any($event.target).value)"
+            />
+          </div>
           <button type="button" class="button primary add-button" (click)="setMode('add')">Add an image</button>
-          <input
-            type="search"
-            class="input"
-            autocomplete="off"
-            maxlength="100"
-            placeholder="Search captions and credits"
-            aria-label="Search the images by caption or credit"
-            [value]="query()"
-            (input)="onInput($any($event.target).value)"
-          />
         </div>
-        <p class="count data" role="status" aria-live="polite">{{ summary() }}</p>
+        <div class="bar">
+          <p class="count data" role="status" aria-live="polite">{{ summary() }}</p>
+          <label class="sort">
+            Sort
+            <select (change)="setSort($any($event.target).value)">
+              @for (o of sortOptions(); track o.value) {
+                <option [value]="o.value" [selected]="o.value === sortShown()">{{ o.label }}</option>
+              }
+            </select>
+          </label>
+        </div>
         @if (status() === 'error') {
           <p class="error" role="alert">The images could not be searched. Try again in a moment.</p>
           <button type="button" class="button more" (click)="reload()">Try again</button>
@@ -56,8 +74,8 @@ type Mode = 'browse' | 'add';
               <button type="button" class="hit" (click)="open(p)">
                 <img [src]="p.thumbUrl" [alt]="p.caption || 'An image'" loading="lazy" />
                 <span class="hit__caption">{{ p.caption || 'Untitled' }}</span>
-                @if (p.credit) {
-                  <span class="hit__credit">{{ p.credit }}</span>
+                @if (p.credit || p.dateTaken) {
+                  <span class="hit__credit">{{ p.credit }}{{ p.credit && p.dateTaken ? ' · ' : '' }}{{ p.dateTaken ? (p.dateTaken | date: 'd MMM y') : '' }}</span>
                 }
               </button>
             </li>
@@ -134,17 +152,18 @@ type Mode = 'browse' | 'add';
     }
   `,
   styles: `
+    /* The full height of the fly-out from the start, so it does not grow as the list arrives, part way through sliding in. */
     :host {
       display: flex;
       flex-direction: column;
       min-height: 0;
-      max-height: 100%;
+      height: 100%;
     }
     .pics {
       display: flex;
       flex-direction: column;
+      flex: 1;
       min-height: 0;
-      max-height: 100%;
       color: var(--paper);
       background: color-mix(in srgb, var(--olive-900) 97%, transparent);
       border: 1px solid var(--olive-500);
@@ -199,14 +218,34 @@ type Mode = 'browse' | 'add';
       text-decoration: underline;
       border: 0;
     }
+    /* The search box, and beside it the button to add an image. */
     .find {
       display: flex;
-      flex-direction: column;
+      align-items: stretch;
       gap: 0.5rem;
       padding: 0.6rem 0.75rem 0;
     }
+    .search {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+    .search__icon {
+      position: absolute;
+      top: 50%;
+      left: 0.55rem;
+      color: var(--olive-500);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    /* Room at the left for the icon (more specific than .input, which comes later). */
+    .search .search__input {
+      height: 100%;
+      padding-left: 1.9rem;
+    }
     .add-button {
-      align-self: flex-start;
+      flex: none;
+      white-space: nowrap;
     }
     .back {
       align-self: flex-start;
@@ -225,10 +264,37 @@ type Mode = 'browse' | 'add';
       border: 1px solid var(--rule);
       border-radius: var(--radius);
     }
-    .count {
+    /* How many there are, and beside it the order they are in. */
+    .bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
       margin: 0.4rem 0.75rem;
+    }
+    .count {
+      margin: 0;
       color: var(--khaki);
       font-size: 0.78rem;
+    }
+    .sort {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--khaki);
+      font-size: 0.78rem;
+    }
+    .sort select {
+      padding: 0.2rem 0.3rem;
+      color: var(--ink);
+      font: inherit;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+    }
+    .sort select:focus-visible {
+      outline: 2px solid var(--smoke-yellow);
+      outline-offset: 2px;
     }
     .error {
       margin: 0.4rem 0;
@@ -400,7 +466,7 @@ type Mode = 'browse' | 'add';
 export class PicturesPanel implements OnDestroy {
   /** The panel was closed. */
   readonly closed = output<void>();
-  /** A picture was chosen, to be shown in the viewer (and on the map, where it has a place). */
+  /** A picture was chosen, to be shown in the viewer. The map stays where it is; the viewer offers a way to the picture's place. */
   readonly openPicture = output<PictureRef>();
   /** A picture was added; one that is already approved can go straight onto the map. */
   readonly added = output<IncidentMediaView>();
@@ -463,6 +529,25 @@ export class PicturesPanel implements OnDestroy {
 
   // ---- finding
 
+  /** The order chosen; `null` until one is, which is best match for a search and newest first otherwise. */
+  protected readonly sort = signal<PictureSort | null>(null);
+  /** The order the list is in now, for the drop-down. */
+  protected readonly sortShown = computed<PictureSort>(() => this.sort() ?? (this.query().trim() ? 'relevance' : 'newest'));
+  /** Best match only means something for a search. */
+  protected readonly sortOptions = computed(() => [
+    ...(this.query().trim() ? [{ value: 'relevance' as const, label: 'Best match' }] : []),
+    { value: 'newest' as const, label: 'Newest added' },
+    { value: 'oldest' as const, label: 'Oldest added' },
+    { value: 'taken-newest' as const, label: 'Date taken, latest first' },
+    { value: 'taken-oldest' as const, label: 'Date taken, earliest first' },
+  ]);
+
+  protected setSort(value: string): void {
+    this.sort.set(value as PictureSort);
+    clearTimeout(this.timer);
+    void this.load(true);
+  }
+
   protected onInput(value: string): void {
     this.query.set(value);
     clearTimeout(this.timer);
@@ -488,7 +573,9 @@ export class PicturesPanel implements OnDestroy {
     const page = fresh ? 1 : this.page + 1;
     this.status.set('loading');
     try {
-      const result = await this.api.searchPictures(this.query().trim(), page, PICTURES_PAGE_SIZE);
+      // Best match was for a search; once the words are cleared there is none, so the list goes back to newest first.
+      const sort = this.sort() === 'relevance' && !this.query().trim() ? null : this.sort();
+      const result = await this.api.searchPictures(this.query().trim(), page, PICTURES_PAGE_SIZE, sort);
       if (seq !== this.seq) {
         return;
       }
