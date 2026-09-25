@@ -110,6 +110,8 @@
   flex-direction: column;
   min-height: 0;
   width: min(16rem, calc(100vw - 1.5rem));
+  /* Layers and the wider Filters glide between their widths, at the pace of the other panels. */
+  transition: width 0.25s ease;
   background: color-mix(in srgb, var(--olive-900) 97%, transparent);
   border: 1px solid var(--olive-500);
   border-radius: var(--radius);
@@ -199,6 +201,35 @@
   .bm__flyout.is-open {
     transition: none;
   }
+}
+
+/* The tooltip over an incident marker (see marker-tip.ts). */
+:host ::ng-deep .map-tip .maplibregl-popup-content {
+  padding: 0.4rem 0.6rem;
+  color: var(--paper);
+  background: color-mix(in srgb, var(--olive-900) 96%, transparent);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+:host ::ng-deep .map-tip .maplibregl-popup-tip {
+  display: none;
+}
+
+:host ::ng-deep .marker-tip p {
+  margin: 0;
+}
+
+:host ::ng-deep .marker-tip__when {
+  font-family: var(--font-data);
+  color: var(--smoke-yellow);
+}
+
+:host ::ng-deep .marker-tip__label {
+  color: var(--khaki);
 }
 
 /* MapLibre's own controls and credit line would otherwise sit under the timeline. */
@@ -407,11 +438,57 @@
   color: var(--khaki);
 }
 
+/*
+ * The body slides open and shut, at the pace of the legend and the fly-outs: a one-row grid whose row runs from nothing to its
+ * full height. It still gives way when the screen is short (its body then scrolls). Shut, it is hidden once it has gone, so
+ * nothing in it can be reached.
+ */
+.panel__frame {
+  display: grid;
+  flex: 0 1 auto;
+  grid-template-rows: 0fr;
+  min-height: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.panel__frame.is-open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0s;
+}
+
 .panel__body {
-  flex: 1 1 auto;
   min-height: 0;
   padding: 0.6rem 0.75rem 0.75rem;
   overflow-y: auto;
+}
+
+/* What a tab holds is made afresh when the tab is chosen, so it fades in as it arrives. */
+.panel__body > * {
+  animation: panel-tab-in 0.25s ease;
+}
+
+@keyframes panel-tab-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel__frame,
+  .panel__frame.is-open {
+    transition: none;
+  }
+
+  .panel__body > * {
+    animation: none;
+  }
 }
 
 fieldset {

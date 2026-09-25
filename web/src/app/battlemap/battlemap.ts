@@ -56,8 +56,11 @@ import {
   setContactVisibility,
   setContacts,
   setHeatField,
+  setMarkerColours,
   setMarkerSizing,
 } from './contact-layers';
+import { NO_OPERATION_COLOUR, operationColours } from './operation-colours';
+import { markerTip } from './marker-tip';
 import {
   DEFAULT_HEAT_FIELD,
   HEAT_FIELDS,
@@ -104,7 +107,7 @@ function centreOf(places: readonly { lon: number; lat: number }[]): { lon: numbe
  * The Battle Map (client-only route). Loads the runtime map catalogue, every contact and the filter catalogue, then
  * draws a heatmap and incident markers on a MapLibre GL map. Filters run in the browser over the loaded contacts (the
  * dataset is small); only the incident-report word search goes to the server. The view is kept in the URL (`?at=`,
- * `?basemap=`, `?terrain=`, `?field=`, `?size=`, `?overlays=`, `?opacity=`, `?bases=`, `?photos=`, `?markers=`, `?heatmap=`,
+ * `?basemap=`, `?terrain=`, `?field=`, `?size=`, `?colour=`, `?overlays=`, `?opacity=`, `?bases=`, `?photos=`, `?markers=`, `?heatmap=`,
  * `?incident=`, `?poi=`, `?picture=`, the tool open at the left (`?charts=`, `?roll=`, `?images=`) and the filter parameters described in `filters.ts`) so a link reproduces what the
  * sender was looking at; every one of them is left out when it is at its default, so a plain `/battlemap` link stays short.
  */
@@ -141,6 +144,7 @@ export class Battlemap {
   readonly terrain = input<string>();
   readonly field = input<string>();
   readonly size = input<string>();
+  readonly colour = input<string>();
   readonly overlays = input<string>();
   readonly opacity = input<string>();
   readonly bases = input<string>();
@@ -206,6 +210,24 @@ export class Battlemap {
   protected readonly sizeField = signal<SizeField | null>(null);
   protected readonly sizeFields = SIZE_FIELDS;
   protected readonly sizeFieldName = computed(() => SIZE_FIELDS.find((f) => f.value === this.sizeField())?.name ?? null);
+  private readonly contactsById = computed(() => new Map(this.contactFilter.allContacts().map((c) => [c.id, c])));
+  /** Whether the markers are coloured by their operation (`?colour=operation`) rather than all red. */
+  protected readonly colourByOperation = signal(false);
+  /** Each operation's colour: the same on the markers, in the Operations list and in the legend. */
+  private readonly allOperationColours = computed(() => operationColours(this.contactFilter.allContacts(), this.contactFilter.catalogue()?.operations ?? []));
+  protected readonly operationColourMap = computed(() => (this.colourByOperation() ? this.allOperationColours() : null));
+  /** The operations with markers showing, for the legend, in the order they started; a last entry for contacts in none. */
+  protected readonly legendOperations = computed(() => {
+    const colours = this.operationColourMap();
+    if (!colours) {
+      return [];
+    }
+    const shown = new Set(this.contactFilter.visible().map((c) => c.op));
+    const names = this.contactFilter.catalogue()?.operations ?? [];
+    const rows = [...colours].filter(([op]) => shown.has(op)).map(([op, colour]) => ({ name: names[op - 1]?.name ?? `Operation ${op}`, colour }));
+    const none = [...shown].some((op) => !colours.has(op));
+    return none ? [...rows, { name: 'No operation', colour: NO_OPERATION_COLOUR }] : rows;
+  });
   /** The types of point on the map, for the legend; none while the layer is switched off. */
   protected readonly legendPoiTypes = computed(() => (this.showPois() ? [...new Set(this.pois().map((p) => p.type))] : []));
   /** The charts drawer, opened from the top bar. */
@@ -486,6 +508,11 @@ export class Battlemap {
     return { field, cap: field ? sizeCap(this.contactFilter.allContacts(), field) : 0 };
   }
 
+  protected setMarkerColour(value: string): void {
+    this.colourByOperation.set(value === 'operation');
+    this.syncUrl();
+  }
+
   protected setMarkerSize(value: string): void {
     const field = isSizeField(value) ? value : null;
     this.sizeField.set(field);
@@ -635,6 +662,7 @@ export class Battlemap {
       if (size && isSizeField(size)) {
         this.sizeField.set(size);
       }
+      this.colourByOperation.set(this.colour() === 'operation');
       this.showPois.set(this.bases() !== '0');
       this.showPhotos.set(this.photos() !== '0');
       this.showMarkers.set(this.markers() !== '0');
@@ -686,6 +714,7 @@ export class Battlemap {
               markers: this.showMarkers(),
               selectedId: this.selection.selectedId(),
               sizing: this.markerSizing(),
+              colours: this.operationColourMap(),
             });
             addTrackLayers(map, this.tracks(), this.followUnits.followed().size > 0);
             // Pictures last, so they draw over the contacts.
@@ -702,6 +731,10 @@ export class Battlemap {
               // click is the picture's alone.
               this.basemaps.bindClick(POI_POINTS, (p, at) => this.pictureAt(at) || this.selectPoi(Number(p['id'])));
               this.basemaps.bindClick(POINT_LAYER, (p, at) => this.pictureAt(at) || this.select(Number(p['id'])));
+              this.basemaps.bindHover(POINT_LAYER, (p) => {
+                const contact = this.contactsById().get(Number(p['id']));
+                return contact ? markerTip(contact, this.contactFilter.catalogue()) : null;
+              });
               this.basemaps.bindClick(PHOTO_POINTS, (p, at) => this.pictureAt(at, [STACK_BADGES]) || this.photoClicked(Number(p['id']), at));
               this.basemaps.bindClick(PHOTO_IMAGES, (p, at) => this.pictureAt(at, [STACK_BADGES]) || this.photoClicked(Number(p['id']), at));
               // The badge sits on a thumbnail's corner; a click on it is for the whole stack.
@@ -742,6 +775,8 @@ export class Battlemap {
       // Marches the dashes along whichever units are followed; off again the moment none are, rather than ticking
       // forever in the background.
       const map = this.map!;
+      // The markers follow the colour setting, and the colours themselves once the list of operations has come.
+      effect(() => setMarkerColours(map, this.operationColourMap()), { injector: this.injector });
       effect(
         (onCleanup) => {
           if (this.followUnits.followed().size > 0) {
@@ -808,6 +843,7 @@ export class Battlemap {
         terrain: this.basemaps.terrainEnabled() ? '1' : null,
         field: this.heatField() !== DEFAULT_HEAT_FIELD ? this.heatField() : null,
         size: this.sizeField(),
+        colour: this.colourByOperation() ? 'operation' : null,
         overlays: this.basemaps.overlayIds().join(',') || null,
         opacity:
           (this.config()?.overlays ?? [])
@@ -881,6 +917,7 @@ export class Battlemap {
     const size = one('size');
     this.sizeField.set(size && isSizeField(size) ? size : null);
     setMarkerSizing(map, this.markerSizing());
+    this.colourByOperation.set(one('colour') === 'operation');
 
     // The filters (a changed report search runs again, and redraws when it answers), and the units followed through them.
     const catalogue = this.contactFilter.catalogue();

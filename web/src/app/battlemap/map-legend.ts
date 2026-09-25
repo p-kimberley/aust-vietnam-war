@@ -28,11 +28,30 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
           <ul id="legend-body" class="legend__list">
             @if (showContacts()) {
               <li>
-                <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="6" fill="#c23a26" fill-opacity="0.9" stroke="#efe7cc" stroke-width="1.5" />
-                </svg>
-                <span>Contact</span>
+                @if (operations().length) {
+                  <span class="legend__group">Contacts by operation</span>
+                } @else {
+                  <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="6" fill="#c23a26" fill-opacity="0.9" stroke="#efe7cc" stroke-width="1.5" />
+                  </svg>
+                  <span>Contact</span>
+                }
               </li>
+              @if (operations().length) {
+                <!-- The same colours as the bars of the Operations list; only operations with markers showing are listed. -->
+                <li class="legend__ops">
+                  <ul class="legend__op-list">
+                    @for (op of operations(); track op.name) {
+                      <li>
+                        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                          <circle cx="12" cy="12" r="6" [attr.fill]="op.colour" stroke="#efe7cc" stroke-width="1.5" />
+                        </svg>
+                        <span>{{ op.name }}</span>
+                      </li>
+                    }
+                  </ul>
+                </li>
+              }
               @if (sizeField(); as size) {
                 <li>
                   <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
@@ -166,6 +185,21 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
       gap: 0.5rem;
       min-height: 1.5rem;
     }
+    .legend__group {
+      color: var(--khaki);
+      font-size: 0.8rem;
+    }
+    /* There can be dozens of operations: the list scrolls rather than push the legend up the screen. */
+    .legend__list .legend__ops {
+      display: block;
+    }
+    .legend__op-list {
+      max-height: 11rem;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+      list-style: none;
+    }
     .legend__list img,
     .legend__list svg,
     .legend__blank {
@@ -211,6 +245,8 @@ export class MapLegend {
   readonly showContacts = input(true);
   /** How markers are sized, by the name of the field, or `null` when they are all one size. */
   readonly sizeField = input<string | null>(null);
+  /** When the markers are coloured by operation, the operations showing and their colours; empty when every marker is red. */
+  readonly operations = input<readonly { name: string; colour: string }[]>([]);
   readonly showHeatmap = input(true);
   /** The name of the field the heatmap shows. */
   readonly heatField = input('');

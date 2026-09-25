@@ -282,6 +282,8 @@ export function timelineOption(buckets: readonly MonthBucket[], range: DateRange
 
 /** When an operation ran: from the day of its first contact to the day of its last. */
 export interface OperationSpan {
+  /** The operation's 1-based number, as a contact's `op` has it. */
+  op: number;
   name: string;
   /** UTC midnight, in milliseconds. */
   start: number;
@@ -307,7 +309,7 @@ export function operationSpans(all: readonly Contact[], operations: readonly { n
       span.end = Math.max(span.end, day);
       span.count++;
     } else {
-      spans.set(c.op, { name: operations[c.op - 1].name, start: day, end: day, count: 1 });
+      spans.set(c.op, { op: c.op, name: operations[c.op - 1].name, start: day, end: day, count: 1 });
     }
   }
   return [...spans.values()].sort((a, b) => a.start - b.start || b.end - a.end || a.name.localeCompare(b.name));
@@ -516,7 +518,7 @@ let nextTimelineId = 0;
                   (click)="pick(i)"
                 >
                   <span class="row__name">{{ row.name }}<span class="visually-hidden">, {{ row.dates }}</span></span>
-                  <span class="row__track"><span class="row__bar" [style.left.%]="row.left" [style.width.%]="row.width"></span></span>
+                  <span class="row__track"><span class="row__bar" [style.left.%]="row.left" [style.width.%]="row.width" [style.background]="operationColours()?.get(row.op) ?? null"></span></span>
                 </div>
               }
             </div>
@@ -948,6 +950,8 @@ export class Timeline implements OnDestroy {
   readonly selectedOperations = input<ReadonlySet<string>>(new Set());
   /** The incident that is open, if any: the operation list zooms to it. */
   readonly focus = input<TimelineFocus | null>(null);
+  /** Each operation's colour, when the map's markers are coloured by operation, so its bar here is the same colour; `null` leaves the bars plain. */
+  readonly operationColours = input<ReadonlyMap<number, string> | null>(null);
   /** Whether the operation timeline is open above the strip. */
   readonly expanded = model(false);
   /** Whether play is moving the window along. */

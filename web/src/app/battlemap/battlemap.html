@@ -39,6 +39,7 @@
         [scope]="contactFilter.operationScope()"
         [selectedOperations]="contactFilter.filters().operations"
         [focus]="timelineFocus()"
+        [operationColours]="operationColourMap()"
         [(expanded)]="timelineOpen"
         [(playing)]="timelinePlaying"
         (rangeChange)="setDateRange($event)"
@@ -144,7 +145,9 @@
             </button>
           </div>
 
-          <div id="tabpanel" class="panel__body" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()" [hidden]="!panelOpen()">
+          <!-- Slides open and shut (see .panel__frame); shut, it is hidden from the keyboard and screen readers once it has gone. -->
+          <div class="panel__frame" [class.is-open]="panelOpen()">
+          <div id="tabpanel" class="panel__body" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
             @if (tab() === 'layers') {
               <fieldset>
                 <legend id="basemap-label">Basemap</legend>
@@ -214,6 +217,13 @@
                     Incident markers
                   </label>
                   <label options class="panel__select">
+                    Marker colour
+                    <select (change)="setMarkerColour($any($event.target).value)">
+                      <option value="red" [selected]="!colourByOperation()">Red for every incident</option>
+                      <option value="operation" [selected]="colourByOperation()">By operation</option>
+                    </select>
+                  </label>
+                  <label options class="panel__select">
                     Marker size
                     <select [value]="sizeField() ?? 'none'" (change)="setMarkerSize($any($event.target).value)">
                       <option value="none" [selected]="sizeField() === null">The same for every incident</option>
@@ -260,6 +270,7 @@
               }
             }
           </div>
+          </div>
         </aside>
       }
       <div class="bm__bottom">
@@ -270,6 +281,7 @@
           <app-map-legend
             [showContacts]="showMarkers()"
             [sizeField]="sizeFieldName()"
+            [operations]="legendOperations()"
             [showHeatmap]="showHeatmap()"
             [heatField]="heatFieldName()"
             [poiTypes]="legendPoiTypes()"

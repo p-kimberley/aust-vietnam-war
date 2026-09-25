@@ -30,8 +30,8 @@ describe('operationSpans', () => {
   it('runs each operation from its first contact to its last, counting its contacts', () => {
     const spans = operationSpans(CONTACTS, OPERATIONS);
 
-    expect(spans.find((s) => s.name === 'Alpha')).toEqual({ name: 'Alpha', start: Date.UTC(1966, 0, 5), end: Date.UTC(1966, 0, 20), count: 2 });
-    expect(spans.find((s) => s.name === 'Bravo')).toEqual({ name: 'Bravo', start: Date.UTC(1966, 3, 2), end: Date.UTC(1966, 5, 30), count: 2 });
+    expect(spans.find((s) => s.name === 'Alpha')).toEqual({ op: 1, name: 'Alpha', start: Date.UTC(1966, 0, 5), end: Date.UTC(1966, 0, 20), count: 2 });
+    expect(spans.find((s) => s.name === 'Bravo')).toEqual({ op: 2, name: 'Bravo', start: Date.UTC(1966, 3, 2), end: Date.UTC(1966, 5, 30), count: 2 });
   });
 
   it('leaves out contacts with no operation, an unknown one, and operations that have no contacts', () => {

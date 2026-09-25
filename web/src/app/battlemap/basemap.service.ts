@@ -48,6 +48,7 @@ export interface MapHooks {
 @Injectable()
 export class BasemapService implements OnDestroy {
   private map?: Map;
+  private lib?: typeof import('maplibre-gl');
   private config?: MapConfig;
 
   readonly basemapId = signal<string | undefined>(undefined);
@@ -63,6 +64,7 @@ export class BasemapService implements OnDestroy {
     // The bundler cannot find the library's web worker (the dev server answers 404 and the map silently loses vector
     // tiles and GeoJSON), so the worker and its shared chunk are copied to /vendor by angular.json and loaded from there.
     maplibre.setWorkerUrl(WORKER_URL);
+    this.lib = maplibre;
     this.config = config;
 
     const basemap = pickBasemap(config, start.basemapId);
@@ -176,6 +178,39 @@ export class BasemapService implements OnDestroy {
     });
     map.on('mouseenter', layerId, () => (map.getCanvas().style.cursor = 'pointer'));
     map.on('mouseleave', layerId, () => (map.getCanvas().style.cursor = ''));
+  }
+
+  /**
+   * Shows a small tooltip by a feature on `layerId` while the pointer is over it, holding what `content` makes of the feature
+   * (none when it gives `null`). Pointer only: a tap is a click, and opens the feature instead. Survives style changes.
+   */
+  bindHover(layerId: string, content: (properties: Record<string, unknown>) => HTMLElement | null): void {
+    const map = this.map;
+    if (!map || !this.lib) {
+      return;
+    }
+    const popup = new this.lib.Popup({ closeButton: false, closeOnClick: false, className: 'map-tip', offset: 10, maxWidth: '18rem' });
+    let shown: unknown;
+    const hide = () => {
+      popup.remove();
+      shown = undefined;
+    };
+    map.on('mousemove', layerId, (e) => {
+      const feature = e.features?.[0];
+      if (!feature) {
+        return hide();
+      }
+      if (feature.id !== shown) {
+        const el = content(feature.properties);
+        if (!el) {
+          return hide();
+        }
+        shown = feature.id;
+        const at = feature.geometry.type === 'Point' ? (feature.geometry.coordinates as [number, number]) : e.lngLat;
+        popup.setDOMContent(el).setLngLat(at).addTo(map);
+      }
+    });
+    map.on('mouseleave', layerId, hide);
   }
 
   /** Calls `handler` when the map is clicked where nothing on any of `layers` is under the pointer. */

@@ -1,6 +1,7 @@
 import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { GeoJSONSource, Map } from 'maplibre-gl';
 import { Contact, HeatField, Range, SizeField, toGeoJson } from './contacts';
+import { operationColourExpression } from './operation-colours';
 
 export const CONTACT_SOURCE = 'avw-contacts';
 export const HEAT_LAYER = 'avw-contacts-heat';
@@ -25,6 +26,8 @@ export interface ContactLayerState {
   /** The incident open in the panel, ringed on the map. */
   selectedId: number | null;
   sizing: MarkerSizing;
+  /** Each operation's colour, when markers are coloured by operation; `null` draws them all red. */
+  colours: ReadonlyMap<number, string> | null;
 }
 
 /** Marker radius in pixels at each zoom when every marker is the same size. */
@@ -150,7 +153,7 @@ export function addContactLayers(
       layout: { visibility: state.markers ? 'visible' : 'none', 'circle-sort-key': pointSortKey(state.sizing) },
       paint: {
         'circle-radius': pointRadius(state.sizing),
-        'circle-color': CONTACT_RED,
+        'circle-color': pointColour(state.colours),
         'circle-stroke-color': PAPER,
         'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 8, 0, 12, 1],
         'circle-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.2, 10, 0.5, 12, 0.95],
@@ -185,6 +188,18 @@ export function setSelectedContact(map: Map, id: number | null): void {
 export function setHeatField(map: Map, field: HeatField, range: Range): void {
   if (map.getLayer(HEAT_LAYER)) {
     map.setPaintProperty(HEAT_LAYER, 'heatmap-weight', heatWeight(field, range));
+  }
+}
+
+/** The markers' fill: red, or the colour of each one's operation. */
+function pointColour(colours: ReadonlyMap<number, string> | null): ExpressionSpecification | string {
+  return colours ? operationColourExpression(colours) : CONTACT_RED;
+}
+
+/** Colours the markers by operation, or turns them back to red. */
+export function setMarkerColours(map: Map, colours: ReadonlyMap<number, string> | null): void {
+  if (map.getLayer(POINT_LAYER)) {
+    map.setPaintProperty(POINT_LAYER, 'circle-color', pointColour(colours));
   }
 }
 

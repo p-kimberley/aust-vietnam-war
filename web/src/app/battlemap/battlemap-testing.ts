@@ -131,6 +131,11 @@ export class FakeBasemapService {
     this.handlers.set(layer, handler);
     if (layer === 'avw-contacts-points') this.clickHandler = handler;
   });
+  /** What each layer's tooltip would hold, by layer id. */
+  readonly tips = new Map<string, (p: Record<string, unknown>) => HTMLElement | null>();
+  bindHover = vi.fn((layer: string, content: (p: Record<string, unknown>) => HTMLElement | null) => {
+    this.tips.set(layer, content);
+  });
 }
 
 export interface RenderOptions {

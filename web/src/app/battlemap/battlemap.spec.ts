@@ -16,7 +16,7 @@ describe('contacts', () => {
     expect(fc.features).toHaveLength(3);
     expect(fc.features[1].geometry.coordinates).toEqual([107.2, 10.61]);
     expect(fc.features[1].id).toBe(9);
-    expect(fc.features[1].properties).toEqual({ id: 9, dtg: '1966-03-05T08:10:00', fr: 40, frCas: 2, en: 12, enCas: 7, frKia: 1, frWia: 1, enKia: 5, enWia: 2 });
+    expect(fc.features[1].properties).toEqual({ id: 9, dtg: '1966-03-05T08:10:00', op: 0, fr: 40, frCas: 2, en: 12, enCas: 7, frKia: 1, frWia: 1, enKia: 5, enWia: 2 });
   });
 
   it('finds the range of a field, and copes with no data', () => {

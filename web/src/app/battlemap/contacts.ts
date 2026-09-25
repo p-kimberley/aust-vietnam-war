@@ -126,7 +126,7 @@ export function fieldRange(contacts: readonly Contact[], field: HeatField): Rang
   return { min, max };
 }
 
-export type ContactProperties = Pick<Contact, 'id' | 'dtg' | 'fr' | 'frCas' | 'en' | 'enCas' | 'frKia' | 'frWia' | 'enKia' | 'enWia'>;
+export type ContactProperties = Pick<Contact, 'id' | 'dtg' | 'op' | 'fr' | 'frCas' | 'en' | 'enCas' | 'frKia' | 'frWia' | 'enKia' | 'enWia'>;
 
 /** GeoJSON is what the map library consumes; the id doubles as the feature id so clicks can be traced back. */
 export function toGeoJson(contacts: readonly Contact[]): FeatureCollection<Point, ContactProperties> {
@@ -137,6 +137,7 @@ export function toGeoJson(contacts: readonly Contact[]): FeatureCollection<Point
     properties: {
       id: c.id,
       dtg: c.dtg,
+      op: c.op,
       fr: c.fr,
       frCas: c.frCas,
       en: c.en,
