@@ -2,7 +2,7 @@ import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Feature, FeatureCollection, Point } from 'geojson';
 import type { GeoJSONSource, Map } from 'maplibre-gl';
 import { IncidentMediaView } from './community/community';
-import { addStackLayers, setStackVisibility, setStacks } from './photo-stacks';
+import { STACK_BADGE_PX, addStackLayers, setStackVisibility, setStacks } from './photo-stacks';
 import { PHOTO_IMAGE_PREFIX, registerPhotoThumbnails } from './photo-thumbnails';
 
 export const PHOTO_SOURCE = 'avw-photos';
@@ -25,6 +25,7 @@ export const PHOTO_FULL_ZOOM = 15;
 export const PHOTO_GROW_FROM = 18;
 export const PHOTO_GROWTH_PER_ZOOM = 0.5;
 const MAX_ZOOM = 22;
+
 /** The ring round the open picture, at the sizes the thumbnails are, so it goes round the thumbnail and not behind it. */
 const RING_AT_FULL_SIZE = 34;
 
@@ -33,7 +34,19 @@ export function thumbnailScale(zoom: number): number {
   return zoom <= PHOTO_GROW_FROM ? 1 : 1 + (zoom - PHOTO_GROW_FROM) * PHOTO_GROWTH_PER_ZOOM;
 }
 
-const IMAGE_SIZE: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], PHOTO_GROW_FROM, 1, MAX_ZOOM, thumbnailScale(MAX_ZOOM)];
+/** How big a thumbnail is drawn at each zoom: its usual size to zoom 18, then growing. Spread-out pictures use it too. */
+export const PHOTO_IMAGE_SIZE: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], PHOTO_GROW_FROM, 1, MAX_ZOOM, thumbnailScale(MAX_ZOOM)];
+const IMAGE_SIZE = PHOTO_IMAGE_SIZE;
+/** The ring round an open thumbnail at each zoom, once thumbnails are fully shown: it grows with them. */
+export const PHOTO_THUMBNAIL_RING: ExpressionSpecification = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  PHOTO_GROW_FROM,
+  RING_AT_FULL_SIZE,
+  MAX_ZOOM,
+  RING_AT_FULL_SIZE * thumbnailScale(MAX_ZOOM),
+];
 /** The thumbnail fades in as the plain marker under it fades out, so the one turns into the other. */
 const IMAGE_OPACITY: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], PHOTO_FADE_START, 0, PHOTO_FULL_ZOOM, 1];
 const DOT_OPACITY: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], PHOTO_FADE_START, 1, PHOTO_FULL_ZOOM, 0];
@@ -183,7 +196,8 @@ function placed(pictures: readonly IncidentMediaView[]): { id: number; lon: numb
 
 /** Works out again which pictures lie on top of each other, for the badges: after a zoom, or when the pictures change. */
 export function refreshStacks(map: Map, pictures: readonly IncidentMediaView[]): void {
-  setStacks(map, placed(pictures));
+  // Bigger thumbnails hide more of each other, so what counts as a stack grows with them.
+  setStacks(map, placed(pictures), STACK_BADGE_PX * thumbnailScale(map.getZoom()));
 }
 
 export function setPhotoVisibility(map: Map, visible: boolean): void {

@@ -1,24 +1,33 @@
 <div class="viewer" (click)="close()">
   <div #box class="box" role="dialog" aria-modal="true" aria-labelledby="viewer-title" (click)="$event.stopPropagation()" (keydown)="onKeydown($event)">
-    @if (shown(); as p) {
-      <div #stage class="stage" [class.is-full]="fullscreen()">
+    <div #stage class="stage" [class.is-full]="fullscreen()">
+      @if (onStage(); as p) {
         <img class="stage__img" [src]="p.url" [alt]="p.caption || 'A photo placed on the map'" />
-        @if (fullscreen()) {
-          <button type="button" class="stage__button stage__exit" aria-label="Exit full screen" (click)="closeFullscreen()">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3v6H3M15 3v6h6M9 21v-6H3M15 21v-6h6" /></svg>
-          </button>
+      }
+      @if (siblings().length > 1) {
+        <button type="button" #previousButton class="stage__step stage__step--previous" aria-label="Previous photo" title="Previous (Left arrow)" [disabled]="!previous()" (click)="step(previous())">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 4 7 12l8 8" /></svg>
+        </button>
+        <button type="button" #nextButton class="stage__step stage__step--next" aria-label="Next photo" title="Next (Right arrow)" [disabled]="!next()" (click)="step(next())">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 4 8 8-8 8" /></svg>
+        </button>
+        <p class="stage__count data" aria-live="polite">{{ position() + 1 }} of {{ siblings().length }}</p>
+      }
+      @if (fullscreen()) {
+        <button type="button" class="stage__button stage__exit" aria-label="Exit full screen" (click)="closeFullscreen()">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3v6H3M15 3v6h6M9 21v-6H3M15 21v-6h6" /></svg>
+        </button>
+        @if (onStage(); as p) {
           @if (p.caption || p.credit) {
             <p class="stage__caption">{{ p.caption }}@if (p.credit) { <span class="data"> · {{ p.credit }}</span> }</p>
           }
-        } @else {
-          <button type="button" #fullButton class="stage__button" aria-label="View the photo full screen" title="Full screen" (click)="openFullscreen()">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" /></svg>
-          </button>
         }
-      </div>
-    } @else {
-      <div class="stage stage--empty"></div>
-    }
+      } @else {
+        <button type="button" #fullButton class="stage__button" aria-label="View the photo full screen" title="Full screen" (click)="openFullscreen()">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" /></svg>
+        </button>
+      }
+    </div>
 
     <aside class="side">
       <header class="side__head">

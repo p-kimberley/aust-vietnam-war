@@ -137,9 +137,12 @@ export function addStackLayers(map: Map, visible: boolean): void {
   }
 }
 
-/** Works the stacks out again, for the zoom the map is at now and the pictures it has. */
-export function setStacks(map: Map, pictures: readonly Place[]): void {
-  map.getSource<GeoJSONSource>(STACK_SOURCE)?.setData(toStackGeoJson(findStacks(pictures, map.getZoom())));
+/**
+ * Works the stacks out again, for the zoom the map is at now and the pictures it has. `px` is how close counts as a stack; it grows
+ * with the thumbnails, which grow from zoom 18.
+ */
+export function setStacks(map: Map, pictures: readonly Place[], px = STACK_BADGE_PX): void {
+  map.getSource<GeoJSONSource>(STACK_SOURCE)?.setData(toStackGeoJson(findStacks(pictures, map.getZoom(), px)));
 }
 
 export function setStackVisibility(map: Map, visible: boolean): void {

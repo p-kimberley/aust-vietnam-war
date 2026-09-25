@@ -1,7 +1,7 @@
 import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { Feature, FeatureCollection, LineString, Point } from 'geojson';
 import type { GeoJSONSource, Map } from 'maplibre-gl';
-import { PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_IMAGES, PHOTO_POINTS } from './photo-layers';
+import { PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_IMAGES, PHOTO_IMAGE_SIZE, PHOTO_POINTS, PHOTO_THUMBNAIL_RING, thumbnailScale } from './photo-layers';
 import { STACK_BADGES, STACK_COUNTS, stackFilter } from './photo-stacks';
 import { PHOTO_IMAGE_PREFIX } from './photo-thumbnails';
 
@@ -19,7 +19,7 @@ const INK = '#22251a';
 const PAPER = '#efe7cc';
 const SMOKE_YELLOW = '#e3b92e';
 
-/** How far apart the spread pictures sit, centre to centre, in pixels: a thumbnail and its frame, and a little air. */
+/** How far apart the spread pictures sit, centre to centre, in pixels at the thumbnails' usual size: a thumbnail and its frame, and a little air. */
 export const SPIDER_SPACING_PX = 68;
 /** Up to this many go round one circle; more wind out in a spiral, which keeps them apart however many there are. */
 export const SPIDER_CIRCLE_MAX = 8;
@@ -95,16 +95,36 @@ function selectedFilter(id: number | null): ExpressionSpecification {
 /**
  * Pictures that sit on top of each other, spread out round where they are so that each can be chosen: they spring out from the
  * stack along thin legs, as full thumbnails whatever the zoom, and the stack they came from is hidden until they close up again.
- * One spread is open at a time. It closes when the map is zoomed, when the empty map is clicked, and when the pictures change.
+ * They grow with the zoom as single thumbnails do (from zoom 18), and spread further apart to match, so they stay open while the
+ * map is zoomed. One spread is open at a time. It closes when the empty map is clicked and when the pictures change, and one spread
+ * from a numbered group also closes when the zoom passes a whole level, since the map numbers its groups afresh at each level.
  */
 export class PhotoSpider {
   private ids: number[] = [];
   private hiddenCluster: number | null = null;
   private frame = 0;
   private selectedId: number | null = null;
+  /** Where the spread springs from, where each picture goes (at the thumbnails' usual size), and how far out they are (0 to 1, and a little past while springing). */
+  private centre = { lon: 0, lat: 0 };
+  private offsets: Offset[] = [];
+  private reach = 1;
+  /** The whole zoom level a spread from a numbered group was opened at. */
+  private level = 0;
 
   constructor(private readonly map: Map) {
-    map.on('zoomstart', () => this.close());
+    map.on('zoom', () => this.onZoom());
+  }
+
+  /** The spread follows the zoom: redrawn to the new size, or, for one from a numbered group at another level, closed. */
+  private onZoom(): void {
+    if (this.ids.length === 0) {
+      return;
+    }
+    if (this.hiddenCluster !== null && Math.floor(this.map.getZoom()) !== this.level) {
+      this.close();
+      return;
+    }
+    this.draw(this.reach);
   }
 
   /** The pictures spread out now, if any. */
@@ -138,7 +158,7 @@ export class PhotoSpider {
         type: 'circle',
         source: SPIDER_SOURCE,
         filter: selectedFilter(this.selectedId),
-        paint: { 'circle-radius': 34, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': SMOKE_YELLOW, 'circle-stroke-width': 3 },
+        paint: { 'circle-radius': PHOTO_THUMBNAIL_RING, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': SMOKE_YELLOW, 'circle-stroke-width': 3 },
       });
     }
     if (!map.getLayer(SPIDER_IMAGES)) {
@@ -148,6 +168,7 @@ export class PhotoSpider {
         source: SPIDER_SOURCE,
         layout: {
           'icon-image': ['concat', PHOTO_IMAGE_PREFIX, ['to-string', ['get', 'id']]],
+          'icon-size': PHOTO_IMAGE_SIZE,
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
         },
@@ -168,40 +189,46 @@ export class PhotoSpider {
     this.ids = ids;
     this.hiddenCluster = clusterId;
     this.hideOriginals();
-
-    const map = this.map;
-    const hub = map.project([centre.lon, centre.lat]);
-    const offsets = spiderOffsets(ids.length);
-    const draw = (k: number) => {
-      const spots = offsets.map(([dx, dy]) => map.unproject([hub.x + dx * k, hub.y + dy * k]));
-      const points: Feature<Point, SpiderProperties>[] = spots.map((s, i) => ({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
-        properties: { id: ids[i] },
-      }));
-      const legs: Feature<LineString | Point>[] = [
-        ...spots.map<Feature<LineString>>((s) => ({ type: 'Feature', geometry: { type: 'LineString', coordinates: [[centre.lon, centre.lat], [s.lng, s.lat]] }, properties: {} })),
-        { type: 'Feature', geometry: { type: 'Point', coordinates: [centre.lon, centre.lat] }, properties: { hub: true } },
-      ];
-      map.getSource<GeoJSONSource>(SPIDER_SOURCE)?.setData({ type: 'FeatureCollection', features: points });
-      map.getSource<GeoJSONSource>(SPIDER_LEGS_SOURCE)?.setData({ type: 'FeatureCollection', features: legs });
-    };
+    this.centre = centre;
+    this.offsets = spiderOffsets(ids.length);
+    this.level = Math.floor(this.map.getZoom());
 
     const still = typeof requestAnimationFrame === 'undefined' || globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (still) {
-      draw(1);
+      this.draw(1);
       return;
     }
     const start = performance.now();
     const step = (now: number) => {
       const t = (now - start) / SPIDER_SPRING_MS;
-      draw(springOut(t));
+      this.draw(springOut(t));
       if (t < 1) {
         this.frame = requestAnimationFrame(step);
       }
     };
-    draw(0);
+    this.draw(0);
     this.frame = requestAnimationFrame(step);
+  }
+
+  /** Draws the spread `reach` of the way out, at the size thumbnails are at the zoom the map is at now. */
+  private draw(reach: number): void {
+    this.reach = reach;
+    const map = this.map;
+    const { centre, ids } = this;
+    const hub = map.project([centre.lon, centre.lat]);
+    const k = reach * thumbnailScale(map.getZoom());
+    const spots = this.offsets.map(([dx, dy]) => map.unproject([hub.x + dx * k, hub.y + dy * k]));
+    const points: Feature<Point, SpiderProperties>[] = spots.map((s, i) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+      properties: { id: ids[i] },
+    }));
+    const legs: Feature<LineString | Point>[] = [
+      ...spots.map<Feature<LineString>>((s) => ({ type: 'Feature', geometry: { type: 'LineString', coordinates: [[centre.lon, centre.lat], [s.lng, s.lat]] }, properties: {} })),
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [centre.lon, centre.lat] }, properties: { hub: true } },
+    ];
+    map.getSource<GeoJSONSource>(SPIDER_SOURCE)?.setData({ type: 'FeatureCollection', features: points });
+    map.getSource<GeoJSONSource>(SPIDER_LEGS_SOURCE)?.setData({ type: 'FeatureCollection', features: legs });
   }
 
   /** Puts the pictures back in their stack. */

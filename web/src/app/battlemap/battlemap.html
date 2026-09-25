@@ -77,7 +77,7 @@
   }
 
   @if (status() === 'ready' && selection.selectedPictureId(); as pictureId) {
-    <app-picture-viewer [pictureId]="pictureId" (closed)="selectPicture(null)" (openIncident)="openIncidentFromPicture($event)" />
+    <app-picture-viewer [pictureId]="pictureId" (closed)="selectPicture(null)" (navigate)="selectPicture($event)" (openIncident)="openIncidentFromPicture($event)" />
   }
 
   @if (status() === 'ready') {

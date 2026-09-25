@@ -284,7 +284,12 @@ export class CommunityService {
 
   /** Every approved picture with a place on the map, newest first (the server sends at most 500). */
   mediaOnMap(): Promise<IncidentMediaView[]> {
-    const params = new HttpParams().set('minLat', -90).set('minLon', -180).set('maxLat', 90).set('maxLon', 180);
+    return this.mediaInArea(-90, -180, 90, 180);
+  }
+
+  /** Approved pictures placed inside a box, newest first. */
+  mediaInArea(minLat: number, minLon: number, maxLat: number, maxLon: number): Promise<IncidentMediaView[]> {
+    const params = new HttpParams().set('minLat', minLat).set('minLon', minLon).set('maxLat', maxLat).set('maxLon', maxLon);
     return firstValueFrom(this.http.get<IncidentMediaView[]>('/api/community-media', { params }));
   }
 

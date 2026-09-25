@@ -417,7 +417,7 @@ describe('PictureViewer', () => {
     expect(el.querySelector('[role=dialog]')).not.toBeNull();
   });
 
-  it('starts out of full screen for another photo', async () => {
+  it('stays full screen when it moves on to another photo', async () => {
     const { fixture, el } = viewer();
     await settle(fixture);
     button(el, 'View full screen').click();
@@ -426,7 +426,142 @@ describe('PictureViewer', () => {
     fixture.componentRef.setInput('pictureId', 6);
     await settle(fixture);
 
-    expect(el.querySelector('.stage.is-full')).toBeNull();
+    expect(el.querySelector('.stage.is-full')).not.toBeNull();
+  });
+});
+
+describe('PictureViewer: stepping through the photos of a place or an incident', () => {
+  /** Pictures by id, as the API would give them. */
+  const all: Record<number, IncidentMediaView> = {
+    5: pic({ id: 5, contactId: 2, url: '/media/5.jpg', caption: 'Five' }),
+    6: pic({ id: 6, contactId: 2, url: '/media/6.jpg', caption: 'Six' }),
+    7: pic({ id: 7, contactId: null, url: '/media/7.jpg', caption: 'Seven' }),
+    8: pic({ id: 8, contactId: null, url: '/media/8.jpg', caption: 'Eight', lat: null, lon: null }),
+  };
+  function stepping(start: number, over: Record<string, unknown> = {}) {
+    TestBed.resetTestingModule();
+    const community = fakeCommunity({
+      mediaDetail: vi.fn((id: number) => Promise.resolve(all[id] ?? null)),
+      media: vi.fn(() => Promise.resolve([all[5], all[6]])),                     // the incident's
+      mediaInArea: vi.fn(() => Promise.resolve([all[7], all[5]])),              // placed at the same spot
+      ...over,
+    });
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), ...communityProviders(community, fakeAuth({}))] });
+    const fixture = TestBed.createComponent(PictureViewer);
+    fixture.componentRef.setInput('pictureId', start);
+    document.body.append(fixture.nativeElement);
+    fixture.detectChanges();
+    // Stands in for the map, which opens whatever the viewer steps to.
+    fixture.componentInstance.navigate.subscribe((id) => fixture.componentRef.setInput('pictureId', id));
+    return { fixture, community, el: fixture.nativeElement as HTMLElement };
+  }
+  const arrow = (el: HTMLElement, which: 'Previous' | 'Next') => el.querySelector<HTMLButtonElement>(`[aria-label="${which} photo"]`)!;
+  const count = (el: HTMLElement) => text(el.querySelector('.stage__count'));
+  const title = (el: HTMLElement) => text(el.querySelector('h2'));
+
+  it("steps through the incident's photos, then the others placed at the same spot, each once", async () => {
+    const { fixture, el, community } = stepping(5);
+    await settle(fixture);
+
+    expect(community['media']).toHaveBeenCalledWith(2);
+    const [minLat, minLon, maxLat, maxLon] = community['mediaInArea'].mock.calls[0] as number[];
+    expect(maxLat - minLat).toBeCloseTo((2 * 30) / 111_320);                    // 30 m either side
+    expect(minLon).toBeLessThan(107.17);
+    expect(maxLon).toBeGreaterThan(107.17);
+    expect(count(el)).toBe('1 of 3');
+    expect(arrow(el, 'Previous').disabled).toBe(true);
+
+    arrow(el, 'Next').click();
+    await settle(fixture);
+    expect([count(el), title(el)]).toEqual(['2 of 3', 'Six']);
+
+    arrow(el, 'Next').click();
+    await settle(fixture);
+    expect([count(el), title(el)]).toEqual(['3 of 3', 'Seven']);
+    expect(arrow(el, 'Next').disabled).toBe(true);
+    expect(community['media']).toHaveBeenCalledTimes(1);                        // the set is kept while stepping
+  });
+
+  it('steps with the left and right arrow keys', async () => {
+    const { fixture, el } = stepping(5);
+    await settle(fixture);
+    const key = (k: string) => el.querySelector('[role=dialog]')!.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+
+    key('ArrowRight');
+    await settle(fixture);
+    expect(title(el)).toBe('Six');
+    key('ArrowLeft');
+    await settle(fixture);
+    expect(title(el)).toBe('Five');
+    key('ArrowLeft');                                                           // already the first: nothing happens
+    await settle(fixture);
+    expect(title(el)).toBe('Five');
+  });
+
+  it('shows the next photo straight away, before its details have come', async () => {
+    let answer: (v: IncidentMediaView) => void = () => undefined;
+    const { fixture, el, community } = stepping(5);
+    await settle(fixture);
+    community['mediaDetail'].mockImplementation(() => new Promise<IncidentMediaView>((r) => (answer = r)));
+
+    arrow(el, 'Next').click();
+    fixture.detectChanges();                                                   // not settle: that would wait for the details
+    await new Promise((r) => setTimeout(r));
+    fixture.detectChanges();
+    expect(el.querySelector('.stage img')?.getAttribute('src')).toBe('/media/6.jpg');
+
+    answer(all[6]);
+    await settle(fixture);
+    expect(title(el)).toBe('Six');
+  });
+
+  it('moves focus to the other arrow at the end of the set', async () => {
+    const { fixture, el } = stepping(6);
+    await settle(fixture);
+    arrow(el, 'Next').focus();
+
+    arrow(el, 'Next').click();
+    await settle(fixture);
+
+    expect(arrow(el, 'Next').disabled).toBe(true);
+    expect(document.activeElement).toBe(arrow(el, 'Previous'));
+  });
+
+  it('shows no arrows for a photo on its own', async () => {
+    const { fixture, el } = stepping(8, { mediaInArea: vi.fn(() => Promise.resolve([])) });
+    await settle(fixture);
+
+    expect(arrow(el, 'Next')).toBeNull();
+    expect(el.querySelector('.stage__count')).toBeNull();
+  });
+
+  it('still opens the photo when the others cannot be found', async () => {
+    const { fixture, el } = stepping(5, { media: vi.fn(() => Promise.reject(new Error('down'))), mediaInArea: vi.fn(() => Promise.reject(new Error('down'))) });
+    await settle(fixture);
+
+    expect(title(el)).toBe('Five');
+    expect(arrow(el, 'Next')).toBeNull();
+  });
+});
+
+describe('Battle Map: stepping through photos in the viewer', () => {
+  it('rings each photo on the map, and puts it in the link, as the viewer steps to it', async () => {
+    const pics = [pic({ id: 5 }), pic({ id: 6 })];
+    const r = await render({
+      community: {
+        mediaOnMap: vi.fn(() => Promise.resolve(pics)),
+        mediaDetail: vi.fn((id: number) => Promise.resolve(pics.find((p) => p.id === id) ?? null)),
+        mediaInArea: vi.fn(() => Promise.resolve(pics)),
+      },
+      inputs: { picture: '5' },
+    });
+    await settle(r.fixture);
+
+    r.el.querySelector<HTMLButtonElement>('[aria-label="Next photo"]')!.click();
+    await settle(r.fixture);
+
+    expect(r.basemaps.map.setFilter).toHaveBeenLastCalledWith(SPIDER_RING, ['==', ['get', 'id'], 6]);
+    expect(r.basemaps.map.setFilter).toHaveBeenCalledWith(PHOTO_SELECTED, ['==', ['get', 'id'], 6]);
   });
 });
 

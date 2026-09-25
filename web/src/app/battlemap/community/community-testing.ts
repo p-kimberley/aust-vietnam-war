@@ -9,6 +9,7 @@ export function fakeCommunity(over: Record<string, unknown> = {}): Record<string
     notes: vi.fn(() => Promise.resolve([])),
     media: vi.fn(() => Promise.resolve([])),
     mediaOnMap: vi.fn(() => Promise.resolve([])),
+    mediaInArea: vi.fn(() => Promise.resolve([])),
     nearbyMedia: vi.fn(() => Promise.resolve([])),
     searchPictures: vi.fn(() => Promise.resolve({ items: [], total: 0, page: 1, pageSize: 24 })),
     mediaDetail: vi.fn(() => Promise.reject(new Error('no such picture'))),

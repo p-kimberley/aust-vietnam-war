@@ -81,6 +81,63 @@
   border-color: var(--smoke-yellow);
 }
 
+/* The arrows to the previous and next picture of the set, at the middle of either side. */
+.stage__step {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 3.5rem;
+  padding: 0;
+  color: var(--paper);
+  background: rgb(31 35 20 / 0.7);
+  border: 1px solid var(--olive-500);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.stage__step--previous {
+  left: 0.75rem;
+}
+
+.stage__step--next {
+  right: 0.75rem;
+}
+
+.stage__step svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stage__step:hover:not(:disabled) {
+  color: var(--smoke-yellow);
+  border-color: var(--smoke-yellow);
+}
+
+.stage__step:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.stage__count {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  margin: 0;
+  padding: 0.15rem 0.5rem;
+  color: var(--paper);
+  font-size: 0.8rem;
+  background: rgb(31 35 20 / 0.7);
+  border-radius: var(--radius);
+}
+
 .stage__caption {
   position: absolute;
   right: 1rem;
@@ -205,7 +262,8 @@ h2 {
 .side__close:focus-visible,
 .side__button:focus-visible,
 .side__link:focus-visible,
-.stage__button:focus-visible {
+.stage__button:focus-visible,
+.stage__step:focus-visible {
   outline: 2px solid var(--smoke-yellow);
   outline-offset: 2px;
 }

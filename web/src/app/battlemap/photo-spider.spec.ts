@@ -1,7 +1,7 @@
 import type { FeatureCollection } from 'geojson';
 import { describe, expect, it, vi } from 'vitest';
 import { fakeMap } from './battlemap-testing';
-import { PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_IMAGES, PHOTO_POINTS } from './photo-layers';
+import { PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_IMAGES, PHOTO_IMAGE_SIZE, PHOTO_POINTS, PHOTO_THUMBNAIL_RING } from './photo-layers';
 import {
   PhotoSpider,
   SPIDER_CIRCLE_MAX,
@@ -132,14 +132,64 @@ describe('PhotoSpider', () => {
     expect(map.dataFor(SPIDER_SOURCE).mock.calls.length).toBe(calls);
   });
 
-  it('closes up when the map starts to zoom', () => {
-    const { map, s } = spider();
-    const zoomstart = map.on.mock.calls.find((c) => c[0] === 'zoomstart')![1] as () => void;
-    s.spread({ lon: 107.17, lat: 10.56 }, pictures);
+  /** A spider on a map whose zoom the test sets, drawn without the spring. */
+  function zoomable(zoom: number) {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    const map = { ...fakeMap(), getZoom: () => zoom };
+    for (const id of [PHOTO_CLUSTERS, PHOTO_COUNTS, PHOTO_POINTS, PHOTO_IMAGES]) map.layers.add(id);
+    const s = new PhotoSpider(map as never);
+    s.addLayers();
+    const zoomTo = (z: number) => {
+      zoom = z;
+      (map.on.mock.calls.find((c) => c[0] === 'zoom')![1] as () => void)();
+    };
+    /** How far the first spread picture is from the middle, in pixels (the fake map has 1000 to the degree). */
+    const reach = () => {
+      const [lon, lat] = (last(map.dataFor(SPIDER_SOURCE)).features[0].geometry as unknown as { coordinates: [number, number] }).coordinates;
+      return Math.hypot(lon - 107.17, lat - 10.56) * 1000;
+    };
+    return { map, s, zoomTo, reach };
+  }
 
-    zoomstart();
+  it('sizes the spread thumbnails and their ring with the zoom, as single thumbnails are', () => {
+    const { map } = spider();
+    const layer = (id: string) => map.addLayer.mock.calls.find((c) => c[0].id === id)![0] as { layout?: Record<string, unknown>; paint?: Record<string, unknown> };
 
-    expect(s.open).toEqual([]);
+    expect(layer(SPIDER_IMAGES).layout!['icon-size']).toEqual(PHOTO_IMAGE_SIZE);
+    expect(layer(SPIDER_RING).paint!['circle-radius']).toEqual(PHOTO_THUMBNAIL_RING);
+  });
+
+  it('stays spread while the map zooms, springing further out as the thumbnails grow', () => {
+    try {
+      const { s, zoomTo, reach } = zoomable(16);
+      s.spread({ lon: 107.17, lat: 10.56 }, pictures);
+      const atUsualSize = reach();
+
+      zoomTo(17);
+      expect(s.open).toEqual([5, 6, 7]);
+      expect(reach()).toBeCloseTo(atUsualSize);                              // thumbnails keep their size to zoom 18
+
+      zoomTo(20);
+      expect(reach()).toBeCloseTo(atUsualSize * 2);                          // and are twice it at 20
+      zoomTo(22);
+      expect(reach()).toBeCloseTo(atUsualSize * 3);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('closes a spread from a numbered group once the zoom passes a whole level, as the groups are numbered afresh', () => {
+    try {
+      const { s, zoomTo } = zoomable(12.2);
+      s.spread({ lon: 107.17, lat: 10.56 }, pictures, 42);
+
+      zoomTo(12.9);
+      expect(s.open).toEqual([5, 6, 7]);
+      zoomTo(13.1);
+      expect(s.open).toEqual([]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('rings the open picture among the spread ones', () => {
