@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/community/community.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/community/community.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Community/CommunityEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Community/CommunityEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Community/HonourRoll.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Community/HonourRoll.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/CommunityTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/CommunityTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/community/community.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/community/community.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/community/honour-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/community/honour-panel.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,7 +192,7 @@
       <workItem from="1789826907280" duration="57186000" />
       <workItem from="1790238719146" duration="12841000" />
       <workItem from="1790331544884" duration="11149000" />
-      <workItem from="1790370537759" duration="38454000" />
+      <workItem from="1790370537759" duration="38827000" />
     </task>
     <task id="LOCAL-00001" summary="Add api as submodule">
       <option name="closed" value="true" />

@@ -345,10 +345,17 @@ public static class CommunityEndpoints
     {
         var g = api.MapGroup("/").WithTags("Community");
 
-        g.MapGet("/honour-roll", async (string? q, string? service, string? rank, string? corps, bool? facets, int? page, int? pageSize, IHonourRollSource roll, HttpContext ctx, CancellationToken ct) =>
+        g.MapGet("/honour-roll", async (string? q, string? service, string? rank, string? corps, bool? facets, int? page, int? pageSize, IHonourRollSource roll, AvwDbContext db, HttpContext ctx, CancellationToken ct) =>
             {
-                ctx.Response.Headers.CacheControl = "public, max-age=300";
-                return Results.Ok(await roll.SearchAsync(q, new HonourFilter(service, rank, corps), facets ?? false, page ?? 1, pageSize ?? 20, ct));
+                var found = await roll.SearchAsync(q, new HonourFilter(service, rank, corps), facets ?? false, page ?? 1, pageSize ?? 20, ct);
+
+                // How many poppies each person on the page has, so the list can show who has been remembered.
+                var numbers = found.Items.Select(p => p.ServiceNumber).ToList();
+                var poppies = await db.Tributes.AsNoTracking().Where(t => numbers.Contains(t.ServiceNumber))
+                    .GroupBy(t => t.ServiceNumber).Select(g => new { g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.Count, ct);
+
+                ctx.Response.Headers.CacheControl = "public, max-age=60";              // short: a poppy just left should soon show
+                return Results.Ok(found with { Items = found.Items.Select(p => p with { Tributes = poppies.GetValueOrDefault(p.ServiceNumber) }).ToList() });
             })
             .RequireRateLimiting(CommunitySearchPolicy)                // searched in memory, so no Elasticsearch call to protect
             .WithName("SearchHonourRoll").Produces<HonourPage>();

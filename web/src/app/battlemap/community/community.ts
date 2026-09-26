@@ -130,6 +130,8 @@ export interface HonourSummary {
   portraitUrl: string | null;
   /** How a roll writes the name: "White, James Mungo". */
   sortName?: string | null;
+  /** How many poppies have been left for them, where the roll's list counts them. */
+  tributes?: number;
 }
 
 export interface HonourTour {

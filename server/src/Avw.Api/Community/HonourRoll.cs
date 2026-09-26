@@ -10,7 +10,8 @@ namespace Avw.Api.Community;
 
 /// <summary>
 /// One line of the honour roll: who they were and when they died. <c>Name</c> reads naturally ("James Mungo White"); <c>SortName</c> is
-/// the way a roll is written ("White, James Mungo").
+/// the way a roll is written ("White, James Mungo"). <c>Tributes</c> is how many poppies have been left for them, where the roll's
+/// list counts them (elsewhere 0).
 /// </summary>
 public sealed record HonourSummary(
     string ServiceNumber,
@@ -21,7 +22,8 @@ public sealed record HonourSummary(
     DateOnly? Death,
     int? AgeAtDeath,
     string? PortraitUrl,
-    string? SortName = null);
+    string? SortName = null,
+    int Tributes = 0);
 
 public sealed record HonourTour(string? Unit, string? Start, string? End);
 

@@ -4,6 +4,7 @@ import { HonourPanel } from './community/honour-panel';
 import { Icon } from './icon';
 import { LoadMore } from './load-more';
 import { PanelInfo } from './panel-info';
+import { Poppy } from './community/poppy';
 
 /** How many people one request brings back, and each "Show more" adds. */
 export const ROLL_PAGE_SIZE = 20;
@@ -34,7 +35,7 @@ interface FilterList {
  */
 @Component({
   selector: 'app-nominal-roll',
-  imports: [HonourPanel, Icon, LoadMore, PanelInfo],
+  imports: [HonourPanel, Icon, LoadMore, PanelInfo, Poppy],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (person(); as serviceNumber) {
@@ -45,7 +46,7 @@ interface FilterList {
           <button type="button" class="close" aria-label="Close the nominal roll" (click)="closed.emit()">×</button>
         </div>
         <div class="detail__panel">
-          <app-honour-panel [serviceNumber]="serviceNumber" [closable]="false" (openIncident)="openIncident.emit($event)" (loaded)="release()" />
+          <app-honour-panel [serviceNumber]="serviceNumber" [closable]="false" [startAt]="poppiesFirst() ? 'poppies' : 'top'" (openIncident)="openIncident.emit($event)" (loaded)="release()" />
         </div>
       </div>
     } @else {
@@ -112,6 +113,12 @@ interface FilterList {
                   <span class="person__meta">{{ meta(person) }}</span>
                 </span>
               </button>
+              <!-- Where poppies have been left for them: a poppy in the corner, which opens them at their poppies. -->
+              @if (person.tributes) {
+                <button type="button" class="person__poppies" [attr.aria-label]="poppyLabel(person)" [title]="poppyLabel(person)" (click)="showPoppies(person.serviceNumber)">
+                  <app-poppy />
+                </button>
+              }
             </li>
           }
           <!-- Inside the list, because the list is what scrolls: it comes into view only as the reader nears the end. -->
@@ -270,6 +277,35 @@ interface FilterList {
     .person:hover {
       background: var(--olive-700);
     }
+    /* The row's own button runs under the poppy's, so its words stop short of it. */
+    li:has(.person__poppies) {
+      position: relative;
+    }
+    li:has(.person__poppies) .person {
+      padding-right: 2rem;
+    }
+    .person__poppies {
+      position: absolute;
+      top: 0.25rem;
+      right: 0.25rem;
+      display: grid;
+      place-items: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      padding: 0;
+      font-size: 1.1rem;
+      background: none;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .person__poppies:hover {
+      background: color-mix(in srgb, var(--smoke-yellow) 15%, transparent);
+    }
+    .person__poppies:focus-visible {
+      outline: 2px solid var(--smoke-yellow);
+      outline-offset: 1px;
+    }
     .person__portrait {
       flex: none;
       width: 2.25rem;
@@ -342,9 +378,24 @@ export class NominalRoll implements OnDestroy {
   /** The service number of the person on show, or `null` for the list: set by a link to a person, and by choosing one here. */
   readonly person = model<string | null>(null);
 
+  /** The person on show opens at their poppies, not at the top. */
+  protected readonly poppiesFirst = signal(false);
+
   /** Shows a person from the list. */
   protected show(serviceNumber: string): void {
+    this.poppiesFirst.set(false);
     this.person.set(serviceNumber);
+  }
+
+  /** Shows a person from the list at the poppies left for them. */
+  protected showPoppies(serviceNumber: string): void {
+    this.poppiesFirst.set(true);
+    this.person.set(serviceNumber);
+  }
+
+  protected poppyLabel(person: HonourSummary): string {
+    const n = person.tributes ?? 0;
+    return `${n} ${n === 1 ? 'poppy' : 'poppies'} left for ${person.name}`;
   }
 
   protected readonly restricted = computed(() => Object.values(this.chosen()).some(Boolean));

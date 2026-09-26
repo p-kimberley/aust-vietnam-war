@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, output, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Injector, afterNextRender, effect, inject, input, output, signal, viewChild } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, HonourPerson, TributeView } from './community';
@@ -167,7 +167,7 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
         }
       </header>
 
-      <div class="body">
+      <div #body class="body">
         @if (error()) {
           <p class="error" role="alert">{{ error() }}</p>
         } @else if (person(); as p) {
@@ -212,7 +212,7 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
             </ul>
           }
 
-          <h3>Poppies ({{ tributes()?.total ?? p.tributes }})</h3>
+          <h3 #poppies>Poppies ({{ tributes()?.total ?? p.tributes }})</h3>
           @if (message()) {
             <p class="error" role="alert">{{ message() }}</p>
           }
@@ -262,6 +262,8 @@ export class HonourPanel {
   readonly closed = output<void>();
   /** Whether the panel has its own close button; not where what holds it has one (the Nominal Roll's). */
   readonly closable = input(true);
+  /** Where the details open: at the top, or at the poppies left for the person (from the poppy beside them on the roll). */
+  readonly startAt = input<'top' | 'poppies'>('top');
   /** Opens one of this person's incidents on the map. */
   readonly openIncident = output<number>();
   /** The person's details (or word that they could not be loaded) are on show. */
@@ -270,6 +272,9 @@ export class HonourPanel {
   protected readonly auth = inject(AuthService);
   private readonly api = inject(CommunityService);
   private readonly heading = viewChild<ElementRef<HTMLElement>>('heading');
+  private readonly body = viewChild<ElementRef<HTMLElement>>('body');
+  private readonly poppiesHeading = viewChild<ElementRef<HTMLElement>>('poppies');
+  private readonly injector = inject(Injector);
 
   protected readonly person = signal<HonourPerson | null>(null);
   protected readonly tributes = signal<{ total: number } | null>(null);
@@ -300,6 +305,15 @@ export class HonourPanel {
     return name && name !== UNKNOWN_AUTHOR ? name : 'Anonymous';
   }
 
+  /** Brings the poppies to the top of the panel. Only the panel's own list scrolls, not the page around it. */
+  private scrollToPoppies(): void {
+    const body = this.body()?.nativeElement;
+    const heading = this.poppiesHeading()?.nativeElement;
+    if (body && heading) {
+      body.scrollTop += heading.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
+    }
+  }
+
   protected birthplace(p: HonourPerson): string {
     return [p.birthPlace, p.birthState, p.birthCountry].filter((x): x is string => !!x).join(', ');
   }
@@ -324,6 +338,9 @@ export class HonourPanel {
         this.tributes.set({ total: tributes.total });
         this.more.set(tributes.items.length < tributes.total);
         this.loaded.emit();
+        if (this.startAt() === 'poppies') {
+          afterNextRender(() => this.scrollToPoppies(), { injector: this.injector });
+        }
       }
     } catch (e) {
       if (ticket === this.latest) {

@@ -109,6 +109,23 @@ describe('NominalRoll', () => {
     expect(rows()[1].querySelector('.person__portrait--none')).not.toBeNull();
   });
 
+  it('marks those who have been left a poppy, and opens them at their poppies from it', async () => {
+    const { settleRoll, el, fixture, community } = roll({
+      honourRoll: vi.fn(() => Promise.resolve(page([summary(1, { tributes: 2 }), summary(2), summary(3, { tributes: 1 })]))),
+    });
+    await settleRoll();
+
+    const poppies = [...el.querySelectorAll<HTMLButtonElement>('.person__poppies')];
+    expect(poppies.map((b) => b.getAttribute('aria-label'))).toEqual(['2 poppies left for Person 1', '1 poppy left for Person 3']);
+    expect(poppies[0].querySelector('app-poppy')).not.toBeNull();
+
+    poppies[1].click();
+    fixture.detectChanges();
+    await settleRoll();
+    expect(community['person']).toHaveBeenCalledWith('573');
+    expect(fixture.debugElement.query((d) => d.name === 'app-honour-panel')!.componentInstance.startAt()).toBe('poppies');
+  });
+
   it('searches when typing pauses, and lists just those who match', async () => {
     const honourRoll = vi.fn((q: string) => Promise.resolve(q === 'white' ? page([summary(9, { name: 'James Mungo White' })]) : page([summary(1), summary(2)])));
     const { community, settleRoll, rows, typeIn } = roll({ honourRoll });

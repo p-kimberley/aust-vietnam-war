@@ -577,6 +577,9 @@ public sealed class CommunityEndpointTests : IDisposable
         Assert.Null(found.Facets);
         Assert.Equal(("grist", HonourFilter.None, false), _roll.LastSearch);
 
+        var everyone = await Read<HonourPage>(await Anon("/api/honour-roll"));
+        Assert.Equal([("5715978", 1), ("39426", 0)], everyone.Items.Select(p => (p.ServiceNumber, p.Tributes)));   // the poppies left for each
+
         await Anon("/api/honour-roll?service=Navy&rank=Able%20Seaman&corps=Seaman&facets=true");
         Assert.Equal((null, new HonourFilter("Navy", "Able Seaman", "Seaman"), true), _roll.LastSearch);
 
