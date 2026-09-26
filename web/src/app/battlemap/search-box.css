@@ -7,6 +7,20 @@
   max-width: 26rem;
 }
 
+/*
+ * Where the bar is wide enough to hold it clear of the link home and the title, it sits in the middle of the page, level with
+ * the title (the bar is its containing block; the title's row is as tall as the box).
+ */
+@media (min-width: 58rem) {
+  :host {
+    position: absolute;
+    top: calc(0.6rem + var(--safe-top, 0px));
+    left: 50%;
+    width: 26rem;
+    transform: translateX(-50%);
+  }
+}
+
 .search {
   position: relative;
 }
