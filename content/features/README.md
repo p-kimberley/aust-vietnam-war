@@ -83,3 +83,38 @@ and render again.
 - **Areas**: each contact counted against the nearest base or landing zone within 15 km.
 - **Pictures**: those linked to the unit's contacts, then up to twelve taken within 1.5 km of at least three of them (and within
   its dates, where a picture is dated).
+
+## War Timeline (`war-timeline/`)
+
+What Australian forces did, and why, from 1965 to 1971, as a vertical timeline from the war's phases down to single incidents. The
+plan is `docs/war-timeline-plan.md`.
+
+| File | What it is | Made by |
+|---|---|---|
+| `operations.csv` | The operations' names by the names the record gives them (`name,recorded`, the recorded names separated by `;`): one operation's spellings (`Smithfield (original - Vendetta)`, `Smithfield`), and names shared with the wider campaign (`Lavarack/Toan Thang III`). A name not listed is its own | By hand |
+| `facts.json` | Every month's and every operation's figures, tasks, units (the unit histories' units, with their corrections and nesting) and most significant contacts, with their incident summaries | `Avw.Features war-timeline facts` |
+| `phases.csv` | The war's phases: their dates, and the units or data series a phase is about | By hand |
+| `narratives/phases.json`, `operations.json`, `months.json` | **What the page says**: each phase, operation and month in plain English, what was done and why, the data's claims kept apart from the sources' (cited with `[n]`), each with the `fingerprint` of the facts it was written from. The rules are in `STYLE.md` | By a model (Claude) from the facts and cited sources, reviewed here |
+| `tools/narratives.py` | Cuts the facts into slices to write from (`slice`), checks narratives against the rules that can be checked (`check`: fingerprints, citations, lengths, plain text, and that every number in the text is in the facts or cited), and merges drafts in (`merge`) | |
+
+```
+# Git Bash, from the repository root, with the Elasticsearch settings as for the unit histories (the database is not needed)
+dotnet run --project server/src/Avw.Features -- war-timeline facts
+```
+
+- **An operation has a place of its own** with 20 contacts or more, or 3 Australians or 25 enemy recorded killed (so a short,
+  costly one such as Long Tan's is not lost). Continuing activities recorded as operations (`LRRP`, `TAOR`, `TAOR patrol`, `U/K`,
+  `na`) are counted in their months as routine, not as operations.
+- **An operation's dates** are its main run of contacts: a run ends where 45 days pass without one, so a name used again later,
+  or mistyped, does not stretch it. Contacts outside the run are counted (`outside`) for checking.
+- **A month's and an operation's notable contacts** are the most significant (as for the unit histories: casualties on both sides,
+  then the forces involved): six a month, eight an operation.
+- **The war's phases** are set out by hand in `phases.csv` (`slug,title,from,to,units,series`: the dates as `yyyy-MM-dd`, the
+  history units a phase is about by their slugs separated by `;`, empty for the whole force, and the Battle Map's data series, if
+  one). Each phase's figures and Battle Map link (its dates, units and data series) are worked out with the rest.
+- **Battle Map links for units** use the Battle Map's own way of naming units in a link (a node id for the node and everything
+  under it, `!` after it for the node alone), so they are exactly the history's units, with those nested under them and without
+  those left out. The one thing a link cannot do is the unit histories' correction of contacts filed against the wrong unit, so
+  each unit and phase carries `recorded`, what its link shows, beside `contacts`; the builder lists where they differ.
+- **When the facts change**, a narrative whose `fingerprint` no longer matches is reported by
+  `py tools/narratives.py check narratives/<file>.json`: read it against the new facts, correct it, and copy the new fingerprint.

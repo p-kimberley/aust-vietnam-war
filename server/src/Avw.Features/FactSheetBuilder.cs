@@ -279,6 +279,9 @@ public sealed class FactSheetBuilder(UnitsTable table, FactInputs input)
 
     private List<ContactSummary> ContactsOf(IReadOnlySet<int> units) => Corrected().Contacts.Where(c => c.Units.Any(units.Contains)).ToList();
 
+    /// <summary>Every contact, with those filed against the wrong unit put right (see <see cref="Corrected"/>).</summary>
+    public IReadOnlyList<ContactSummary> Contacts => Corrected().Contacts;
+
     /// <summary>A sub-unit's name without its unit's ("B Company, 5 Battalion, Royal Australian Regiment" is "B Company").</summary>
     private string SubUnitTitle(UnitRow unit, UnitNode node)
     {

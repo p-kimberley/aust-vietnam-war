@@ -22,6 +22,12 @@ using Microsoft.Extensions.Options;
 //       Needs ConnectionStrings__Default and Elasticsearch__Url (with Elasticsearch__ApiKey and Elasticsearch__CaCertificatePath), as
 //       the API does.
 //
+//   Avw.Features war-timeline facts [--content <folder>]
+//       Works out the War Timeline's facts (content/features/war-timeline/facts.json): each month's and each operation's figures,
+//       units, tasks and most significant contacts, with their reports' plain-English summaries, from the contacts
+//       (Elasticsearch, read-only), using the unit histories' table of units. See docs/war-timeline-plan.md.
+//       Needs Elasticsearch__Url (with Elasticsearch__ApiKey and Elasticsearch__CaCertificatePath), as the API does.
+//
 //   Avw.Features unit-histories render [--content <folder>] [--only <slug>]
 //       Writes each unit's history (<unit>/history.md), which the site shows, from its fact sheet and the summaries of its notable
 //       contacts' reports (summaries.json). Reads only those files. Reports the notable contacts with no summary, or one written from
@@ -29,10 +35,11 @@ using Microsoft.Extensions.Options;
 
 var config = new ConfigurationBuilder().AddEnvironmentVariables().AddCommandLine(args).Build();
 var positional = args.Where((a, i) => !a.StartsWith("--") && (i == 0 || !args[i - 1].StartsWith("--"))).ToArray();
-if (positional is not ["unit-histories", "facts" or "render"])
+if (positional is not (["unit-histories", "facts" or "render"] or ["war-timeline", "facts"]))
 {
     Console.Error.WriteLine("Usage: Avw.Features unit-histories facts [--content <folder>] [--portraits <folder>] [--only <slug>]");
     Console.Error.WriteLine("       Avw.Features unit-histories render [--content <folder>] [--only <slug>]");
+    Console.Error.WriteLine("       Avw.Features war-timeline facts [--content <folder>]");
     return 2;
 }
 
@@ -74,6 +81,52 @@ var source = new ElasticsearchContactSource(http, Options.Create(es), NullLogger
 var (contacts, catalogue) = CatalogueBuilder.Build(await source.GetAllAsync(CancellationToken.None));
 var roles = await ContactRoles.ReadAsync(http, es.ContactsIndex, CancellationToken.None);
 Console.WriteLine($"Contacts: {contacts.Length} (who led and supported read for {roles.Count}); units in the tree: {catalogue.Units.Length}.");
+
+if (positional[0] == "war-timeline")
+{
+    // The unit histories' way of telling which unit a contact was (their table, corrections and nesting); nothing else of theirs.
+    var unitFacts = new FactSheetBuilder(table, new FactInputs(contacts, catalogue, roles, [], Enumerable.Empty<int>().ToLookup(_ => "", _ => 0), [], [], new HashSet<string>()));
+    var aliasesPath = Path.Combine(contentDir, "war-timeline", "operations.csv");
+    var aliases = File.Exists(aliasesPath) ? WarTimelineBuilder.ParseAliases(await File.ReadAllTextAsync(aliasesPath)) : new Dictionary<string, string>();
+    var phasesPath = Path.Combine(contentDir, "war-timeline", "phases.csv");
+    var phases = File.Exists(phasesPath) ? WarTimelineBuilder.ParsePhases(await File.ReadAllTextAsync(phasesPath)) : [];
+    var timeline = new WarTimelineBuilder(table, unitFacts, catalogue, aliases, contacts, phases);
+    var summaries = new Dictionary<int, ContactDetail>();
+    foreach (var id in timeline.Candidates())
+    {
+        if (await source.GetAsync(id, CancellationToken.None) is { } detail)
+        {
+            summaries[id] = detail;
+        }
+    }
+
+    var facts = timeline.Build(summaries);
+    var timelineDir = Path.Combine(contentDir, "war-timeline");
+    Directory.CreateDirectory(timelineDir);
+    var factsPath = Path.Combine(timelineDir, "facts.json");
+    var factsText = JsonSerializer.Serialize(facts, json).Replace("\r\n", "\n") + "\n";
+    var previous = File.Exists(factsPath) ? (await File.ReadAllTextAsync(factsPath)).Replace("\r\n", "\n") : null;
+    if (previous != factsText)
+    {
+        await File.WriteAllTextAsync(factsPath, factsText);
+    }
+
+    Console.WriteLine(
+        $"war-timeline {(previous is null ? "new" : previous == factsText ? "unchanged" : "changed")}: {facts.Contacts} contacts, " +
+        $"{facts.Phases.Count} phases, {facts.Months.Count} months ({facts.From} to {facts.To}), {facts.Operations.Count} operations; " +
+        $"{summaries.Values.Count(d => d.Summary is not null)} of {summaries.Count} notable contacts with a summary.");
+    foreach (var unit in facts.Units.Where(u => u.Contacts != u.Recorded))
+    {
+        Console.WriteLine($"  {unit.Slug,-20} {unit.Contacts} contacts, {unit.Recorded} as the Battle Map's filter shows them (contacts filed against the wrong unit)");
+    }
+
+    foreach (var phase in facts.Phases.Where(p => p.Contacts != p.Recorded))
+    {
+        Console.WriteLine($"  phase {phase.Slug,-20} {phase.Contacts} contacts, {phase.Recorded} on its Battle Map link");
+    }
+
+    return 0;
+}
 
 // ---------------------------------------------------------------- the database
 
