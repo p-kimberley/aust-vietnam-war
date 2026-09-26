@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { StubEChart } from './analytics/echart-stub';
 import { ZOOM_SETTLE_MS, dayMs } from './analytics/timeline';
-import { render, settle } from './battlemap-testing';
+import { arrive, render, settle } from './battlemap-testing';
 import { CONTACTS } from './filter-fixtures';
 
 type Rendered = Awaited<ReturnType<typeof render>>;
@@ -118,7 +118,7 @@ describe('an incident and the operation list', () => {
     const r = await render({ contacts: CONTACTS, inputs: { incident: '2' } });
 
     expect(r.el.querySelector('#right-tab-filters .tab__badge')).toBeNull();
-    expect(r.basemaps.fitTo).not.toHaveBeenCalled();
+    expect(fitted(r)).toEqual([1, 2, 3, 4]);                                             // the whole view shows everyone
   });
 });
 
@@ -142,11 +142,14 @@ describe('animating to the data extents on load', () => {
     expect(r.basemaps.fitTo).not.toHaveBeenCalled();
   });
 
-  it('flies to the incident, base or photo the link opens instead of fitting to everyone', async () => {
+  it('shows everything first and then closes in on the incident the link opens, one move after the other', async () => {
     const r = await render({ contacts: CONTACTS, inputs: { incident: '2' } });
 
-    expect(r.basemaps.flyTo).toHaveBeenCalledWith(CONTACTS[1].lat, CONTACTS[1].lon, 11);
-    expect(r.basemaps.fitTo).not.toHaveBeenCalled();
+    expect(fitted(r)).toEqual([1, 2, 3, 4]);
+    expect(r.basemaps.flyTo).not.toHaveBeenCalled();
+    arrive(r.basemaps.map);
+    expect(r.basemaps.flyTo).toHaveBeenCalledWith(CONTACTS[1].lat, CONTACTS[1].lon, 15, expect.anything());   // an incident close up
+    expect(r.basemaps.fitTo).toHaveBeenCalledTimes(1);
   });
 
   it('does nothing when there is nothing to fit to', async () => {

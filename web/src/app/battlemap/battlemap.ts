@@ -98,6 +98,8 @@ type Tab = 'layers' | 'filters';
 const FLYOUT_SLIDE_MS = 300;
 /** A filter that leaves one contact, or a few close together, zooms no closer than this. */
 const FIT_MAX_ZOOM = 13;
+/** How close a link to an incident, with no view of its own, opens on it: close enough to tell it from its neighbours. */
+const LINKED_INCIDENT_ZOOM = 15;
 /** Air round the fitted contacts, beyond the panels and the timeline, so they do not land flush against an edge. */
 const FIT_PADDING_PX = 50;
 /** How far round the pointer, in pixels, a click looks for pictures lying on top of each other. */
@@ -789,6 +791,19 @@ export class Battlemap {
 
       const target = opened ?? openedPoi ?? openedPicture;
       const hasOwnView = !!parseAt(this.at());
+      // Where the camera goes first: one of these, never two at once (each would pull the camera its own way). The link's own view
+      // stays as it is; otherwise the map shows the whole picture and then closes in on the incident the link names, flies to the
+      // base or photo it names, or to where a picture not yet on the map was taken, or, with none of those, fits whatever the
+      // filters leave.
+      const firstView: 'own' | 'incident' | 'target' | 'pending-picture' | 'fit' = hasOwnView
+        ? 'own'
+        : opened
+          ? 'incident'
+          : target
+            ? 'target'
+            : this.selection.selectedPictureId() !== null
+              ? 'pending-picture'
+              : 'fit';
 
       let firstStyle = true;
       this.map = await this.basemaps.create(
@@ -851,12 +866,32 @@ export class Battlemap {
               // With no explicit view in the link and nothing else to fly to, animate to fit whatever the filters leave.
               // Deferred to after this is rendered: mapPadding reads the panels' real width, and they do not exist (the
               // whole right-hand column is behind an `@if (status() === 'ready')`) until this has been drawn.
-              if (!target && !hasOwnView) {
+              if (firstView === 'fit') {
                 afterNextRender(
                   () => {
                     const shown = this.contactFilter.visible();
                     if (shown.length > 0) {
                       this.basemaps.fitTo(shown, this.mapPadding(), FIT_MAX_ZOOM);
+                    }
+                  },
+                  { injector: this.injector },
+                );
+              } else if (firstView === 'incident' && opened) {
+                // An incident the link opens onto: first the whole of what the filters leave, so the reader sees where it is, then,
+                // once that has settled, close up on it, in the middle of the map that can be seen (beside its panel, above the
+                // timeline), and, once there, a reticule closes in on its marker. Deferred for the same reason as the fit.
+                afterNextRender(
+                  () => {
+                    const shown = this.contactFilter.visible();
+                    const closeIn = () => {
+                      map.once('moveend', () => homeIn(map, opened.lon, opened.lat, this.selectionColour));
+                      this.basemaps.flyTo(opened.lat, opened.lon, LINKED_INCIDENT_ZOOM, this.mapPadding());
+                    };
+                    if (shown.length > 0) {
+                      map.once('moveend', closeIn);
+                      this.basemaps.fitTo(shown, this.mapPadding(), FIT_MAX_ZOOM);
+                    } else {
+                      closeIn();
                     }
                   },
                   { injector: this.injector },
@@ -895,23 +930,18 @@ export class Battlemap {
         { injector: this.injector },
       );
 
-      // An incident the link opened onto is pointed out, once the map has come to it: a reticule, in the ring's colour for this
-      // basemap, closes in on its marker. The basemap's colour is only known once its style has loaded (the map is handed back
-      // before that), so it waits for that too: a link with its own view has no flight to wait for, and would go in yellow.
-      if (opened) {
+      // An incident the link opened onto with a view of its own is pointed out at once (one the map flies to, once there: see
+      // above): a reticule, in the ring's colour for this basemap, closes in on its marker. That colour is only known once the
+      // basemap's style has loaded (the map is handed back before that), so it waits for that, or it would go in yellow.
+      if (opened && firstView === 'own') {
         const pointOut = () => homeIn(map, opened.lon, opened.lat, this.selectionColour);
-        const onceStyled = () => (this.status() === 'ready' ? pointOut() : map.once('style.load', pointOut));
-        if (target && !hasOwnView) {
-          map.once('moveend', onceStyled);
-        } else {
-          afterNextRender(onceStyled, { injector: this.injector });
-        }
+        afterNextRender(() => (this.status() === 'ready' ? pointOut() : map.once('style.load', pointOut)), { injector: this.injector });
       }
 
-      // With no explicit view in the link, bring the incident, base or photo into frame.
-      if (target && !hasOwnView) {
+      // A base or photo the link names is brought into frame now (an incident, once the map is ready: see above).
+      if (firstView === 'target' && target) {
         this.basemaps.flyTo(target.lat!, target.lon!, 11);
-      } else if (!hasOwnView && this.selection.selectedPictureId() !== null) {
+      } else if (firstView === 'pending-picture') {
         // A picture that is not on the map yet (one waiting for approval, linked from the Studio): find out where it goes.
         const detail = await this.community.mediaDetail(this.selection.selectedPictureId()!).catch(() => null);
         if (detail?.lat != null && detail.lon != null) {

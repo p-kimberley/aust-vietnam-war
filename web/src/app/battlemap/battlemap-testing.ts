@@ -58,6 +58,13 @@ export const config: MapConfig = {
 };
 
 /** A stand-in for the map that records what the feature code asks of it. */
+/** The map settles after the last move it was sent on: whatever was waiting for that ('moveend') goes ahead. */
+export function arrive(map: { once: ReturnType<typeof vi.fn> }): void {
+  const waiting = map.once.mock.calls.filter(([event]) => event === 'moveend').at(-1);
+  if (!waiting) throw new Error('Nothing is waiting for the map to settle');
+  (waiting[1] as () => void)();
+}
+
 export function fakeMap() {
   const sources = new Set<string>();
   const layers = new Set<string>();

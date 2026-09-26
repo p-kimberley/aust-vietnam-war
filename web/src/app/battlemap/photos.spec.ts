@@ -968,6 +968,14 @@ describe('Battle Map community photos', () => {
     expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.6, 107.2, 11);
   });
 
+  it('flies to a picture not yet on the map from its link, without fitting the map to everyone as well', async () => {
+    const r = await render({ community: { mediaDetail: vi.fn(() => Promise.resolve(pic({ id: 77, lat: 10.4, lon: 107.1 }))) }, inputs: { picture: '77' } });
+    await settle(r.fixture);
+
+    expect(r.basemaps.flyTo).toHaveBeenCalledWith(10.4, 107.1, 15);
+    expect(r.basemaps.fitTo).not.toHaveBeenCalled();                                   // one or the other, never both
+  });
+
   it.each(['abc', '-1', '0', '1.5'])('ignores a picture link that is not a picture id (%s)', async (bad) => {
     const r = await render({ ...withPictures, inputs: { picture: bad } });
 

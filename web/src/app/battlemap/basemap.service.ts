@@ -249,11 +249,16 @@ export class BasemapService implements OnDestroy {
     map.fitBounds([[west, south], [east, north]], { padding, maxZoom, duration: FIT_DURATION_MS });
   }
 
-  /** Eases the camera to a point, zooming in if the view is currently wider than `minZoom`. */
-  flyTo(lat: number, lon: number, minZoom: number): void {
+  /**
+   * Eases the camera to a point, zooming in if the view is currently wider than `minZoom`. With `padding` (what the panels and
+   * timeline cover at each side), the point lands in the middle of the map that can be seen rather than of the whole map. It is
+   * an offset for this move only: the library's own padding would stay with the map and move every later centre.
+   */
+  flyTo(lat: number, lon: number, minZoom: number, padding?: { top: number; bottom: number; left: number; right: number }): void {
     const map = this.map;
     if (map) {
-      map.easeTo({ center: [lon, lat], zoom: Math.max(map.getZoom(), minZoom), duration: 800 });
+      const offset: [number, number] = padding ? [(padding.left - padding.right) / 2, (padding.top - padding.bottom) / 2] : [0, 0];
+      map.easeTo({ center: [lon, lat], zoom: Math.max(map.getZoom(), minZoom), offset, duration: 800 });
     }
   }
 

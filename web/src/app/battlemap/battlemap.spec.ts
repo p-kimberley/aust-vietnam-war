@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
-import { config, contacts, render, settle } from './battlemap-testing';
+import { arrive, config, contacts, render, settle } from './battlemap-testing';
 import { HEAT_LAYER, POINT_LAYER, PULSE_MS, SELECTED_HALO, SELECTED_LAYER, heatWeight, pointRadius, pulseSelection, selectedRadius } from './contact-layers';
 import { fieldRange, formatDtg, sizeCap, toGeoJson } from './contacts';
 import { parseOverlayOpacities } from './basemap.service';
@@ -462,21 +462,24 @@ describe('Battlemap', () => {
     expect(basemaps.map.setFilter).toHaveBeenLastCalledWith(SELECTED_LAYER, ['==', ['get', 'id'], -1]);
   });
 
-  it('opens straight onto an incident from the link and frames it when the link has no view', async () => {
+  it('opens straight onto an incident from the link: everything first, then in close (zoom 15) on it, when the link has no view', async () => {
     const { el, basemaps } = await render({ inputs: { incident: '9' } });
 
     expect(el.querySelector('app-incident-panel')).not.toBeNull();
-    expect(basemaps.flyTo).toHaveBeenCalledWith(10.61, 107.2, 11);
+    expect(basemaps.fitTo).toHaveBeenCalledTimes(1);
+    expect(basemaps.flyTo).not.toHaveBeenCalled();                                     // not until the whole view has settled
+
+    arrive(basemaps.map);
+    expect(basemaps.flyTo).toHaveBeenCalledWith(10.61, 107.2, 15, expect.objectContaining({ right: expect.any(Number) }));   // centred beside the panels
   });
 
   it('points out an incident opened from the link once the map has come to it, with a reticule that closes in and goes', async () => {
     const { basemaps } = await render({ inputs: { incident: '9' } });
     const map = basemaps.map;
-    expect(map.container.querySelector('.home-in')).toBeNull();                        // not until the map has come to it
+    arrive(map);                                                                       // the whole view has settled
+    expect(map.container.querySelector('.home-in')).toBeNull();                        // not until the map has come to the incident
 
-    const [event, arrived] = map.once.mock.calls.at(-1)!;
-    expect(event).toBe('moveend');
-    arrived();
+    arrive(map);
     const reticule = map.container.querySelector<HTMLElement>('.home-in')!;
     expect(reticule.getAttribute('aria-hidden')).toBe('true');
     expect(reticule.style.transform).toBe('translate(107200px, -10610px)');           // on the incident, as the fake map projects it
