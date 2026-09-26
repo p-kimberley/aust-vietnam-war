@@ -51,37 +51,44 @@
     {
       "name": "Patrol",
       "count": 58,
-      "share": 0.42
+      "share": 0.42,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Security",
       "count": 32,
-      "share": 0.23
+      "share": 0.23,
+      "filter": "tasks=Security"
     },
     {
       "name": "Mine incident",
       "count": 30,
-      "share": 0.22
+      "share": 0.22,
+      "filter": null
     },
     {
       "name": "Ambush",
       "count": 8,
-      "share": 0.06
+      "share": 0.06,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Bunker",
       "count": 3,
-      "share": 0.02
+      "share": 0.02,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Artillery engagement",
       "count": 1,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     },
     {
       "name": "Not recorded",
       "count": 5,
-      "share": 0.04
+      "share": 0.04,
+      "filter": null
     }
   ],
   "support": [
@@ -148,7 +155,8 @@
     {
       "name": "1ATF",
       "count": 205,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -1020,32 +1028,38 @@
         {
           "name": "Mine incident",
           "count": 15,
-          "share": 0.44
+          "share": 0.44,
+          "filter": null
         },
         {
           "name": "Security",
           "count": 9,
-          "share": 0.26
+          "share": 0.26,
+          "filter": "tasks=Security"
         },
         {
           "name": "Patrol",
           "count": 6,
-          "share": 0.18
+          "share": 0.18,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 2,
-          "share": 0.06
+          "share": 0.06,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         }
       ],
       "support": [
@@ -1077,9 +1091,36 @@
         }
       ],
       "notable": [
-        3537,
-        3544,
-        3869
+        {
+          "id": 3537,
+          "url": "/battlemap?incident=3537",
+          "date": "1970-02-18",
+          "operation": "Hammersley",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 13,
+          "enemyKilled": 12
+        },
+        {
+          "id": 3544,
+          "url": "/battlemap?incident=3544",
+          "date": "1970-02-18",
+          "operation": "Hammersley",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 8,
+          "enemyKilled": 6
+        },
+        {
+          "id": 3869,
+          "url": "/battlemap?incident=3869",
+          "date": "1970-05-21",
+          "operation": "Concrete",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 12,
+          "enemyKilled": 5
+        }
       ]
     },
     {
@@ -1105,37 +1146,44 @@
         {
           "name": "Patrol",
           "count": 17,
-          "share": 0.33
+          "share": 0.33,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 12,
-          "share": 0.24
+          "share": 0.24,
+          "filter": "tasks=Security"
         },
         {
           "name": "Mine incident",
           "count": 11,
-          "share": 0.22
+          "share": 0.22,
+          "filter": null
         },
         {
           "name": "Ambush",
           "count": 6,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.06
+          "share": 0.06,
+          "filter": null
         }
       ],
       "support": [
@@ -1167,9 +1215,36 @@
         }
       ],
       "notable": [
-        2064,
-        2496,
-        2509
+        {
+          "id": 2064,
+          "url": "/battlemap?incident=2064",
+          "date": "1969-02-16",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 8,
+          "enemyKilled": 6
+        },
+        {
+          "id": 2496,
+          "url": "/battlemap?incident=2496",
+          "date": "1969-06-06",
+          "operation": "Hammer",
+          "activity": "Not recorded",
+          "friendlyKilled": 1,
+          "friendlyWounded": 10,
+          "enemyKilled": 43
+        },
+        {
+          "id": 2509,
+          "url": "/battlemap?incident=2509",
+          "date": "1969-06-07",
+          "operation": "Hammer/Tong",
+          "activity": "Not recorded",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 40
+        }
       ]
     },
     {
@@ -1195,27 +1270,32 @@
         {
           "name": "Patrol",
           "count": 34,
-          "share": 0.69
+          "share": 0.69,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 10,
-          "share": 0.2
+          "share": 0.2,
+          "filter": "tasks=Security"
         },
         {
           "name": "Mine incident",
           "count": 3,
-          "share": 0.06
+          "share": 0.06,
+          "filter": null
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [
@@ -1247,9 +1327,36 @@
         }
       ],
       "notable": [
-        1323,
-        1330,
-        1503
+        {
+          "id": 1323,
+          "url": "/battlemap?incident=1323",
+          "date": "1968-05-26",
+          "operation": "Toan Thang 1",
+          "activity": "Security",
+          "friendlyKilled": 3,
+          "friendlyWounded": 16,
+          "enemyKilled": 6
+        },
+        {
+          "id": 1330,
+          "url": "/battlemap?incident=1330",
+          "date": "1968-05-28",
+          "operation": "Toan Thang 1",
+          "activity": "Security",
+          "friendlyKilled": 1,
+          "friendlyWounded": 8,
+          "enemyKilled": 55
+        },
+        {
+          "id": 1503,
+          "url": "/battlemap?incident=1503",
+          "date": "1968-08-22",
+          "operation": "Nowra",
+          "activity": "Attack",
+          "friendlyKilled": 0,
+          "friendlyWounded": 12,
+          "enemyKilled": 40
+        }
       ]
     }
   ],

@@ -43,37 +43,44 @@
     {
       "name": "Ambush",
       "count": 93,
-      "share": 0.46
+      "share": 0.46,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Patrol",
       "count": 54,
-      "share": 0.26
+      "share": 0.26,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Security",
       "count": 33,
-      "share": 0.16
+      "share": 0.16,
+      "filter": "tasks=Security"
     },
     {
       "name": "Bunker",
       "count": 7,
-      "share": 0.03
+      "share": 0.03,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Mine incident",
       "count": 4,
-      "share": 0.02
+      "share": 0.02,
+      "filter": null
     },
     {
       "name": "Artillery and mortar fire",
       "count": 3,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Not recorded",
       "count": 10,
-      "share": 0.05
+      "share": 0.05,
+      "filter": null
     }
   ],
   "support": [
@@ -96,7 +103,8 @@
     {
       "name": "1ATF",
       "count": 211,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -689,34 +697,66 @@
         {
           "name": "Ambush",
           "count": 24,
-          "share": 0.57
+          "share": 0.57,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 10,
-          "share": 0.24
+          "share": 0.24,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 5,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 2,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [],
       "notable": [
-        3584,
-        3815,
-        3849
+        {
+          "id": 3584,
+          "url": "/battlemap?incident=3584",
+          "date": "1970-02-28",
+          "operation": "Hammersley",
+          "activity": "Patrol",
+          "friendlyKilled": 7,
+          "friendlyWounded": 13,
+          "enemyKilled": 0
+        },
+        {
+          "id": 3815,
+          "url": "/battlemap?incident=3815",
+          "date": "1970-05-03",
+          "operation": "Nudgee",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 6,
+          "enemyKilled": 2
+        },
+        {
+          "id": 3849,
+          "url": "/battlemap?incident=3849",
+          "date": "1970-05-14",
+          "operation": "Nudgee",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 7
+        }
       ]
     },
     {
@@ -742,32 +782,38 @@
         {
           "name": "Ambush",
           "count": 20,
-          "share": 0.43
+          "share": 0.43,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 18,
-          "share": 0.38
+          "share": 0.38,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 3,
-          "share": 0.06
+          "share": 0.06,
+          "filter": "tasks=Security"
         },
         {
           "name": "Mine incident",
           "count": 2,
-          "share": 0.04
+          "share": 0.04,
+          "filter": null
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.06
+          "share": 0.06,
+          "filter": null
         }
       ],
       "support": [
@@ -783,9 +829,36 @@
         }
       ],
       "notable": [
-        3544,
-        3609,
-        3763
+        {
+          "id": 3544,
+          "url": "/battlemap?incident=3544",
+          "date": "1970-02-18",
+          "operation": "Hammersley",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 8,
+          "enemyKilled": 6
+        },
+        {
+          "id": 3609,
+          "url": "/battlemap?incident=3609",
+          "date": "1970-03-06",
+          "operation": "Hamilton",
+          "activity": "Mine incident",
+          "friendlyKilled": 2,
+          "friendlyWounded": 6,
+          "enemyKilled": 0
+        },
+        {
+          "id": 3763,
+          "url": "/battlemap?incident=3763",
+          "date": "1970-04-20",
+          "operation": "Concrete",
+          "activity": "Transport",
+          "friendlyKilled": 1,
+          "friendlyWounded": 10,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -811,32 +884,38 @@
         {
           "name": "Ambush",
           "count": 21,
-          "share": 0.4
+          "share": 0.4,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 13,
-          "share": 0.25
+          "share": 0.25,
+          "filter": "tasks=Security"
         },
         {
           "name": "Patrol",
           "count": 11,
-          "share": 0.21
+          "share": 0.21,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Bunker",
           "count": 3,
-          "share": 0.06
+          "share": 0.06,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Not recorded",
           "count": 4,
-          "share": 0.08
+          "share": 0.08,
+          "filter": null
         }
       ],
       "support": [
@@ -856,9 +935,36 @@
         }
       ],
       "notable": [
-        3516,
-        3537,
-        4092
+        {
+          "id": 3516,
+          "url": "/battlemap?incident=3516",
+          "date": "1970-02-15",
+          "operation": "Hammersley",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 3,
+          "enemyKilled": 10
+        },
+        {
+          "id": 3537,
+          "url": "/battlemap?incident=3537",
+          "date": "1970-02-18",
+          "operation": "Hammersley",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 13,
+          "enemyKilled": 12
+        },
+        {
+          "id": 4092,
+          "url": "/battlemap?incident=4092",
+          "date": "1970-08-12",
+          "operation": "Cung Chung 2",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 1,
+          "enemyKilled": 19
+        }
       ]
     },
     {
@@ -884,32 +990,38 @@
         {
           "name": "Ambush",
           "count": 20,
-          "share": 0.51
+          "share": 0.51,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 9,
-          "share": 0.23
+          "share": 0.23,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 5,
-          "share": 0.13
+          "share": 0.13,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.08
+          "share": 0.08,
+          "filter": null
         }
       ],
       "support": [
@@ -925,9 +1037,36 @@
         }
       ],
       "notable": [
-        3278,
-        3363,
-        3541
+        {
+          "id": 3278,
+          "url": "/battlemap?incident=3278",
+          "date": "1969-12-21",
+          "operation": "Atherton",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 2,
+          "enemyKilled": 1
+        },
+        {
+          "id": 3363,
+          "url": "/battlemap?incident=3363",
+          "date": "1970-01-13",
+          "operation": "TAOR",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 8
+        },
+        {
+          "id": 3541,
+          "url": "/battlemap?incident=3541",
+          "date": "1970-02-18",
+          "operation": "Hammersley",
+          "activity": "Not recorded",
+          "friendlyKilled": 0,
+          "friendlyWounded": 7,
+          "enemyKilled": 0
+        }
       ]
     }
   ],

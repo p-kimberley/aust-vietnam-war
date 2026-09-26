@@ -62,22 +62,26 @@
     {
       "name": "Artillery engagement",
       "count": 164,
-      "share": 0.96
+      "share": 0.96,
+      "filter": null
     },
     {
       "name": "Security",
       "count": 3,
-      "share": 0.02
+      "share": 0.02,
+      "filter": "tasks=Security"
     },
     {
       "name": "Artillery and mortar fire",
       "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Patrol",
       "count": 1,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Patrol"
     }
   ],
   "support": [
@@ -91,7 +95,7 @@
         },
         {
           "unit": "2 RAR",
-          "contacts": 12
+          "contacts": 11
         },
         {
           "unit": "161 Field Battery, RNZA (New Zealand)",
@@ -112,6 +116,10 @@
         {
           "unit": "US Artillery",
           "contacts": 1
+        },
+        {
+          "unit": "W Company, 2 RAR (New Zealand)",
+          "contacts": 1
         }
       ]
     }
@@ -120,7 +128,8 @@
     {
       "name": "1ATF",
       "count": 214,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -550,7 +559,7 @@
         "significant"
       ],
       "role": "Fire support",
-      "ledBy": "2 RAR",
+      "ledBy": "W Company, 2 RAR (New Zealand)",
       "operation": "Pinnaroo",
       "task": "Ambush",
       "gridRef": "YS459585",
@@ -651,17 +660,20 @@
         {
           "name": "Artillery engagement",
           "count": 72,
-          "share": 0.95
+          "share": 0.95,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Security",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Security"
         }
       ],
       "support": [
@@ -697,9 +709,36 @@
         }
       ],
       "notable": [
-        586,
-        791,
-        794
+        {
+          "id": 586,
+          "url": "/battlemap?incident=586",
+          "date": "1967-08-06",
+          "operation": "Ballarat",
+          "activity": "Bunker",
+          "friendlyKilled": 6,
+          "friendlyWounded": 19,
+          "enemyKilled": 15
+        },
+        {
+          "id": 791,
+          "url": "/battlemap?incident=791",
+          "date": "1968-01-02",
+          "operation": "Forrest",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 2
+        },
+        {
+          "id": 794,
+          "url": "/battlemap?incident=794",
+          "date": "1968-01-03",
+          "operation": "Forrest",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 3
+        }
       ]
     },
     {
@@ -725,12 +764,14 @@
         {
           "name": "Artillery engagement",
           "count": 92,
-          "share": 0.99
+          "share": 0.99,
+          "filter": null
         },
         {
           "name": "Security",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Security"
         }
       ],
       "support": [
@@ -740,7 +781,7 @@
           "for": [
             {
               "unit": "2 RAR",
-              "contacts": 11
+              "contacts": 10
             },
             {
               "unit": "4 Fd Regt",
@@ -757,14 +798,45 @@
             {
               "unit": "V Company, 2 RAR (New Zealand)",
               "contacts": 4
+            },
+            {
+              "unit": "W Company, 2 RAR (New Zealand)",
+              "contacts": 1
             }
           ]
         }
       ],
       "notable": [
-        697,
-        753,
-        1051
+        {
+          "id": 697,
+          "url": "/battlemap?incident=697",
+          "date": "1967-11-05",
+          "operation": "Santa Fe",
+          "activity": "Security",
+          "friendlyKilled": 1,
+          "friendlyWounded": 0,
+          "enemyKilled": 0
+        },
+        {
+          "id": 753,
+          "url": "/battlemap?incident=753",
+          "date": "1967-12-02",
+          "operation": "Forrest",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 4
+        },
+        {
+          "id": 1051,
+          "url": "/battlemap?incident=1051",
+          "date": "1968-03-09",
+          "operation": "Pinnaroo",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 3
+        }
       ]
     }
   ],

@@ -35,34 +35,22 @@
         "date": "1968-02-05",
         "recordedAgainst": "5-rar",
         "countedFor": "2-rar"
-      },
-      {
-        "id": 618,
-        "date": "1968-08-29",
-        "recordedAgainst": "2-rar",
-        "countedFor": null
-      },
-      {
-        "id": 2327,
-        "date": "1969-05-02",
-        "recordedAgainst": "2-rar",
-        "countedFor": null
       }
     ],
     "mapUrl": "/battlemap?units=1419"
   },
   "figures": {
-    "contacts": 371,
-    "led": 366,
-    "supported": 5,
+    "contacts": 320,
+    "led": 316,
+    "supported": 4,
     "first": "1967-06-11",
     "last": "1971-04-29",
-    "operations": 33,
-    "friendlyKilled": 29,
-    "friendlyWounded": 128,
-    "enemyKilled": 230,
-    "enemyWounded": 97,
-    "mineIncidents": 25
+    "operations": 31,
+    "friendlyKilled": 25,
+    "friendlyWounded": 99,
+    "enemyKilled": 204,
+    "enemyWounded": 89,
+    "mineIncidents": 16
   },
   "perYear": [
     {
@@ -71,11 +59,11 @@
     },
     {
       "year": 1968,
-      "contacts": 127
+      "contacts": 97
     },
     {
       "year": 1970,
-      "contacts": 103
+      "contacts": 82
     },
     {
       "year": 1971,
@@ -85,54 +73,63 @@
   "activity": [
     {
       "name": "Patrol",
-      "count": 127,
-      "share": 0.35
-    },
-    {
-      "name": "Security",
-      "count": 98,
-      "share": 0.27
+      "count": 108,
+      "share": 0.34,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Ambush",
-      "count": 92,
-      "share": 0.25
+      "count": 84,
+      "share": 0.27,
+      "filter": "tasks=Ambush"
+    },
+    {
+      "name": "Security",
+      "count": 83,
+      "share": 0.26,
+      "filter": "tasks=Security"
     },
     {
       "name": "Bunker",
-      "count": 26,
-      "share": 0.07
+      "count": 21,
+      "share": 0.07,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Artillery and mortar fire",
-      "count": 8,
-      "share": 0.02
+      "count": 7,
+      "share": 0.02,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Artillery engagement",
       "count": 4,
-      "share": 0.01
-    },
-    {
-      "name": "Mine incident",
-      "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     },
     {
       "name": "Transport",
       "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Transport"
+    },
+    {
+      "name": "Mine incident",
+      "count": 1,
+      "share": 0,
+      "filter": null
     },
     {
       "name": "Not recorded",
-      "count": 7,
-      "share": 0.02
+      "count": 6,
+      "share": 0.02,
+      "filter": null
     }
   ],
   "support": [
     {
       "kind": "In another unit\u0027s contact",
-      "contacts": 5,
+      "contacts": 4,
       "for": [
         {
           "unit": "3 Cav Regt",
@@ -141,10 +138,6 @@
         {
           "unit": "1 Div Int Unit",
           "contacts": 1
-        },
-        {
-          "unit": "ARVN",
-          "contacts": 1
         }
       ]
     }
@@ -152,8 +145,9 @@
   "dataSources": [
     {
       "name": "1ATF",
-      "count": 371,
-      "share": 1
+      "count": 320,
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -167,7 +161,7 @@
     },
     {
       "name": "TAOR",
-      "contacts": 16,
+      "contacts": 15,
       "first": "1967-06-12",
       "last": "1968-01-26",
       "friendlyKilled": 0,
@@ -223,9 +217,9 @@
     },
     {
       "name": "Horseshoe",
-      "contacts": 2,
+      "contacts": 1,
       "first": "1967-09-30",
-      "last": "1968-01-12",
+      "last": "1967-09-30",
       "friendlyKilled": 3,
       "enemyKilled": 0
     },
@@ -247,7 +241,7 @@
     },
     {
       "name": "Forrest",
-      "contacts": 26,
+      "contacts": 25,
       "first": "1967-11-25",
       "last": "1968-01-05",
       "friendlyKilled": 4,
@@ -263,34 +257,34 @@
     },
     {
       "name": "Coburg",
-      "contacts": 56,
+      "contacts": 53,
       "first": "1968-01-25",
       "last": "1968-02-12",
-      "friendlyKilled": 6,
-      "enemyKilled": 74
+      "friendlyKilled": 5,
+      "enemyKilled": 71
     },
     {
       "name": "OAKLEigh",
-      "contacts": 7,
-      "first": "1968-02-12",
+      "contacts": 3,
+      "first": "1968-02-16",
       "last": "1968-02-17",
       "friendlyKilled": 1,
-      "enemyKilled": 7
+      "enemyKilled": 3
     },
     {
       "name": "Pinnaroo",
-      "contacts": 20,
-      "first": "1968-03-01",
+      "contacts": 6,
+      "first": "1968-03-02",
       "last": "1968-03-27",
       "friendlyKilled": 1,
-      "enemyKilled": 9
+      "enemyKilled": 2
     },
     {
       "name": "Cook Town Orchid",
-      "contacts": 6,
+      "contacts": 3,
       "first": "1968-04-03",
-      "last": "1968-04-22",
-      "friendlyKilled": 2,
+      "last": "1968-04-10",
+      "friendlyKilled": 0,
       "enemyKilled": 1
     },
     {
@@ -302,28 +296,12 @@
       "enemyKilled": 11
     },
     {
-      "name": "Kosciusko",
-      "contacts": 1,
-      "first": "1968-06-16",
-      "last": "1968-06-16",
-      "friendlyKilled": 0,
-      "enemyKilled": 0
-    },
-    {
-      "name": "Ashfield",
-      "contacts": 5,
-      "first": "1970-05-16",
-      "last": "1970-05-23",
-      "friendlyKilled": 0,
-      "enemyKilled": 3
-    },
-    {
       "name": "Capricorn",
-      "contacts": 16,
+      "contacts": 12,
       "first": "1970-05-26",
       "last": "1970-06-11",
-      "friendlyKilled": 3,
-      "enemyKilled": 3
+      "friendlyKilled": 2,
+      "enemyKilled": 2
     },
     {
       "name": "Cung  Chung",
@@ -335,9 +313,9 @@
     },
     {
       "name": "Cung Chung 1",
-      "contacts": 3,
+      "contacts": 2,
       "first": "1970-06-14",
-      "last": "1970-06-24",
+      "last": "1970-06-16",
       "friendlyKilled": 0,
       "enemyKilled": 0
     },
@@ -351,11 +329,11 @@
     },
     {
       "name": "Nathan",
-      "contacts": 14,
+      "contacts": 11,
       "first": "1970-07-15",
       "last": "1970-08-02",
       "friendlyKilled": 2,
-      "enemyKilled": 4
+      "enemyKilled": 2
     },
     {
       "name": "Cung Chung",
@@ -367,19 +345,11 @@
     },
     {
       "name": "Cung Chung 2",
-      "contacts": 17,
+      "contacts": 14,
       "first": "1970-08-08",
-      "last": "1970-09-10",
+      "last": "1970-09-07",
       "friendlyKilled": 0,
-      "enemyKilled": 8
-    },
-    {
-      "name": "Cung Chung 3",
-      "contacts": 11,
-      "first": "1970-09-11",
-      "last": "1971-01-14",
-      "friendlyKilled": 0,
-      "enemyKilled": 14
+      "enemyKilled": 5
     },
     {
       "name": "Cung  Chung 3",
@@ -388,6 +358,14 @@
       "last": "1971-03-22",
       "friendlyKilled": 1,
       "enemyKilled": 28
+    },
+    {
+      "name": "Cung Chung 3",
+      "contacts": 7,
+      "first": "1970-11-04",
+      "last": "1971-01-14",
+      "friendlyKilled": 0,
+      "enemyKilled": 11
     },
     {
       "name": "Phoi Hop",
@@ -426,50 +404,50 @@
     {
       "place": "Andersen",
       "type": "FSB",
-      "contacts": 34,
-      "share": 0.09
+      "contacts": 33,
+      "share": 0.1
     },
     {
       "place": "Weir",
       "type": "FSB",
-      "contacts": 27,
-      "share": 0.07
-    },
-    {
-      "place": "Noela",
-      "type": "FSB",
-      "contacts": 20,
-      "share": 0.05
-    },
-    {
-      "place": "Melissa",
-      "type": "FSB",
-      "contacts": 19,
-      "share": 0.05
+      "contacts": 25,
+      "share": 0.08
     },
     {
       "place": "Harrison",
       "type": "FSB",
       "contacts": 18,
-      "share": 0.05
+      "share": 0.06
     },
     {
-      "place": "Arrow",
+      "place": "Melissa",
       "type": "FSB",
-      "contacts": 17,
-      "share": 0.05
+      "contacts": 18,
+      "share": 0.06
     },
     {
       "place": "Garth",
       "type": "FSB",
       "contacts": 16,
-      "share": 0.04
+      "share": 0.05
+    },
+    {
+      "place": "Noela",
+      "type": "FSB",
+      "contacts": 16,
+      "share": 0.05
     },
     {
       "place": "Buffalo",
       "type": "FSB",
       "contacts": 13,
       "share": 0.04
+    },
+    {
+      "place": "Friendship",
+      "type": "FSB",
+      "contacts": 10,
+      "share": 0.03
     }
   ],
   "notable": [
@@ -586,7 +564,7 @@
       "url": "/battlemap?incident=852",
       "dtg": "1968-01-26T16:20:00",
       "why": [
-        "typical:Bunker"
+        "significant"
       ],
       "role": "led",
       "ledBy": null,
@@ -607,6 +585,33 @@
       ],
       "report": "9pl assaulted a camp and just had time to occupy the horsehoe shaped enemy defences when the 20 or more enemy counter attacked. A spasmodic firefight ensued for next 3 hours and LFT airstrikes and arty fire were called in. The enemy attacked 7 times, and used heavy machine guns which chopped trees in half. 2 Aust killed. Enemy cas 1 killed, with probably more cas. Late report credits 1 more enemy killed and 4 blood trails. Enemy were 274 VC Regt ; Trang Bom District Unit.\n\nNoted in Combined Arms Data Base\n\nYT248150, C/2RAR contacts 6 or more VC in a base camp. The VC tried to recover their equipment in the camp and fire was exchanged until VC broke contact at 2000hrs. Arty and LFT supported. 1 Aust killed and 1 wded. 1 VC killed and possibly more. 1xSKS rifle, 1xGarand, and 15 packs were captured.(Intsum 26/1/68)\n\nIntsum 27/1/68, contact continued until 27 1015hrs. A lot more equipment was captured, and 1 more VC killed. Blood trails indicated 4 VC wded. 500lbs of rice, 200lbs of food captured. See contact 27/1 0805hrs.",
       "archivalSource": "On the Offensive pg295; Intsum AWM95 1/4/80.pdf p157; AWM95 7-2-48.pdf 2 RAR pg77"
+    },
+    {
+      "id": 856,
+      "url": "/battlemap?incident=856",
+      "dtg": "1968-01-27T08:05:00",
+      "why": [
+        "typical:Bunker"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Coburg",
+      "task": "Bunker",
+      "gridRef": "YT248150",
+      "friendlyForce": 75,
+      "enemyForce": 15,
+      "friendlyKilled": 0,
+      "friendlyWounded": 2,
+      "enemyKilled": 1,
+      "enemyWounded": 4,
+      "units": [
+        "C Company, 2 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "C Coy was following up from its bunker contact of 26/1 when it was fired on briefly from a bunker. This bunker once it was located, was grenaded as was at least one more. At 0848hrs C Coy was fired on from 3 sides and sustained 1 casualty who had his nose shot off. At 0855 C Coy suffered another casualty. It was receiving sniper fire and also had one pl pinned down, every movement drawing fire (0918hrs). V Coy was sent to relieve pressure on C Coy but the going was hard and the Coy did not arrive until 1130hrs. Meanwhile arty support was fired 1018hrs and all casualties were evacuated 1100hrs. C Coy was able to disengage. 1xSKS rifle and 1xmauser captured, and 700lbs of food. 1 dead enemy found and 4 blood trails.\n\nSee Contact 26/1 1620hrs.",
+      "archivalSource": "AWM95 7-2-48.pdf 2 RAR pg82; Intsum, AWM95 1/4/80.pdf p159;"
     },
     {
       "id": 895,
@@ -690,34 +695,6 @@
       ],
       "report": "M16 mine incident according to 2 RAR Diary.\n\nYS441575: AT THE LOC STATED 2 RAR DETONATED A MINE RESULTINGIN 1 AUST KIA AND 11 AUST WIA. \n\nB Coy seized the Dinh-Co hill. An engineer exploded a booby trap in the temple, killing himself and wounding 13 others. Area was infested with mines and booby traps. Enemy was placing mines in areas which might be interesting culturally to Westerners. Opinion of OC B coy in After Action Report.\n\nLocation NW Long Hais S of Long Dien",
       "archivalSource": "On the Offensive pg334; AWM95 7-2-50.pdf 2 RAR pg23,25; Intsum AWM95 1/4/91.pdf p78;"
-    },
-    {
-      "id": 1159,
-      "url": "/battlemap?incident=1159",
-      "dtg": "1968-04-12T14:35:00",
-      "why": [
-        "significant"
-      ],
-      "role": "led",
-      "ledBy": null,
-      "operation": "Cook Town Orchid",
-      "task": "Security",
-      "gridRef": "YS513557",
-      "friendlyForce": 20,
-      "enemyForce": 0,
-      "friendlyKilled": 2,
-      "friendlyWounded": 5,
-      "enemyKilled": 0,
-      "enemyWounded": 0,
-      "units": [
-        "1 Platoon, W Company, 2 Battalion, Royal Australian Regiment",
-        "6 Troop, A Squadron, 3 Cavalry Regiment"
-      ],
-      "subUnits": [
-        "w-company"
-      ],
-      "report": "YS513557: 2 RAR DETONATED A MINE AT THE STATED LOC.RESULTS WERE 1 AUST KIA, 1 NZ KIA, 1 AUST WIA, 1 NZ WIA.AFTER THE INCIDENT 3 MORE MINES WERE FOUND, ALL OF THEM LAIDALONG A RECENTLY MADE TANK TRACK.\n\n7 wded from mine explosion (very probably an M16 mine) from which 2 die. All had shrapnel wds. 1 NZ DOW, 1 Aust DOW, 4 Aust wded, 1 NZ wded.\n\n6 Tp A Sqn 3 CAV were at the same location and reported 3 wded in their diary. One of the self propelled M108 howitzers hit an anti tank mine wounding 3 members of the crew and 2 others (When the Scorpion Stings pg 101). The Sect was protecting a LCT. The 2 RAR diary describes the event without mentioning 6 Tp as does the SITREP which is odd if it were the same event. Was this a separate event? It seems more likely that 6 Tp was part of the W Coy mine incident, or so we shall assume. APC diary says that it was with W Coy.\n\nLocation Jungle E of My An",
-      "archivalSource": "AWM95 7-2-52.pdf 2 RAR pg92-3; AWM95 2-4-16.pdf APC pg9; AWM95 2-3-8.pdf p102 SITREP; Intsum AWM95 1/4/94 Pt3.pdf p96;"
     },
     {
       "id": 4081,
@@ -879,42 +856,50 @@
         {
           "name": "Patrol",
           "count": 30,
-          "share": 0.32
+          "share": 0.32,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 27,
-          "share": 0.29
+          "share": 0.29,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 25,
-          "share": 0.27
+          "share": 0.27,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 6,
-          "share": 0.06
+          "share": 0.06,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Mine incident",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         }
       ],
       "support": [
@@ -930,9 +915,36 @@
         }
       ],
       "notable": [
-        746,
-        4081,
-        4445
+        {
+          "id": 746,
+          "url": "/battlemap?incident=746",
+          "date": "1967-11-30",
+          "operation": "Forrest",
+          "activity": "Patrol",
+          "friendlyKilled": 2,
+          "friendlyWounded": 8,
+          "enemyKilled": 0
+        },
+        {
+          "id": 4081,
+          "url": "/battlemap?incident=4081",
+          "date": "1970-08-02",
+          "operation": "Nathan",
+          "activity": "Security",
+          "friendlyKilled": 2,
+          "friendlyWounded": 3,
+          "enemyKilled": 0
+        },
+        {
+          "id": 4445,
+          "url": "/battlemap?incident=4445",
+          "date": "1971-03-31",
+          "operation": "Briar Patch",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 6,
+          "enemyKilled": 2
+        }
       ]
     },
     {
@@ -958,34 +970,66 @@
         {
           "name": "Patrol",
           "count": 33,
-          "share": 0.39
+          "share": 0.39,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 22,
-          "share": 0.26
+          "share": 0.26,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 17,
-          "share": 0.2
+          "share": 0.2,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 8,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 4,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Arty%2FMor"
         }
       ],
       "support": [],
       "notable": [
-        895,
-        1033,
-        4245
+        {
+          "id": 895,
+          "url": "/battlemap?incident=895",
+          "date": "1968-01-31",
+          "operation": "Coburg",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 5,
+          "enemyKilled": 4
+        },
+        {
+          "id": 1033,
+          "url": "/battlemap?incident=1033",
+          "date": "1968-03-02",
+          "operation": "Pinnaroo",
+          "activity": "Patrol",
+          "friendlyKilled": 1,
+          "friendlyWounded": 13,
+          "enemyKilled": 0
+        },
+        {
+          "id": 4245,
+          "url": "/battlemap?incident=4245",
+          "date": "1970-12-15",
+          "operation": "Cung Chung 3",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 2,
+          "enemyKilled": 10
+        }
       ]
     },
     {
@@ -1011,49 +1055,84 @@
         {
           "name": "Patrol",
           "count": 21,
-          "share": 0.33
+          "share": 0.33,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 18,
-          "share": 0.28
+          "share": 0.28,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 14,
-          "share": 0.22
+          "share": 0.22,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 7,
-          "share": 0.11
+          "share": 0.11,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [],
       "notable": [
-        852,
-        856,
-        3892
+        {
+          "id": 852,
+          "url": "/battlemap?incident=852",
+          "date": "1968-01-26",
+          "operation": "Coburg",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 0,
+          "enemyKilled": 2
+        },
+        {
+          "id": 856,
+          "url": "/battlemap?incident=856",
+          "date": "1968-01-27",
+          "operation": "Coburg",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 2,
+          "enemyKilled": 1
+        },
+        {
+          "id": 3892,
+          "url": "/battlemap?incident=3892",
+          "date": "1970-05-29",
+          "operation": "Capricorn",
+          "activity": "Patrol",
+          "friendlyKilled": 2,
+          "friendlyWounded": 3,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -1079,17 +1158,20 @@
         {
           "name": "Patrol",
           "count": 11,
-          "share": 0.37
+          "share": 0.37,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 11,
-          "share": 0.37
+          "share": 0.37,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 8,
-          "share": 0.27
+          "share": 0.27,
+          "filter": "tasks=Ambush"
         }
       ],
       "support": [
@@ -1105,9 +1187,36 @@
         }
       ],
       "notable": [
-        580,
-        894,
-        906
+        {
+          "id": 580,
+          "url": "/battlemap?incident=580",
+          "date": "1967-08-01",
+          "operation": "Cairns",
+          "activity": "Patrol",
+          "friendlyKilled": 2,
+          "friendlyWounded": 3,
+          "enemyKilled": 0
+        },
+        {
+          "id": 894,
+          "url": "/battlemap?incident=894",
+          "date": "1968-01-31",
+          "operation": "Coburg",
+          "activity": "Patrol",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 4
+        },
+        {
+          "id": 906,
+          "url": "/battlemap?incident=906",
+          "date": "1968-02-01",
+          "operation": "Coburg",
+          "activity": "Patrol",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 11
+        }
       ]
     },
     {
@@ -1133,17 +1242,20 @@
         {
           "name": "Security",
           "count": 10,
-          "share": 0.45
+          "share": 0.45,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 6,
-          "share": 0.27
+          "share": 0.27,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 6,
-          "share": 0.27
+          "share": 0.27,
+          "filter": "tasks=Patrol"
         }
       ],
       "support": [
@@ -1159,83 +1271,36 @@
         }
       ],
       "notable": [
-        955,
-        4087,
-        4233
-      ]
-    },
-    {
-      "id": 1703,
-      "slug": "w-company",
-      "parent": null,
-      "title": "W Company",
-      "mapUrl": "/battlemap?units=1703",
-      "figures": {
-        "contacts": 51,
-        "led": 50,
-        "supported": 1,
-        "first": "1968-01-02",
-        "last": "1970-10-19",
-        "operations": 14,
-        "friendlyKilled": 4,
-        "friendlyWounded": 29,
-        "enemyKilled": 26,
-        "enemyWounded": 8,
-        "mineIncidents": 9
-      },
-      "activity": [
         {
-          "name": "Patrol",
-          "count": 19,
-          "share": 0.38
+          "id": 955,
+          "url": "/battlemap?incident=955",
+          "date": "1968-02-06",
+          "operation": "Coburg",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 6
         },
         {
-          "name": "Security",
-          "count": 15,
-          "share": 0.3
+          "id": 4087,
+          "url": "/battlemap?incident=4087",
+          "date": "1970-08-08",
+          "operation": "Cung Chung 2",
+          "activity": "Patrol",
+          "friendlyKilled": 0,
+          "friendlyWounded": 8,
+          "enemyKilled": 0
         },
         {
-          "name": "Ambush",
-          "count": 8,
-          "share": 0.16
-        },
-        {
-          "name": "Bunker",
-          "count": 5,
-          "share": 0.1
-        },
-        {
-          "name": "Artillery and mortar fire",
-          "count": 1,
-          "share": 0.02
-        },
-        {
-          "name": "Mine incident",
-          "count": 1,
-          "share": 0.02
-        },
-        {
-          "name": "Not recorded",
-          "count": 1,
-          "share": 0.02
+          "id": 4233,
+          "url": "/battlemap?incident=4233",
+          "date": "1970-12-05",
+          "operation": "Cung  Chung 3",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 2
         }
-      ],
-      "support": [
-        {
-          "kind": "In another unit\u0027s contact",
-          "contacts": 1,
-          "for": [
-            {
-              "unit": "ARVN",
-              "contacts": 1
-            }
-          ]
-        }
-      ],
-      "notable": [
-        1029,
-        1159,
-        4048
       ]
     }
   ],
@@ -1680,17 +1745,6 @@
       "nearbyContacts": 5
     },
     {
-      "id": 407,
-      "url": "/media/uploads/14/14474e4ca564fd4457d488ef462e1e8e40ba8d8aee7f47f5b66d0f3df7bbd760.jpg",
-      "thumbUrl": "/media/uploads/14/14474e4ca564fd4457d488ef462e1e8e40ba8d8aee7f47f5b66d0f3df7bbd760-480.jpg",
-      "caption": "Fire started by test firing tracer rounds",
-      "credit": "Ern Marshall",
-      "dateTaken": "1967-11-30",
-      "contact": null,
-      "how": "near",
-      "nearbyContacts": 4
-    },
-    {
       "id": 620,
       "url": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98.jpg",
       "thumbUrl": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98-480.jpg",
@@ -1746,17 +1800,6 @@
       "nearbyContacts": 4
     },
     {
-      "id": 436,
-      "url": "/media/uploads/6f/6f750235b140c928cd50c611bc50b6c76f8c0a3ee2d35d64b426f4d9466b1960.jpg",
-      "thumbUrl": "/media/uploads/6f/6f750235b140c928cd50c611bc50b6c76f8c0a3ee2d35d64b426f4d9466b1960-480.jpg",
-      "caption": "32 Charlie after having been escorted back to FSB Dyke. Temporary repairs had been made to the damaged suspension station. Rus Kiellerup is inspecting the damage.",
-      "credit": "Duncan McIntosh",
-      "dateTaken": "1968-12-10",
-      "contact": 1754,
-      "how": "near",
-      "nearbyContacts": 3
-    },
-    {
       "id": 625,
       "url": "/media/uploads/19/198c79360f48a0750e02b1fb942778f265f406d1c40076773279229c32028f03.jpg",
       "thumbUrl": "/media/uploads/19/198c79360f48a0750e02b1fb942778f265f406d1c40076773279229c32028f03-480.jpg",
@@ -1788,6 +1831,28 @@
       "contact": null,
       "how": "near",
       "nearbyContacts": 11
+    },
+    {
+      "id": 525,
+      "url": "/media/uploads/e2/e29bbf04dc987d29c8d965b6bfa826c5898331e6155ad29d96bea65161acb113.jpg",
+      "thumbUrl": "/media/uploads/e2/e29bbf04dc987d29c8d965b6bfa826c5898331e6155ad29d96bea65161acb113-480.jpg",
+      "caption": "Hoa Long Map",
+      "credit": "Ern Marshall rasurvey",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 9
+    },
+    {
+      "id": 363,
+      "url": "/media/uploads/17/176bc09f4ae5c397ef04ad10321e3c93418f3fb5e5620a256550724d1d601fe7.jpg",
+      "thumbUrl": "/media/uploads/17/176bc09f4ae5c397ef04ad10321e3c93418f3fb5e5620a256550724d1d601fe7-480.jpg",
+      "caption": "POW Compound Nui Dat",
+      "credit": "Ern Marshall, Allen Burkhill",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 5
     }
   ],
   "sources": {

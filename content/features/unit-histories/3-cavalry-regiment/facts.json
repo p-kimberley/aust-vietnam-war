@@ -59,47 +59,56 @@
     {
       "name": "Patrol",
       "count": 156,
-      "share": 0.42
+      "share": 0.42,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Ambush",
       "count": 66,
-      "share": 0.18
+      "share": 0.18,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Security",
       "count": 62,
-      "share": 0.17
+      "share": 0.17,
+      "filter": "tasks=Security"
     },
     {
       "name": "Transport",
       "count": 36,
-      "share": 0.1
+      "share": 0.1,
+      "filter": "tasks=Transport"
     },
     {
       "name": "Mine incident",
       "count": 33,
-      "share": 0.09
+      "share": 0.09,
+      "filter": null
     },
     {
       "name": "Artillery and mortar fire",
       "count": 5,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Artillery engagement",
       "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     },
     {
       "name": "Bunker",
       "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Not recorded",
       "count": 9,
-      "share": 0.02
+      "share": 0.02,
+      "filter": null
     }
   ],
   "support": [
@@ -124,11 +133,11 @@
           "contacts": 13
         },
         {
-          "unit": "2 RAR",
-          "contacts": 7
+          "unit": "1 RAR",
+          "contacts": 6
         },
         {
-          "unit": "1 RAR",
+          "unit": "2 RAR",
           "contacts": 6
         },
         {
@@ -174,6 +183,10 @@
         {
           "unit": "V Company, 2 RAR (New Zealand)",
           "contacts": 1
+        },
+        {
+          "unit": "W Company, 2 RAR (New Zealand)",
+          "contacts": 1
         }
       ]
     }
@@ -182,7 +195,8 @@
     {
       "name": "1ATF",
       "count": 465,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -1400,37 +1414,44 @@
         {
           "name": "Patrol",
           "count": 14,
-          "share": 0.67
+          "share": 0.67,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 2,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Security"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": null
         },
         {
           "name": "Mine incident",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": null
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": null
         }
       ],
       "support": [
@@ -1482,9 +1503,36 @@
         }
       ],
       "notable": [
-        220,
-        222,
-        4525
+        {
+          "id": 220,
+          "url": "/battlemap?incident=220",
+          "date": "1966-08-18",
+          "operation": "Smithfield (original - Vendetta)",
+          "activity": "Patrol",
+          "friendlyKilled": 17,
+          "friendlyWounded": 19,
+          "enemyKilled": 245
+        },
+        {
+          "id": 222,
+          "url": "/battlemap?incident=222",
+          "date": "1966-08-18",
+          "operation": "Smithfield (original - Vendetta)",
+          "activity": "Not recorded",
+          "friendlyKilled": 0,
+          "friendlyWounded": 4,
+          "enemyKilled": 20
+        },
+        {
+          "id": 4525,
+          "url": "/battlemap?incident=4525",
+          "date": "1971-06-07",
+          "operation": "Overlord",
+          "activity": "Bunker",
+          "friendlyKilled": 3,
+          "friendlyWounded": 8,
+          "enemyKilled": 5
+        }
       ]
     },
     {
@@ -1510,47 +1558,56 @@
         {
           "name": "Patrol",
           "count": 86,
-          "share": 0.42
+          "share": 0.42,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 40,
-          "share": 0.19
+          "share": 0.19,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 33,
-          "share": 0.16
+          "share": 0.16,
+          "filter": "tasks=Security"
         },
         {
           "name": "Transport",
           "count": 21,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Mine incident",
           "count": 18,
-          "share": 0.09
+          "share": 0.09,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 3,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0
+          "share": 0,
+          "filter": null
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0
+          "share": 0,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         }
       ],
       "support": [
@@ -1567,11 +1624,11 @@
               "contacts": 4
             },
             {
-              "unit": "2 RAR",
-              "contacts": 4
+              "unit": "1 Armd Regt",
+              "contacts": 3
             },
             {
-              "unit": "1 Armd Regt",
+              "unit": "2 RAR",
               "contacts": 3
             },
             {
@@ -1609,14 +1666,45 @@
             {
               "unit": "V Company, 2 RAR (New Zealand)",
               "contacts": 1
+            },
+            {
+              "unit": "W Company, 2 RAR (New Zealand)",
+              "contacts": 1
             }
           ]
         }
       ],
       "notable": [
-        447,
-        1272,
-        1330
+        {
+          "id": 447,
+          "url": "/battlemap?incident=447",
+          "date": "1967-02-17",
+          "operation": "Bribie",
+          "activity": "Bunker",
+          "friendlyKilled": 8,
+          "friendlyWounded": 21,
+          "enemyKilled": 50
+        },
+        {
+          "id": 1272,
+          "url": "/battlemap?incident=1272",
+          "date": "1968-05-16",
+          "operation": "Toan Thang 1",
+          "activity": "Security",
+          "friendlyKilled": 7,
+          "friendlyWounded": 19,
+          "enemyKilled": 38
+        },
+        {
+          "id": 1330,
+          "url": "/battlemap?incident=1330",
+          "date": "1968-05-28",
+          "operation": "Toan Thang 1",
+          "activity": "Security",
+          "friendlyKilled": 1,
+          "friendlyWounded": 8,
+          "enemyKilled": 55
+        }
       ]
     },
     {
@@ -1642,42 +1730,50 @@
         {
           "name": "Patrol",
           "count": 55,
-          "share": 0.39
+          "share": 0.39,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 26,
-          "share": 0.18
+          "share": 0.18,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 26,
-          "share": 0.18
+          "share": 0.18,
+          "filter": "tasks=Security"
         },
         {
           "name": "Transport",
           "count": 14,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Mine incident",
           "count": 13,
-          "share": 0.09
+          "share": 0.09,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 5,
-          "share": 0.04
+          "share": 0.04,
+          "filter": null
         }
       ],
       "support": [
@@ -1721,9 +1817,36 @@
         }
       ],
       "notable": [
-        2496,
-        2509,
-        3537
+        {
+          "id": 2496,
+          "url": "/battlemap?incident=2496",
+          "date": "1969-06-06",
+          "operation": "Hammer",
+          "activity": "Not recorded",
+          "friendlyKilled": 1,
+          "friendlyWounded": 10,
+          "enemyKilled": 43
+        },
+        {
+          "id": 2509,
+          "url": "/battlemap?incident=2509",
+          "date": "1969-06-07",
+          "operation": "Hammer/Tong",
+          "activity": "Not recorded",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 40
+        },
+        {
+          "id": 3537,
+          "url": "/battlemap?incident=3537",
+          "date": "1970-02-18",
+          "operation": "Hammersley",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 13,
+          "enemyKilled": 12
+        }
       ]
     }
   ],

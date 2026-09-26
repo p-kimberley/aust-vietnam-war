@@ -51,7 +51,9 @@ public sealed record SupportedUnit(string Unit, int Contacts);
 public sealed record YearCount(int Year, int Contacts);
 
 /// <param name="Share">Of the contacts counted (for activity, those the unit led), 0 to 1, to two places.</param>
-public sealed record ShareCount(string Name, int Count, double Share);
+/// <param name="Filter">For an activity, the Battle Map's filter for it (its unit tasks: "tasks=Arty%2FMor"), or null when the Battle
+/// Map has none (an activity worked out from the report's other fields, or none recorded).</param>
+public sealed record ShareCount(string Name, int Count, double Share, string? Filter = null);
 
 public sealed record OperationFacts(string Name, int Contacts, string First, string Last, int FriendlyKilled, int EnemyKilled);
 
@@ -90,7 +92,11 @@ public sealed record NotableContact(
 /// <param name="Parent">The slug of the section it sits under (a troop under its squadron), or null when directly under the unit.</param>
 public sealed record SubUnitFacts(
     int Id, string Slug, string? Parent, string Title, string MapUrl, Figures Figures, IReadOnlyList<ShareCount> Activity,
-    IReadOnlyList<SupportFacts> Support, IReadOnlyList<int> Notable);
+    IReadOnlyList<SupportFacts> Support, IReadOnlyList<NotableBrief> Notable);
+
+/// <summary>One of a sub-unit's most significant contacts, in brief: enough to name it and link it to the Battle Map.</summary>
+/// <param name="Activity">What was being done (see <see cref="FactSheet.Activity"/>).</param>
+public sealed record NotableBrief(int Id, string Url, string Date, string? Operation, string Activity, int FriendlyKilled, int FriendlyWounded, int EnemyKilled);
 
 /// <summary>One of the unit's dead: on a tour with it when they died, or linked to one of its contacts.</summary>
 /// <param name="Via"><c>tour</c>, <c>contact</c>, or both.</param>

@@ -101,6 +101,8 @@ public class FactSheetBuilderTests
 
         Assert.Equal([("a-company", (string?)null, "A Company")],
             rar.SubUnits.Select(s => (s.Slug, s.Parent, s.Title)));                 // B Company, with 5 contacts, has none; 1 Platoon is in A Company's
+        Assert.Equal([("1966-05-01", "/battlemap?incident=1", "Patrol"), ("1966-05-02", "/battlemap?incident=2", "Patrol"), ("1966-05-03", "/battlemap?incident=3", "Patrol")],
+            rar.SubUnits[0].Notable.Select(n => (n.Date, n.Url, n.Activity)));
         Assert.Equal(("1-atf-artillery", "1 ATF Artillery"), (atf.SubUnits.Single().Slug, atf.SubUnits.Single().Title));
     }
 
@@ -268,12 +270,65 @@ public class FactSheetBuilderTests
         Assert.Empty(six.Unit.OutsideTours);
     }
 
+    [Fact]
+    public void Lists_the_units_with_their_sections_in_the_tables_order_for_the_page()
+    {
+        var contacts = Enumerable.Range(1, 25).Select(i => C(i, $"1966-05-{i:00}", [2], frKia: i == 1 ? 1 : 0)).ToList();
+        var b = Builder(contacts);
+        var sheets = new[] { "1-atf", "5-rar" }.ToDictionary(s => s, s => b.Build(Unit(s), new Dictionary<int, ContactDetail>()));
+
+        var index = UnitIndex.Build(UnitsTable.Parse(UnitsCsv), sheets);
+
+        Assert.Equal(["5-rar", "1-atf"], index.Units.Select(u => u.Slug));      // the table's order; units without a sheet left out
+        Assert.Equal(("5 RAR", 25, 1), (index.Units[0].Short, index.Units[0].Contacts, index.Units[0].FriendlyKilled));
+        Assert.Equal([("a-company", "A Company", 25)], index.Units[0].SubUnits.Select(s => (s.Slug, s.Title, s.Contacts)));
+    }
+
     [Theory]
     [InlineData("Arty/Mor", "Artillery and mortar fire")]
     [InlineData("patrol", "Patrol")]
     [InlineData("Friendly Fire", "Friendly fire")]
     [InlineData("Harrassing fire", "Harassing fire")]
     public void Puts_the_reports_unit_tasks_in_plain_words(string task, string plain) => Assert.Equal(plain, FactSheetBuilder.PlainTask(task));
+
+    [Fact]
+    public void Uses_a_reports_summary_only_while_the_report_is_the_one_it_was_written_from()
+    {
+        var summaries = ReportSummaries.Parse(
+            $$"""{ "4": { "report": "{{ReportSummaries.Fingerprint("B Coy contact en.\r\n")}}", "summary": "B Company met the enemy." } }""");
+
+        Assert.Equal("B Company met the enemy.", summaries.For(4, "B Coy contact en.\n"));   // line endings and space aside
+        Assert.Null(summaries.For(4, "B Coy contact en. Amended."));
+        Assert.Null(summaries.For(5, "B Coy contact en."));
+    }
+
+    [Fact]
+    public void Writes_the_history_as_markdown_with_its_head_sections_summaries_and_galleries()
+    {
+        var contacts = new[] { C(1, "1966-05-24", [2], frKia: 2, enKia: 3) };
+        var roll = new[] { new RollPerson("1", "A [Name]", "Private", new DateOnly(1966, 5, 24), [new Tour("5th Battalion, The Royal Australian Regiment", new(1966, 5, 1), new(1966, 12, 1))]) };
+        var pictures = new[] { new SitePicture(7, "/media/a.jpg", "/media/a-480.jpg", "A caption", "A credit", null, 10.5, 107.2, 1) };
+        var sheet = Builder(contacts, roll, pictures: pictures, portraits: new HashSet<string> { "1" })
+            .Build(Unit("5-rar"), new Dictionary<int, ContactDetail> { [1] = Detail(1, "A Coy contact 5 en.") });
+        var summaries = ReportSummaries.Parse(
+            $$"""{ "1": { "report": "{{ReportSummaries.Fingerprint("A Coy contact 5 en.")}}", "summary": "A Company met five enemy." } }""");
+
+        var md = HistoryMarkdown.Render(sheet, summaries);
+
+        Assert.StartsWith("---\nunit: 5-rar\nid: 1\ntitle: 5th Battalion, Royal Australian Regiment\n", md);
+        Assert.Contains("tours: April 1966 – May 1967, February 1969 – February 1970\n", md);
+        Assert.Contains("\n## Year by year\n", md);
+        // The first column opens the Battle Map on the unit's contacts of that year, or with that task.
+        Assert.Contains("| [1966](/battlemap?units=1&from=1966-01-01&to=1966-12-31) | 1 |", md);
+        Assert.Contains("| [Patrol](/battlemap?units=1&tasks=Patrol) | 1 | 100% |", md);
+        Assert.Contains("\n### 24 May 1966: Ambush\n", md);
+        Assert.Contains("\nAustralian: 2 killed. Enemy: 3 killed.\n", md);
+        Assert.Contains("\nA Company met five enemy.\n", md);
+        // Name (escaped), rank and date of death, a line each.
+        Assert.Contains("\n- ![](/media/portraits/1.jpg) [A \\[Name\\]](/battlemap?person=1)\\\n  Private\\\n  24 May 1966\n", md);
+        Assert.Contains("\n- [![A caption](/media/a-480.jpg)](/battlemap?picture=7) A caption *A credit*\n", md);
+        Assert.Contains("*No summary of the report yet.*", HistoryMarkdown.Render(sheet, ReportSummaries.Empty));
+    }
 
     private static ContactDetail Detail(int id, string report) =>
         new(id, "1968-01-01T10:00:00", 10.5, 107.2, "YS374671", null, "Ambush", [], 10, 5, 0, 0, 0, 0, report, "AWM95", null);

@@ -71,47 +71,56 @@
     {
       "name": "Patrol",
       "count": 131,
-      "share": 0.42
+      "share": 0.42,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Security",
       "count": 78,
-      "share": 0.25
+      "share": 0.25,
+      "filter": "tasks=Security"
     },
     {
       "name": "Ambush",
       "count": 67,
-      "share": 0.21
+      "share": 0.21,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Bunker",
       "count": 16,
-      "share": 0.05
+      "share": 0.05,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Transport",
       "count": 7,
-      "share": 0.02
+      "share": 0.02,
+      "filter": "tasks=Transport"
     },
     {
       "name": "Artillery and mortar fire",
       "count": 5,
-      "share": 0.02
+      "share": 0.02,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Mine incident",
       "count": 4,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     },
     {
       "name": "Attack",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Attack"
     },
     {
       "name": "Not recorded",
       "count": 6,
-      "share": 0.02
+      "share": 0.02,
+      "filter": null
     }
   ],
   "support": [
@@ -146,7 +155,8 @@
     {
       "name": "1ATF",
       "count": 324,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -785,27 +795,32 @@
         {
           "name": "Ambush",
           "count": 20,
-          "share": 0.34
+          "share": 0.34,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 16,
-          "share": 0.27
+          "share": 0.27,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 15,
-          "share": 0.25
+          "share": 0.25,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 6,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Arty%2FMor"
         }
       ],
       "support": [
@@ -825,9 +840,36 @@
         }
       ],
       "notable": [
-        1900,
-        1943,
-        3048
+        {
+          "id": 1900,
+          "url": "/battlemap?incident=1900",
+          "date": "1969-01-10",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 6,
+          "enemyKilled": 10
+        },
+        {
+          "id": 1943,
+          "url": "/battlemap?incident=1943",
+          "date": "1969-01-19",
+          "operation": "Goodwood",
+          "activity": "Security",
+          "friendlyKilled": 3,
+          "friendlyWounded": 5,
+          "enemyKilled": 0
+        },
+        {
+          "id": 3048,
+          "url": "/battlemap?incident=3048",
+          "date": "1969-10-24",
+          "operation": "JACK",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 6
+        }
       ]
     },
     {
@@ -853,47 +895,56 @@
         {
           "name": "Patrol",
           "count": 35,
-          "share": 0.38
+          "share": 0.38,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 22,
-          "share": 0.24
+          "share": 0.24,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 21,
-          "share": 0.23
+          "share": 0.23,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Bunker",
           "count": 4,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 3,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 2,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Transport",
           "count": 2,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Attack",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Attack"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         }
       ],
       "support": [
@@ -917,9 +968,36 @@
         }
       ],
       "notable": [
-        1884,
-        2016,
-        2885
+        {
+          "id": 1884,
+          "url": "/battlemap?incident=1884",
+          "date": "1969-01-06",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 4,
+          "enemyKilled": 0
+        },
+        {
+          "id": 2016,
+          "url": "/battlemap?incident=2016",
+          "date": "1969-02-04",
+          "operation": "Goodwood",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 6
+        },
+        {
+          "id": 2885,
+          "url": "/battlemap?incident=2885",
+          "date": "1969-09-04",
+          "operation": "Nepabunna",
+          "activity": "Security",
+          "friendlyKilled": 0,
+          "friendlyWounded": 4,
+          "enemyKilled": 1
+        }
       ]
     },
     {
@@ -945,34 +1023,66 @@
         {
           "name": "Patrol",
           "count": 40,
-          "share": 0.61
+          "share": 0.61,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 13,
-          "share": 0.2
+          "share": 0.2,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 10,
-          "share": 0.15
+          "share": 0.15,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [],
       "notable": [
-        1928,
-        2059,
-        2692
+        {
+          "id": 1928,
+          "url": "/battlemap?incident=1928",
+          "date": "1969-01-16",
+          "operation": "Goodwood",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 5
+        },
+        {
+          "id": 2059,
+          "url": "/battlemap?incident=2059",
+          "date": "1969-02-14",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 5,
+          "enemyKilled": 6
+        },
+        {
+          "id": 2692,
+          "url": "/battlemap?incident=2692",
+          "date": "1969-07-19",
+          "operation": "Hat Dich",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 8,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -998,42 +1108,50 @@
         {
           "name": "Patrol",
           "count": 34,
-          "share": 0.45
+          "share": 0.45,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 22,
-          "share": 0.29
+          "share": 0.29,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 12,
-          "share": 0.16
+          "share": 0.16,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Bunker",
           "count": 4,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Mine incident",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         }
       ],
       "support": [
@@ -1049,9 +1167,36 @@
         }
       ],
       "notable": [
-        1879,
-        2078,
-        2227
+        {
+          "id": 1879,
+          "url": "/battlemap?incident=1879",
+          "date": "1969-01-05",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 5,
+          "enemyKilled": 0
+        },
+        {
+          "id": 2078,
+          "url": "/battlemap?incident=2078",
+          "date": "1969-02-23",
+          "operation": "Federal",
+          "activity": "Security",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 15
+        },
+        {
+          "id": 2227,
+          "url": "/battlemap?incident=2227",
+          "date": "1969-04-08",
+          "operation": "Overlander",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 6,
+          "enemyKilled": 0
+        }
       ]
     }
   ],

@@ -90,62 +90,74 @@
     {
       "name": "Artillery engagement",
       "count": 207,
-      "share": 0.4
+      "share": 0.4,
+      "filter": null
     },
     {
       "name": "Artillery and mortar fire",
       "count": 133,
-      "share": 0.26
+      "share": 0.26,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Security",
       "count": 50,
-      "share": 0.1
+      "share": 0.1,
+      "filter": "tasks=Security"
     },
     {
       "name": "Patrol",
       "count": 36,
-      "share": 0.07
+      "share": 0.07,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Mine incident",
       "count": 25,
-      "share": 0.05
+      "share": 0.05,
+      "filter": null
     },
     {
       "name": "Ambush",
       "count": 17,
-      "share": 0.03
+      "share": 0.03,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Transport",
       "count": 15,
-      "share": 0.03
+      "share": 0.03,
+      "filter": "tasks=Transport"
     },
     {
       "name": "Land clearance",
       "count": 2,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Land%20Clearance"
     },
     {
       "name": "Air support",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=LFT%2FAir"
     },
     {
       "name": "Bunker",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Mine clearance",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Mine%20Clearance"
     },
     {
       "name": "Not recorded",
       "count": 24,
-      "share": 0.05
+      "share": 0.05,
+      "filter": null
     }
   ],
   "support": [
@@ -246,7 +258,8 @@
     {
       "name": "1ATF",
       "count": 569,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -1230,37 +1243,44 @@
         {
           "name": "Patrol",
           "count": 18,
-          "share": 0.32
+          "share": 0.32,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 13,
-          "share": 0.23
+          "share": 0.23,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 10,
-          "share": 0.18
+          "share": 0.18,
+          "filter": "tasks=Security"
         },
         {
           "name": "Mine incident",
           "count": 3,
-          "share": 0.05
+          "share": 0.05,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 2,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Not recorded",
           "count": 10,
-          "share": 0.18
+          "share": 0.18,
+          "filter": null
         }
       ],
       "support": [
@@ -1280,9 +1300,36 @@
         }
       ],
       "notable": [
-        4718,
-        2885,
-        4474
+        {
+          "id": 4718,
+          "url": "/battlemap?incident=4718",
+          "date": "1969-04-10",
+          "operation": null,
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 1,
+          "enemyKilled": 2
+        },
+        {
+          "id": 2885,
+          "url": "/battlemap?incident=2885",
+          "date": "1969-09-04",
+          "operation": "Nepabunna",
+          "activity": "Security",
+          "friendlyKilled": 0,
+          "friendlyWounded": 4,
+          "enemyKilled": 1
+        },
+        {
+          "id": 4474,
+          "url": "/battlemap?incident=4474",
+          "date": "1971-04-17",
+          "operation": "U/K",
+          "activity": "Patrol",
+          "friendlyKilled": 2,
+          "friendlyWounded": 0,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -1308,32 +1355,38 @@
         {
           "name": "Artillery engagement",
           "count": 183,
-          "share": 0.63
+          "share": 0.63,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 85,
-          "share": 0.29
+          "share": 0.29,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Patrol",
           "count": 9,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 7,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Security"
         },
         {
           "name": "Air support",
           "count": 1,
-          "share": 0
+          "share": 0,
+          "filter": "tasks=LFT%2FAir"
         },
         {
           "name": "Not recorded",
           "count": 5,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [
@@ -1383,9 +1436,36 @@
         }
       ],
       "notable": [
-        4705,
-        1330,
-        4525
+        {
+          "id": 4705,
+          "url": "/battlemap?incident=4705",
+          "date": "1968-02-04",
+          "operation": "Coburg",
+          "activity": "Artillery engagement",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 18
+        },
+        {
+          "id": 1330,
+          "url": "/battlemap?incident=1330",
+          "date": "1968-05-28",
+          "operation": "Toan Thang 1",
+          "activity": "Security",
+          "friendlyKilled": 1,
+          "friendlyWounded": 8,
+          "enemyKilled": 55
+        },
+        {
+          "id": 4525,
+          "url": "/battlemap?incident=4525",
+          "date": "1971-06-07",
+          "operation": "Overlord",
+          "activity": "Bunker",
+          "friendlyKilled": 3,
+          "friendlyWounded": 8,
+          "enemyKilled": 5
+        }
       ]
     },
     {
@@ -1411,32 +1491,38 @@
         {
           "name": "Artillery and mortar fire",
           "count": 46,
-          "share": 0.63
+          "share": 0.63,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 21,
-          "share": 0.29
+          "share": 0.29,
+          "filter": null
         },
         {
           "name": "Security",
           "count": 3,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Patrol",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         }
       ],
       "support": [
@@ -1502,9 +1588,36 @@
         }
       ],
       "notable": [
-        1325,
-        1900,
-        3815
+        {
+          "id": 1325,
+          "url": "/battlemap?incident=1325",
+          "date": "1968-05-26",
+          "operation": "Toan Thang 1",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 17
+        },
+        {
+          "id": 1900,
+          "url": "/battlemap?incident=1900",
+          "date": "1969-01-10",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 6,
+          "enemyKilled": 10
+        },
+        {
+          "id": 3815,
+          "url": "/battlemap?incident=3815",
+          "date": "1970-05-03",
+          "operation": "Nudgee",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 6,
+          "enemyKilled": 2
+        }
       ]
     },
     {
@@ -1530,22 +1643,26 @@
         {
           "name": "Ambush",
           "count": 3,
-          "share": 0.3
+          "share": 0.3,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 2,
-          "share": 0.2
+          "share": 0.2,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 2,
-          "share": 0.2
+          "share": 0.2,
+          "filter": "tasks=Security"
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.3
+          "share": 0.3,
+          "filter": null
         }
       ],
       "support": [
@@ -1583,9 +1700,36 @@
         }
       ],
       "notable": [
-        2448,
-        4286,
-        4539
+        {
+          "id": 2448,
+          "url": "/battlemap?incident=2448",
+          "date": "1969-05-29",
+          "operation": null,
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 11
+        },
+        {
+          "id": 4286,
+          "url": "/battlemap?incident=4286",
+          "date": "1971-01-17",
+          "operation": null,
+          "activity": "Patrol",
+          "friendlyKilled": 1,
+          "friendlyWounded": 7,
+          "enemyKilled": 0
+        },
+        {
+          "id": 4539,
+          "url": "/battlemap?incident=4539",
+          "date": "1971-06-12",
+          "operation": "Overlord",
+          "activity": "Patrol",
+          "friendlyKilled": 8,
+          "friendlyWounded": 2,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -1611,27 +1755,32 @@
         {
           "name": "Mine incident",
           "count": 22,
-          "share": 0.51
+          "share": 0.51,
+          "filter": null
         },
         {
           "name": "Security",
           "count": 17,
-          "share": 0.4
+          "share": 0.4,
+          "filter": "tasks=Security"
         },
         {
           "name": "Land clearance",
           "count": 2,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Land%20Clearance"
         },
         {
           "name": "Mine clearance",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Mine%20Clearance"
         },
         {
           "name": "Patrol",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Patrol"
         }
       ],
       "support": [
@@ -1661,9 +1810,36 @@
         }
       ],
       "notable": [
-        2736,
-        2754,
-        2779
+        {
+          "id": 2736,
+          "url": "/battlemap?incident=2736",
+          "date": "1969-08-02",
+          "operation": "Mundingburra",
+          "activity": "Security",
+          "friendlyKilled": 0,
+          "friendlyWounded": 1,
+          "enemyKilled": 0
+        },
+        {
+          "id": 2754,
+          "url": "/battlemap?incident=2754",
+          "date": "1969-08-07",
+          "operation": null,
+          "activity": "Mine incident",
+          "friendlyKilled": 0,
+          "friendlyWounded": 2,
+          "enemyKilled": 0
+        },
+        {
+          "id": 2779,
+          "url": "/battlemap?incident=2779",
+          "date": "1969-08-11",
+          "operation": null,
+          "activity": "Security",
+          "friendlyKilled": 0,
+          "friendlyWounded": 2,
+          "enemyKilled": 0
+        }
       ]
     }
   ],

@@ -52,26 +52,26 @@
     "mapUrl": "/battlemap?units=3774"
   },
   "figures": {
-    "contacts": 277,
-    "led": 271,
-    "supported": 6,
+    "contacts": 223,
+    "led": 220,
+    "supported": 3,
     "first": "1968-06-04",
     "last": "1971-11-02",
-    "operations": 30,
-    "friendlyKilled": 25,
-    "friendlyWounded": 103,
-    "enemyKilled": 234,
-    "enemyWounded": 77,
-    "mineIncidents": 6
+    "operations": 26,
+    "friendlyKilled": 23,
+    "friendlyWounded": 84,
+    "enemyKilled": 197,
+    "enemyWounded": 44,
+    "mineIncidents": 5
   },
   "perYear": [
     {
       "year": 1968,
-      "contacts": 125
+      "contacts": 96
     },
     {
       "year": 1969,
-      "contacts": 92
+      "contacts": 67
     },
     {
       "year": 1971,
@@ -81,48 +81,55 @@
   "activity": [
     {
       "name": "Patrol",
-      "count": 97,
-      "share": 0.36
+      "count": 79,
+      "share": 0.36,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Ambush",
-      "count": 78,
-      "share": 0.29
+      "count": 68,
+      "share": 0.31,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Security",
-      "count": 66,
-      "share": 0.24
+      "count": 48,
+      "share": 0.22,
+      "filter": "tasks=Security"
     },
     {
       "name": "Bunker",
-      "count": 25,
-      "share": 0.09
+      "count": 20,
+      "share": 0.09,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Artillery and mortar fire",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Artillery engagement",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": null
     },
     {
       "name": "Not recorded",
       "count": 3,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     }
   ],
   "support": [
     {
       "kind": "In another unit\u0027s contact",
-      "contacts": 6,
+      "contacts": 3,
       "for": [
         {
           "unit": "3 Cav Regt",
-          "contacts": 5
+          "contacts": 2
         },
         {
           "unit": "1 Armd Regt",
@@ -134,8 +141,9 @@
   "dataSources": [
     {
       "name": "1ATF",
-      "count": 277,
-      "share": 1
+      "count": 223,
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -149,9 +157,9 @@
     },
     {
       "name": "Kosciusko",
-      "contacts": 4,
-      "first": "1968-06-16",
-      "last": "1968-06-18",
+      "contacts": 1,
+      "first": "1968-06-17",
+      "last": "1968-06-17",
       "friendlyKilled": 0,
       "enemyKilled": 2
     },
@@ -197,11 +205,11 @@
     },
     {
       "name": "Lyre Bird",
-      "contacts": 12,
-      "first": "1968-08-02",
+      "contacts": 8,
+      "first": "1968-08-10",
       "last": "1968-09-01",
       "friendlyKilled": 0,
-      "enemyKilled": 3
+      "enemyKilled": 2
     },
     {
       "name": "TAOR/Innamincka",
@@ -213,27 +221,19 @@
     },
     {
       "name": "Innamincka",
-      "contacts": 2,
+      "contacts": 1,
       "first": "1968-09-08",
-      "last": "1968-09-09",
+      "last": "1968-09-08",
       "friendlyKilled": 0,
       "enemyKilled": 0
     },
     {
       "name": "Hawkesbury",
-      "contacts": 21,
+      "contacts": 15,
       "first": "1968-09-13",
       "last": "1968-09-22",
-      "friendlyKilled": 4,
-      "enemyKilled": 19
-    },
-    {
-      "name": "Sceptre",
-      "contacts": 7,
-      "first": "1968-09-29",
-      "last": "1968-10-05",
-      "friendlyKilled": 0,
-      "enemyKilled": 8
+      "friendlyKilled": 3,
+      "enemyKilled": 17
     },
     {
       "name": "Track Duster",
@@ -245,7 +245,7 @@
     },
     {
       "name": "Capital",
-      "contacts": 13,
+      "contacts": 12,
       "first": "1968-10-15",
       "last": "1968-11-23",
       "friendlyKilled": 1,
@@ -261,19 +261,19 @@
     },
     {
       "name": "Goodwood",
-      "contacts": 57,
-      "first": "1968-12-04",
+      "contacts": 43,
+      "first": "1968-12-12",
       "last": "1969-02-16",
-      "friendlyKilled": 6,
-      "enemyKilled": 47
+      "friendlyKilled": 5,
+      "enemyKilled": 39
     },
     {
       "name": "Federal",
-      "contacts": 20,
+      "contacts": 13,
       "first": "1969-02-20",
       "last": "1969-03-16",
       "friendlyKilled": 0,
-      "enemyKilled": 23
+      "enemyKilled": 14
     },
     {
       "name": "MAT",
@@ -285,11 +285,11 @@
     },
     {
       "name": "Overlander",
-      "contacts": 10,
+      "contacts": 8,
       "first": "1969-04-09",
       "last": "1969-04-17",
       "friendlyKilled": 0,
-      "enemyKilled": 14
+      "enemyKilled": 13
     },
     {
       "name": "Stafford",
@@ -300,36 +300,12 @@
       "enemyKilled": 7
     },
     {
-      "name": "ATF Reaction Coy",
-      "contacts": 1,
-      "first": "1969-05-11",
-      "last": "1969-05-11",
-      "friendlyKilled": 0,
-      "enemyKilled": 0
-    },
-    {
-      "name": "ATF Ready Reaction Force",
-      "contacts": 1,
-      "first": "1969-05-11",
-      "last": "1969-05-11",
-      "friendlyKilled": 0,
-      "enemyKilled": 2
-    },
-    {
       "name": "U/K",
-      "contacts": 5,
-      "first": "1969-05-11",
+      "contacts": 4,
+      "first": "1971-05-27",
       "last": "1971-11-02",
       "friendlyKilled": 0,
-      "enemyKilled": 4
-    },
-    {
-      "name": "Phase 2 in AO Scorpion",
-      "contacts": 1,
-      "first": "1969-05-12",
-      "last": "1969-05-12",
-      "friendlyKilled": 0,
-      "enemyKilled": 2
+      "enemyKilled": 0
     },
     {
       "name": "Overlord",
@@ -384,49 +360,49 @@
     {
       "place": "Wattle",
       "type": "FSPB",
-      "contacts": 27,
-      "share": 0.1
+      "contacts": 26,
+      "share": 0.12
     },
     {
       "place": "Flinders",
       "type": "FSB",
-      "contacts": 21,
-      "share": 0.08
-    },
-    {
-      "place": "Evans",
-      "type": "FSB",
-      "contacts": 15,
-      "share": 0.05
+      "contacts": 20,
+      "share": 0.09
     },
     {
       "place": "Lindy",
       "type": "FSB",
       "contacts": 14,
+      "share": 0.06
+    },
+    {
+      "place": "Evans",
+      "type": "FSB",
+      "contacts": 12,
       "share": 0.05
     },
     {
       "place": "Cambrai",
       "type": "FSPB",
-      "contacts": 10,
+      "contacts": 8,
       "share": 0.04
     },
     {
       "place": "Kate",
       "type": "FSB",
-      "contacts": 9,
+      "contacts": 8,
+      "share": 0.04
+    },
+    {
+      "place": "Peggy",
+      "type": "FSB",
+      "contacts": 7,
       "share": 0.03
     },
     {
-      "place": "Noela",
+      "place": "Syke",
       "type": "FSB",
-      "contacts": 9,
-      "share": 0.03
-    },
-    {
-      "place": "Virginia",
-      "type": "FSB",
-      "contacts": 9,
+      "contacts": 7,
       "share": 0.03
     }
   ],
@@ -484,33 +460,6 @@
       "archivalSource": "Intsum, AWM1/4/116.pdf p161; Contact Report AWM 723/1/72; AWM95 7-4-31.pdf pg27; AWM95 7-4-32.pdf pg206 Contact Rept"
     },
     {
-      "id": 1590,
-      "url": "/battlemap?incident=1590",
-      "dtg": "1968-10-02T11:55:00",
-      "why": [
-        "typical:Bunker"
-      ],
-      "role": "led",
-      "ledBy": null,
-      "operation": "Sceptre",
-      "task": "Bunker",
-      "gridRef": "YS448815",
-      "friendlyForce": 24,
-      "enemyForce": 10,
-      "friendlyKilled": 0,
-      "friendlyWounded": 0,
-      "enemyKilled": 6,
-      "enemyWounded": 2,
-      "units": [
-        "2 Platoon, W Company, 4 Battalion, Royal Australian Regiment"
-      ],
-      "subUnits": [
-        "w-company"
-      ],
-      "report": "YS448815: AT THE LOC STATED, 2/W/4 RAR CONTACTED 10 EN IN A CAMP. RESULTS: 6 EN KIA (BC); 2 EN WIA.CAPTURED WERE 1 M1 CARBINE, 4 SKS RIFLES, 3 M26 GRENADES,QUANTITY OF SA AMMO, 1 MAP, 1 PHOTO ALBUM, COOKING UTENSILS, CLOTHING AND DOCS.  (noted in Combined arms Data Base)\n\nThe pl was moving when it heard talking and chopping. A recce was carried out. 2 M60 MGs were then moved to the head of the pl and the pl approached the camp to 15m. It opened fire and then proceeded to clear the camp by fire and movement. clearing bunkers as it went. 6 en killed and 1 blood trail. Pl had moved very quietly. Most of the enemy killed in the first 30 second burst from M60 MGs.",
-      "archivalSource": "Intsum, AWM95 1/4/121.pdf p74; AWM95 7-4-32.pdf pg19; AWM95 7-4-33.pdf pg198 Contact Rept"
-    },
-    {
       "id": 1616,
       "url": "/battlemap?incident=1616",
       "dtg": "1968-10-08T11:30:00",
@@ -566,9 +515,36 @@
       "archivalSource": "Intsum, AWM95 1/4/131.pdf p125; Contact Report AWM 723/1/72; AWM95 7-4-34.pdf pg11; AWM95 7-4-35.pdf pg224 Contact Rept;"
     },
     {
-      "id": 1990,
-      "url": "/battlemap?incident=1990",
-      "dtg": "1969-01-29T19:05:00",
+      "id": 2009,
+      "url": "/battlemap?incident=2009",
+      "dtg": "1969-02-01T19:25:00",
+      "why": [
+        "typical:Security"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Goodwood",
+      "task": "Security",
+      "gridRef": "YS296793",
+      "friendlyForce": 27,
+      "enemyForce": 4,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 1,
+      "enemyWounded": 2,
+      "units": [
+        "5 Platoon, B Company, 4 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "5 pl fired a claymore at several enemy moving round their perimeter. 1 enemy was wded and continued to moan through the night. The enemy mounted several rescue attempts and fired several bursts into the perimeter which were met by M79 fire and SA. Next morning 3 pl found 1 enemy body and an AK47. It also found 2 discrete blood trails going in different directions.",
+      "archivalSource": "Intsum, AWM95 1/4/140.pdf p60; AWM95 7-4-36.pdf pg18-19"
+    },
+    {
+      "id": 2061,
+      "url": "/battlemap?incident=2061",
+      "dtg": "1969-02-15T21:03:00",
       "why": [
         "typical:Ambush"
       ],
@@ -576,21 +552,21 @@
       "ledBy": null,
       "operation": "Goodwood",
       "task": "Ambush",
-      "gridRef": "YS354788",
-      "friendlyForce": 108,
-      "enemyForce": 50,
+      "gridRef": "YS219801",
+      "friendlyForce": 25,
+      "enemyForce": 12,
       "friendlyKilled": 0,
-      "friendlyWounded": 3,
-      "enemyKilled": 1,
-      "enemyWounded": 6,
+      "friendlyWounded": 0,
+      "enemyKilled": 6,
+      "enemyWounded": 0,
       "units": [
-        "W Company, 4 Battalion, Royal Australian Regiment"
+        "10 Platoon, D Company, 4 Battalion, Royal Australian Regiment"
       ],
       "subUnits": [
-        "w-company"
+        "d-company"
       ],
-      "report": "YS354788: AT THE LOC STATED, W/4 RAR WERE ENGAGED BY ELEMENTSOF AN ENEMY COY WHO FIRED RPG, HMG AND SA FIRE. EN CAS UNKNOWNTHERE WERE 2 NZ WIA.\n\nSpooky and US and Aust arty used in support. The enemy suffered heavy losses but all bodies had been removed by morning. The W coy had been led into this major enemy infiltration area by SAS. Enemy thought they were attacking a SAS patrol and got a severe surprise. The coy put an ambush on a main track in a triangular formation with the apex pointing away from the track. The pls detected en movement and fired the claymores in front of all pls. The enemy retaliated with a heavy volume of AW fire and at least 10 RPGs several of which exploded in trees. Three NZ wded with shrapnel 2 of them relatively minor. The Coy returned fire firing at the muzzle flashes of the enemy. The enemy withdrew.  3 pl next morning found 4 large pools of blood containing brain matter, 6 blood trails and 5 drag marks in its area. 1 of the M60 MGs of 3 pl became unserviceable during the battle because of a broken feed mechanism. Arty fire was directed on en withdrawal routes.\n\nEquip Failure- M60",
-      "archivalSource": "Intsum, AWM95 1/4/136.pdf p162; Horner SAS pg290; AWM95 7-4-35.pdf pg37-8; AWM95 7-4-37.pdf pg194 Contact Rept;"
+      "report": "10 pl ambushes 4-5 boats carrying 12-15 enemy. 2-3 enemy in each boat. 2 boats sunk and one drifting down stream. The enemy returned fire from the S bank. Enemy withdrawal routes hit by Arty. 6 enemy killed. Intsum says contact was result of informant info (Intsum 15/2/69).",
+      "archivalSource": "AWM95 7-4-36.pdf pg11, 31;  Intsum, AWM95 1/4/140.pdf p85"
     },
     {
       "id": 2064,
@@ -621,60 +597,6 @@
       "archivalSource": "Intsum, AWM95 1/4/140.pdf p87; AWM95 7-4-36.pdf pg11-12, 31-33,"
     },
     {
-      "id": 2083,
-      "url": "/battlemap?incident=2083",
-      "dtg": "1969-02-23T20:20:00",
-      "why": [
-        "significant"
-      ],
-      "role": "led",
-      "ledBy": null,
-      "operation": "Federal",
-      "task": "Security",
-      "gridRef": "YT163077",
-      "friendlyForce": 109,
-      "enemyForce": 80,
-      "friendlyKilled": 0,
-      "friendlyWounded": 5,
-      "enemyKilled": 6,
-      "enemyWounded": 9,
-      "units": [
-        "W Company, 4 Battalion, Royal Australian Regiment"
-      ],
-      "subUnits": [
-        "w-company"
-      ],
-      "report": "The Coy was covering the approaches to Long Binh. The MG of 1 pl saw enemy movement and opened fire (the coy had been standing to). Claymores were fired and the enemy immediately opened up with RPG 2 and 7s. The enemy made several attacks with infantry and RPGs. Arty and mortars were closely co ordinated and fired close to the coy position. Spooky was also called in and systematically attacked withdrawal routes. 6 enemy bodies were found at first light sweep, 5 of them in the cone of the first MG of 1 pl. There were 9 drag marks. 5 NZ lightly wded by shrapnel. 4 AK47s capt plus 7 RPG launchers and 43 RPGs, 80lbs plastic explosive, 13 AK47 mags.",
-      "archivalSource": "D inf 723/R5/53; AWM95 7-4-37.pdf pg189 Contact Rept; AWM95 7-4-36.pdf pg39; Intsum, AWM95 1/4/140.pdf p99,102;"
-    },
-    {
-      "id": 2085,
-      "url": "/battlemap?incident=2085",
-      "dtg": "1969-02-23T20:30:00",
-      "why": [
-        "typical:Security"
-      ],
-      "role": "led",
-      "ledBy": null,
-      "operation": "Federal",
-      "task": "Security",
-      "gridRef": "YT162076",
-      "friendlyForce": 16,
-      "enemyForce": 1,
-      "friendlyKilled": 0,
-      "friendlyWounded": 2,
-      "enemyKilled": 1,
-      "enemyWounded": 0,
-      "units": [
-        "2 Platoon, W Company, 4 Battalion, Royal Australian Regiment"
-      ],
-      "subUnits": [
-        "w-company"
-      ],
-      "report": "Part of the pl was acting as early warning standing patrol for the Coy ( 2 sections) when the Coy was attacked at 2020hrs about 175m away. The pl was not involved except that 2 claymores from the Coy position went off in the pls direction, but they caused no casualties. Soon after, a figure came running towards the patrol and into the perimeter where he was tripped by the section leader. He got up on his knee and turned to the leader and spoke to him in Vietnamese. Before he could do anything else he was shot dead by the M60 5m away. The M60 fire attracted the enemy",
-      "archivalSource": "AWM95 7-4-37.pdf pg170 Contact Rept; Intsum, AWM95 1/4/140.pdf p99"
-    },
-    {
       "id": 2135,
       "url": "/battlemap?incident=2135",
       "dtg": "1969-03-07T20:15:00",
@@ -699,6 +621,59 @@
       "subUnits": [],
       "report": "3 Aust and 22 Vn laid an ambush in paddy fields, 150m from the tree line of Dat Do. Within 15 minutes, the enemy opened fire from the trees with MG, AW and B40. The leader of the rear protection squad was killed, and the accurate MG fire pinned the rest of the patrol in the paddy bunds. The pl began to withdraw, and 2 more VN were killed. The 3 Aust were sheltering behind a bund when a MG burst hit it and killed Corporal Dawson. The enemy began to advance on the remaining Australians with fire and movement. The MG fire remained accurate. Mortar fire was called in from 4 RAR Mor at the Horseshoe. It stopped the enemy who retreated leaving 1 dead.\n\nApparently, the pl had been ambushing regularly from this position and the enemy had become too familiar with its movements. The Australians thought that if the VN had not withdrawn, the Mor fire would have driven off the enemy without so many friendly casualties.",
       "archivalSource": "AWM290 4/R723/1/3 Pt1 Contact Report; AWM109 R723/1/1/2 Pt2, HQ 1 ATF Reports General, Contact Rept;"
+    },
+    {
+      "id": 2241,
+      "url": "/battlemap?incident=2241",
+      "dtg": "1969-04-09T20:10:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Overlander",
+      "task": "Ambush",
+      "gridRef": "YS255793",
+      "friendlyForce": 25,
+      "enemyForce": 13,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 7,
+      "enemyWounded": 3,
+      "units": [
+        "Anti-Tank Platoon, Support Company, 4 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "YS255797: AT THE LOC STATED, ATK PL/4 RAR CONTACTED ANUNK NO OF EN WHO WITHDREW EAST. RESULTS: 7 EN KIA (BC),6 AK-47S CAPTURED.\n\nMovement is engaged by claymores and M60 MGs. Hand held flares used as well as arty (for illum) and mortars. Moaning and movement was heard again at 2127hrs and the area was engaged with grenades and M60. Sweep at first light found 7 bodies 2 blood trails 1 drag mark and 6 AK47s.",
+      "archivalSource": "Intsum AWM95 1/4/148.pdf p108; AWM95 7-4-38.pdf pg7,20"
+    },
+    {
+      "id": 4609,
+      "url": "/battlemap?incident=4609",
+      "dtg": "1971-07-29T14:40:00",
+      "why": [
+        "typical:Bunker"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Iron Fox",
+      "task": "Bunker",
+      "gridRef": "YS398913",
+      "friendlyForce": 32,
+      "enemyForce": 20,
+      "friendlyKilled": 0,
+      "friendlyWounded": 3,
+      "enemyKilled": 3,
+      "enemyWounded": 0,
+      "units": [
+        "1 ATF Artillery",
+        "7 Platoon, C Company, 4 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "The platoon was following a track which led from an unoccupied bunker system found earlier. The track crossed a deep, steep-sided reentrant. The forward section crossed the reentrant and a bunker was seen. As the section commander moved forward to investigate, an enemy came out of the bunker and the contact was initiated. SA fire was received from within the bunker system and claymore mines were fired from trees located near the system. After about 15 mins of firing the en started to fire RPGs as well. After about 1 hour of fighting, 7 platoon withdrew by fire and movement. During the contact at least 3 en were heard to cry out from wounds and a commander was heard to take charge of the contact from within the system. \n\n104 Fd Bty fired in support as did C Bty 5/42 US Arty.  (AWM95 3/8/5.pdf p23 12 Fd Regt Diary)\n\nMany arty rounds failed to detonate because they were delay fuzed and the ground was too soft. Once quick fuzed ammo was used the inf were able to extract themselves. The arty covered the bunker area keeping the VC fixed in their bunkers while the pl withdrew. (However, quick fuzed ammo is unlikely to destroy bunkers.) During the contact approx half the M79 rds failed to detonate. 2xM60 had mechanical failures- including the broken extractor of the gun of the forward section. M72 were not available but would have been ideal for this situation. Max use was made of WP and HE grens fired from SLR. According to the pl OC they were reasonably effective but did not destroy bunkers. However, the Coy OC commented that the rifle grens were invaluable and far more effective than the M79.\n\nEquip Failure- M60x2, M79",
+      "archivalSource": "AWM288, R569/1/2, Operation Iron Fox; AWM109 Ops 1 ATF [I]; AWM95 7-4-48.pdf pg253 Contact Rept; Intsum, AWM95 1/4/229.pdf p188"
     },
     {
       "id": 4611,
@@ -836,22 +811,26 @@
         {
           "name": "Patrol",
           "count": 18,
-          "share": 0.35
+          "share": 0.35,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 16,
-          "share": 0.31
+          "share": 0.31,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 14,
-          "share": 0.27
+          "share": 0.27,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Bunker",
           "count": 4,
-          "share": 0.08
+          "share": 0.08,
+          "filter": "tasks=Bunker"
         }
       ],
       "support": [
@@ -871,9 +850,36 @@
         }
       ],
       "notable": [
-        1542,
-        2064,
-        4655
+        {
+          "id": 1542,
+          "url": "/battlemap?incident=1542",
+          "date": "1968-09-16",
+          "operation": "Hawkesbury",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 2
+        },
+        {
+          "id": 2064,
+          "url": "/battlemap?incident=2064",
+          "date": "1969-02-16",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 8,
+          "enemyKilled": 6
+        },
+        {
+          "id": 4655,
+          "url": "/battlemap?incident=4655",
+          "date": "1971-09-21",
+          "operation": "Ivanhoe",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 15,
+          "enemyKilled": 7
+        }
       ]
     },
     {
@@ -899,39 +905,72 @@
         {
           "name": "Ambush",
           "count": 31,
-          "share": 0.42
+          "share": 0.42,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 19,
-          "share": 0.26
+          "share": 0.26,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 16,
-          "share": 0.22
+          "share": 0.22,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 5,
-          "share": 0.07
+          "share": 0.07,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         }
       ],
       "support": [],
       "notable": [
-        1534,
-        1844,
-        4609
+        {
+          "id": 1534,
+          "url": "/battlemap?incident=1534",
+          "date": "1968-09-13",
+          "operation": "Hawkesbury",
+          "activity": "Bunker",
+          "friendlyKilled": 3,
+          "friendlyWounded": 6,
+          "enemyKilled": 2
+        },
+        {
+          "id": 1844,
+          "url": "/battlemap?incident=1844",
+          "date": "1968-12-23",
+          "operation": "Goodwood",
+          "activity": "Patrol",
+          "friendlyKilled": 1,
+          "friendlyWounded": 5,
+          "enemyKilled": 0
+        },
+        {
+          "id": 4609,
+          "url": "/battlemap?incident=4609",
+          "date": "1971-07-29",
+          "operation": "Iron Fox",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 3,
+          "enemyKilled": 3
+        }
       ]
     },
     {
@@ -957,93 +996,66 @@
         {
           "name": "Patrol",
           "count": 32,
-          "share": 0.49
+          "share": 0.49,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 14,
-          "share": 0.22
+          "share": 0.22,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Bunker",
           "count": 10,
-          "share": 0.15
+          "share": 0.15,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Security",
           "count": 8,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Security"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [],
       "notable": [
-        1616,
-        4611,
-        4652
-      ]
-    },
-    {
-      "id": 3807,
-      "slug": "w-company",
-      "parent": null,
-      "title": "W Company",
-      "mapUrl": "/battlemap?units=3807",
-      "figures": {
-        "contacts": 54,
-        "led": 51,
-        "supported": 3,
-        "first": "1968-06-16",
-        "last": "1969-05-12",
-        "operations": 13,
-        "friendlyKilled": 2,
-        "friendlyWounded": 19,
-        "enemyKilled": 37,
-        "enemyWounded": 33,
-        "mineIncidents": 1
-      },
-      "activity": [
         {
-          "name": "Patrol",
-          "count": 18,
-          "share": 0.35
+          "id": 1616,
+          "url": "/battlemap?incident=1616",
+          "date": "1968-10-08",
+          "operation": "Track Duster",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 6,
+          "enemyKilled": 0
         },
         {
-          "name": "Security",
-          "count": 18,
-          "share": 0.35
+          "id": 4611,
+          "url": "/battlemap?incident=4611",
+          "date": "1971-07-30",
+          "operation": "Iron Fox",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 5,
+          "enemyKilled": 12
         },
         {
-          "name": "Ambush",
-          "count": 10,
-          "share": 0.2
-        },
-        {
-          "name": "Bunker",
-          "count": 5,
-          "share": 0.1
+          "id": 4652,
+          "url": "/battlemap?incident=4652",
+          "date": "1971-09-21",
+          "operation": "Ivanhoe",
+          "activity": "Bunker",
+          "friendlyKilled": 5,
+          "friendlyWounded": 9,
+          "enemyKilled": 18
         }
-      ],
-      "support": [
-        {
-          "kind": "In another unit\u0027s contact",
-          "contacts": 3,
-          "for": [
-            {
-              "unit": "3 Cav Regt",
-              "contacts": 3
-            }
-          ]
-        }
-      ],
-      "notable": [
-        1590,
-        1990,
-        2083
       ]
     }
   ],
@@ -1425,17 +1437,6 @@
       "nearbyContacts": 6
     },
     {
-      "id": 426,
-      "url": "/media/uploads/8d/8d4d78b7ef920c3d398413161b5e7865588a2caee30466749097bb1d67fedd0c.jpg",
-      "thumbUrl": "/media/uploads/8d/8d4d78b7ef920c3d398413161b5e7865588a2caee30466749097bb1d67fedd0c-480.jpg",
-      "caption": "Sapper Ken Lowdon of Vic climbs onto his bulldozer to begin a shift during the land clearing team\\\u0027s Operation Lyrebird in Phuoc Tuy Province. Members of the 1st Field Squadron and the 17th Construction Squadron, Royal Australian Engineers (RAE), were involved in the operation to clear trails through 30 kilometres of thickly jungled foothills of the Nui Dinh, Nui Thi and Nui Thi Vai hills, a few kilometres west of the 1st Australian Task Force Base at Nui Dat, 1968.",
-      "credit": "Ern Marshall Bernie Weisz",
-      "dateTaken": null,
-      "contact": null,
-      "how": "near",
-      "nearbyContacts": 8
-    },
-    {
       "id": 434,
       "url": "/media/uploads/23/231f89bc9164eae65098374ca98b6bd7fa4cf0aa13ccaac8277ab7f902a252f6.jpg",
       "thumbUrl": "/media/uploads/23/231f89bc9164eae65098374ca98b6bd7fa4cf0aa13ccaac8277ab7f902a252f6-480.jpg",
@@ -1531,6 +1532,17 @@
       "credit": "Ern Marshall",
       "dateTaken": null,
       "contact": 220,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 522,
+      "url": "/media/uploads/4b/4b57a5514fb24b8c989aaa075faf46b5408ee0d887bb4e383b70013c4c4a9fa8.jpg",
+      "thumbUrl": "/media/uploads/4b/4b57a5514fb24b8c989aaa075faf46b5408ee0d887bb4e383b70013c4c4a9fa8-480.jpg",
+      "caption": "FSB Garth",
+      "credit": "Ern Marshall Unknown",
+      "dateTaken": null,
+      "contact": null,
       "how": "near",
       "nearbyContacts": 3
     }

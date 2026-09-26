@@ -138,6 +138,8 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: web
+          # The Features pages' content (content/features/), which the site bundles; see web/Dockerfile.
+          build-contexts: content=content
           load: true
           tags: avw-web:ci
           cache-from: type=gha,scope=web

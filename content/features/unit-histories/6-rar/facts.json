@@ -116,52 +116,62 @@
     {
       "name": "Patrol",
       "count": 227,
-      "share": 0.5
+      "share": 0.5,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Ambush",
       "count": 75,
-      "share": 0.17
+      "share": 0.17,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Security",
       "count": 67,
-      "share": 0.15
+      "share": 0.15,
+      "filter": "tasks=Security"
     },
     {
       "name": "Bunker",
       "count": 30,
-      "share": 0.07
+      "share": 0.07,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Artillery and mortar fire",
       "count": 15,
-      "share": 0.03
+      "share": 0.03,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Artillery engagement",
       "count": 8,
-      "share": 0.02
+      "share": 0.02,
+      "filter": null
     },
     {
       "name": "Mine incident",
       "count": 6,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     },
     {
       "name": "Transport",
       "count": 3,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Transport"
     },
     {
       "name": "Friendly fire",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Friendly%20fire"
     },
     {
       "name": "Not recorded",
       "count": 19,
-      "share": 0.04
+      "share": 0.04,
+      "filter": null
     }
   ],
   "support": [
@@ -200,7 +210,8 @@
     {
       "name": "1ATF",
       "count": 461,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -976,47 +987,56 @@
         {
           "name": "Patrol",
           "count": 59,
-          "share": 0.51
+          "share": 0.51,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 20,
-          "share": 0.17
+          "share": 0.17,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 14,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Bunker",
           "count": 10,
-          "share": 0.09
+          "share": 0.09,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 3,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Friendly fire",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Friendly%20fire"
         },
         {
           "name": "Not recorded",
           "count": 7,
-          "share": 0.06
+          "share": 0.06,
+          "filter": null
         }
       ],
       "support": [
@@ -1036,9 +1056,36 @@
         }
       ],
       "notable": [
-        220,
-        222,
-        2697
+        {
+          "id": 220,
+          "url": "/battlemap?incident=220",
+          "date": "1966-08-18",
+          "operation": "Smithfield (original - Vendetta)",
+          "activity": "Patrol",
+          "friendlyKilled": 17,
+          "friendlyWounded": 19,
+          "enemyKilled": 245
+        },
+        {
+          "id": 222,
+          "url": "/battlemap?incident=222",
+          "date": "1966-08-18",
+          "operation": "Smithfield (original - Vendetta)",
+          "activity": "Not recorded",
+          "friendlyKilled": 0,
+          "friendlyWounded": 4,
+          "enemyKilled": 20
+        },
+        {
+          "id": 2697,
+          "url": "/battlemap?incident=2697",
+          "date": "1969-07-21",
+          "operation": "Mundingburra",
+          "activity": "Patrol",
+          "friendlyKilled": 1,
+          "friendlyWounded": 18,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -1064,42 +1111,50 @@
         {
           "name": "Patrol",
           "count": 47,
-          "share": 0.48
+          "share": 0.48,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 22,
-          "share": 0.23
+          "share": 0.23,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 11,
-          "share": 0.11
+          "share": 0.11,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 10,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 3,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Not recorded",
           "count": 2,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [
@@ -1119,9 +1174,36 @@
         }
       ],
       "notable": [
-        220,
-        222,
-        447
+        {
+          "id": 220,
+          "url": "/battlemap?incident=220",
+          "date": "1966-08-18",
+          "operation": "Smithfield (original - Vendetta)",
+          "activity": "Patrol",
+          "friendlyKilled": 17,
+          "friendlyWounded": 19,
+          "enemyKilled": 245
+        },
+        {
+          "id": 222,
+          "url": "/battlemap?incident=222",
+          "date": "1966-08-18",
+          "operation": "Smithfield (original - Vendetta)",
+          "activity": "Not recorded",
+          "friendlyKilled": 0,
+          "friendlyWounded": 4,
+          "enemyKilled": 20
+        },
+        {
+          "id": 447,
+          "url": "/battlemap?incident=447",
+          "date": "1967-02-17",
+          "operation": "Bribie",
+          "activity": "Bunker",
+          "friendlyKilled": 8,
+          "friendlyWounded": 21,
+          "enemyKilled": 50
+        }
       ]
     },
     {
@@ -1147,32 +1229,38 @@
         {
           "name": "Patrol",
           "count": 40,
-          "share": 0.65
+          "share": 0.65,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 9,
-          "share": 0.15
+          "share": 0.15,
+          "filter": "tasks=Security"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 6,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Ambush",
           "count": 4,
-          "share": 0.06
+          "share": 0.06,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Artillery engagement",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Bunker"
         }
       ],
       "support": [
@@ -1192,9 +1280,36 @@
         }
       ],
       "notable": [
-        137,
-        180,
-        372
+        {
+          "id": 137,
+          "url": "/battlemap?incident=137",
+          "date": "1966-07-09",
+          "operation": "TAOR",
+          "activity": "Ambush",
+          "friendlyKilled": 1,
+          "friendlyWounded": 2,
+          "enemyKilled": 1
+        },
+        {
+          "id": 180,
+          "url": "/battlemap?incident=180",
+          "date": "1966-07-25",
+          "operation": "Hobart",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 3,
+          "enemyKilled": 2
+        },
+        {
+          "id": 372,
+          "url": "/battlemap?incident=372",
+          "date": "1966-12-05",
+          "operation": "TAOR",
+          "activity": "Patrol",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 5
+        }
       ]
     },
     {
@@ -1220,42 +1335,50 @@
         {
           "name": "Patrol",
           "count": 57,
-          "share": 0.47
+          "share": 0.47,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 26,
-          "share": 0.21
+          "share": 0.21,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 16,
-          "share": 0.13
+          "share": 0.13,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 8,
-          "share": 0.07
+          "share": 0.07,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 3,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 2,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 9,
-          "share": 0.07
+          "share": 0.07,
+          "filter": null
         }
       ],
       "support": [
@@ -1275,9 +1398,36 @@
         }
       ],
       "notable": [
-        220,
-        2566,
-        3617
+        {
+          "id": 220,
+          "url": "/battlemap?incident=220",
+          "date": "1966-08-18",
+          "operation": "Smithfield (original - Vendetta)",
+          "activity": "Patrol",
+          "friendlyKilled": 17,
+          "friendlyWounded": 19,
+          "enemyKilled": 245
+        },
+        {
+          "id": 2566,
+          "url": "/battlemap?incident=2566",
+          "date": "1969-06-20",
+          "operation": "Lavarack",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 22
+        },
+        {
+          "id": 3617,
+          "url": "/battlemap?incident=3617",
+          "date": "1970-03-08",
+          "operation": "Gisborne",
+          "activity": "Bunker",
+          "friendlyKilled": 3,
+          "friendlyWounded": 6,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -1303,27 +1453,32 @@
         {
           "name": "Patrol",
           "count": 18,
-          "share": 0.53
+          "share": 0.53,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 7,
-          "share": 0.21
+          "share": 0.21,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 7,
-          "share": 0.21
+          "share": 0.21,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         }
       ],
       "support": [
@@ -1351,9 +1506,36 @@
         }
       ],
       "notable": [
-        447,
-        3053,
-        3684
+        {
+          "id": 447,
+          "url": "/battlemap?incident=447",
+          "date": "1967-02-17",
+          "operation": "Bribie",
+          "activity": "Bunker",
+          "friendlyKilled": 8,
+          "friendlyWounded": 21,
+          "enemyKilled": 50
+        },
+        {
+          "id": 3053,
+          "url": "/battlemap?incident=3053",
+          "date": "1969-10-25",
+          "operation": "Ross",
+          "activity": "Patrol",
+          "friendlyKilled": 2,
+          "friendlyWounded": 6,
+          "enemyKilled": 0
+        },
+        {
+          "id": 3684,
+          "url": "/battlemap?incident=3684",
+          "date": "1970-03-30",
+          "operation": "Townsville",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 5
+        }
       ]
     }
   ],

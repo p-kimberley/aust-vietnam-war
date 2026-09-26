@@ -9,10 +9,19 @@ the repository is the only copy. A change is made here, reviewed, and live with 
 | File | What it is | Made by |
 |---|---|---|
 | `units.csv` | Which units have a history (`history`), which are shown under another (`nest`: 1 ATF Artillery and Mortars under 1 ATF), which are left out with everything under them (`exclude`: the New Zealand companies and battery); each unit's address, names, **arm**, **Australian War Memorial record** and **official tours** (from that record or the Anzac Portal; empty until checked), and the names the nominal roll uses for it | By hand, from the official records |
+| `index.json` | The page's list of units: each with its dates, a few figures and its sub-unit sections | `Avw.Features unit-histories facts` |
 | `<unit>/facts.json` | The unit's fact sheet: figures, activity mix, operations, areas, notable contacts with their reports, sub-unit sections, its dead (with their portraits' addresses) and pictures | `Avw.Features unit-histories facts` |
+| `summaries.json` | A plain-English summary of each notable contact's report (the reports are full of abbreviations and soldiers' shorthand), written by an AI model (Claude) from the report and reviewed here, with a fingerprint of the report it was written from | By hand or by a model, reviewed |
+| `<unit>/history.md` | **What the site shows**: the unit's history in Markdown, with front matter for the page's head, made from its fact sheet and the summaries | `Avw.Features unit-histories render` |
 
-Every link and picture in a fact sheet is a plain site address (`/battlemap?incident=<id>`, `/battlemap?units=<id>`,
-`/media/portraits/<service number>.jpg`, a picture's `/media/…`), so the pages need nothing else to show them.
+The site bundles `index.json` and the `history.md` files when it is built (`web/src/app/features/`); a new unit also needs its
+line in `web/src/app/features/unit-histories/histories.ts` (a test checks the two agree). The page takes its contents from the
+history's `##` sections, opens a sub-unit's address at its `###` heading (the heading's words as a slug), shows the lists under
+*Roll of honour* and *Photographs* as galleries, and shows the first ten rows of a longer table with a button for the rest.
+
+Every link and picture is a plain site address (`/battlemap?incident=<id>`, `/battlemap?units=<id>`, `/battlemap?person=<service
+number>`, `/battlemap?picture=<id>`, `/media/portraits/<service number>.jpg`, a picture's `/media/…`), so the pages need nothing
+else to show them.
 
 ### Rebuilding the fact sheets
 
@@ -29,7 +38,19 @@ dotnet run --project server/src/Avw.Features -- unit-histories facts --only 5-ra
 It reads the contacts from Elasticsearch and the honour roll, casualty links, pictures and bases from the database, all
 read-only, and the deployed portraits from a folder of `<service number>.jpg` (`--portraits`, by default `.ai/kia-portraits`).
 It reports which sheets changed; the difference shows in the commit. A sheet carries no timestamp, so an unchanged sheet is
-left untouched.
+left untouched. It then renders the histories (below).
+
+### Rendering the histories
+
+```
+dotnet run --project server/src/Avw.Features -- unit-histories render                 # all units; needs no Elasticsearch or database
+```
+
+It writes each `history.md` from the unit's `facts.json` and `summaries.json`, and lists the notable contacts that have no
+summary, or one written from a report that has since changed. Write those summaries (plain English, abbreviations spelt out,
+nothing the report does not say, no names of the fallen) into `summaries.json` with the report's fingerprint
+(`ReportSummaries.Fingerprint`: the first 12 hex digits of the SHA-256 of the report's text, trimmed, with `\n` line endings),
+and render again.
 
 ### How the facts are worked out
 

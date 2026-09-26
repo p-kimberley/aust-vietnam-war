@@ -118,117 +118,140 @@
     {
       "name": "Patrol",
       "count": 238,
-      "share": 0.35
+      "share": 0.35,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Installation",
       "count": 96,
-      "share": 0.14
+      "share": 0.14,
+      "filter": "tasks=Installation"
     },
     {
       "name": "Security",
       "count": 88,
-      "share": 0.13
+      "share": 0.13,
+      "filter": "tasks=Security"
     },
     {
       "name": "Ambush",
       "count": 59,
-      "share": 0.09
+      "share": 0.09,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Harassing fire",
       "count": 40,
-      "share": 0.06
+      "share": 0.06,
+      "filter": "tasks=Harrassing%20fire"
     },
     {
       "name": "Sighting",
       "count": 40,
-      "share": 0.06
+      "share": 0.06,
+      "filter": "tasks=Sighting"
     },
     {
       "name": "Bunker",
       "count": 27,
-      "share": 0.04
+      "share": 0.04,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Deployment",
       "count": 27,
-      "share": 0.04
+      "share": 0.04,
+      "filter": "tasks=Deployment"
     },
     {
       "name": "Mine or booby trap",
       "count": 27,
-      "share": 0.04
+      "share": 0.04,
+      "filter": "tasks=Mine%2FBooby%20trap"
     },
     {
       "name": "Artillery and mortar fire",
       "count": 5,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Assault",
       "count": 5,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Assault"
     },
     {
       "name": "Accident",
       "count": 3,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Accident"
     },
     {
       "name": "Civil affairs",
       "count": 2,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Civil%20Affairs"
     },
     {
       "name": "Cordon and search",
       "count": 2,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Cordon%20and%20search"
     },
     {
       "name": "Friendly fire",
       "count": 2,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Friendly%20fire"
     },
     {
       "name": "Attack",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Attack"
     },
     {
       "name": "Detainees",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Detainees"
     },
     {
       "name": "Enemy attack",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Attack%20by%20en\u0026tasks=Enemy%20attack"
     },
     {
       "name": "Land clearance",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Land%20Clearance"
     },
     {
       "name": "Rallier",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Rallier"
     },
     {
       "name": "Transport",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Transport"
     },
     {
       "name": "Tunnel search",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Tunnel%20search"
     },
     {
       "name": "Not recorded",
       "count": 3,
-      "share": 0
+      "share": 0,
+      "filter": null
     }
   ],
   "support": [
@@ -251,12 +274,14 @@
     {
       "name": "1RAR",
       "count": 431,
-      "share": 0.64
+      "share": 0.64,
+      "filter": null
     },
     {
       "name": "1ATF",
       "count": 243,
-      "share": 0.36
+      "share": 0.36,
+      "filter": null
     }
   ],
   "operations": [
@@ -1147,57 +1172,68 @@
         {
           "name": "Patrol",
           "count": 60,
-          "share": 0.41
+          "share": 0.41,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Installation",
           "count": 22,
-          "share": 0.15
+          "share": 0.15,
+          "filter": "tasks=Installation"
         },
         {
           "name": "Security",
           "count": 17,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Security"
         },
         {
           "name": "Harassing fire",
           "count": 15,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Harrassing%20fire"
         },
         {
           "name": "Ambush",
           "count": 10,
-          "share": 0.07
+          "share": 0.07,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Mine or booby trap",
           "count": 6,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Mine%2FBooby%20trap"
         },
         {
           "name": "Sighting",
           "count": 6,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Sighting"
         },
         {
           "name": "Bunker",
           "count": 5,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Friendly fire",
           "count": 2,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Friendly%20fire"
         },
         {
           "name": "Cordon and search",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Cordon%20and%20search"
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Transport"
         }
       ],
       "support": [
@@ -1213,9 +1249,36 @@
         }
       ],
       "notable": [
-        10203,
-        1743,
-        1825
+        {
+          "id": 10203,
+          "url": "/battlemap?incident=10203",
+          "date": "1965-11-08",
+          "operation": "14/65",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 4,
+          "enemyKilled": 0
+        },
+        {
+          "id": 1743,
+          "url": "/battlemap?incident=1743",
+          "date": "1968-11-24",
+          "operation": "Capital 2",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 3,
+          "enemyKilled": 2
+        },
+        {
+          "id": 1825,
+          "url": "/battlemap?incident=1825",
+          "date": "1968-12-19",
+          "operation": "Goodwood",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 10,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -1241,72 +1304,86 @@
         {
           "name": "Patrol",
           "count": 50,
-          "share": 0.33
+          "share": 0.33,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Installation",
           "count": 36,
-          "share": 0.24
+          "share": 0.24,
+          "filter": "tasks=Installation"
         },
         {
           "name": "Security",
           "count": 21,
-          "share": 0.14
+          "share": 0.14,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 12,
-          "share": 0.08
+          "share": 0.08,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Harassing fire",
           "count": 8,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Harrassing%20fire"
         },
         {
           "name": "Mine or booby trap",
           "count": 6,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Mine%2FBooby%20trap"
         },
         {
           "name": "Bunker",
           "count": 5,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Sighting",
           "count": 4,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Sighting"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 2,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Deployment",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Deployment"
         },
         {
           "name": "Detainees",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Detainees"
         },
         {
           "name": "Land clearance",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Land%20Clearance"
         },
         {
           "name": "Tunnel search",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Tunnel%20search"
         },
         {
           "name": "Not recorded",
           "count": 2,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         }
       ],
       "support": [
@@ -1322,9 +1399,36 @@
         }
       ],
       "notable": [
-        1256,
-        1472,
-        1503
+        {
+          "id": 1256,
+          "url": "/battlemap?incident=1256",
+          "date": "1968-05-14",
+          "operation": "Toan Thang 1",
+          "activity": "Patrol",
+          "friendlyKilled": 1,
+          "friendlyWounded": 2,
+          "enemyKilled": 4
+        },
+        {
+          "id": 1472,
+          "url": "/battlemap?incident=1472",
+          "date": "1968-08-05",
+          "operation": "Platypus",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 9,
+          "enemyKilled": 0
+        },
+        {
+          "id": 1503,
+          "url": "/battlemap?incident=1503",
+          "date": "1968-08-22",
+          "operation": "Nowra",
+          "activity": "Attack",
+          "friendlyKilled": 0,
+          "friendlyWounded": 12,
+          "enemyKilled": 40
+        }
       ]
     },
     {
@@ -1350,67 +1454,80 @@
         {
           "name": "Patrol",
           "count": 65,
-          "share": 0.42
+          "share": 0.42,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 19,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Security"
         },
         {
           "name": "Sighting",
           "count": 18,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Sighting"
         },
         {
           "name": "Installation",
           "count": 17,
-          "share": 0.11
+          "share": 0.11,
+          "filter": "tasks=Installation"
         },
         {
           "name": "Ambush",
           "count": 14,
-          "share": 0.09
+          "share": 0.09,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Bunker",
           "count": 10,
-          "share": 0.06
+          "share": 0.06,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine or booby trap",
           "count": 5,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Mine%2FBooby%20trap"
         },
         {
           "name": "Harassing fire",
           "count": 3,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Harrassing%20fire"
         },
         {
           "name": "Assault",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Assault"
         },
         {
           "name": "Attack",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Attack"
         },
         {
           "name": "Civil affairs",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Civil%20Affairs"
         },
         {
           "name": "Deployment",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Deployment"
         },
         {
           "name": "Rallier",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Rallier"
         }
       ],
       "support": [
@@ -1434,9 +1551,36 @@
         }
       ],
       "notable": [
-        10441,
-        1333,
-        1503
+        {
+          "id": 10441,
+          "url": "/battlemap?incident=10441",
+          "date": "1965-11-26",
+          "operation": "New Life",
+          "activity": "Assault",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 4
+        },
+        {
+          "id": 1333,
+          "url": "/battlemap?incident=1333",
+          "date": "1968-05-30",
+          "operation": "Toan Thang 1",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 7,
+          "enemyKilled": 24
+        },
+        {
+          "id": 1503,
+          "url": "/battlemap?incident=1503",
+          "date": "1968-08-22",
+          "operation": "Nowra",
+          "activity": "Attack",
+          "friendlyKilled": 0,
+          "friendlyWounded": 12,
+          "enemyKilled": 40
+        }
       ]
     },
     {
@@ -1462,67 +1606,80 @@
         {
           "name": "Patrol",
           "count": 57,
-          "share": 0.4
+          "share": 0.4,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 20,
-          "share": 0.14
+          "share": 0.14,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Installation",
           "count": 17,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Installation"
         },
         {
           "name": "Security",
           "count": 14,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Security"
         },
         {
           "name": "Mine or booby trap",
           "count": 8,
-          "share": 0.06
+          "share": 0.06,
+          "filter": "tasks=Mine%2FBooby%20trap"
         },
         {
           "name": "Harassing fire",
           "count": 7,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Harrassing%20fire"
         },
         {
           "name": "Sighting",
           "count": 7,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Sighting"
         },
         {
           "name": "Bunker",
           "count": 6,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Assault",
           "count": 2,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Assault"
         },
         {
           "name": "Deployment",
           "count": 2,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Deployment"
         },
         {
           "name": "Accident",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Accident"
         },
         {
           "name": "Cordon and search",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Cordon%20and%20search"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         }
       ],
       "support": [
@@ -1542,9 +1699,36 @@
         }
       ],
       "notable": [
-        1234,
-        1325,
-        1564
+        {
+          "id": 1234,
+          "url": "/battlemap?incident=1234",
+          "date": "1968-05-13",
+          "operation": "Toan Thang 1",
+          "activity": "Ambush",
+          "friendlyKilled": 2,
+          "friendlyWounded": 9,
+          "enemyKilled": 1
+        },
+        {
+          "id": 1325,
+          "url": "/battlemap?incident=1325",
+          "date": "1968-05-26",
+          "operation": "Toan Thang 1",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 17
+        },
+        {
+          "id": 1564,
+          "url": "/battlemap?incident=1564",
+          "date": "1968-09-20",
+          "operation": "Hawkesbury",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 5,
+          "enemyKilled": 6
+        }
       ]
     }
   ],

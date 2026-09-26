@@ -17,16 +17,22 @@ using Microsoft.Extensions.Options;
 //   Avw.Features unit-histories facts [--content <folder>] [--portraits <folder>] [--only <slug>]
 //       Works out each unit's fact sheet (content/features/unit-histories/<unit>/facts.json) from the contacts (Elasticsearch), the
 //       honour roll, casualty links, pictures and bases (the database), and the deployed portraits (a folder of <service number>.jpg,
-//       by default .ai/kia-portraits). Reports which sheets changed.
+//       by default .ai/kia-portraits), and the page's list of them (index.json). Reports which sheets changed, then renders the
+//       histories (below).
+//       Needs ConnectionStrings__Default and Elasticsearch__Url (with Elasticsearch__ApiKey and Elasticsearch__CaCertificatePath), as
+//       the API does.
 //
-// Needs ConnectionStrings__Default and Elasticsearch__Url (with Elasticsearch__ApiKey and Elasticsearch__CaCertificatePath), as the
-// API does.
+//   Avw.Features unit-histories render [--content <folder>] [--only <slug>]
+//       Writes each unit's history (<unit>/history.md), which the site shows, from its fact sheet and the summaries of its notable
+//       contacts' reports (summaries.json). Reads only those files. Reports the notable contacts with no summary, or one written from
+//       a report that has since changed.
 
 var config = new ConfigurationBuilder().AddEnvironmentVariables().AddCommandLine(args).Build();
 var positional = args.Where((a, i) => !a.StartsWith("--") && (i == 0 || !args[i - 1].StartsWith("--"))).ToArray();
-if (positional is not ["unit-histories", "facts"])
+if (positional is not ["unit-histories", "facts" or "render"])
 {
     Console.Error.WriteLine("Usage: Avw.Features unit-histories facts [--content <folder>] [--portraits <folder>] [--only <slug>]");
+    Console.Error.WriteLine("       Avw.Features unit-histories render [--content <folder>] [--only <slug>]");
     return 2;
 }
 
@@ -36,6 +42,12 @@ var portraitsDir = Arg("--portraits") ?? Path.Combine(repo, ".ai", "kia-portrait
 var only = Arg("--only");
 var unitsDir = Path.Combine(contentDir, "unit-histories");
 var table = UnitsTable.Parse(await File.ReadAllTextAsync(Path.Combine(unitsDir, "units.csv")));
+var json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never };
+if (positional[1] == "render")
+{
+    await Render();
+    return 0;
+}
 
 // ---------------------------------------------------------------- the contacts, as the Battle Map has them
 
@@ -95,7 +107,6 @@ Console.WriteLine($"Honour roll: {roll.Count}; casualty links: {links.Sum(g => g
 // ---------------------------------------------------------------- the sheets
 
 var builder = new FactSheetBuilder(table, new FactInputs(contacts, catalogue, roles, roll, links, pictures, places, portraits));
-var json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never };
 var reports = new Dictionary<int, ContactDetail>();
 var changed = 0;
 foreach (var unit in table.Histories.Where(u => only is null || u.Slug == only))
@@ -126,8 +137,58 @@ foreach (var unit in table.Histories.Where(u => only is null || u.Slug == only))
         $"{sheet.Dead.Count,3} dead ({sheet.Dead.Count(d => d.Portrait is not null)} with portraits), {sheet.Pictures.Count,2} pictures");
 }
 
-Console.WriteLine($"{changed} fact sheet(s) written.");
+// The page's list, from every sheet on disk (so that one rebuilt alone with --only still leaves the list whole).
+var sheets = table.Histories
+    .Select(h => (h.Slug, Path: Path.Combine(unitsDir, h.Slug, "facts.json")))
+    .Where(x => File.Exists(x.Path))
+    .ToDictionary(x => x.Slug, x => JsonSerializer.Deserialize<FactSheet>(File.ReadAllText(x.Path), json)!);
+var indexPath = Path.Combine(unitsDir, "index.json");
+var indexText = JsonSerializer.Serialize(UnitIndex.Build(table, sheets), json).Replace("\r\n", "\n") + "\n";
+if (!File.Exists(indexPath) || (await File.ReadAllTextAsync(indexPath)).Replace("\r\n", "\n") != indexText)
+{
+    await File.WriteAllTextAsync(indexPath, indexText);
+    changed++;
+}
+
+Console.WriteLine($"{changed} file(s) written.");
+await Render();
 return 0;
+
+// Each unit's history.md, from its fact sheet and the report summaries.
+async Task Render()
+{
+    var summariesPath = Path.Combine(unitsDir, "summaries.json");
+    var summaries = File.Exists(summariesPath) ? ReportSummaries.Parse(await File.ReadAllTextAsync(summariesPath)) : ReportSummaries.Empty;
+    var written = 0;
+    var missing = new SortedSet<int>();
+    foreach (var unit in table.Histories.Where(u => only is null || u.Slug == only))
+    {
+        var factsPath = Path.Combine(unitsDir, unit.Slug, "facts.json");
+        if (!File.Exists(factsPath))
+        {
+            Console.WriteLine($"{unit.Slug,-20} no fact sheet: run `unit-histories facts` first");
+            continue;
+        }
+
+        var sheet = JsonSerializer.Deserialize<FactSheet>(await File.ReadAllTextAsync(factsPath), json)!;
+        missing.UnionWith(sheet.Notable.Where(c => summaries.For(c.Id, c.Report) is null).Select(c => c.Id));
+        var path = Path.Combine(unitsDir, unit.Slug, "history.md");
+        var text = HistoryMarkdown.Render(sheet, summaries);
+        var before = File.Exists(path) ? (await File.ReadAllTextAsync(path)).Replace("\r\n", "\n") : null;
+        if (before != text)
+        {
+            await File.WriteAllTextAsync(path, text);
+            written++;
+        }
+    }
+
+    Console.WriteLine($"{written} history file(s) written.");
+    if (missing.Count > 0)
+    {
+        Console.WriteLine($"{missing.Count} notable contact(s) have no summary of their report, or one written from a report that has " +
+                          $"since changed (summaries.json): {string.Join(", ", missing)}");
+    }
+}
 
 string? Arg(string name)
 {

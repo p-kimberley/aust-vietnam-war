@@ -74,47 +74,56 @@
     {
       "name": "Ambush",
       "count": 134,
-      "share": 0.34
+      "share": 0.34,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Patrol",
       "count": 133,
-      "share": 0.34
+      "share": 0.34,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Security",
       "count": 82,
-      "share": 0.21
+      "share": 0.21,
+      "filter": "tasks=Security"
     },
     {
       "name": "Bunker",
       "count": 22,
-      "share": 0.06
+      "share": 0.06,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Mine incident",
       "count": 10,
-      "share": 0.03
+      "share": 0.03,
+      "filter": null
     },
     {
       "name": "Artillery engagement",
       "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     },
     {
       "name": "Artillery and mortar fire",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Search",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Search"
     },
     {
       "name": "Not recorded",
       "count": 6,
-      "share": 0.02
+      "share": 0.02,
+      "filter": null
     }
   ],
   "support": [
@@ -149,7 +158,8 @@
     {
       "name": "1ATF",
       "count": 401,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -833,32 +843,38 @@
         {
           "name": "Patrol",
           "count": 34,
-          "share": 0.34
+          "share": 0.34,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 33,
-          "share": 0.33
+          "share": 0.33,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 22,
-          "share": 0.22
+          "share": 0.22,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 5,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 4,
-          "share": 0.04
+          "share": 0.04,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 2,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [
@@ -878,9 +894,36 @@
         }
       ],
       "notable": [
-        586,
-        875,
-        3869
+        {
+          "id": 586,
+          "url": "/battlemap?incident=586",
+          "date": "1967-08-06",
+          "operation": "Ballarat",
+          "activity": "Bunker",
+          "friendlyKilled": 6,
+          "friendlyWounded": 19,
+          "enemyKilled": 15
+        },
+        {
+          "id": 875,
+          "url": "/battlemap?incident=875",
+          "date": "1968-01-29",
+          "operation": "Coburg",
+          "activity": "Ambush",
+          "friendlyKilled": 1,
+          "friendlyWounded": 7,
+          "enemyKilled": 8
+        },
+        {
+          "id": 3869,
+          "url": "/battlemap?incident=3869",
+          "date": "1970-05-21",
+          "operation": "Concrete",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 12,
+          "enemyKilled": 5
+        }
       ]
     },
     {
@@ -906,37 +949,44 @@
         {
           "name": "Ambush",
           "count": 36,
-          "share": 0.35
+          "share": 0.35,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 35,
-          "share": 0.34
+          "share": 0.34,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 25,
-          "share": 0.24
+          "share": 0.24,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 5,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Mine incident",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Search",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": "tasks=Search"
         }
       ],
       "support": [
@@ -956,9 +1006,36 @@
         }
       ],
       "notable": [
-        3770,
-        4265,
-        4284
+        {
+          "id": 3770,
+          "url": "/battlemap?incident=3770",
+          "date": "1970-04-22",
+          "operation": "Concrete",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 5,
+          "enemyKilled": 4
+        },
+        {
+          "id": 4265,
+          "url": "/battlemap?incident=4265",
+          "date": "1970-12-31",
+          "operation": "Cung  Chung 3",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 21
+        },
+        {
+          "id": 4284,
+          "url": "/battlemap?incident=4284",
+          "date": "1971-01-16",
+          "operation": "Cung  Chung 3",
+          "activity": "Ambush",
+          "friendlyKilled": 1,
+          "friendlyWounded": 1,
+          "enemyKilled": 5
+        }
       ]
     },
     {
@@ -984,32 +1061,38 @@
         {
           "name": "Ambush",
           "count": 35,
-          "share": 0.4
+          "share": 0.4,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Patrol",
           "count": 27,
-          "share": 0.31
+          "share": 0.31,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 15,
-          "share": 0.17
+          "share": 0.17,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 8,
-          "share": 0.09
+          "share": 0.09,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 1,
-          "share": 0.01
+          "share": 0.01,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 2,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [
@@ -1029,9 +1112,36 @@
         }
       ],
       "notable": [
-        966,
-        3784,
-        3796
+        {
+          "id": 966,
+          "url": "/battlemap?incident=966",
+          "date": "1968-02-07",
+          "operation": "Coburg",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 14,
+          "enemyKilled": 3
+        },
+        {
+          "id": 3784,
+          "url": "/battlemap?incident=3784",
+          "date": "1970-04-25",
+          "operation": "Concrete",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 1,
+          "enemyKilled": 8
+        },
+        {
+          "id": 3796,
+          "url": "/battlemap?incident=3796",
+          "date": "1970-04-30",
+          "operation": "Concrete",
+          "activity": "Ambush",
+          "friendlyKilled": 1,
+          "friendlyWounded": 4,
+          "enemyKilled": 2
+        }
       ]
     },
     {
@@ -1057,37 +1167,44 @@
         {
           "name": "Patrol",
           "count": 20,
-          "share": 0.33
+          "share": 0.33,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 19,
-          "share": 0.31
+          "share": 0.31,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 14,
-          "share": 0.23
+          "share": 0.23,
+          "filter": "tasks=Security"
         },
         {
           "name": "Bunker",
           "count": 4,
-          "share": 0.07
+          "share": 0.07,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         },
         {
           "name": "Artillery engagement",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": null
         }
       ],
       "support": [
@@ -1103,9 +1220,36 @@
         }
       ],
       "notable": [
-        737,
-        860,
-        944
+        {
+          "id": 737,
+          "url": "/battlemap?incident=737",
+          "date": "1967-11-27",
+          "operation": "Forrest",
+          "activity": "Bunker",
+          "friendlyKilled": 2,
+          "friendlyWounded": 22,
+          "enemyKilled": 4
+        },
+        {
+          "id": 860,
+          "url": "/battlemap?incident=860",
+          "date": "1968-01-27",
+          "operation": "Coburg",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 10,
+          "enemyKilled": 5
+        },
+        {
+          "id": 944,
+          "url": "/battlemap?incident=944",
+          "date": "1968-02-05",
+          "operation": "Coburg",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 2,
+          "enemyKilled": 3
+        }
       ]
     },
     {
@@ -1131,32 +1275,38 @@
         {
           "name": "Patrol",
           "count": 12,
-          "share": 0.4
+          "share": 0.4,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 11,
-          "share": 0.37
+          "share": 0.37,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Security",
           "count": 3,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Security"
         },
         {
           "name": "Mine incident",
           "count": 2,
-          "share": 0.07
+          "share": 0.07,
+          "filter": null
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Not recorded",
           "count": 1,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         }
       ],
       "support": [
@@ -1172,9 +1322,36 @@
         }
       ],
       "notable": [
-        3869,
-        4117,
-        4309
+        {
+          "id": 3869,
+          "url": "/battlemap?incident=3869",
+          "date": "1970-05-21",
+          "operation": "Concrete",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 12,
+          "enemyKilled": 5
+        },
+        {
+          "id": 4117,
+          "url": "/battlemap?incident=4117",
+          "date": "1970-08-27",
+          "operation": "Cung Chung 2",
+          "activity": "Patrol",
+          "friendlyKilled": 1,
+          "friendlyWounded": 4,
+          "enemyKilled": 0
+        },
+        {
+          "id": 4309,
+          "url": "/battlemap?incident=4309",
+          "date": "1971-02-01",
+          "operation": "Phoi Hop",
+          "activity": "Ambush",
+          "friendlyKilled": 2,
+          "friendlyWounded": 3,
+          "enemyKilled": 0
+        }
       ]
     }
   ],

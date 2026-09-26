@@ -61,32 +61,38 @@
     {
       "name": "Artillery engagement",
       "count": 22,
-      "share": 0.76
+      "share": 0.76,
+      "filter": null
     },
     {
       "name": "Enemy attack",
       "count": 2,
-      "share": 0.07
+      "share": 0.07,
+      "filter": "tasks=Attack%20by%20en\u0026tasks=Enemy%20attack"
     },
     {
       "name": "Security",
       "count": 2,
-      "share": 0.07
+      "share": 0.07,
+      "filter": "tasks=Security"
     },
     {
       "name": "Artillery and mortar fire",
       "count": 1,
-      "share": 0.03
+      "share": 0.03,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Mine incident",
       "count": 1,
-      "share": 0.03
+      "share": 0.03,
+      "filter": null
     },
     {
       "name": "Transport",
       "count": 1,
-      "share": 0.03
+      "share": 0.03,
+      "filter": "tasks=Transport"
     }
   ],
   "support": [
@@ -125,12 +131,14 @@
     {
       "name": "1ATF",
       "count": 56,
-      "share": 0.82
+      "share": 0.82,
+      "filter": null
     },
     {
       "name": "1RAR",
       "count": 12,
-      "share": 0.18
+      "share": 0.18,
+      "filter": null
     }
   ],
   "operations": [
@@ -822,7 +830,8 @@
         {
           "name": "Artillery engagement",
           "count": 15,
-          "share": 1
+          "share": 1,
+          "filter": null
         }
       ],
       "support": [
@@ -850,9 +859,36 @@
         }
       ],
       "notable": [
-        447,
-        2541,
-        2903
+        {
+          "id": 447,
+          "url": "/battlemap?incident=447",
+          "date": "1967-02-17",
+          "operation": "Bribie",
+          "activity": "Bunker",
+          "friendlyKilled": 8,
+          "friendlyWounded": 21,
+          "enemyKilled": 50
+        },
+        {
+          "id": 2541,
+          "url": "/battlemap?incident=2541",
+          "date": "1969-06-11",
+          "operation": "Lavarack",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 10,
+          "enemyKilled": 9
+        },
+        {
+          "id": 2903,
+          "url": "/battlemap?incident=2903",
+          "date": "1969-09-09",
+          "operation": "Burnham",
+          "activity": "Bunker",
+          "friendlyKilled": 0,
+          "friendlyWounded": 2,
+          "enemyKilled": 1
+        }
       ]
     },
     {
@@ -878,22 +914,26 @@
         {
           "name": "Artillery engagement",
           "count": 4,
-          "share": 0.5
+          "share": 0.5,
+          "filter": null
         },
         {
           "name": "Enemy attack",
           "count": 2,
-          "share": 0.25
+          "share": 0.25,
+          "filter": "tasks=Attack%20by%20en\u0026tasks=Enemy%20attack"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Security",
           "count": 1,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Security"
         }
       ],
       "support": [
@@ -917,9 +957,36 @@
         }
       ],
       "notable": [
-        2496,
-        2509,
-        2833
+        {
+          "id": 2496,
+          "url": "/battlemap?incident=2496",
+          "date": "1969-06-06",
+          "operation": "Hammer",
+          "activity": "Not recorded",
+          "friendlyKilled": 1,
+          "friendlyWounded": 10,
+          "enemyKilled": 43
+        },
+        {
+          "id": 2509,
+          "url": "/battlemap?incident=2509",
+          "date": "1969-06-07",
+          "operation": "Hammer/Tong",
+          "activity": "Not recorded",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 40
+        },
+        {
+          "id": 2833,
+          "url": "/battlemap?incident=2833",
+          "date": "1969-08-21",
+          "operation": "Camden 2",
+          "activity": "Bunker",
+          "friendlyKilled": 1,
+          "friendlyWounded": 37,
+          "enemyKilled": 9
+        }
       ]
     }
   ],

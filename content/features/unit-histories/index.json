@@ -1,0 +1,617 @@
+{
+  "units": [
+    {
+      "slug": "1-rar",
+      "title": "1st Battalion, Royal Australian Regiment",
+      "short": "1 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1965-05",
+          "to": "1966-06"
+        },
+        {
+          "from": "1968-04",
+          "to": "1969-02"
+        }
+      ],
+      "contacts": 674,
+      "operations": 52,
+      "friendlyKilled": 58,
+      "dead": 56,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 146
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 153
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 161
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 146
+        }
+      ]
+    },
+    {
+      "slug": "2-rar",
+      "title": "2nd Battalion, Royal Australian Regiment",
+      "short": "2 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1967-04",
+          "to": "1968-06"
+        },
+        {
+          "from": "1970-05",
+          "to": "1971-05"
+        }
+      ],
+      "contacts": 320,
+      "operations": 31,
+      "friendlyKilled": 25,
+      "dead": 30,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 95
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 84
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 64
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 32
+        },
+        {
+          "slug": "support-company",
+          "title": "Support Company",
+          "contacts": 23
+        }
+      ]
+    },
+    {
+      "slug": "3-rar",
+      "title": "3rd Battalion, Royal Australian Regiment",
+      "short": "3 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1967-12",
+          "to": "1968-11"
+        },
+        {
+          "from": "1971-02",
+          "to": "1971-10"
+        }
+      ],
+      "contacts": 287,
+      "operations": 27,
+      "friendlyKilled": 49,
+      "dead": 30,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 72
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 52
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 66
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 63
+        },
+        {
+          "slug": "support-company",
+          "title": "Support Company",
+          "contacts": 22
+        }
+      ]
+    },
+    {
+      "slug": "4-rar",
+      "title": "4th Battalion, Royal Australian Regiment",
+      "short": "4 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1968-06",
+          "to": "1969-05"
+        },
+        {
+          "from": "1971-05",
+          "to": "1971-12"
+        }
+      ],
+      "contacts": 223,
+      "operations": 26,
+      "friendlyKilled": 23,
+      "dead": 22,
+      "subUnits": [
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 54
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 73
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 65
+        }
+      ]
+    },
+    {
+      "slug": "5-rar",
+      "title": "5th Battalion, Royal Australian Regiment",
+      "short": "5 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1966-04",
+          "to": "1967-05"
+        },
+        {
+          "from": "1969-02",
+          "to": "1970-02"
+        }
+      ],
+      "contacts": 596,
+      "operations": 51,
+      "friendlyKilled": 50,
+      "dead": 52,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 133
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 132
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 123
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 133
+        },
+        {
+          "slug": "support-company",
+          "title": "Support Company",
+          "contacts": 52
+        }
+      ]
+    },
+    {
+      "slug": "6-rar",
+      "title": "6th Battalion, Royal Australian Regiment",
+      "short": "6 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1966-05",
+          "to": "1967-06"
+        },
+        {
+          "from": "1969-05",
+          "to": "1970-05"
+        }
+      ],
+      "contacts": 461,
+      "operations": 37,
+      "friendlyKilled": 50,
+      "dead": 49,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 119
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 102
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 64
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 124
+        },
+        {
+          "slug": "support-company",
+          "title": "Support Company",
+          "contacts": 40
+        }
+      ]
+    },
+    {
+      "slug": "7-rar",
+      "title": "7th Battalion, Royal Australian Regiment",
+      "short": "7 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1967-04",
+          "to": "1968-04"
+        },
+        {
+          "from": "1970-02",
+          "to": "1971-02"
+        }
+      ],
+      "contacts": 401,
+      "operations": 30,
+      "friendlyKilled": 26,
+      "dead": 34,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 104
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 107
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 90
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 62
+        },
+        {
+          "slug": "support-company",
+          "title": "Support Company",
+          "contacts": 31
+        }
+      ]
+    },
+    {
+      "slug": "8-rar",
+      "title": "8th Battalion, Royal Australian Regiment",
+      "short": "8 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1969-11",
+          "to": "1970-11"
+        }
+      ],
+      "contacts": 211,
+      "operations": 15,
+      "friendlyKilled": 19,
+      "dead": 18,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 42
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 48
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 57
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 40
+        }
+      ]
+    },
+    {
+      "slug": "9-rar",
+      "title": "9th Battalion, Royal Australian Regiment",
+      "short": "9 RAR",
+      "arm": "infantry",
+      "tours": [
+        {
+          "from": "1968-11",
+          "to": "1969-12"
+        }
+      ],
+      "contacts": 324,
+      "operations": 22,
+      "friendlyKilled": 30,
+      "dead": 35,
+      "subUnits": [
+        {
+          "slug": "a-company",
+          "title": "A Company",
+          "contacts": 62
+        },
+        {
+          "slug": "b-company",
+          "title": "B Company",
+          "contacts": 94
+        },
+        {
+          "slug": "c-company",
+          "title": "C Company",
+          "contacts": 66
+        },
+        {
+          "slug": "d-company",
+          "title": "D Company",
+          "contacts": 77
+        }
+      ]
+    },
+    {
+      "slug": "3-cavalry-regiment",
+      "title": "3rd Cavalry Regiment",
+      "short": "3 Cav Regt",
+      "arm": "cavalry",
+      "tours": [
+        {
+          "from": "1965-05",
+          "to": "1972-03"
+        }
+      ],
+      "contacts": 465,
+      "operations": 90,
+      "friendlyKilled": 97,
+      "dead": 18,
+      "subUnits": [
+        {
+          "slug": "1-apc-squadron",
+          "title": "1 APC Squadron",
+          "contacts": 45
+        },
+        {
+          "slug": "a-squadron",
+          "title": "A Squadron",
+          "contacts": 240
+        },
+        {
+          "slug": "b-squadron",
+          "title": "B Squadron",
+          "contacts": 173
+        }
+      ]
+    },
+    {
+      "slug": "1-armoured-regiment",
+      "title": "1st Armoured Regiment",
+      "short": "1 Armd Regt",
+      "arm": "armour",
+      "tours": [
+        {
+          "from": "1968-02",
+          "to": "1971-09"
+        }
+      ],
+      "contacts": 205,
+      "operations": 48,
+      "friendlyKilled": 29,
+      "dead": 2,
+      "subUnits": [
+        {
+          "slug": "a-squadron",
+          "title": "A Squadron",
+          "contacts": 47
+        },
+        {
+          "slug": "b-squadron",
+          "title": "B Squadron",
+          "contacts": 59
+        },
+        {
+          "slug": "c-squadron",
+          "title": "C Squadron",
+          "contacts": 64
+        }
+      ]
+    },
+    {
+      "slug": "sasr",
+      "title": "Special Air Service Regiment",
+      "short": "SASR",
+      "arm": "special-air-service",
+      "tours": [
+        {
+          "from": "1966-06",
+          "to": "1971-10"
+        }
+      ],
+      "contacts": 380,
+      "operations": 16,
+      "friendlyKilled": 2,
+      "dead": 5,
+      "subUnits": [
+        {
+          "slug": "1-sas-squadron",
+          "title": "1 SAS Squadron",
+          "contacts": 139
+        },
+        {
+          "slug": "2-sas-squadron",
+          "title": "2 SAS Squadron",
+          "contacts": 100
+        },
+        {
+          "slug": "3-sas-squadron",
+          "title": "3 SAS Squadron",
+          "contacts": 130
+        }
+      ]
+    },
+    {
+      "slug": "1-atf",
+      "title": "1st Australian Task Force",
+      "short": "1 ATF",
+      "arm": "headquarters",
+      "tours": [
+        {
+          "from": "1966-04",
+          "to": "1971-12"
+        }
+      ],
+      "contacts": 569,
+      "operations": 63,
+      "friendlyKilled": 28,
+      "dead": 17,
+      "subUnits": [
+        {
+          "slug": "1-australian-reinforcement-unit",
+          "title": "1 Australian Reinforcement Unit",
+          "contacts": 59
+        },
+        {
+          "slug": "1-atf-artillery",
+          "title": "1 ATF Artillery",
+          "contacts": 305
+        },
+        {
+          "slug": "1-atf-mortars",
+          "title": "1 ATF Mortars",
+          "contacts": 96
+        },
+        {
+          "slug": "d-e-platoon",
+          "title": "D \u0026 E Platoon",
+          "contacts": 34
+        },
+        {
+          "slug": "land-clearing-team",
+          "title": "Land Clearing Team",
+          "contacts": 47
+        }
+      ]
+    },
+    {
+      "slug": "4-field-regiment",
+      "title": "4th Field Regiment",
+      "short": "4 Fd Regt",
+      "arm": "artillery",
+      "tours": [
+        {
+          "from": "1967-04",
+          "to": "1968-05"
+        },
+        {
+          "from": "1970-02",
+          "to": "1971-03"
+        }
+      ],
+      "contacts": 214,
+      "operations": 11,
+      "friendlyKilled": 9,
+      "dead": 3,
+      "subUnits": [
+        {
+          "slug": "106-field-battery",
+          "title": "106 Field Battery",
+          "contacts": 99
+        },
+        {
+          "slug": "108-field-battery",
+          "title": "108 Field Battery",
+          "contacts": 126
+        }
+      ]
+    },
+    {
+      "slug": "1-field-regiment",
+      "title": "1st Field Regiment",
+      "short": "1 Fd Regt",
+      "arm": "artillery",
+      "tours": [
+        {
+          "from": "1965-09",
+          "to": "1967-05"
+        },
+        {
+          "from": "1969-02",
+          "to": "1970-05"
+        }
+      ],
+      "contacts": 68,
+      "operations": 26,
+      "friendlyKilled": 30,
+      "dead": 4,
+      "subUnits": [
+        {
+          "slug": "101-field-battery",
+          "title": "101 Field Battery",
+          "contacts": 24
+        },
+        {
+          "slug": "105-field-battery",
+          "title": "105 Field Battery",
+          "contacts": 35
+        }
+      ]
+    },
+    {
+      "slug": "1-field-squadron",
+      "title": "1st Field Squadron",
+      "short": "1 Fd Sqn",
+      "arm": "engineers",
+      "tours": [
+        {
+          "from": "1965-09",
+          "to": "1971-12"
+        }
+      ],
+      "contacts": 76,
+      "operations": 22,
+      "friendlyKilled": 9,
+      "dead": 34,
+      "subUnits": []
+    }
+  ]
+}

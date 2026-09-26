@@ -54,7 +54,7 @@ scratch volume for uploads in progress.
 6. **Values.** Copy the defaults and set at least: `host`, `auth.authority`, `elasticsearch.url`, `map.basemaps` (and `overlays`,
    `terrain` if used), `media.storage` (the RWX class or NFS export), `ingress.className` and TLS, and for `avw-web` the same `host`.
    Email to editors is **optional** and can wait (section 7); nothing needs setting for the site to run.
-7. **Images.** `docker build -t <registry>/avw-server:<tag> server/` and `docker build -t <registry>/avw-web:<tag> web/`.
+7. **Images.** `docker build -t <registry>/avw-server:<tag> server/` and `docker build -t <registry>/avw-web:<tag> --build-context content=content web/` (the site bundles the Features pages' content from `content/features/`).
    The server image is about 370 MB and holds the API, worker and migrator. Both run as non-root with a read-only root filesystem.
 
 ## 3. Install and upgrade

@@ -213,7 +213,7 @@ public sealed class FactSheetBuilder(UnitsTable table, FactInputs input)
             return new SubUnitFacts(
                 s.Node.Id, s.Slug, parent, SubUnitTitle(unit, s.Node), MapUrl(s.Node.Id), FiguresOf(own, s.Subtree), ActivityOf(own, s.Subtree),
                 SupportOf(unit, own, s.Subtree),
-                own.OrderByDescending(Significance).ThenBy(c => c.Dtg).Take(3).Select(c => c.Id).OrderBy(id => byId[id].Dtg).ToList());
+                own.OrderByDescending(Significance).ThenBy(c => c.Dtg).Take(3).OrderBy(c => c.Dtg).Select(Brief).ToList());
         }).ToList();
 
         return new FactSheet(
@@ -417,12 +417,23 @@ public sealed class FactSheetBuilder(UnitsTable table, FactInputs input)
         var t => char.ToUpperInvariant(t[0]) + t[1..],
     };
 
+    /// <summary>
+    /// The Battle Map's filter for an activity: the unit tasks that read as it in plain words ("Arty/Mor" for "Artillery and mortar
+    /// fire"; both spellings of harassing fire), or null for one the Battle Map cannot filter on (worked out from the report's other
+    /// fields: an artillery engagement, a mine incident with no task; or none recorded).
+    /// </summary>
+    private string? TaskFilter(string activity)
+    {
+        var tasks = input.Catalogue.Tasks.Where(t => !string.IsNullOrWhiteSpace(t.Name) && PlainTask(t.Name) == activity).Select(t => t.Name).ToList();
+        return tasks.Count == 0 ? null : string.Join("&", tasks.Order(StringComparer.Ordinal).Select(t => "tasks=" + Uri.EscapeDataString(t)));
+    }
+
     /// <summary>What the unit did in the contacts it led, by activity, commonest first (with those whose activity is not recorded).</summary>
     private IReadOnlyList<ShareCount> ActivityOf(IReadOnlyCollection<ContactSummary> contacts, IReadOnlySet<int> subtree)
     {
         var led = contacts.Where(c => Led(c, subtree)).ToList();
         return led.GroupBy(ActivityOf)
-            .Select(g => new ShareCount(g.Key, g.Count(), Math.Round((double)g.Count() / led.Count, 2)))
+            .Select(g => new ShareCount(g.Key, g.Count(), Math.Round((double)g.Count() / led.Count, 2), TaskFilter(g.Key)))
             .OrderBy(s => s.Name == "Not recorded").ThenByDescending(s => s.Count).ThenBy(s => s.Name, StringComparer.Ordinal)
             .ToList();
     }
@@ -513,6 +524,10 @@ public sealed class FactSheetBuilder(UnitsTable table, FactInputs input)
             .Take(8)
             .ToList();
     }
+
+    private NotableBrief Brief(ContactSummary c) => new(
+        c.Id, $"/battlemap?incident={c.Id}", Day(c.Dtg), c.Op > 0 ? Name(input.Catalogue.Operations, c.Op) : null, ActivityOf(c),
+        c.FrKia, c.FrWia, c.EnKia);
 
     private NotableContact Notable(UnitRow unit, IReadOnlySet<int> subtree, ContactSummary c, List<string> why, ContactDetail? detail, IReadOnlyList<string> sections) => new(
         c.Id,

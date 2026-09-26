@@ -43,6 +43,7 @@ const PROFILE_PX = 40;
         <nav #navBar class="nav" aria-label="Main">
           <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
           <a routerLink="/battlemap" routerLinkActive="is-active">Battle Map</a>
+          <a routerLink="/features" routerLinkActive="is-active">Features</a>
           <a routerLink="/articles" routerLinkActive="is-active">Stories</a>
           @for (page of nav.pages.value(); track page.path) {
             <a [routerLink]="'/' + page.path" routerLinkActive="is-active">{{ page.title }}</a>
@@ -116,7 +117,7 @@ const PROFILE_PX = 40;
     }
     .nav {
       display: flex;
-      gap: 1.25rem;
+      gap: 0.25rem 1.25rem;
       flex: 1;
     }
     .nav a,
@@ -178,6 +179,8 @@ const PROFILE_PX = 40;
     .is-stacked.is-folded .nav {
       flex-basis: 100%;
       order: 2;
+      /* The narrowest layout: on a small phone the links go onto a second row rather than off the edge. */
+      flex-wrap: wrap;
     }
     .profile__button {
       display: inline-grid;

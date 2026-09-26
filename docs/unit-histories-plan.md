@@ -63,8 +63,10 @@ feature (Unit Histories now, Operation Histories later), each opening its own pa
 
 **Routes:** `/features/unit-histories` (the list, and an introduction), `/features/unit-histories/<unit>` for a unit's history,
 and `/features/unit-histories/<unit>/<sub-unit>` for a sub-unit's section of it (for example
-`/features/unit-histories/5-rar/b-company`). They are **prerendered at build time** into plain HTML from the committed Markdown,
-so they load at once, are found by search engines, can be shared, and read without the map.
+`/features/unit-histories/5-rar/b-company`). They are **rendered on the server** from the committed files, which are bundled into
+the site when it is built, so they load at once, are found by search engines, can be shared, and read without the map. (Planned as
+prerendered; rendered per request instead, like the site's other public pages, because a prerendered page would carry the build's
+address in its canonical and Open Graph links rather than the deployed one. Either way, no API or database call is made.)
 
 **Layout:** a list at the left (the 16 units, each with its sub-units indented beneath it; a filter box; each with its contact
 count), the history at the right. Choosing a sub-unit opens its unit's history at that sub-unit's section. On a phone the list
@@ -76,7 +78,7 @@ with **View on the Battle Map**: the map filtered to the unit (`/battlemap?units
 **Written account** (the default):
 
 1. *In brief*: two or three sentences on the unit's war.
-2. *What it did*: the activity mix (from unit tasks: patrols, ambushes, cordon and search, convoy escort, fire support …),
+2. *Unit actions*: the activity mix (from unit tasks: patrols, ambushes, cordon and search, convoy escort, fire support …),
    with a small bar of the proportions, and what that meant on the ground.
 3. *Its war, in order*: tours and operations as sections, each describing what the unit did, with photographs where there
    are any, and short quotations from the reports where they say it best. **Only the contacts that matter are linked**
@@ -176,9 +178,11 @@ API call: a contact is `/battlemap?incident=<id>`, the unit on the map is `/batt
 `/media/portraits/<service number>.jpg`, and a community picture is its deployed `/media/…` address. The drafting command checks
 each exists (the contact is the unit's, the portrait and the picture are deployed).
 
-**The web build** copies `content/features/` into the site's assets (an `angular.json` asset entry) and **prerenders** each
-page from it: the Markdown is rendered (with `marked`, already in the app) when the site is built, and Angular sanitises the
-result as it does any HTML it is given. Nothing is added to the API or the database. A change to a history is a change to its
+**The web build bundles** `content/features/` (imported through the `@content/*` path in `web/tsconfig.json`; the web image gets
+it as a second build context, `--build-context content=content`): the list of units (`index.json`) with the page, and each unit's
+files as a bundle of their own, loaded by the route before the page is made, on the server and in the browser alike. The Markdown
+(phase 4) is rendered the same way, and Angular sanitises the result as it does any HTML it is given. Nothing is added to the API or
+the database. A change to a history is a change to its
 Markdown, reviewed and committed like code, and live with the next deploy.
 
 ### 4.5 Keeping it current

@@ -88,52 +88,62 @@
     {
       "name": "Patrol",
       "count": 101,
-      "share": 0.36
+      "share": 0.36,
+      "filter": "tasks=Patrol"
     },
     {
       "name": "Security",
       "count": 97,
-      "share": 0.35
+      "share": 0.35,
+      "filter": "tasks=Security"
     },
     {
       "name": "Ambush",
       "count": 41,
-      "share": 0.15
+      "share": 0.15,
+      "filter": "tasks=Ambush"
     },
     {
       "name": "Bunker",
       "count": 12,
-      "share": 0.04
+      "share": 0.04,
+      "filter": "tasks=Bunker"
     },
     {
       "name": "Artillery and mortar fire",
       "count": 8,
-      "share": 0.03
+      "share": 0.03,
+      "filter": "tasks=Arty%2FMor"
     },
     {
       "name": "Mine incident",
       "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": null
     },
     {
       "name": "Transport",
       "count": 2,
-      "share": 0.01
+      "share": 0.01,
+      "filter": "tasks=Transport"
     },
     {
       "name": "Air support",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=LFT%2FAir"
     },
     {
       "name": "Attack",
       "count": 1,
-      "share": 0
+      "share": 0,
+      "filter": "tasks=Attack"
     },
     {
       "name": "Not recorded",
       "count": 15,
-      "share": 0.05
+      "share": 0.05,
+      "filter": null
     }
   ],
   "support": [
@@ -164,7 +174,8 @@
     {
       "name": "1ATF",
       "count": 287,
-      "share": 1
+      "share": 1,
+      "filter": null
     }
   ],
   "operations": [
@@ -860,37 +871,44 @@
         {
           "name": "Security",
           "count": 25,
-          "share": 0.35
+          "share": 0.35,
+          "filter": "tasks=Security"
         },
         {
           "name": "Patrol",
           "count": 22,
-          "share": 0.31
+          "share": 0.31,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 14,
-          "share": 0.2
+          "share": 0.2,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 3,
-          "share": 0.04
+          "share": 0.04,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Bunker",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Mine incident",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.04
+          "share": 0.04,
+          "filter": null
         }
       ],
       "support": [
@@ -906,9 +924,36 @@
         }
       ],
       "notable": [
-        903,
-        1639,
-        1652
+        {
+          "id": 903,
+          "url": "/battlemap?incident=903",
+          "date": "1968-02-01",
+          "operation": "Coburg",
+          "activity": "Security",
+          "friendlyKilled": 1,
+          "friendlyWounded": 19,
+          "enemyKilled": 42
+        },
+        {
+          "id": 1639,
+          "url": "/battlemap?incident=1639",
+          "date": "1968-10-15",
+          "operation": "Capital",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 1,
+          "enemyKilled": 2
+        },
+        {
+          "id": 1652,
+          "url": "/battlemap?incident=1652",
+          "date": "1968-10-19",
+          "operation": "Capital",
+          "activity": "Ambush",
+          "friendlyKilled": 2,
+          "friendlyWounded": 6,
+          "enemyKilled": 7
+        }
       ]
     },
     {
@@ -934,32 +979,38 @@
         {
           "name": "Security",
           "count": 21,
-          "share": 0.42
+          "share": 0.42,
+          "filter": "tasks=Security"
         },
         {
           "name": "Patrol",
           "count": 14,
-          "share": 0.28
+          "share": 0.28,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Bunker",
           "count": 6,
-          "share": 0.12
+          "share": 0.12,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Ambush",
           "count": 5,
-          "share": 0.1
+          "share": 0.1,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.06
+          "share": 0.06,
+          "filter": null
         }
       ],
       "support": [
@@ -979,9 +1030,36 @@
         }
       ],
       "notable": [
-        5792,
-        977,
-        4525
+        {
+          "id": 5792,
+          "url": "/battlemap?incident=5792",
+          "date": "1968-02-08",
+          "operation": null,
+          "activity": "Not recorded",
+          "friendlyKilled": 2,
+          "friendlyWounded": 5,
+          "enemyKilled": 9
+        },
+        {
+          "id": 977,
+          "url": "/battlemap?incident=977",
+          "date": "1968-08-08",
+          "operation": "Long Dien",
+          "activity": "Patrol",
+          "friendlyKilled": 3,
+          "friendlyWounded": 4,
+          "enemyKilled": 9
+        },
+        {
+          "id": 4525,
+          "url": "/battlemap?incident=4525",
+          "date": "1971-06-07",
+          "operation": "Overlord",
+          "activity": "Bunker",
+          "friendlyKilled": 3,
+          "friendlyWounded": 8,
+          "enemyKilled": 5
+        }
       ]
     },
     {
@@ -1007,32 +1085,38 @@
         {
           "name": "Patrol",
           "count": 29,
-          "share": 0.45
+          "share": 0.45,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 20,
-          "share": 0.31
+          "share": 0.31,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 7,
-          "share": 0.11
+          "share": 0.11,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 3,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Bunker",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Not recorded",
           "count": 4,
-          "share": 0.06
+          "share": 0.06,
+          "filter": null
         }
       ],
       "support": [
@@ -1048,9 +1132,36 @@
         }
       ],
       "notable": [
-        1006,
-        1107,
-        1569
+        {
+          "id": 1006,
+          "url": "/battlemap?incident=1006",
+          "date": "1968-02-19",
+          "operation": "Coburg",
+          "activity": "Security",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 2
+        },
+        {
+          "id": 1107,
+          "url": "/battlemap?incident=1107",
+          "date": "1968-03-22",
+          "operation": "Pinnaroo",
+          "activity": "Patrol",
+          "friendlyKilled": 3,
+          "friendlyWounded": 4,
+          "enemyKilled": 0
+        },
+        {
+          "id": 1569,
+          "url": "/battlemap?incident=1569",
+          "date": "1968-09-22",
+          "operation": "Nowra",
+          "activity": "Patrol",
+          "friendlyKilled": 0,
+          "friendlyWounded": 4,
+          "enemyKilled": 6
+        }
       ]
     },
     {
@@ -1076,42 +1187,50 @@
         {
           "name": "Patrol",
           "count": 27,
-          "share": 0.44
+          "share": 0.44,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Security",
           "count": 15,
-          "share": 0.24
+          "share": 0.24,
+          "filter": "tasks=Security"
         },
         {
           "name": "Ambush",
           "count": 14,
-          "share": 0.23
+          "share": 0.23,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Air support",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=LFT%2FAir"
         },
         {
           "name": "Attack",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Attack"
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.02
+          "share": 0.02,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Not recorded",
           "count": 2,
-          "share": 0.03
+          "share": 0.03,
+          "filter": null
         }
       ],
       "support": [
@@ -1127,9 +1246,36 @@
         }
       ],
       "notable": [
-        5789,
-        1373,
-        4349
+        {
+          "id": 5789,
+          "url": "/battlemap?incident=5789",
+          "date": "1968-02-04",
+          "operation": null,
+          "activity": "Security",
+          "friendlyKilled": 0,
+          "friendlyWounded": 1,
+          "enemyKilled": 3
+        },
+        {
+          "id": 1373,
+          "url": "/battlemap?incident=1373",
+          "date": "1968-06-26",
+          "operation": "Toan Thang 2",
+          "activity": "Ambush",
+          "friendlyKilled": 0,
+          "friendlyWounded": 0,
+          "enemyKilled": 1
+        },
+        {
+          "id": 4349,
+          "url": "/battlemap?incident=4349",
+          "date": "1971-03-02",
+          "operation": "Phoi Hop",
+          "activity": "Security",
+          "friendlyKilled": 2,
+          "friendlyWounded": 2,
+          "enemyKilled": 0
+        }
       ]
     },
     {
@@ -1155,37 +1301,44 @@
         {
           "name": "Security",
           "count": 10,
-          "share": 0.48
+          "share": 0.48,
+          "filter": "tasks=Security"
         },
         {
           "name": "Patrol",
           "count": 4,
-          "share": 0.19
+          "share": 0.19,
+          "filter": "tasks=Patrol"
         },
         {
           "name": "Ambush",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Ambush"
         },
         {
           "name": "Artillery and mortar fire",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Arty%2FMor"
         },
         {
           "name": "Bunker",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Bunker"
         },
         {
           "name": "Transport",
           "count": 1,
-          "share": 0.05
+          "share": 0.05,
+          "filter": "tasks=Transport"
         },
         {
           "name": "Not recorded",
           "count": 3,
-          "share": 0.14
+          "share": 0.14,
+          "filter": null
         }
       ],
       "support": [
@@ -1201,9 +1354,36 @@
         }
       ],
       "notable": [
-        1005,
-        1233,
-        1330
+        {
+          "id": 1005,
+          "url": "/battlemap?incident=1005",
+          "date": "1968-02-18",
+          "operation": "Coburg",
+          "activity": "Security",
+          "friendlyKilled": 8,
+          "friendlyWounded": 27,
+          "enemyKilled": 4
+        },
+        {
+          "id": 1233,
+          "url": "/battlemap?incident=1233",
+          "date": "1968-05-13",
+          "operation": "Toan Thang 1",
+          "activity": "Security",
+          "friendlyKilled": 9,
+          "friendlyWounded": 28,
+          "enemyKilled": 55
+        },
+        {
+          "id": 1330,
+          "url": "/battlemap?incident=1330",
+          "date": "1968-05-28",
+          "operation": "Toan Thang 1",
+          "activity": "Security",
+          "friendlyKilled": 1,
+          "friendlyWounded": 8,
+          "enemyKilled": 55
+        }
       ]
     }
   ],

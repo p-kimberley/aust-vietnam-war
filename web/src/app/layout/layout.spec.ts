@@ -72,6 +72,7 @@ describe('SiteHeader', () => {
     expect(links.map((a) => [a.textContent?.trim(), a.getAttribute('href')])).toEqual([
       ['Home', '/'],
       ['Battle Map', '/battlemap'],
+      ['Features', '/features'],
       ['Stories', '/articles'],
       ['About', '/about'],
       ['Help', '/help'],

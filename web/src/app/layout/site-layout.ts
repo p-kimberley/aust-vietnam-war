@@ -1,18 +1,20 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SiteFooter } from './site-footer';
+import { ScrollTop } from './scroll-top';
 import { SiteHeader } from './site-header';
 
 /** Chrome for the public site. The Battle Map and Studio bring their own layouts. */
 @Component({
   selector: 'app-site-layout',
-  imports: [RouterOutlet, SiteHeader, SiteFooter],
+  imports: [RouterOutlet, SiteHeader, SiteFooter, ScrollTop],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <a class="skip visually-hidden" href="#main">Skip to content</a>
     <app-site-header />
     <main id="main" tabindex="-1"><router-outlet /></main>
     <app-site-footer />
+    <app-scroll-top />
   `,
   styles: `
     :host {

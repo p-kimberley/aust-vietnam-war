@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { cmsPageMatcher } from './content/cms-page';
 import { roleGuard } from './core/role.guard';
+import { historyResolver } from './features/unit-histories/histories';
 import { SiteLayout } from './layout/site-layout';
 
 const site = "Australia's Vietnam War";
@@ -37,6 +38,13 @@ export const routes: Routes = [
       { path: 'articles', pathMatch: 'full', loadComponent: () => import('./content/article-list').then((m) => m.ArticleList) },
       { path: 'articles/:slug', loadComponent: () => import('./content/article-page').then((m) => m.ArticlePage) },
       { path: 'feedback', loadComponent: () => import('./pages/feedback').then((m) => m.Feedback) },
+      { path: 'features', pathMatch: 'full', loadComponent: () => import('./features/features-page').then((m) => m.FeaturesPage) },
+      ...['features/unit-histories', 'features/unit-histories/:unit', 'features/unit-histories/:unit/:sub'].map((path) => ({
+        path,
+        pathMatch: 'full' as const,
+        resolve: { history: historyResolver },
+        loadComponent: () => import('./features/unit-histories/unit-histories').then((m) => m.UnitHistories),
+      })),
       { path: 'forbidden', title: `Not permitted · ${site}`, loadComponent: () => import('./pages/forbidden').then((m) => m.Forbidden) },
       // Anything else is looked up as an authored page; the page shows Not found (and a 404 status) if there is none.
       { matcher: cmsPageMatcher, loadComponent: () => import('./content/cms-page').then((m) => m.CmsPage) },

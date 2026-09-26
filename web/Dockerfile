@@ -1,4 +1,4 @@
-#   docker build -t avw-web web/
+#   docker build -t avw-web --build-context content=content web/
 # Build on Debian (Node's own image); run on Google's distroless Node, which has Node and little else: no shell, no package
 # manager, no npm, and a non-root user. Neither is Ubuntu.
 FROM node:24-trixie-slim AS build
@@ -6,6 +6,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+# The Features pages' committed content (content/features/, the build context named "content"), bundled into the site: the
+# app finds it at ../content, as it does in the repository.
+COPY --from=content features /content/features
 RUN npm run build
 
 # The server bundle is self-contained, so the runtime image needs no node_modules. The image's entry point is `node`, so CMD is
