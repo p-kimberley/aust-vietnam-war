@@ -24,7 +24,13 @@ public class Article
     public string Title { get; set; } = "";
     public string? Excerpt { get; set; }
 
-    /// <summary>Sanitised HTML. The API runs an allowlist sanitiser on every save.</summary>
+    /// <summary>The body as Markdown: what editors write, and what revisions keep.</summary>
+    public string BodyMarkdown { get; set; } = "";
+
+    /// <summary>
+    /// The body as readers get it: rendered from <see cref="BodyMarkdown"/> on every save and put through the allowlist
+    /// sanitiser. Never edited directly.
+    /// </summary>
     public string BodyHtml { get; set; } = "";
 
     public ArticleStatus Status { get; set; }
@@ -67,7 +73,9 @@ public class ArticleRevision
     public Article Article { get; set; } = null!;
     public int RevisionNo { get; set; }
     public string Title { get; set; } = "";
-    public string BodyHtml { get; set; } = "";
+
+    /// <summary>The body as Markdown, as it was at this revision.</summary>
+    public string BodyMarkdown { get; set; } = "";
     public long CreatedById { get; set; }
     public AppUser CreatedBy { get; set; } = null!;
     public DateTime CreatedUtc { get; set; }

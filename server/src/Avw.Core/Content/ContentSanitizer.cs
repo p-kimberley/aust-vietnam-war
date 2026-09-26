@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using Ganss.Xss;
 
-namespace Avw.Api.Cms;
+namespace Avw.Core.Content;
 
 /// <summary>
 /// Reduces editor HTML to a small allowlist before it is stored. Article bodies are published as HTML, so this is the
@@ -20,7 +20,7 @@ public sealed partial class ContentSanitizer
 
     private static readonly string[] Tags =
     [
-        "p", "br", "hr", "h2", "h3", "h4", "strong", "b", "em", "i", "u", "s", "sub", "sup", "ul", "ol", "li", "blockquote",
+        "p", "br", "hr", "h2", "h3", "h4", "strong", "b", "em", "i", "u", "s", "del", "sub", "sup", "ul", "ol", "li", "blockquote",
         "a", "img", "figure", "figcaption", "table", "thead", "tbody", "tfoot", "tr", "th", "td", "code", "pre", "div", "span", "iframe",
     ];
 

@@ -39,7 +39,8 @@ export interface ArticleInput {
   title: string;
   slug: string | null;
   excerpt: string | null;
-  bodyHtml: string;
+  /** The body, as Markdown. */
+  bodyMarkdown: string;
   categoryId: number | null;
   featuredMediaId: number | null;
   featureOnHomepage: boolean;
@@ -57,6 +58,9 @@ export interface ArticleEdit {
   slug: string;
   title: string;
   excerpt: string | null;
+  /** The body as it is kept and edited. */
+  bodyMarkdown: string;
+  /** The body as readers get it, rendered and cleaned by the server when it was last saved (for the preview). */
   bodyHtml: string;
   status: ArticleStatus;
   authorId: number;
@@ -87,6 +91,7 @@ export interface RevisionSummary {
 }
 
 export interface RevisionDetail extends RevisionSummary {
+  bodyMarkdown: string;
   bodyHtml: string;
 }
 

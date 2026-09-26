@@ -44,7 +44,7 @@ public sealed record ArticleInput(
     string? Title,
     string? Slug,
     string? Excerpt,
-    string? BodyHtml,
+    string? BodyMarkdown,
     long? CategoryId,
     long? FeaturedMediaId,
     bool FeatureOnHomepage,
@@ -62,6 +62,8 @@ public sealed record ArticleEdit(
     string Slug,
     string Title,
     string? Excerpt,
+    string BodyMarkdown,
+    /// <summary>The body as readers get it, rendered from the Markdown when it was last saved (for the Studio's preview).</summary>
     string BodyHtml,
     ArticleStatus Status,
     long AuthorId,
@@ -102,7 +104,7 @@ public sealed record Paged<T>(IReadOnlyList<T> Items, int Total, int Page, int P
 
 public sealed record RevisionSummary(int RevisionNo, string Title, string AuthorName, DateTime CreatedUtc);
 
-public sealed record RevisionDetail(int RevisionNo, string Title, string BodyHtml, string AuthorName, DateTime CreatedUtc);
+public sealed record RevisionDetail(int RevisionNo, string Title, string BodyMarkdown, string BodyHtml, string AuthorName, DateTime CreatedUtc);
 
 public sealed record TransitionRequest(ArticleStatus Status, DateTime? ScheduledUtc, int Version);
 

@@ -34,7 +34,7 @@ Latent bugs found and **not** to be ported: SQL injection in `delete-incident-no
 | Relational store | Dedicated database on the existing **MySQL 8.4 InnoDB Cluster**, via MySQL Router. |
 | Search / map data | **Elasticsearch 9**. Also used as a search projection for articles, notes and people. |
 | Identity | **Keycloak 26** (operator deployed), dedicated realm for this app, self-registration enabled. |
-| Editor | **TipTap (ProseMirror)**, stored as **sanitised HTML**. Server-side allowlist sanitiser on every save. Verify the current licence terms at kickoff. |
+| Editor | **TipTap (ProseMirror)** with its Markdown extension, and a plain Markdown mode beside it (the editor's choice, visual by default). Bodies are **stored as Markdown** (since 2026-09-26; R.33); the HTML readers get is rendered from it on every save (Markdig) and put through the server-side allowlist sanitiser. Verify the current licence terms at kickoff. |
 | Media storage | Shared RWX volume (CephFS or NFS) for final images, plus a per-pod **RWO** scratch volume. See section 6. |
 | Basemap styles | Absolute http(s) style URLs served by a tile server (currently TileServer GL at `tiles.hosting.gradata.com.au`: terrain, bright, light, dark, `ww2`). `mapbox://` styles cannot be loaded and the API refuses to start with one. |
 

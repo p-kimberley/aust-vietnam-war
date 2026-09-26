@@ -13,16 +13,23 @@ import {
 } from '@angular/core';
 import { ChainedCommands, Editor } from '@tiptap/core';
 import Image from '@tiptap/extension-image';
+import { Markdown } from '@tiptap/markdown';
 import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table';
 import StarterKit from '@tiptap/starter-kit';
+import { storedChoice } from '../battlemap/stored-flag';
 import { VideoEmbed, toEmbedUrl } from './video-embed';
+
+/** How the body is being edited: formatted as it will look (the default), or as the Markdown it is kept as. */
+export type EditMode = 'visual' | 'markdown';
 
 type Bar = 'link' | 'video' | null;
 
 /**
- * The article body editor: TipTap with the formatting the site allows (headings, bold, italic, underline, lists, quotes,
- * links, images, tables, approved video embeds). The server sanitises again on every save, so this limits what an editor
- * can try rather than what a reader can receive.
+ * The article body editor. Bodies are kept as Markdown; this edits them either visually (TipTap, with the formatting the site
+ * allows: headings, bold, italic, strikethrough, lists, quotes, links, pictures, tables, approved video embeds), or as the
+ * Markdown itself, and remembers which the editor last chose. Both read and write the same Markdown. A video embed, which
+ * Markdown has no form for, is a line of HTML. The server renders and sanitises again on every save, so this limits what an
+ * editor can try rather than what a reader can receive.
  */
 @Component({
   selector: 'app-rich-text',
@@ -31,12 +38,16 @@ type Bar = 'link' | 'video' | null;
   template: `
     @if (editor(); as ed) {
       <div class="rt__bar" role="toolbar" aria-label="Formatting">
+        @if (mode() === 'markdown') {
+          <button type="button" (click)="pickImage.emit()" title="Insert a picture from the library">Picture</button>
+          <a class="rt__help" href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer">Markdown help</a>
+        } @else {
         <button type="button" (click)="run((c) => c.toggleHeading({ level: 2 }))" [class.is-on]="on('heading', { level: 2 })" title="Heading">H2</button>
         <button type="button" (click)="run((c) => c.toggleHeading({ level: 3 }))" [class.is-on]="on('heading', { level: 3 })" title="Subheading">H3</button>
         <span class="rt__sep"></span>
         <button type="button" (click)="run((c) => c.toggleBold())" [class.is-on]="on('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
         <button type="button" (click)="run((c) => c.toggleItalic())" [class.is-on]="on('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-        <button type="button" (click)="run((c) => c.toggleUnderline())" [class.is-on]="on('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button type="button" (click)="run((c) => c.toggleStrike())" [class.is-on]="on('strike')" title="Strikethrough"><s>S</s></button>
         <span class="rt__sep"></span>
         <button type="button" (click)="run((c) => c.toggleBulletList())" [class.is-on]="on('bulletList')" title="Bulleted list">• List</button>
         <button type="button" (click)="run((c) => c.toggleOrderedList())" [class.is-on]="on('orderedList')" title="Numbered list">1. List</button>
@@ -55,6 +66,11 @@ type Bar = 'link' | 'video' | null;
         <span class="rt__sep"></span>
         <button type="button" (click)="run((c) => c.undo())" [disabled]="!ed.can().undo()" title="Undo">Undo</button>
         <button type="button" (click)="run((c) => c.redo())" [disabled]="!ed.can().redo()" title="Redo">Redo</button>
+        }
+        <div class="rt__modes" role="group" aria-label="Edit the text">
+          <button type="button" [class.is-on]="mode() === 'visual'" [attr.aria-pressed]="mode() === 'visual'" (click)="setMode('visual')">Visual</button>
+          <button type="button" [class.is-on]="mode() === 'markdown'" [attr.aria-pressed]="mode() === 'markdown'" (click)="setMode('markdown')">Markdown</button>
+        </div>
       </div>
 
       @if (bar(); as which) {
@@ -74,7 +90,18 @@ type Bar = 'link' | 'video' | null;
         </form>
       }
     }
-    <div #host class="rt__body"></div>
+    <div #host class="rt__body" [hidden]="mode() === 'markdown'"></div>
+    @if (mode() === 'markdown') {
+      <textarea
+        #source
+        class="rt__md"
+        aria-label="The text, in Markdown"
+        spellcheck="true"
+        [value]="markdown()"
+        [disabled]="disabled()"
+        (input)="changed.emit($any($event.target).value)"
+      ></textarea>
+    }
   `,
   styles: `
     app-rich-text {
@@ -116,6 +143,33 @@ type Bar = 'link' | 'video' | null;
     .rt__bar button:disabled {
       opacity: 0.4;
       cursor: default;
+    }
+    .rt__modes {
+      display: flex;
+      gap: 0.15rem;
+      margin-left: auto;
+      padding: 0.1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+    }
+    .rt__help {
+      margin-left: 0.5rem;
+      font-size: 0.85rem;
+    }
+    .rt__md {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 22rem;
+      padding: 1rem 1.25rem;
+      color: var(--ink);
+      font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      background: #fff;
+      border: 0;
+      resize: vertical;
+      outline: none;
     }
     .rt__sep {
       width: 1px;
@@ -201,8 +255,8 @@ type Bar = 'link' | 'video' | null;
   `,
 })
 export class RichText implements OnDestroy {
-  /** The content to show. Changes that did not come from typing here replace the text; typing here does not loop back. */
-  readonly html = input.required<string>();
+  /** The body, as Markdown. Changes that did not come from typing here replace the text; typing here does not loop back. */
+  readonly markdown = input.required<string>();
   readonly disabled = input(false);
   readonly changed = output<string>();
   /** The host opens its picture library, then calls {@link insertImage}. */
@@ -213,15 +267,21 @@ export class RichText implements OnDestroy {
   protected readonly barError = signal('');
   private readonly tick = signal(0);
   private readonly host = viewChild.required<ElementRef<HTMLElement>>('host');
+  private readonly source = viewChild<ElementRef<HTMLTextAreaElement>>('source');
+  /** Visual or Markdown; the browser remembers the choice from one visit to the next. */
+  protected readonly mode = storedChoice<EditMode>('studio.editMode', ['visual', 'markdown'], 'visual');
 
   constructor() {
     afterNextRender(() => {
       const ed = new Editor({
         element: this.host().nativeElement,
-        content: this.html(),
+        content: this.markdown(),
+        contentType: 'markdown',
         editable: !this.disabled(),
         extensions: [
-          StarterKit.configure({ heading: { levels: [2, 3] }, link: { openOnClick: false, autolink: true, HTMLAttributes: { rel: 'noopener noreferrer' } } }),
+          // No underline: Markdown has none, and underlined words on a web page look like links.
+          StarterKit.configure({ heading: { levels: [2, 3] }, underline: false, link: { openOnClick: false, autolink: true, HTMLAttributes: { rel: 'noopener noreferrer' } } }),
+          Markdown,
           Image.configure({ inline: false }),
           Table.configure({ resizable: false }),
           TableRow,
@@ -231,8 +291,8 @@ export class RichText implements OnDestroy {
         ],
         onUpdate: ({ editor }) => {
           // TipTap tidies what it is given (and may report that as an update); only a real difference is a change.
-          const out = editor.isEmpty ? '' : editor.getHTML();
-          if (out !== this.html()) {
+          const out = editor.isEmpty ? '' : editor.getMarkdown();
+          if (out !== this.markdown()) {
             this.changed.emit(out);
           }
         },
@@ -242,11 +302,12 @@ export class RichText implements OnDestroy {
     });
 
     effect(() => {
-      const html = this.html();
+      const markdown = this.markdown();
       const ed = this.editor();
-      // Only replace the text when it differs from what the editor already holds (a restored revision, a reload).
-      if (ed && html !== (ed.isEmpty ? '' : ed.getHTML())) {
-        ed.commands.setContent(html, { emitUpdate: false });
+      // Only replace the text when it differs from what the editor already holds (a restored revision, a reload). While the
+      // Markdown is being typed, the visual editor catches up when it is switched back to.
+      if (ed && this.mode() === 'visual') {
+        this.load(ed, markdown);
       }
     });
 
@@ -298,8 +359,33 @@ export class RichText implements OnDestroy {
     this.bar.set(null);
   }
 
-  /** Puts a picture from the library at the cursor. */
+  /** Switches between editing visually and editing the Markdown; the text is the same either way. */
+  protected setMode(mode: EditMode): void {
+    const ed = this.editor();
+    if (mode === 'visual' && ed) {
+      this.load(ed, this.markdown());
+    }
+    this.mode.set(mode);
+  }
+
+  private load(ed: Editor, markdown: string): void {
+    if (markdown !== (ed.isEmpty ? '' : ed.getMarkdown())) {
+      ed.commands.setContent(markdown, { emitUpdate: false, contentType: 'markdown' });
+    }
+  }
+
+  /** Puts a picture from the library at the cursor (as Markdown, when the Markdown is being edited). */
   insertImage(src: string, alt: string): void {
+    const area = this.source()?.nativeElement;
+    if (this.mode() === 'markdown' && area) {
+      const text = `![${alt.replace(/[[\]]/g, '')}](${src})`;
+      const at = area.selectionStart ?? area.value.length;
+      const before = area.value.slice(0, at);
+      const after = area.value.slice(at);
+      const gap = (s: string) => (s === '' || s.endsWith('\n\n') ? '' : s.endsWith('\n') ? '\n' : '\n\n');
+      this.changed.emit(`${before}${gap(before)}${text}\n\n${after.replace(/^\n+/, '')}`);
+      return;
+    }
     this.editor()?.chain().focus().setImage({ src, alt }).run();
   }
 

@@ -19,6 +19,7 @@ const edit = (over: Partial<ArticleEdit> = {}): ArticleEdit => ({
   slug: 'long-tan',
   title: 'Long Tan',
   excerpt: null,
+  bodyMarkdown: 'Body.',
   bodyHtml: '<p>Body.</p>',
   status: 'Draft',
   authorId: 1,
@@ -91,7 +92,7 @@ describe('StudioApi', () => {
 
   it('creates with the kind in the query and updates in place', () => {
     const { api, ctl } = setup();
-    const input = { title: 'T', slug: null, excerpt: null, bodyHtml: '', categoryId: null, featuredMediaId: null, featureOnHomepage: false, parentId: null, sortOrder: 0, seoTitle: null, seoDescription: null, tags: [], version: 0 };
+    const input = { title: 'T', slug: null, excerpt: null, bodyMarkdown: '', categoryId: null, featuredMediaId: null, featureOnHomepage: false, parentId: null, sortOrder: 0, seoTitle: null, seoDescription: null, tags: [], version: 0 };
 
     void api.create('Page', input);
     expect(ctl.expectOne((r) => r.url === '/api/studio/articles' && r.method === 'POST').request.params.get('kind')).toBe('Page');
@@ -183,7 +184,7 @@ describe('StudioArticles', () => {
 
 @Component({ selector: 'app-rich-text', template: '' })
 class StubRichText {
-  readonly html = input.required<string>();
+  readonly markdown = input.required<string>();
   readonly disabled = input(false);
   readonly changed = output<string>();
   readonly pickImage = output<void>();
@@ -213,8 +214,8 @@ describe('ArticleEditor', () => {
       transition: vi.fn((_id: number, status: ArticleEdit['status'], version: number) => Promise.resolve(edit({ status, version: version + 1, transitions: ['Draft'] }))),
       remove: vi.fn(() => Promise.resolve()),
       revisions: vi.fn(() => Promise.resolve([{ revisionNo: 2, title: 'Newer', authorName: 'Ann', createdUtc: '2026-03-02T00:00:00Z' }, { revisionNo: 1, title: 'Older', authorName: 'Ann', createdUtc: '2026-03-01T00:00:00Z' }])),
-      revision: vi.fn((_id: number, no: number) => Promise.resolve({ revisionNo: no, title: 'Older', bodyHtml: '<p>Old body.</p>', authorName: 'Ann', createdUtc: '2026-03-01T00:00:00Z' })),
-      restore: vi.fn((_id: number, _no: number, version: number) => Promise.resolve(edit({ title: 'Older', bodyHtml: '<p>Old body.</p>', version: version + 1 }))),
+      revision: vi.fn((_id: number, no: number) => Promise.resolve({ revisionNo: no, title: 'Older', bodyMarkdown: 'Old body.', bodyHtml: '<p>Old body.</p>', authorName: 'Ann', createdUtc: '2026-03-01T00:00:00Z' })),
+      restore: vi.fn((_id: number, _no: number, version: number) => Promise.resolve(edit({ title: 'Older', bodyMarkdown: 'Old body.', bodyHtml: '<p>Old body.</p>', version: version + 1 }))),
       categories: vi.fn(() => Promise.resolve([{ id: 1, slug: 'battles', name: 'Battles' }])),
       createCategory: vi.fn(() => Promise.resolve({ id: 2, slug: 'new', name: 'New' })),
       list: vi.fn(() => Promise.resolve({ items: [], total: 0, page: 1, pageSize: 100 })),

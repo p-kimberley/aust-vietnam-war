@@ -1,3 +1,4 @@
+using Avw.Core.Content;
 using Avw.Api.Cms;
 using Avw.Data;
 using Avw.Data.Entities;
@@ -31,7 +32,7 @@ public class ArticleServiceTests
             new AppUser { Id = 4, Subject = "f", DisplayName = "Flo Editor" });
         db.SaveChanges();
         var clock = new Clock(T0);
-        return new Fixture(db, new ArticleService(db, new ContentSanitizer(), clock), clock);
+        return new Fixture(db, new ArticleService(db, new ArticleMarkdown(new ContentSanitizer()), clock), clock);
     }
 
     private static ArticleInput Input(string title = "The Battle of Long Tan", string body = "<p>Text.</p>", int version = 0, string? slug = null,
@@ -415,7 +416,7 @@ public class ArticleServiceTests
     {
         var f = Make();
         var a = await Create(f, Editor);
-        f.Db.ArticleRevisions.Add(new ArticleRevision { ArticleId = a.Id, RevisionNo = 2, Title = "Old", BodyHtml = "<p>Hi</p><script>x</script>", CreatedById = 3, CreatedUtc = T0 });
+        f.Db.ArticleRevisions.Add(new ArticleRevision { ArticleId = a.Id, RevisionNo = 2, Title = "Old", BodyMarkdown = "<p>Hi</p><script>x</script>", CreatedById = 3, CreatedUtc = T0 });
         await f.Db.SaveChangesAsync();
 
         var restored = (await f.Svc.RestoreAsync(a.Id, 2, new(a.Version), Editor, default)).Value!;

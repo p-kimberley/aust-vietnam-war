@@ -9,7 +9,8 @@ using MySql.Data.MySqlClient;
 
 // Schema and data migration job. Runs as a Helm pre-install/pre-upgrade hook and by hand.
 //
-//   Avw.Migrator [--dry-run]                       apply pending EF migrations (or list them with --dry-run)
+//   Avw.Migrator [--dry-run]                       apply pending EF migrations (or list them with --dry-run), then convert any article
+//                                                  bodies still in HTML to Markdown (ArticleBodyConverter; safe to repeat)
 //   Avw.Migrator import-poi [--dry-run]            import points of interest from the legacy database
 //   Avw.Migrator import-community [--dry-run] [--media-root <folder>] [--skip-media]
 //                                                  import notes, comments, tributes, casualty reports, links and pictures.
@@ -182,16 +183,18 @@ async Task<int> ApplyMigrations()
     if (pending.Count == 0)
     {
         Console.WriteLine("Database is up to date.");
-        return 0;
     }
-
-    if (dryRun)
+    else if (dryRun)
     {
         Console.WriteLine($"Dry run: {pending.Count} migration(s) would be applied.");
         return 0;
     }
+    else
+    {
+        await db.Database.MigrateAsync();
+        Console.WriteLine($"Applied {pending.Count} migration(s).");
+    }
 
-    await db.Database.MigrateAsync();
-    Console.WriteLine($"Applied {pending.Count} migration(s).");
+    Console.WriteLine(await ArticleBodyConverter.ConvertAsync(db, dryRun));
     return 0;
 }

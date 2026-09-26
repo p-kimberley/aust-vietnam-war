@@ -1,3 +1,4 @@
+using Avw.Core.Content;
 using System.Security.Claims;
 using Avw.Api.Auth;
 using Avw.Data.Entities;
@@ -13,6 +14,7 @@ public static class CmsEndpoints
     public static IServiceCollection AddAvwCms(this IServiceCollection services)
     {
         services.AddSingleton<ContentSanitizer>();
+        services.AddSingleton<ArticleMarkdown>();
         services.AddScoped<ArticleService>();
         services.AddScoped<PublicContent>();
         return services;

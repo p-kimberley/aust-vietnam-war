@@ -6,16 +6,21 @@
   <component name="ChangeListManager">
     <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/assumptions-and-open-questions.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/assumptions-and-open-questions.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/public/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/web/public/site.webmanifest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/scripts/icon/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/web/scripts/icon/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/scripts/icon/build-svg.py" beforeDir="false" afterPath="$PROJECT_DIR$/web/scripts/icon/build-svg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/app.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/icon.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/icon.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/layout/site-footer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/layout/site-footer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/layout/site-header.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/layout/site-header.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/Directory.Packages.props" beforeDir="false" afterPath="$PROJECT_DIR$/server/Directory.Packages.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Avw.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Avw.Api.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/ArticleService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Cms/ArticleService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsModels.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsModels.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/ContentSanitizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Core/Content/ContentSanitizer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Core/Avw.Core.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Core/Avw.Core.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Data/AvwDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Data/AvwDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Data/Entities/Article.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Data/Entities/Article.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Data/Migrations/AvwDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Data/Migrations/AvwDbContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Migrator/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Migrator/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ArticleServiceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ArticleServiceTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ContentSanitizerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ContentSanitizerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,23 +74,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.000001080402265" />
-      <entry key="MS500" value="1.0643781132570824" />
-      <entry key="S2" value="1.6396419533360205" />
-      <entry key="S5" value="2.3303433846029877" />
-      <entry key="S10" value="3.0040236186775138" />
-      <entry key="S30" value="4.635296445997806" />
-      <entry key="S60" value="5.810239610612905" />
-      <entry key="M2" value="6.726112338640863" />
-      <entry key="M5" value="7.438002143784712" />
-      <entry key="M10" value="7.709310148983747" />
-      <entry key="M15" value="7.803976095511711" />
-      <entry key="M30" value="7.900852726538326" />
-      <entry key="H1" value="7.950138717466453" />
-      <entry key="H2" value="7.974998200017415" />
-      <entry key="H4" value="7.994584458067607" />
-      <entry key="D1" value="21.798946823553447" />
-      <entry key="W1" value="65.90579297621565" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0000000000268685" />
+      <entry key="S30" value="1.0006228245752293" />
+      <entry key="S60" value="1.0432242170378074" />
+      <entry key="M2" value="1.3600974928229048" />
+      <entry key="M5" value="2.2848126874518795" />
+      <entry key="M10" value="2.963731051761269" />
+      <entry key="M15" value="3.2732209716855314" />
+      <entry key="M30" value="3.9132305874651405" />
+      <entry key="H1" value="5.366611965008563" />
+      <entry key="H2" value="7.441306571804645" />
+      <entry key="H4" value="9.277949318209332" />
+      <entry key="D1" value="24.366164889069395" />
+      <entry key="W1" value="69.27156452564101" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -96,34 +101,34 @@
       <entry key="S30" value="0.0" />
       <entry key="S60" value="0.0" />
       <entry key="M2" value="0.0" />
-      <entry key="M5" value="7.87419418510233E-256" />
-      <entry key="M10" value="2.8060994610138665E-128" />
-      <entry key="M15" value="9.234258763416828E-86" />
-      <entry key="M30" value="3.038792319889074E-43" />
-      <entry key="H1" value="5.5125242129981375E-22" />
-      <entry key="H2" value="2.347876532741474E-11" />
-      <entry key="H4" value="4.8454891731810525E-6" />
-      <entry key="D1" value="0.13008371700053242" />
-      <entry key="W1" value="0.7472405298258957" />
+      <entry key="M5" value="2.79770474658633E-264" />
+      <entry key="M10" value="1.6726340743229888E-132" />
+      <entry key="M15" value="1.4090745140723652E-88" />
+      <entry key="M30" value="1.187044444859738E-44" />
+      <entry key="H1" value="1.0895156928010436E-22" />
+      <entry key="H2" value="1.0437986840387571E-11" />
+      <entry key="H4" value="3.230787340631939E-6" />
+      <entry key="D1" value="0.12158632411260777" />
+      <entry key="W1" value="0.7400639459019756" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9138324105370463" />
-      <entry key="MS500" value="1.0450190581355232" />
-      <entry key="S2" value="1.631479737249178" />
-      <entry key="S5" value="2.325532976859351" />
-      <entry key="S10" value="3.000765612827458" />
-      <entry key="S30" value="4.6328599971317574" />
-      <entry key="S60" value="5.808299522844449" />
-      <entry key="M2" value="6.724822067373687" />
-      <entry key="M5" value="7.437379869036029" />
-      <entry key="M10" value="7.708978162312142" />
-      <entry key="M15" value="7.803749872987498" />
-      <entry key="M30" value="7.900737096681002" />
-      <entry key="H1" value="7.950080259521293" />
-      <entry key="H2" value="7.974968808613597" />
-      <entry key="H4" value="7.994574563901172" />
-      <entry key="D1" value="21.929020153048675" />
-      <entry key="W1" value="66.6530267537376" />
+      <entry key="MS100" value="0.9794202975869268" />
+      <entry key="MS500" value="0.9958497530944581" />
+      <entry key="S2" value="0.998960819551523" />
+      <entry key="S5" value="0.9995841981612189" />
+      <entry key="S10" value="0.9997920774915785" />
+      <entry key="S30" value="1.000553440242974" />
+      <entry key="S60" value="1.0431870624314938" />
+      <entry key="M2" value="1.3600697619462443" />
+      <entry key="M5" value="2.2847909119397727" />
+      <entry key="M10" value="2.9637162254360474" />
+      <entry key="M15" value="3.2732096078382535" />
+      <entry key="M30" value="3.913219900374551" />
+      <entry key="H1" value="5.366597142457264" />
+      <entry key="H2" value="7.441291822487427" />
+      <entry key="H4" value="9.277941867365135" />
+      <entry key="D1" value="24.48774136016256" />
+      <entry key="W1" value="70.0116217634668" />
     </decayedShown>
   </component>
   <component name="PackageJsonUpdateNotifier">
@@ -150,7 +155,7 @@
     "ignore.virus.scanning.warn.message": "true",
     "javascript.preferred.runtime.type.id": "node",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/pkimb/WebstormProjects/aust-vietnam-war/.ai/site-home-images",
+    "last_opened_file_path": "C:/Users/pkimb/WebstormProjects/aust-vietnam-war/.ai",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.jshint": "true",
     "node.js.detected.package.tslint": "true",
@@ -166,8 +171,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.ai\site-home-images" />
       <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.ai" />
+      <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.ai\site-home-images" />
       <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.ai\map-styles" />
       <recent name="C:\Users\pkimb\WebstormProjects\aust-vietnam-war\.samples\screenshots" />
     </key>
@@ -196,7 +201,7 @@
       <workItem from="1789826907280" duration="57186000" />
       <workItem from="1790238719146" duration="12841000" />
       <workItem from="1790331544884" duration="11149000" />
-      <workItem from="1790370537759" duration="8964000" />
+      <workItem from="1790370537759" duration="12193000" />
     </task>
     <task id="LOCAL-00001" summary="Add api as submodule">
       <option name="closed" value="true" />

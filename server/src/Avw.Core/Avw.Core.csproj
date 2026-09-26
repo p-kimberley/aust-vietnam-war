@@ -7,7 +7,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlSanitizer" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+    <PackageReference Include="Markdig" />
+    <PackageReference Include="ReverseMarkdown" />
     <PackageReference Include="Microsoft.Extensions.Options" />
   </ItemGroup>
 

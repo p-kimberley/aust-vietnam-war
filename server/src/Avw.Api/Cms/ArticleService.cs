@@ -1,3 +1,4 @@
+using Avw.Core.Content;
 using System.Net;
 using System.Text.RegularExpressions;
 using Avw.Data;
@@ -14,7 +15,7 @@ namespace Avw.Api.Cms;
 /// An author creates and edits their own drafts and submits them for review. An editor or admin does everything else:
 /// edits any item, publishes, schedules, archives, manages pages and the homepage feature flag.
 /// </remarks>
-public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer sanitizer, TimeProvider clock)
+public sealed partial class ArticleService(AvwDbContext db, ArticleMarkdown markdown, TimeProvider clock)
 {
     public const int MaxBodyChars = 1_000_000;
     public const int MaxTags = 20;
@@ -165,14 +166,14 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
         }
 
         var oldTitle = article.Title;
-        var oldBody = article.BodyHtml;
+        var oldBody = article.BodyMarkdown;
         var invalid = await ApplyAsync(article, input, actor, isNew: false, ct);
         if (invalid is not null)
         {
             return CmsResult<ArticleEdit>.Invalid(invalid.Value.Field, invalid.Value.Message);
         }
 
-        if (article.Title != oldTitle || article.BodyHtml != oldBody)
+        if (article.Title != oldTitle || article.BodyMarkdown != oldBody)
         {
             await RecordRevisionAsync(article, actor, ct);
         }
@@ -283,11 +284,12 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
 
         var revision = await db.ArticleRevisions.AsNoTracking()
             .Where(r => r.ArticleId == id && r.RevisionNo == revisionNo)
-            .Select(r => new RevisionDetail(r.RevisionNo, r.Title, r.BodyHtml, r.CreatedBy.DisplayName, r.CreatedUtc))
+            .Select(r => new { r.RevisionNo, r.Title, r.BodyMarkdown, Author = r.CreatedBy.DisplayName, r.CreatedUtc })
             .FirstOrDefaultAsync(ct);
         return revision is null
             ? CmsResult<RevisionDetail>.Fail(CmsError.NotFound, "There is no such revision.")
-            : CmsResult<RevisionDetail>.Success(revision);
+            : CmsResult<RevisionDetail>.Success(new RevisionDetail(
+                revision.RevisionNo, revision.Title, revision.BodyMarkdown, markdown.ToHtml(revision.BodyMarkdown), revision.Author, revision.CreatedUtc));
     }
 
     /// <summary>Copies an old revision back as the current text. That is itself recorded as a new revision, so nothing is lost.</summary>
@@ -317,7 +319,8 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
         }
 
         article.Title = revision.Title;
-        article.BodyHtml = sanitizer.Sanitize(revision.BodyHtml);          // sanitise again in case the rules have tightened since
+        article.BodyMarkdown = revision.BodyMarkdown;
+        article.BodyHtml = markdown.ToHtml(revision.BodyMarkdown);          // rendered again, in case the rules have tightened since
         AddRevision(article, actor, await NextRevisionNo(id, ct));
         Touch(article);
         return await SaveAsync(article, actor, ct);
@@ -386,7 +389,7 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
         if (last is not null && last.CreatedById == actor.Id && now - last.CreatedUtc < RevisionWindow)
         {
             last.Title = article.Title;
-            last.BodyHtml = article.BodyHtml;
+            last.BodyMarkdown = article.BodyMarkdown;
             return;
         }
 
@@ -401,7 +404,7 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
         {
             RevisionNo = no,
             Title = article.Title,
-            BodyHtml = article.BodyHtml,
+            BodyMarkdown = article.BodyMarkdown,
             CreatedById = actor.Id,
             CreatedUtc = clock.GetUtcNow().UtcDateTime,
         });
@@ -434,9 +437,9 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
             return ("title", "Give it a title of up to 300 characters.");
         }
 
-        if ((input.BodyHtml?.Length ?? 0) > MaxBodyChars)
+        if ((input.BodyMarkdown?.Length ?? 0) > MaxBodyChars)
         {
-            return ("bodyHtml", "The text is too long.");
+            return ("bodyMarkdown", "The text is too long.");
         }
 
         if ((input.Excerpt?.Length ?? 0) > 1000 || (input.SeoTitle?.Length ?? 0) > 200 || (input.SeoDescription?.Length ?? 0) > 400)
@@ -497,7 +500,9 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
             article.Slug = Slugs.Unique(baseSlug, taken.Contains);
         }
 
-        var body = sanitizer.Sanitize(input.BodyHtml);
+        // The Markdown is kept as written; readers get it rendered and sanitised.
+        article.BodyMarkdown = ArticleMarkdown.Normalise(input.BodyMarkdown);
+        var body = markdown.ToHtml(article.BodyMarkdown);
         article.Title = title;
         article.BodyHtml = body;
         article.Excerpt = string.IsNullOrWhiteSpace(input.Excerpt) ? PlainText(body, ExcerptChars) : input.Excerpt.Trim();
@@ -575,7 +580,7 @@ public sealed partial class ArticleService(AvwDbContext db, ContentSanitizer san
     }
 
     private static ArticleEdit ToEdit(Article a, Actor actor) => new(
-        a.Id, a.Kind, a.Slug, a.Title, a.Excerpt, a.BodyHtml, a.Status, a.AuthorId, a.Author?.DisplayName ?? "",
+        a.Id, a.Kind, a.Slug, a.Title, a.Excerpt, a.BodyMarkdown, a.BodyHtml, a.Status, a.AuthorId, a.Author?.DisplayName ?? "",
         a.CategoryId, a.FeaturedMediaId, a.FeaturedMedia is null ? null : PublicContent.MediaUrl(a.FeaturedMedia.Sha256), a.FeatureOnHomepage, a.ParentId, a.SortOrder, a.SeoTitle, a.SeoDescription,
         a.Tags.Select(t => t.Tag.Name).OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToArray(),
         a.PublishedUtc, a.ScheduledUtc, a.CreatedUtc, a.UpdatedUtc, a.Version, CanEdit(a, actor), Transitions(a, actor));

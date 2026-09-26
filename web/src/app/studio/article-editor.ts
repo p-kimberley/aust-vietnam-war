@@ -90,7 +90,7 @@ export function defaultScheduleValue(now = new Date()): string {
               <app-cms-body [html]="item()?.bodyHtml ?? ''" />
             </article>
           } @else {
-            <app-rich-text #rt [html]="body()" [disabled]="!canEdit()" (changed)="set(body, $event)" (pickImage)="picker.set('body')" />
+            <app-rich-text #rt [markdown]="body()" [disabled]="!canEdit()" (changed)="set(body, $event)" (pickImage)="picker.set('body')" />
           }
         </main>
 
@@ -546,7 +546,7 @@ export class ArticleEditor {
     this.title.set(it?.title ?? '');
     this.slug.set(it?.slug ?? '');
     this.excerpt.set(it?.excerpt ?? '');
-    this.body.set(it?.bodyHtml ?? '');
+    this.body.set(it?.bodyMarkdown ?? '');
     this.categoryId.set(it?.categoryId ?? null);
     this.featuredId.set(it?.featuredMediaId ?? null);
     this.featuredUrl.set(it?.featuredMediaUrl ?? null);
@@ -621,7 +621,7 @@ export class ArticleEditor {
       title: this.title().trim(),
       slug: blank(this.slug()),
       excerpt: blank(this.excerpt()),
-      bodyHtml: this.body(),
+      bodyMarkdown: this.body(),
       categoryId: this.categoryId(),
       featuredMediaId: this.featuredId(),
       featureOnHomepage: this.feature(),
@@ -664,7 +664,7 @@ export class ArticleEditor {
       this.featuredUrl.set(saved.featuredMediaUrl);
       this.message.set('');
       // If more was typed while this was in flight, that is still unsaved.
-      this.saveState.set(this.body() === sent.bodyHtml && this.title().trim() === sent.title ? 'saved' : 'unsaved');
+      this.saveState.set(this.body() === sent.bodyMarkdown && this.title().trim() === sent.title ? 'saved' : 'unsaved');
       if (!existing) {
         this.loaded = String(saved.id);
         void this.router.navigate(['/studio/articles', saved.id], { replaceUrl: true });
@@ -777,7 +777,7 @@ export class ArticleEditor {
       const restored = await this.api.restore(it.id, no, it.version);
       this.item.set(restored);
       this.title.set(restored.title);
-      this.body.set(restored.bodyHtml);
+      this.body.set(restored.bodyMarkdown);
       this.saveState.set('saved');
       this.message.set(`Version ${no} restored as the newest version.`);
       this.revision.set(null);

@@ -53,4 +53,7 @@ export const VideoEmbed = Node.create({
   renderHTML({ HTMLAttributes }) {
     return ['iframe', mergeAttributes(HTMLAttributes, { allowfullscreen: 'true', loading: 'lazy' })];
   },
+
+  // Markdown has no form for a video, so it is kept as a line of HTML (read back in by parseHTML above).
+  renderMarkdown: (node) => `<iframe src="${node.attrs?.['src'] ?? ''}"></iframe>`,
 });

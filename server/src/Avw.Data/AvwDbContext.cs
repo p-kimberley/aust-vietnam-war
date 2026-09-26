@@ -226,6 +226,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
             e.Property(x => x.Slug).HasMaxLength(200);
             e.Property(x => x.Title).HasMaxLength(300);
             e.Property(x => x.Excerpt).HasMaxLength(1000);
+            e.Property(x => x.BodyMarkdown).HasColumnType("longtext");
             e.Property(x => x.BodyHtml).HasColumnType("longtext");
             e.Property(x => x.SeoTitle).HasMaxLength(200);
             e.Property(x => x.SeoDescription).HasMaxLength(400);
@@ -255,7 +256,7 @@ public class AvwDbContext(DbContextOptions<AvwDbContext> options) : DbContext(op
         {
             e.ToTable("article_revisions");
             e.Property(x => x.Title).HasMaxLength(300);
-            e.Property(x => x.BodyHtml).HasColumnType("longtext");
+            e.Property(x => x.BodyMarkdown).HasColumnType("longtext");
             e.HasIndex(x => new { x.ArticleId, x.RevisionNo }).IsUnique();
             e.HasOne(x => x.Article).WithMany(a => a.Revisions).HasForeignKey(x => x.ArticleId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne(x => x.CreatedBy).WithMany().HasForeignKey(x => x.CreatedById).OnDelete(DeleteBehavior.Restrict);
