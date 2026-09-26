@@ -1,5 +1,5 @@
 <div class="viewer" (click)="backdropClicked()">
-  <div #box class="box" role="dialog" aria-modal="true" aria-labelledby="viewer-title" (click)="$event.stopPropagation()" (keydown)="onKeydown($event)">
+  <div #box class="box" role="dialog" aria-modal="true" aria-labelledby="viewer-title" [attr.aria-describedby]="shown()?.caption ? 'viewer-description' : null" (click)="$event.stopPropagation()" (keydown)="onKeydown($event)">
     <div #stage class="stage" [class.is-full]="fullscreen()" [class.stage--swipe]="siblings().length > 1">
       <!-- The previous, open and next pictures side by side; the track slides to change picture, and follows a finger or the mouse. -->
       <div class="stage__track" [class.is-sliding]="sliding()" [style.transform]="trackTransform()" (pointerdown)="onPointerDown($event)">
@@ -42,7 +42,7 @@
 
     <aside class="side">
       <header class="side__head">
-        <h2 id="viewer-title">{{ shown()?.caption || 'Photo' }}</h2>
+        <h2 id="viewer-title">Photo</h2>
         <button type="button" #closeButton class="side__close" aria-label="Close the photo" (click)="close()">×</button>
       </header>
 
@@ -55,6 +55,15 @@
         } @else if (shown(); as p) {
           @if (p.status !== 'Approved') {
             <p class="side__badge">{{ p.status === 'Pending' ? 'Waiting for approval' : 'Not accepted' }}</p>
+          }
+          <!-- The description as it was written (not in capitals), its first five lines until the reader asks for the rest. -->
+          @if (p.caption) {
+            <p #description id="viewer-description" class="description" [class.is-clamped]="!expanded()">{{ p.caption }}</p>
+            @if (clamped() || expanded()) {
+              <button type="button" class="more" aria-controls="viewer-description" [attr.aria-expanded]="expanded()" (click)="expanded.set(!expanded())">
+                {{ expanded() ? 'Read less' : 'Read more' }}
+              </button>
+            }
           }
           <dl class="meta">
             @if (p.credit) {

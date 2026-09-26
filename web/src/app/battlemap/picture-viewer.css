@@ -222,6 +222,31 @@ h2 {
   padding: 0.6rem 0.75rem 1rem;
 }
 
+.description {
+  margin: 0 0 0.75rem;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* The first five lines. */
+.description.is-clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
+}
+
+.more {
+  margin: -0.5rem 0 0.75rem;
+  padding: 0;
+  font: inherit;
+  color: var(--smoke-yellow);
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
 .meta {
   display: grid;
   grid-template-columns: auto 1fr;

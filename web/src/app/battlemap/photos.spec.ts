@@ -198,13 +198,14 @@ describe('PictureViewer', () => {
   };
   const button = (el: HTMLElement, label: string) => [...el.querySelectorAll('button')].find((b) => text(b) === label || b.getAttribute('aria-label') === label)!;
 
-  it('is a modal dialog, named by the caption, with the full picture beside what is known of it', async () => {
+  it('is a modal dialog, described by the caption, with the full picture beside what is known of it', async () => {
     const { fixture, el } = viewer();
     await settle(fixture);
 
     const dialog = el.querySelector('[role=dialog]')!;
     expect(dialog.getAttribute('aria-modal')).toBe('true');
-    expect(text(el.querySelector('#' + dialog.getAttribute('aria-labelledby')))).toBe('A patrol at Nui Dat');
+    expect(text(el.querySelector('#' + dialog.getAttribute('aria-labelledby')))).toBe('Photo');
+    expect(text(el.querySelector('#' + dialog.getAttribute('aria-describedby')))).toBe('A patrol at Nui Dat');   // as written, not in capitals
     const img = el.querySelector('.stage img')!;
     expect(img.getAttribute('src')).toBe('/media/aa/full.jpg');
     expect(img.getAttribute('alt')).toBe('A patrol at Nui Dat');
@@ -213,6 +214,32 @@ describe('PictureViewer', () => {
     expect(field(el, 'Taken')).toBe('18 Aug 1966');
     expect(field(el, 'Likes')).toBe('3');
     expect(el.querySelector('a[target=_blank]')).toBeNull();                          // nothing opens another tab
+  });
+
+  it('shows the first lines of a long description, with Read more for the rest, and no button for a short one', async () => {
+    const { fixture, el } = viewer();
+    await settle(fixture);
+    expect(el.querySelector('button.more')).toBeNull();                              // it all fits
+
+    // As a browser lays out a description longer than five lines.
+    const height = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(400);
+    const shown = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(120);
+    try {
+      fixture.componentRef.setInput('pictureId', 2);
+      await settle(fixture);
+      const description = el.querySelector('.description')!;
+      const more = el.querySelector<HTMLButtonElement>('button.more')!;
+      expect(description.classList).toContain('is-clamped');
+      expect([text(more), more.getAttribute('aria-expanded')]).toEqual(['Read more', 'false']);
+
+      more.click();
+      await settle(fixture);
+      expect(description.classList).not.toContain('is-clamped');
+      expect([text(more), more.getAttribute('aria-expanded')]).toEqual(['Read less', 'true']);
+    } finally {
+      height.mockRestore();
+      shown.mockRestore();
+    }
   });
 
   it('shows what was recorded when it was uploaded: who added it, when, where, and the size and kind of file', async () => {
@@ -471,7 +498,7 @@ describe('PictureViewer: stepping through the photos of a place or an incident',
   }
   const arrow = (el: HTMLElement, which: 'Previous' | 'Next') => el.querySelector<HTMLButtonElement>(`[aria-label="${which} photo"]`)!;
   const count = (el: HTMLElement) => text(el.querySelector('.stage__count'));
-  const title = (el: HTMLElement) => text(el.querySelector('h2'));
+  const title = (el: HTMLElement) => text(el.querySelector('.description'));
 
   it("steps through the incident's photos, then the others placed at the same spot, each once", async () => {
     const { fixture, el, community } = stepping(5);

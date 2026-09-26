@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Injector, OnDestroy, afterNextRender, computed, effect, untracked, inject, input, output, resource, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Injector, OnDestroy, afterNextRender, afterRenderEffect, computed, effect, untracked, inject, input, output, resource, signal, viewChild } from '@angular/core';
 import { AuthService } from '../core/auth.service';
 import { problemMessage } from '../studio/studio-api';
 import { CommunityService, IncidentMediaView } from './community/community';
@@ -127,8 +127,23 @@ export class PictureViewer implements OnDestroy {
   protected readonly fullscreen = signal(false);
   protected readonly formatBytes = formatBytes;
   protected readonly formatType = formatType;
+  /** The whole description is showing, not only its first lines. */
+  protected readonly expanded = signal(false);
+  /** The description is longer than its first lines, so there is more to read. */
+  protected readonly clamped = signal(false);
+  private readonly description = viewChild<ElementRef<HTMLElement>>('description');
 
   constructor() {
+    // Each picture's description starts at its first lines; whether there is more is seen once it is on the page.
+    effect(() => {
+      this.pictureId();
+      untracked(() => this.expanded.set(false));
+    });
+    afterRenderEffect(() => {
+      const el = this.description()?.nativeElement;
+      this.shown();
+      if (el && !this.expanded()) this.clamped.set(el.scrollHeight > el.clientHeight + 1);
+    });
     // Focus starts on the close button, so the keyboard lands in the dialog.
     afterNextRender(() => this.closeButton()?.nativeElement.focus(), { injector: this.injector });
     // Stepping to another picture keeps full screen, and where focus is.
