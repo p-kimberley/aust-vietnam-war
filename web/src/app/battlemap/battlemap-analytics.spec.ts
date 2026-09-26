@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
 import { REFRESH_DELAY_MS } from './analytics/analytics-panel';
+import { ZOOM_SETTLE_MS } from './analytics/timeline';
 import { StubEChart } from './analytics/echart-stub';
 import { dayMs } from './analytics/timeline';
 import { contacts, render, settle } from './battlemap-testing';
@@ -38,6 +39,7 @@ describe('Battle Map timeline', () => {
     expect(shownIds(r)).toEqual([1, 2, 3, 4]);
 
     timelineChart(r).zoomed.emit({ start: dayMs('1966-03-01'), end: dayMs('1966-04-01') });
+    await wait(ZOOM_SETTLE_MS + 50);
     await settle(r.fixture);
 
     expect(shownIds(r)).toEqual([1, 2]);
@@ -115,6 +117,7 @@ describe('Battle Map charts', () => {
     expect(r.analytics.draw).toHaveBeenLastCalledWith('battle-damage-date', null);
 
     timelineChart(r).zoomed.emit({ start: dayMs('1966-03-01'), end: dayMs('1966-04-01') });
+    await wait(ZOOM_SETTLE_MS + 50);
     await settle(r.fixture);
     await wait(REFRESH_DELAY_MS + 100);
     await settle(r.fixture);
@@ -256,6 +259,7 @@ describe('Battle Map unit tracks', () => {
     const before = stops(r);
 
     timelineChart(r).zoomed.emit({ start: dayMs('1966-03-01'), end: dayMs('1966-03-04') });
+    await wait(ZOOM_SETTLE_MS + 50);
     await settle(r.fixture);
 
     expect(before).toBeGreaterThan(stops(r));

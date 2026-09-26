@@ -27,6 +27,12 @@ const DAY = 24 * HOUR;
 /** The margins round the bars inside the chart's box, in pixels. A drag across the bars is measured against them. */
 export const CHART_GRID = { left: 8, right: 12, top: 6, bottom: 62 } as const;
 
+/** How long the slider's handles must be still before the dates they show are applied to the map. */
+export const ZOOM_SETTLE_MS = 300;
+
+/** Nearer an end of the timeline than this (a share of it), a handle's date sits inside the window rather than outside it. */
+const LABEL_INSIDE_WITHIN = 0.12;
+
 /** How often the play button moves the window on. */
 export const PLAY_INTERVAL_MS = 400;
 /** The speeds play can go at, chosen from the menu beside Play: how many days the window moves on at each step. */
@@ -248,7 +254,11 @@ export function timelineOption(buckets: readonly MonthBucket[], range: DateRange
         type: 'slider',
         height: 36,
         bottom: 4,
-        realtime: false,           // report when the handle is let go, not on every pixel of a drag
+        // Level with the plot, so the dates drawn beside the handles (the timeline's own, not the chart's) sit on them.
+        left: CHART_GRID.left,
+        right: CHART_GRID.right,
+        realtime: true,            // report as the handles move; the timeline applies the dates once they are still
+        showDetail: false,
         filterMode: 'none',
         startValue: shown?.start,
         endValue: shown?.end,
@@ -556,7 +566,7 @@ let nextTimelineId = 0;
             }
           </div>
           <span class="tl__range data" aria-live="polite">{{ label() }}</span>
-          @if (from() || to()) {
+          @if (range().from || range().to) {
             <button type="button" class="tl__reset" (click)="reset()"><app-icon name="zoom-out" />Reset zoom</button>
           } @else {
             <span class="tl__hint">Drag across the bars to zoom</span>
@@ -570,6 +580,10 @@ let nextTimelineId = 0;
           (pointercancel)="dragEnd($event)"
         >
           <app-echart [option]="option()" (zoomed)="zoomed($event)" />
+          <!-- The dates at the slider's handles, following them as they move. -->
+          @for (h of handles(); track h.side) {
+            <span class="tl__handle data" [class.tl__handle--start]="h.side === 'start'" [class.tl__handle--end]="h.side === 'end'" [class.is-inside]="h.inside" [style.left]="h.left" aria-hidden="true">{{ h.text }}</span>
+          }
           @if (dragBox(); as box) {
             <div class="tl__drag" [style.left.px]="box.left" [style.width.px]="box.width"></div>
           }
@@ -898,6 +912,28 @@ let nextTimelineId = 0;
       min-width: 0;
       touch-action: none;
     }
+    /* A date at one of the slider's handles: outside the window, or inside it near an end of the timeline. */
+    .tl__handle {
+      position: absolute;
+      bottom: 4px;
+      height: 36px;
+      line-height: 36px;
+      padding-inline: 6px;
+      font-size: 0.75rem;
+      color: var(--paper);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .tl__handle--start {
+      transform: translateX(-100%);
+    }
+    .tl__handle--start.is-inside,
+    .tl__handle--end {
+      transform: none;
+    }
+    .tl__handle--end.is-inside {
+      transform: translateX(-100%);
+    }
     /* The dates being picked by a drag across the bars. */
     .tl__drag {
       position: absolute;
@@ -1040,10 +1076,36 @@ export class Timeline implements OnDestroy {
     return operation ? this.rows().findIndex((r) => r.name === operation) : -1;
   });
   protected readonly activeRow = computed(() => Math.min(this.active(), Math.max(this.rows().length - 1, 0)));
+  /** Where the slider's handles are while they are being moved, before the dates they show are applied. */
+  private readonly moving = signal<ZoomRange | null>(null);
+  private settleTimer?: ReturnType<typeof setTimeout>;
+  /** The dates shown: those the handles are on while they move, otherwise the date filter's. */
+  protected readonly range = computed<DateRange>(() => {
+    const moving = this.moving();
+    const axis = this.axis();
+    return moving && axis ? zoomToRange(moving, axis.min, axis.max) : { from: this.from(), to: this.to() };
+  });
   protected readonly label = computed(() => {
-    const from = this.from();
-    const to = this.to();
+    const { from, to } = this.range();
     return from || to ? `${from ?? 'the start'} to ${to ?? 'the end'}` : 'The whole war';
+  });
+  /** The dates beside the slider's handles, where a side is set (an open side sits at the end of the timeline, and needs none). */
+  protected readonly handles = computed(() => {
+    const axis = this.axis();
+    const { from, to } = this.range();
+    if (!axis) return [];
+    const at = (ms: number) => Math.min(Math.max((ms - axis.min) / (axis.max - axis.min), 0), 1);
+    const left = (share: number) => `calc(${CHART_GRID.left}px + (100% - ${CHART_GRID.left + CHART_GRID.right}px) * ${share})`;
+    const handles: { side: 'start' | 'end'; text: string; left: string; inside: boolean }[] = [];
+    if (from) {
+      const share = at(dayMs(from));
+      handles.push({ side: 'start', text: from, left: left(share), inside: share < LABEL_INSIDE_WITHIN });
+    }
+    if (to) {
+      const share = at(dayMs(to) + DAY);
+      handles.push({ side: 'end', text: to, left: left(share), inside: share > 1 - LABEL_INSIDE_WITHIN });
+    }
+    return handles;
   });
 
   constructor() {
@@ -1153,16 +1215,26 @@ export class Timeline implements OnDestroy {
     }
   }
 
+  /**
+   * The slider's handles moved: the dates they are on show at once (beside the handles and above), and are applied to the map once
+   * the handles have been still for a moment, not on every pixel of a drag.
+   */
   protected zoomed(zoom: ZoomRange): void {
     const lim = this.axis();
-    if (lim) {
-      this.stop();
+    if (!lim) return;
+    this.stop();
+    this.moving.set(zoom);
+    clearTimeout(this.settleTimer);
+    this.settleTimer = setTimeout(() => {
+      this.moving.set(null);
       this.rangeChange.emit(zoomToRange(zoom, lim.min, lim.max));
-    }
+    }, ZOOM_SETTLE_MS);
   }
 
   protected reset(): void {
     this.stop();
+    clearTimeout(this.settleTimer);
+    this.moving.set(null);
     this.rangeChange.emit({ from: null, to: null });
   }
 
@@ -1238,5 +1310,6 @@ export class Timeline implements OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.timer);
+    clearTimeout(this.settleTimer);
   }
 }

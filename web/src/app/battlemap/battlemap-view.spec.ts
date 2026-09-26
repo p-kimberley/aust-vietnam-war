@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { StubEChart } from './analytics/echart-stub';
-import { dayMs } from './analytics/timeline';
+import { ZOOM_SETTLE_MS, dayMs } from './analytics/timeline';
 import { render, settle } from './battlemap-testing';
 import { CONTACTS } from './filter-fixtures';
 
@@ -220,6 +220,7 @@ describe('zooming the map to the contacts a filter leaves', () => {
     const chart = r.fixture.debugElement.query((d) => d.name === 'app-timeline').query((d) => d.componentInstance instanceof StubEChart).componentInstance as StubEChart;
 
     chart.zoomed.emit({ start: dayMs('1966-03-01'), end: dayMs('1966-04-01') });
+    await wait(ZOOM_SETTLE_MS + 50);
     await settle(r.fixture);
 
     expect(fitted(r)).toEqual([1, 2]);                                                    // the two March 1966 contacts

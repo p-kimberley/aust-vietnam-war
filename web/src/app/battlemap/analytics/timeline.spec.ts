@@ -6,6 +6,7 @@ import { StubEChart, stubEchartIn } from './echart-stub';
 import {
   DateRange,
   PLAY_INTERVAL_MS,
+  ZOOM_SETTLE_MS,
   PLAY_SPEEDS,
   Timeline,
   bucketIntervalMs,
@@ -173,7 +174,7 @@ describe('timelineOption', () => {
     expect(o['series'].map((s: any) => s.name)).toEqual(['All contacts', 'Shown']);
     expect(o['series'][0].data[0]).toEqual([MIN, 2]);
     expect(o['series'][1].data[0]).toEqual([MIN, 1]);
-    expect(o['dataZoom'][0]).toMatchObject({ type: 'slider', startValue: dayMs('1966-02-01'), endValue: dayMs('1966-03-31') + DAY, realtime: false });
+    expect(o['dataZoom'][0]).toMatchObject({ type: 'slider', startValue: dayMs('1966-02-01'), endValue: dayMs('1966-03-31') + DAY, realtime: true, showDetail: false });
     expect(o['xAxis']).toMatchObject({ type: 'time', min: MIN, max: MAX });
   });
 
@@ -267,11 +268,17 @@ describe('Timeline', () => {
     });
   });
 
-  it('turns a slider change into a date range', () => {
-    const { chart, emitted } = setup();
+  it('shows the dates at the handles and above as the slider moves, and applies them once it is still', async () => {
+    const { chart, emitted, el, f } = setup();
 
     chart().zoomed.emit({ start: dayMs('1966-02-10'), end: dayMs('1966-03-21') });
+    f.detectChanges();
 
+    expect(el.querySelector('.tl__range')?.textContent).toBe('1966-02-10 to 1966-03-20');
+    expect([...el.querySelectorAll('.tl__handle')].map((h) => h.textContent)).toEqual(['1966-02-10', '1966-03-20']);
+    expect(emitted).toEqual([]);                                                     // not on every pixel of a drag
+
+    await vi.advanceTimersByTimeAsync(ZOOM_SETTLE_MS + 50);
     expect(emitted).toEqual([{ from: '1966-02-10', to: '1966-03-20' }]);
   });
 
