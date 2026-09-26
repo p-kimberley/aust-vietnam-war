@@ -437,6 +437,28 @@ describe('Battlemap', () => {
     expect(basemaps.flyTo).toHaveBeenCalledWith(10.61, 107.2, 11);
   });
 
+  it('points out an incident opened from the link once the map has come to it, with a reticule that closes in and goes', async () => {
+    const { basemaps } = await render({ inputs: { incident: '9' } });
+    const map = basemaps.map;
+    expect(map.container.querySelector('.home-in')).toBeNull();                        // not until the map has come to it
+
+    const [event, arrived] = map.once.mock.calls.at(-1)!;
+    expect(event).toBe('moveend');
+    arrived();
+    const reticule = map.container.querySelector<HTMLElement>('.home-in')!;
+    expect(reticule.getAttribute('aria-hidden')).toBe('true');
+    expect(reticule.style.transform).toBe('translate(107200px, -10610px)');           // on the incident, as the fake map projects it
+
+    reticule.dispatchEvent(new Event('animationend'));
+    expect(map.container.querySelector('.home-in')).toBeNull();
+  });
+
+  it('points out nothing when the link opens no incident', async () => {
+    const { basemaps } = await render();
+    expect(basemaps.map.once).not.toHaveBeenCalled();
+    expect(basemaps.map.container.querySelector('.home-in')).toBeNull();
+  });
+
   it('keeps the view from the link rather than jumping to the incident', async () => {
     const { basemaps } = await render({ inputs: { incident: '9', at: '10.6,107.2,11' } });
     expect(basemaps.flyTo).not.toHaveBeenCalled();

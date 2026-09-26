@@ -74,6 +74,7 @@ import {
   isSizeField,
   sizeCap,
 } from './contacts';
+import { homeIn } from './home-in';
 import { ContactFilteringService } from './contact-filtering.service';
 import { ContactsService } from './contacts.service';
 import { FilterCatalogueService } from './filter-catalogue';
@@ -875,6 +876,16 @@ export class Battlemap {
         },
         { injector: this.injector },
       );
+
+      // An incident the link opened onto is pointed out, once the map has come to it: a reticule closes in on its marker.
+      if (opened) {
+        const pointOut = () => homeIn(map, opened.lon, opened.lat);
+        if (target && !hasOwnView) {
+          map.once('moveend', pointOut);
+        } else {
+          afterNextRender(pointOut, { injector: this.injector });
+        }
+      }
 
       // With no explicit view in the link, bring the incident, base or photo into frame.
       if (target && !hasOwnView) {

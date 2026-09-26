@@ -101,3 +101,62 @@
   border-top: 0;
   border-radius: 0 0 2px 2px;
 }
+
+/*
+ * The reticule that closes in on an incident a link opened onto (see home-in.ts): it swings in wide and faint, closes on the
+ * marker, overshoots a little, settles, and fades into the marker's own ring. Its strokes keep their width as it shrinks.
+ */
+.bm .home-in {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  color: var(--smoke-yellow);
+  pointer-events: none;
+}
+
+.bm .home-in svg {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  translate: -50% -50%;
+  filter: drop-shadow(0 0 3px rgb(0 0 0 / 0.75));
+  animation: home-in 1.6s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes home-in {
+  0% {
+    width: 440px;
+    height: 440px;
+    rotate: -90deg;
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  65% {
+    width: 48px;
+    height: 48px;
+    rotate: 0deg;
+  }
+
+  75% {
+    width: 60px;
+    height: 60px;
+  }
+
+  85% {
+    width: 48px;
+    height: 48px;
+    opacity: 1;
+  }
+
+  100% {
+    width: 40px;
+    height: 40px;
+    rotate: 0deg;
+    opacity: 0;
+  }
+}

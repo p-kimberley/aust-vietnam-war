@@ -83,6 +83,13 @@ export function fakeMap() {
     hasImage: vi.fn(() => false),
     addImage: vi.fn(),
     on: vi.fn(),
+    once: vi.fn(),
+    off: vi.fn(),
+    /** Where the map draws, for what is laid over it (the reticule that points out an incident). */
+    container: document.createElement('div'),
+    getContainer() {
+      return this.container;
+    },
     setLayoutProperty: vi.fn(),
     getCenter: () => ({ lat: 10.55, lng: 107.17 }),
     getZoom: () => 8,
