@@ -43,11 +43,16 @@ let nextId = 0;
       width: 1.6rem;
       height: 1.6rem;
       padding: 0;
-      color: var(--khaki);
+      color: var(--paper);
       background: none;
       border: 0;
       border-radius: 50%;
       cursor: pointer;
+      /*
+       * Centred on the heading's capitals, not its line: headings are all capitals, with nothing below the line, so the line's
+       * middle is a little under theirs.
+       */
+      translate: 0 -1.5px;
     }
     .info:hover,
     .info[aria-expanded='true'] {
