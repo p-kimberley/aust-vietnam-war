@@ -214,7 +214,7 @@ export class TimelineNavigator {
     const still = this.reducedMotion();
     const bring = () =>
       this.document.getElementById(operation ? `op-${operation}` : phase)?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
-    afterNextRender(() => (wasOpen || still || !operation ? bring() : setTimeout(bring, PHASE_OPENING_MS)), { injector: this.injector });
+    afterNextRender(() => (wasOpen || still ? bring() : setTimeout(bring, PHASE_OPENING_MS)), { injector: this.injector });
   }
 
   protected onScroll(): void {
