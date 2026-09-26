@@ -46,12 +46,22 @@ describe('MapViewStateService', () => {
     expect(navigate).toHaveBeenCalledWith([], { queryParams: { at: '1' }, queryParamsHandling: 'merge', replaceUrl: true });
   });
 
+  it('settles the entry the map opened on with its first write, rather than adding one (so Back leaves the map)', async () => {
+    service.sync(() => ({ at: '1', roll: '1' }));
+
+    await wait(450);
+
+    expect(navigate).toHaveBeenCalledWith([], { queryParams: { at: '1', roll: '1' }, queryParamsHandling: 'merge', replaceUrl: true });
+  });
+
   it('adds a history entry when what is open, the filters or the layers change', async () => {
+    service.sync(() => ({ at: '1' }));
+    await wait(450);
     service.sync(() => ({ at: '1', incident: 5 }));
 
     await wait(450);
 
-    expect(navigate).toHaveBeenCalledWith([], { queryParams: { at: '1', incident: 5 }, queryParamsHandling: 'merge', replaceUrl: false });
+    expect(navigate).toHaveBeenLastCalledWith([], { queryParams: { at: '1', incident: 5 }, queryParamsHandling: 'merge', replaceUrl: false });
   });
 
   it('adds no entry while told not to, as while the timeline plays', async () => {

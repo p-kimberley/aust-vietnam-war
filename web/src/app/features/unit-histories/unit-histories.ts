@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Injector, afterNextRender, computed, effect, inject, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { ScrollMemory } from '../../core/scroll-memory';
 import { Seo } from '../../core/seo.service';
 import { NotFound } from '../../pages/not-found';
 import { UNITS, toursText } from './unit-facts';
@@ -153,6 +154,8 @@ export class UnitHistories {
   private readonly seo = inject(Seo);
   private readonly doc = inject(DOCUMENT);
   private readonly injector = inject(Injector);
+  private readonly router = inject(Router);
+  private readonly scrollMemory = inject(ScrollMemory);
 
   constructor() {
     effect(() => {
@@ -180,12 +183,15 @@ export class UnitHistories {
       });
     });
 
-    // In the browser: open at the section the address names, or at the top of a newly chosen unit.
+    // In the browser: at the section the address names, or at the top of a newly chosen unit; but going Back (or Forward) to a page
+    // the reader has been on, where they left it, which the app's ScrollMemory sees to.
     effect(() => {
       const unit = this.unit();
       const sub = this.sub();
       afterNextRender(
         () => {
+          const back = this.router.lastSuccessfulNavigation()?.trigger === 'popstate';
+          if (back && this.scrollMemory.positionOf(this.router.url) !== undefined) return;
           // A section the address names (a sub-unit, or one of the page's own: "#roll-of-honour").
           const hash = decodeURIComponent(this.doc.location?.hash.slice(1) ?? '');
           const target = (sub ? this.doc.getElementById(sub) : null) ?? (hash ? this.doc.getElementById(hash) : null);

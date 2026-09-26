@@ -55,10 +55,11 @@ export class MapViewStateService implements OnDestroy {
   private timer?: ReturnType<typeof setTimeout>;
   private readonly events: Subscription;
   /**
-   * The reader has just gone Back or Forward. The next write only settles the entry arrived at (the map may write it a little
-   * differently than it was, an old parameter dropped say); a new entry then would throw away everything Forward of it.
+   * The map has just opened, or the reader has just gone Back or Forward. The next write only settles the entry arrived at (the map
+   * may write it a little differently than the link had it: a person's link gains the Nominal Roll it opens, say); a new entry then
+   * would make Back return to the same page rather than the one the reader came from, or throw away everything Forward of it.
    */
-  private arrived = false;
+  private arrived = true;
 
   /** Shows the map as a history entry has it. Set by the map once it can. */
   onRestore: ((params: Params) => void) | null = null;
