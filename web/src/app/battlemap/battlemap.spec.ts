@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
 import { arrive, config, contacts, render, settle } from './battlemap-testing';
+import { POI_HALO } from './poi-layers';
 import { HEAT_LAYER, POINT_LAYER, PULSE_MS, SELECTED_HALO, SELECTED_LAYER, heatWeight, pointRadius, pulseSelection, selectedRadius } from './contact-layers';
 import { fieldRange, formatDtg, sizeCap, toGeoJson } from './contacts';
 import { parseOverlayOpacities } from './basemap.service';
@@ -129,7 +130,7 @@ describe('the pulse of the ring round the open incident', () => {
     vi.useFakeTimers();
     try {
       const setPaintProperty = vi.fn();
-      const map = { getLayer: (id: string) => (id === SELECTED_HALO ? {} : undefined), setPaintProperty };
+      const map = { getLayer: (id: string) => (id === SELECTED_HALO || id === POI_HALO ? {} : undefined), setPaintProperty };
       const stop = pulseSelection(map as never, () => ({ field: null, cap: 0 }));
 
       vi.advanceTimersByTime(PULSE_MS / 2);
@@ -141,6 +142,7 @@ describe('the pulse of the ring round the open incident', () => {
       expect(opacities.at(-1)!).toBeLessThan(opacities[0]);                      // and fading
       vi.advanceTimersByTime(PULSE_MS);
       expect(halo(setPaintProperty, 'circle-radius').length).toBeGreaterThan(radii.length);   // and again
+      expect(setPaintProperty.mock.calls.some(([layer]) => layer === POI_HALO)).toBe(true);   // an open point's ripples the same way
 
       stop();
       const drawn = setPaintProperty.mock.calls.length;
@@ -495,6 +497,15 @@ describe('Battlemap', () => {
     expect(moved.slice(-2)).toEqual([[SELECTED_HALO, undefined], [SELECTED_LAYER, undefined]]);   // to the top: the ring over its ripple
     const lastAdded = Math.max(...basemaps.map.addLayer.mock.invocationCallOrder);
     expect(basemaps.map.moveLayer.mock.invocationCallOrder.at(-1)!).toBeGreaterThan(lastAdded);  // after every layer is added
+  });
+
+  it('points out a point of interest the link opens onto, as it does an incident, once the map has flown to it', async () => {
+    const { basemaps } = await render({ inputs: { poi: '1' } });
+    const map = basemaps.map;
+    expect(map.container.querySelector('.home-in')).toBeNull();
+
+    arrive(map);
+    expect(map.container.querySelector<HTMLElement>('.home-in')!.style.transform).toBe('translate(107240px, -10630px)');   // on Le Loi
   });
 
   it('points out nothing when the link opens no incident', async () => {

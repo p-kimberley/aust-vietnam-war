@@ -2,6 +2,7 @@ import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type { GeoJSONSource, Map } from 'maplibre-gl';
 import { Contact, HeatField, Range, SizeField, toGeoJson } from './contacts';
 import { operationColourExpression } from './operation-colours';
+import { POI_HALO, POI_SELECTED, poiSelectedRadius } from './poi-layers';
 
 export const CONTACT_SOURCE = 'avw-contacts';
 export const HEAT_LAYER = 'avw-contacts-heat';
@@ -226,7 +227,7 @@ export function setSelectedContact(map: Map, id: number | null): void {
  * pictures are added after the contacts), so the incident being read is never hidden. After every style load, once all are added.
  */
 export function raiseSelection(map: Map): void {
-  for (const layer of [SELECTED_HALO, SELECTED_LAYER]) {
+  for (const layer of [POI_HALO, POI_SELECTED, SELECTED_HALO, SELECTED_LAYER]) {
     if (map.getLayer(layer)) {
       map.moveLayer(layer);
     }
@@ -235,12 +236,14 @@ export function raiseSelection(map: Map): void {
 
 /** Colours the ring round the open incident, and its ripple, to stand out on the basemap (see `selectionColour`). */
 export function setSelectionColour(map: Map, colour: string): void {
-  if (map.getLayer(SELECTED_LAYER)) {
-    map.setPaintProperty(SELECTED_LAYER, 'circle-stroke-color', colour);
+  for (const layer of [SELECTED_LAYER, POI_SELECTED]) {
+    if (map.getLayer(layer)) map.setPaintProperty(layer, 'circle-stroke-color', colour);
   }
-  if (map.getLayer(SELECTED_HALO)) {
-    map.setPaintProperty(SELECTED_HALO, 'circle-stroke-color', colour);
-    map.setPaintProperty(SELECTED_HALO, 'circle-color', colour);
+  for (const layer of [SELECTED_HALO, POI_HALO]) {
+    if (map.getLayer(layer)) {
+      map.setPaintProperty(layer, 'circle-stroke-color', colour);
+      map.setPaintProperty(layer, 'circle-color', colour);
+    }
   }
 }
 
@@ -257,23 +260,31 @@ export function pulseSelection(map: Map, sizing: () => MarkerSizing): () => void
   // Drawn every frame the screen shows: at any lower rate the ripple, slowing as it spreads, visibly steps.
   let frame = 0;
   let started: number | null = null;
+  // The open incident's ripple and the open point's (only one is ever open; the other's ring matches nothing).
+  const halos: [string, (grow: number) => ExpressionSpecification][] = [
+    [SELECTED_HALO, (grow) => selectedRadius(sizing(), grow)],
+    [POI_HALO, poiSelectedRadius],
+  ];
   const step = (now: number) => {
     started ??= now;
-    if (map.getLayer(SELECTED_HALO)) {
-      const t = ((now - started) % PULSE_MS) / PULSE_MS;
-      const eased = 1 - (1 - t) * (1 - t);                                // out quickly, then slowing as it fades
-      map.setPaintProperty(SELECTED_HALO, 'circle-radius', selectedRadius(sizing(), eased * HALO_TRAVEL));
-      map.setPaintProperty(SELECTED_HALO, 'circle-stroke-opacity', HALO_OPACITY * (1 - t * t));   // strong most of the way, then gone
-      map.setPaintProperty(SELECTED_HALO, 'circle-opacity', HALO_FILL * (1 - t));
+    const t = ((now - started) % PULSE_MS) / PULSE_MS;
+    const eased = 1 - (1 - t) * (1 - t);                                  // out quickly, then slowing as it fades
+    for (const [layer, radius] of halos) {
+      if (!map.getLayer(layer)) continue;
+      map.setPaintProperty(layer, 'circle-radius', radius(eased * HALO_TRAVEL));
+      map.setPaintProperty(layer, 'circle-stroke-opacity', HALO_OPACITY * (1 - t * t));   // strong most of the way, then gone
+      map.setPaintProperty(layer, 'circle-opacity', HALO_FILL * (1 - t));
     }
     frame = requestAnimationFrame(step);
   };
   frame = requestAnimationFrame(step);
   return () => {
     cancelAnimationFrame(frame);
-    if (map.getLayer(SELECTED_HALO)) {
-      map.setPaintProperty(SELECTED_HALO, 'circle-stroke-opacity', 0);
-      map.setPaintProperty(SELECTED_HALO, 'circle-opacity', 0);
+    for (const [layer] of halos) {
+      if (map.getLayer(layer)) {
+        map.setPaintProperty(layer, 'circle-stroke-opacity', 0);
+        map.setPaintProperty(layer, 'circle-opacity', 0);
+      }
     }
   };
 }

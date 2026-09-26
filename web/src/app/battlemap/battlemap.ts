@@ -941,10 +941,10 @@ export class Battlemap {
         },
         { injector: this.injector },
       );
-      // The ring round the open incident pulses slowly for as long as one is open, and not at all otherwise.
+      // The ring round the open incident, or point of interest, pulses slowly for as long as one is open, and not at all otherwise.
       effect(
         (onCleanup) => {
-          if (this.selection.selectedId() !== null) {
+          if (this.selection.selectedId() !== null || this.selection.selectedPoiId() !== null) {
             onCleanup(pulseSelection(map, () => this.markerSizing()));
           }
         },
@@ -957,6 +957,15 @@ export class Battlemap {
       if (opened && firstView === 'own') {
         const pointOut = () => homeIn(map, opened.lon, opened.lat, this.selectionColour);
         afterNextRender(() => (this.status() === 'ready' ? pointOut() : map.once('style.load', pointOut)), { injector: this.injector });
+      }
+
+      // A point of interest the link opens onto is pointed out the same way: once the map has flown to it, or at once where the link
+      // has a view of its own (either way once the basemap's colour is known).
+      if (openedPoi && (firstView === 'target' || firstView === 'own')) {
+        const pointOut = () => homeIn(map, openedPoi.lon, openedPoi.lat, this.selectionColour);
+        const onceStyled = () => (this.status() === 'ready' ? pointOut() : map.once('style.load', pointOut));
+        if (firstView === 'target') map.once('moveend', onceStyled);
+        else afterNextRender(onceStyled, { injector: this.injector });
       }
 
       // A base or photo the link names is brought into frame now (an incident, once the map is ready: see above).

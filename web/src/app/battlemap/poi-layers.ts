@@ -8,6 +8,8 @@ export const POI_SOURCE = 'avw-pois';
 export const POI_POINTS = 'avw-pois-points';
 export const POI_LABELS = 'avw-pois-labels';
 export const POI_SELECTED = 'avw-pois-selected';
+/** A second ring under the first that ripples out from it while the point is open, as the open incident's does. */
+export const POI_HALO = 'avw-pois-selected-halo';
 
 // Colours match the style guide tokens in styles.scss; map paint properties cannot read CSS variables.
 const INK = '#22251a';
@@ -42,6 +44,11 @@ const ICON_BY_TYPE: ExpressionSpecification = [
  * Adds fire support bases, landing zones and the other points as icons for their type, with names from zoom 11.
  * Called after every style load and before the contact layers, so contacts always draw over these.
  */
+/** The ring round the open point, by zoom; `grow` pixels further out is where its ripple has got to. */
+export function poiSelectedRadius(grow = 0): ExpressionSpecification {
+  return ['interpolate', ['linear'], ['zoom'], 7, 7 + grow, 15, 15 + grow] as ExpressionSpecification;
+}
+
 export function addPoiLayers(map: Map, pois: readonly Poi[], state: { visible: boolean; selectedId: number | null }): void {
   if (!map.getSource(POI_SOURCE)) {
     map.addSource(POI_SOURCE, { type: 'geojson', data: toPoiGeoJson(pois) });
@@ -86,6 +93,27 @@ export function addPoiLayers(map: Map, pois: readonly Poi[], state: { visible: b
     });
   }
 
+  if (!map.getLayer(POI_HALO)) {
+    map.addLayer({
+      id: POI_HALO,
+      type: 'circle',
+      source: POI_SOURCE,
+      filter: selectedFilter(state.visible ? state.selectedId : null),
+      paint: {
+        'circle-radius': poiSelectedRadius(),
+        'circle-color': SMOKE_YELLOW,
+        'circle-opacity': 0,
+        'circle-stroke-color': SMOKE_YELLOW,
+        'circle-stroke-width': 3,
+        'circle-stroke-opacity': 0,
+        // Set afresh every frame, so the map is not to ease between the values as well (as it does by default).
+        'circle-radius-transition': { duration: 0 },
+        'circle-opacity-transition': { duration: 0 },
+        'circle-stroke-opacity-transition': { duration: 0 },
+      },
+    });
+  }
+
   if (!map.getLayer(POI_SELECTED)) {
     map.addLayer({
       id: POI_SELECTED,
@@ -93,7 +121,7 @@ export function addPoiLayers(map: Map, pois: readonly Poi[], state: { visible: b
       source: POI_SOURCE,
       filter: selectedFilter(state.visible ? state.selectedId : null),
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 7, 7, 15, 15],
+        'circle-radius': poiSelectedRadius(),
         'circle-color': 'rgba(0,0,0,0)',
         'circle-stroke-color': SMOKE_YELLOW,
         'circle-stroke-width': 3,
@@ -106,10 +134,12 @@ export function setPoiVisibility(map: Map, visible: boolean): void {
   for (const id of [POI_POINTS, POI_LABELS]) {
     if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility(visible));
   }
-  if (!visible && map.getLayer(POI_SELECTED)) map.setFilter(POI_SELECTED, selectedFilter(null));
+  if (!visible) setSelectedPoi(map, null);
 }
 
-/** Rings the point open in the panel, or clears the ring. */
+/** Rings the point open in the panel (with its ripple), or clears the ring. */
 export function setSelectedPoi(map: Map, id: number | null): void {
-  if (map.getLayer(POI_SELECTED)) map.setFilter(POI_SELECTED, selectedFilter(id));
+  for (const layer of [POI_HALO, POI_SELECTED]) {
+    if (map.getLayer(layer)) map.setFilter(layer, selectedFilter(id));
+  }
 }

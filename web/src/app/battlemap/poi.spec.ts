@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { POIS, poiDetail, render, settle } from './battlemap-testing';
 import { Poi, PoiService, poiLabel, typeName } from './poi';
 import { POI_ICON_IDS } from './poi-icons';
-import { POI_LABELS, POI_POINTS, POI_SELECTED, POI_SOURCE, addPoiLayers, setPoiVisibility, setSelectedPoi, toPoiGeoJson } from './poi-layers';
+import { POI_HALO, POI_LABELS, POI_POINTS, POI_SELECTED, POI_SOURCE, addPoiLayers, setPoiVisibility, setSelectedPoi, toPoiGeoJson } from './poi-layers';
 import { PoiPanel } from './poi-panel';
 
 const text = (el: Element | null) => el?.textContent?.replace(/\s+/g, ' ').trim();
@@ -100,7 +100,7 @@ describe('POI layers', () => {
     };
   }
 
-  it('adds a source, markers, labels and a selection ring, once', () => {
+  it('adds a source, markers, labels and a selection ring with its ripple, once', () => {
     const map = fake();
 
     addPoiLayers(map as never, POIS, { visible: true, selectedId: null });
@@ -108,7 +108,7 @@ describe('POI layers', () => {
 
     expect(map.addSource).toHaveBeenCalledTimes(1);
     expect(map.addSource.mock.calls[0][0]).toBe(POI_SOURCE);
-    expect([...map.layers.keys()]).toEqual([POI_POINTS, POI_LABELS, POI_SELECTED]);
+    expect([...map.layers.keys()]).toEqual([POI_POINTS, POI_LABELS, POI_HALO, POI_SELECTED]);             // the ripple under the ring
   });
 
   it('draws each type of point with its own icon, and anything else as a flag', () => {
@@ -211,7 +211,7 @@ describe('POI layers', () => {
     expect(map.setFilter).toHaveBeenCalledWith(POI_SELECTED, ['==', ['get', 'id'], -1]);
   });
 
-  it('rings a point, or clears the ring', () => {
+  it('rings a point with its ripple, or clears both', () => {
     const map = fake();
     addPoiLayers(map as never, POIS, { visible: true, selectedId: null });
 
@@ -219,7 +219,9 @@ describe('POI layers', () => {
     setSelectedPoi(map as never, null);
 
     expect(map.setFilter.mock.calls).toEqual([
+      [POI_HALO, ['==', ['get', 'id'], 2]],
       [POI_SELECTED, ['==', ['get', 'id'], 2]],
+      [POI_HALO, ['==', ['get', 'id'], -1]],
       [POI_SELECTED, ['==', ['get', 'id'], -1]],
     ]);
   });
