@@ -37,9 +37,13 @@ interface FilterList {
   template: `
     @if (person(); as serviceNumber) {
       <div class="detail">
-        <button type="button" class="back" (click)="person.set(null)"><app-icon name="arrow-left" />Back</button>
+        <!-- Back to the list, or close the roll altogether: the person's own panel has no close of its own here. -->
+        <div class="detail__bar">
+          <button type="button" class="back" (click)="person.set(null)"><app-icon name="arrow-left" />Back</button>
+          <button type="button" class="close" aria-label="Close the nominal roll" (click)="closed.emit()">×</button>
+        </div>
         <div class="detail__panel">
-          <app-honour-panel [serviceNumber]="serviceNumber" (closed)="person.set(null)" (openIncident)="openIncident.emit($event)" />
+          <app-honour-panel [serviceNumber]="serviceNumber" [closable]="false" (openIncident)="openIncident.emit($event)" />
         </div>
       </div>
     } @else {
@@ -139,6 +143,12 @@ interface FilterList {
     .detail {
       height: 100%;
     }
+    .detail__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0.4rem 0.5rem 0.2rem;
+    }
     .detail__panel {
       flex: 1;
       min-height: 0;
@@ -179,8 +189,6 @@ interface FilterList {
       line-height: 1;
     }
     .back {
-      align-self: flex-start;
-      margin: 0.4rem 0.5rem 0.2rem;
       padding: 0.25rem 0.6rem;
       font-size: 0.85rem;
     }

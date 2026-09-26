@@ -341,13 +341,14 @@ describe('NominalRoll', () => {
       expect(rows().map((r) => text(r.querySelector('.person__name')))).toEqual(['Found']);
     });
 
-    it('also goes back with the close button of the person', async () => {
-      const { el, fixture } = await choose();
+    it('closes the roll from the close button beside Back, the person having none of their own', async () => {
+      const { el, fixture, closed } = await choose();
+      expect(el.querySelector('app-honour-panel .close')).toBeNull();
 
-      el.querySelector<HTMLButtonElement>('app-honour-panel .close')!.click();
+      el.querySelector<HTMLButtonElement>('.detail__bar .close')!.click();
       fixture.detectChanges();
 
-      expect(el.querySelector('.roll')).not.toBeNull();
+      expect(closed).toHaveBeenCalledTimes(1);
     });
 
     it('opens an incident the person is linked to, on the map', async () => {

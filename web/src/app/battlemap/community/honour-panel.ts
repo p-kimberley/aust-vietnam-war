@@ -107,7 +107,9 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
     <section class="panel" aria-labelledby="honour-title">
       <header class="head">
         <h2 id="honour-title" #heading tabindex="-1">{{ person()?.name ?? 'Honour roll' }}</h2>
-        <button type="button" class="close" aria-label="Close" (click)="closed.emit()">×</button>
+        @if (closable()) {
+          <button type="button" class="close" aria-label="Close" (click)="closed.emit()">×</button>
+        }
       </header>
 
       <div class="body">
@@ -194,6 +196,8 @@ export class HonourPanel {
   protected readonly awmUrl = awmRollOfHonourUrl;
   readonly serviceNumber = input.required<string>();
   readonly closed = output<void>();
+  /** Whether the panel has its own close button; not where what holds it has one (the Nominal Roll's). */
+  readonly closable = input(true);
   /** Opens one of this person's incidents on the map. */
   readonly openIncident = output<number>();
 

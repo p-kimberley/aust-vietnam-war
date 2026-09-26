@@ -612,13 +612,18 @@ export class Battlemap {
   /** Flies a tool out from the left, or puts it away. */
   protected setFlyout(id: string | null): void {
     clearTimeout(this.flyoutTimer);
-    if (id !== 'roll') this.rollPerson.set(null);
     this.flyoutSwitching.set(id !== null && this.flyout() !== null);
     this.flyout.set(id);
     if (id !== null) {
+      // Another tool in its place: the roll's person goes with it.
+      if (id !== 'roll') this.rollPerson.set(null);
       this.flyoutShown.set(id);
     } else {
-      this.flyoutTimer = setTimeout(() => this.flyoutShown.set(null), FLYOUT_SLIDE_MS);
+      // Put away: what it shows (a person in the roll, say) stays until it has slid out of sight, so it leaves as it was.
+      this.flyoutTimer = setTimeout(() => {
+        this.flyoutShown.set(null);
+        this.rollPerson.set(null);
+      }, FLYOUT_SLIDE_MS);
     }
     this.syncUrl();
   }

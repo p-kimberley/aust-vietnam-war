@@ -128,14 +128,17 @@ describe('Battle Map honour roll', () => {
     expect(flyout()).toBe(true);
   });
 
-  it('closes the person panel from its close button', async () => {
+  it('closes the Nominal Roll, person and all, from the close button beside Back', async () => {
     const r = await render({ inputs: { person: '5715978' }, community: community() });
     await settle(r.fixture);
 
-    r.el.querySelector<HTMLButtonElement>('app-honour-panel .close')!.click();
+    r.el.querySelector<HTMLButtonElement>('#left-flyout .detail__bar .close')!.click();
     await settle(r.fixture);
 
-    expect(r.el.querySelector('app-honour-panel')).toBeNull();
+    expect(r.el.querySelector('#left-flyout')!.classList.contains('is-open')).toBe(false);
+    // It slides away showing the person still, not the list.
+    expect(r.el.querySelector('#left-flyout app-honour-panel')).not.toBeNull();
+    expect(r.el.querySelector('#left-flyout .roll')).toBeNull();
   });
 
   it("shows a linked person in the Nominal Roll, which stays open beside an incident chosen after", async () => {
