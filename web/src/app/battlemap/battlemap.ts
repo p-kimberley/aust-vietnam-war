@@ -252,10 +252,12 @@ export class Battlemap {
     { id: 'roll', label: 'Nominal roll', icon: 'users' },
     { id: 'images', label: 'Images', icon: 'image' },
   ];
+  /** Counts the changes the reader makes to the filters, so the Filters tab can draw the eye to each (see `LeftTab.pulse`). */
+  private readonly filtersChanged = signal(0);
   /** The tools in the rail at the right; Filters carries how many filters are on. */
   protected readonly rightTabs = computed<readonly LeftTab[]>(() => [
     { id: 'layers', label: 'Layers', icon: 'layers' },
-    { id: 'filters', label: 'Filters', icon: 'filter', badge: this.contactFilter.activeCount() || null },
+    { id: 'filters', label: 'Filters', icon: 'filter', badge: this.contactFilter.activeCount() || null, pulse: this.filtersChanged() },
   ]);
   /** The tool flown out at the right, or `null`: the panel's open state and its tab, both kept by the browser (see above). */
   protected readonly rightTool = computed<Tab | null>(() => (this.panelOpen() && !this.rightHeldBack() ? this.tab() : null));
@@ -688,6 +690,7 @@ export class Battlemap {
     // step would be dizzying, so it is left where it is.
     if (!this.timelinePlaying()) {
       this.fitRequest = changedText && hasText(this.contactFilter.filters()) ? 'search' : 'now';
+      this.filtersChanged.update((n) => n + 1);                   // not on each step of Play, or the tab would never stop
     }
     this.refreshContacts();
     this.syncUrl();

@@ -28,6 +28,46 @@ function setup(active: string | null = null) {
 }
 
 describe('LeftTabs', () => {
+  describe('a ring from the count, when what it counts changes', () => {
+    const withCount = (badge: number | null, pulse: number): LeftTab[] => [TABS[0], { id: 'filters', label: 'Filters', badge, pulse }];
+    const rings = (el: HTMLElement) => [...el.querySelectorAll('#left-tab-filters .tab__badge .tab__pulse')].map(() => 'count');
+
+    it('sends none out for where the tab starts, one from the count for each change, and none once the count has gone', () => {
+      const { f, el } = setup();
+      f.componentRef.setInput('tabs', withCount(1, 0));
+      f.detectChanges();
+      expect(rings(el)).toEqual([]);                                              // the count it starts with is no change
+
+      f.componentRef.setInput('tabs', withCount(2, 1));
+      f.detectChanges();
+      expect(rings(el)).toEqual(['count']);
+      const first = el.querySelector('.tab__pulse');
+
+      f.componentRef.setInput('tabs', withCount(2, 2));                          // another unit, say: the same count, still a change
+      f.detectChanges();
+      expect(rings(el)).toEqual(['count']);
+      expect(el.querySelector('.tab__pulse')).not.toBe(first);                    // a new ring, so it plays again
+
+      f.componentRef.setInput('tabs', withCount(null, 3));                       // the last filter off: nowhere for it to come from
+      f.detectChanges();
+      expect(el.querySelector('#left-tab-filters .tab__badge')).toBeNull();
+      expect(el.querySelector('.tab__pulse')).toBeNull();
+
+      f.componentRef.setInput('tabs', withCount(1, 4));                          // and a filter on again: a ring, from the new count
+      f.detectChanges();
+      expect(rings(el)).toEqual(['count']);
+    });
+
+    it('sends none out from a tab that is not told of changes', () => {
+      const { f, el } = setup();
+      f.componentRef.setInput('tabs', [{ id: 'filters', label: 'Filters', badge: 1 }]);
+      f.detectChanges();
+      f.componentRef.setInput('tabs', [{ id: 'filters', label: 'Filters', badge: 2 }]);
+      f.detectChanges();
+      expect(rings(el)).toEqual([]);
+    });
+  });
+
   it('is a vertical list of tabs, one for each tool, with the label running down the tab', () => {
     const { el, tabs } = setup();
     const list = el.querySelector('[role=tablist]')!;

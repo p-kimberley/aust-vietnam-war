@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, input, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, model, signal } from '@angular/core';
 import { Icon, IconName } from './icon';
 
 /** One tool in a rail at the edge of the map. More are added by listing them; nothing else needs to change here. */
@@ -8,6 +8,11 @@ export interface LeftTab {
   icon?: IconName;
   /** A count shown on the tab (how many filters are on, say); `null` or none shows nothing. */
   badge?: number | null;
+  /**
+   * Changes whenever what the count counts has changed (a filter added or removed, say): each change that leaves a count on the
+   * tab sends a ring out from it, to draw the eye to it. None goes out when the count has gone. Left out, the tab never does.
+   */
+  pulse?: number;
 }
 
 /**
@@ -40,7 +45,8 @@ export interface LeftTab {
           }
           <span class="tab__text">{{ tab.label }}</span>
           @if (tab.badge) {
-            <span class="tab__badge" [attr.aria-label]="tab.badge + ' on'">{{ tab.badge }}</span>
+            <!-- The ring is keyed by the change, so each change draws a new one and its animation plays from the start. -->
+            <span class="tab__badge" [attr.aria-label]="tab.badge + ' on'">{{ tab.badge }}@for (n of pulsesOf(tab.id); track n) {<span class="tab__pulse" aria-hidden="true"></span>}</span>
           }
         </button>
       }
@@ -121,6 +127,40 @@ export interface LeftTab {
     .tab.is-on .tab__badge {
       background: var(--paper);
     }
+    /* The ring a change sends out: from the count, in the count's colour, growing and fading. */
+    .tab {
+      position: relative;
+      --badge-colour: var(--smoke-yellow);
+    }
+    .tab.is-on {
+      --badge-colour: var(--paper);
+    }
+    .tab__badge {
+      position: relative;
+    }
+    .tab__pulse {
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--badge-colour);
+      border-radius: 999px;
+      pointer-events: none;
+      animation: tab-pulse 0.9s ease-out forwards;
+    }
+    @keyframes tab-pulse {
+      from {
+        opacity: 0.95;
+        transform: scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: scale(2.8);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tab__pulse {
+        display: none;
+      }
+    }
     :host(.is-right) .tab {
       border-right: 0;
       border-left: 1px solid var(--olive-500);
@@ -159,6 +199,36 @@ export class LeftTabs {
   readonly panelId = input('left-flyout');
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /**
+   * The latest change of each tab's count that has sent a ring out; the first each tab is given is where it starts, not a change.
+   * A change that takes the count away sends none, and clears the last, so a count that comes back does not replay an old ring.
+   */
+  private readonly pulses = signal<ReadonlyMap<string, number>>(new Map());
+  private readonly seen = new Map<string, number | undefined>();
+
+  constructor() {
+    effect(() => {
+      const changed = new Map(this.pulses());
+      let any = false;
+      for (const tab of this.tabs()) {
+        const before = this.seen.has(tab.id) ? this.seen.get(tab.id) : tab.pulse;
+        this.seen.set(tab.id, tab.pulse);
+        if (!tab.badge && changed.delete(tab.id)) any = true;
+        if (tab.pulse !== undefined && before !== undefined && tab.pulse !== before && tab.badge) {
+          changed.set(tab.id, tab.pulse);
+          any = true;
+        }
+      }
+      if (any) this.pulses.set(changed);
+    });
+  }
+
+  /** The ring to draw on a tab, as a list of none or one, keyed by the change that sent it. */
+  protected pulsesOf(id: string): number[] {
+    const n = this.pulses().get(id);
+    return n === undefined ? [] : [n];
+  }
 
   /** The tab that can be reached with Tab: the open one, or the first. */
   protected focusable(): number {
