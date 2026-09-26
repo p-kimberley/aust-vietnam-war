@@ -2,7 +2,7 @@ import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ContactDetail } from './contacts';
 import { ContactsService } from './contacts.service';
 import { communityProviders } from './community/community-testing';
@@ -144,6 +144,65 @@ describe('IncidentPanel', () => {
     expect(el.querySelector('a')).toBeNull();
     expect(el.querySelector('.incident__none')?.textContent).toBe('Unknown');
     expect(el.querySelector('.incident__report')?.textContent).toContain('No report is recorded');
+  });
+
+  it('puts the plain-English summary above the original report, and leaves it out where there is none', async () => {
+    const { fixture, ctl, el } = render();
+    await tick(fixture);
+    ctl.expectOne('/api/contacts/2').flush({ ...detail, summary: '1 Platoon, A Company, 5 RAR, made contact with five enemy soldiers.' });
+    await settle(fixture);
+
+    const headings = [...el.querySelectorAll('.incident__section h3')].map((h) => h.textContent?.trim());
+    expect(headings).toEqual(['Friendly units', 'Strength and casualties', 'Incident summary', 'Original incident report', 'Archival source']);
+    expect(el.querySelector('.incident__summary')?.textContent).toBe('1 Platoon, A Company, 5 RAR, made contact with five enemy soldiers.');
+
+    TestBed.resetTestingModule();
+    const without = render();
+    await tick(without.fixture);
+    without.ctl.expectOne('/api/contacts/2').flush(detail);
+    await settle(without.fixture);
+    expect(without.el.querySelector('.incident__summary')).toBeNull();
+    expect(without.el.textContent).not.toContain('Incident summary');
+  });
+
+  it('gives each section an info button that says what it is', async () => {
+    const { fixture, ctl, el } = render();
+    await tick(fixture);
+    ctl.expectOne('/api/contacts/2').flush({ ...detail, summary: 'A summary.' });
+    await settle(fixture);
+
+    const buttons = [...el.querySelectorAll<HTMLButtonElement>('.incident__section app-panel-info button')];
+    expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual([
+      'About the friendly units', 'About the strength and casualties', 'About the incident summary', 'About the original incident report',
+      'About the archival source',
+    ]);
+    buttons[2].click();
+    await settle(fixture);
+    expect(el.querySelector('.incident__section [role=note]')?.textContent).toContain('written by an AI model');
+  });
+
+  it('shows the first lines of a long report, with Read more for the rest', async () => {
+    const height = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(600);
+    const shown = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(200);
+    try {
+      const { fixture, ctl, el } = render();
+      await tick(fixture);
+      ctl.expectOne('/api/contacts/2').flush(detail);
+      await settle(fixture);
+
+      const report = el.querySelector('.incident__report')!;
+      const more = el.querySelector<HTMLButtonElement>('.incident__more')!;
+      expect(report.classList).toContain('is-clamped');
+      expect([more.textContent?.trim(), more.getAttribute('aria-expanded')]).toEqual(['Read more', 'false']);
+
+      more.click();
+      await settle(fixture);
+      expect(report.classList).not.toContain('is-clamped');
+      expect(more.textContent?.trim()).toBe('Read less');
+    } finally {
+      height.mockRestore();
+      shown.mockRestore();
+    }
   });
 
   it('says so when the incident does not exist', async () => {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, output, resource, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, afterRenderEffect, effect, inject, input, output, resource, signal, viewChild } from '@angular/core';
 import { NotesTab } from './community/notes-tab';
 import { PeopleTab } from './community/people-tab';
 import { PictureRef } from './community/community';
@@ -7,6 +7,19 @@ import { ContactsService } from './contacts.service';
 import { formatDtg } from './contacts';
 import { FollowInfo } from './track';
 import { Icon } from './icon';
+import { PanelInfo } from './panel-info';
+
+/** What each section of an incident's details is, for its info button. */
+export const INCIDENT_SECTION_INFO = {
+  units: 'The Australian and allied units recorded as taking part. Follow a unit to draw its path from incident to incident on the map.',
+  stats:
+    'The numbers recorded for this incident: the size of each side\'s force present, and those killed and wounded. Enemy figures are as the Australians reported them.',
+  summary:
+    'The report below in plain English, written by an AI model to spell out its abbreviations and military shorthand. The original report is the authoritative record.',
+  report:
+    'The report as it was recorded at the time, mostly from the units\' commanders\' diaries and intelligence summaries, with its abbreviations and shorthand.',
+  archive: "Where the original report is held: the Australian War Memorial's records (such as AWM95, the commanders' diaries) and other sources.",
+} as const;
 
 /**
  * "About this incident": the full record for one contact, loaded when it is selected on the map, with tabs for what the
@@ -14,7 +27,7 @@ import { Icon } from './icon';
  */
 @Component({
   selector: 'app-incident-panel',
-  imports: [NotesTab, PicturesTab, PeopleTab, Icon],
+  imports: [NotesTab, PicturesTab, PeopleTab, Icon, PanelInfo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './incident-panel.html',
   styleUrl: './incident-panel.css',
@@ -49,8 +62,20 @@ export class IncidentPanel {
   protected readonly notesCount = signal<number | null>(null);
   protected readonly picturesCount = signal<number | null>(null);
   protected readonly peopleCount = signal<number | null>(null);
+  protected readonly info = INCIDENT_SECTION_INFO;
+  /** The whole report is showing, not only its first lines. */
+  protected readonly reportExpanded = signal(false);
+  /** The report is longer than its first lines, so there is more to read. */
+  protected readonly reportClamped = signal(false);
+  private readonly report = viewChild<ElementRef<HTMLElement>>('report');
 
   constructor() {
+    // Whether the report runs past its first lines is seen once it is on the page.
+    afterRenderEffect(() => {
+      const el = this.report()?.nativeElement;
+      this.incident.value();
+      if (el && !this.reportExpanded()) this.reportClamped.set(el.scrollHeight > el.clientHeight + 1);
+    });
     // Move focus into the panel when an incident opens, so keyboard and screen-reader users land on it.
     effect(() => {
       this.contactId();
@@ -60,6 +85,7 @@ export class IncidentPanel {
       this.notesCount.set(null);
       this.picturesCount.set(null);
       this.peopleCount.set(null);
+      this.reportExpanded.set(false);
     });
   }
 }

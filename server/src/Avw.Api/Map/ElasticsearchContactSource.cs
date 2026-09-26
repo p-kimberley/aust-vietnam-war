@@ -214,6 +214,7 @@ public sealed class ElasticsearchContactSource(
     [
         "DTG", "Location", "Grid_Ref", "Operation", "Unit_Task", "Fr_Units", "Fr_Force_Present", "En_Force",
         "Fr_KIA", "Fr_WIA", "En_KIA", "En_WIA", "Description_of_Incident", "Archival_Source_Data", "Source_Hyperlink",
+        "Incident_Summary",
     ];
 
     public async Task<ContactDetail?> GetAsync(int id, CancellationToken ct)
@@ -243,7 +244,7 @@ public sealed class ElasticsearchContactSource(
                 .OrderBy(u => u.ShortName, StringComparer.OrdinalIgnoreCase)
                 .ToArray(),
             s.FrForce, s.EnForce, s.FrKia, s.FrWia, s.EnKia, s.EnWia,
-            Clean(s.Description), Clean(s.ArchivalSource), HttpUrlOrNull(s.SourceHyperlink));
+            Clean(s.Description), Clean(s.ArchivalSource), HttpUrlOrNull(s.SourceHyperlink), Clean(s.Summary));
     }
 
     /// <summary>Throws with Elasticsearch's own error text, which says which field or privilege was the problem.</summary>
@@ -284,7 +285,8 @@ public sealed class ElasticsearchContactSource(
         [property: JsonPropertyName("En_WIA")] int EnWia,
         [property: JsonPropertyName("Description_of_Incident")] string? Description,
         [property: JsonPropertyName("Archival_Source_Data")] string? ArchivalSource,
-        [property: JsonPropertyName("Source_Hyperlink")] string? SourceHyperlink);
+        [property: JsonPropertyName("Source_Hyperlink")] string? SourceHyperlink,
+        [property: JsonPropertyName("Incident_Summary")] string? Summary);
 
     private sealed record UnitDoc(
         [property: JsonPropertyName("_id")] int Id,

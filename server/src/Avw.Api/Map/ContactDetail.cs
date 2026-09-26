@@ -11,6 +11,8 @@ public sealed record ContactUnit(int Id, string ShortName, string LongName);
 /// <param name="Units">Friendly units involved. Units flagged hidden in the data are never returned.</param>
 /// <param name="Description">The original incident report text.</param>
 /// <param name="SourceUrl">An external source link, only ever an absolute http(s) URL.</param>
+/// <param name="Summary">The report in plain English, written by an AI model from the original (the index's <c>Incident_Summary</c>),
+/// or null where there is none.</param>
 public sealed record ContactDetail(
     int Id,
     string Dtg,
@@ -28,4 +30,5 @@ public sealed record ContactDetail(
     int EnWia,
     string? Description,
     string? ArchivalSource,
-    string? SourceUrl);
+    string? SourceUrl,
+    string? Summary = null);

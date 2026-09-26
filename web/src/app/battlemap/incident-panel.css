@@ -165,16 +165,7 @@ h3.incident__when {
   margin-top: 1rem;
   border-collapse: collapse;
   text-align: right;
-}
-
-.incident__stats caption {
-  padding-bottom: 0.25rem;
-  text-align: left;
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--brass);
+  font-variant-numeric: tabular-nums;
 }
 
 .incident__stats th,
@@ -197,10 +188,54 @@ h3.incident__when {
   color: var(--contact-red-bright);
 }
 
+/* A section's heading, with its info button beside it; the button's words hang across the heading's row. */
+.incident__section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin: 1rem 0 0.25rem;
+}
+
+.incident__section h3 {
+  margin: 0;
+}
+
+.incident__summary {
+  margin: 0;
+  line-height: 1.5;
+}
+
 .incident__report {
   margin: 0;
   white-space: pre-wrap;
   line-height: 1.45;
+}
+
+/* The report's first ten lines. */
+.incident__report.is-clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 10;
+  overflow: hidden;
+}
+
+/* Centred under the report, its arrow after the words. */
+.incident__more {
+  display: flex;
+  align-items: center;
+  margin: 0.35rem auto 0;
+  padding: 0;
+  font: inherit;
+  color: var(--smoke-yellow);
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.incident__more app-icon {
+  margin-inline: 0.25em 0;
 }
 
 a {

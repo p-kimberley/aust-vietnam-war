@@ -36,7 +36,10 @@
         <p class="incident__line"><strong>Grid reference</strong> <span class="data">{{ d.gridRef }}</span></p>
       }
 
-      <h3>Friendly units</h3>
+      <div class="incident__section">
+        <h3>Friendly units</h3>
+        <app-panel-info subject="the friendly units" [text]="info.units" />
+      </div>
       @if (d.units.length) {
         <ul class="incident__units">
           @for (u of d.units; track u.id) {
@@ -68,8 +71,11 @@
         <p class="incident__none">Unknown</p>
       }
 
-      <table class="incident__stats data">
-        <caption>Strength and casualties</caption>
+      <div class="incident__section">
+        <h3 id="incident-stats">Strength and casualties</h3>
+        <app-panel-info subject="the strength and casualties" [text]="info.stats" />
+      </div>
+      <table class="incident__stats" aria-labelledby="incident-stats">
         <thead>
           <tr>
             <td></td>
@@ -96,11 +102,31 @@
         </tbody>
       </table>
 
-      <h3>Original incident report</h3>
-      <p class="incident__report data">{{ d.description || 'No report is recorded.' }}</p>
+      @if (d.summary) {
+        <div class="incident__section">
+          <h3>Incident summary</h3>
+          <app-panel-info subject="the incident summary" [text]="info.summary" />
+        </div>
+        <p class="incident__summary">{{ d.summary }}</p>
+      }
+
+      <div class="incident__section">
+        <h3>Original incident report</h3>
+        <app-panel-info subject="the original incident report" [text]="info.report" />
+      </div>
+      <!-- The report's first ten lines or so, until the reader asks for the rest. -->
+      <p #report id="incident-report" class="incident__report" [class.is-clamped]="!reportExpanded()">{{ d.description || 'No report is recorded.' }}</p>
+      @if (reportClamped() || reportExpanded()) {
+        <button type="button" class="incident__more" aria-controls="incident-report" [attr.aria-expanded]="reportExpanded()" (click)="reportExpanded.set(!reportExpanded())">
+          {{ reportExpanded() ? 'Read less' : 'Read more' }}<app-icon [name]="reportExpanded() ? 'chevron-up' : 'chevron-down'" />
+        </button>
+      }
 
       @if (d.archivalSource) {
-        <h3>Archival source</h3>
+        <div class="incident__section">
+          <h3>Archival source</h3>
+          <app-panel-info subject="the archival source" [text]="info.archive" />
+        </div>
         <p>{{ d.archivalSource }}</p>
       }
       @if (d.sourceUrl) {

@@ -63,6 +63,8 @@ export interface ContactDetail {
   archivalSource: string | null;
   /** An absolute http(s) URL, already vetted by the API. */
   sourceUrl: string | null;
+  /** The report in plain English, written by an AI model from the original; missing or null where there is none. */
+  summary?: string | null;
 }
 
 export type HeatField = 'fr' | 'frCas' | 'en' | 'enCas';

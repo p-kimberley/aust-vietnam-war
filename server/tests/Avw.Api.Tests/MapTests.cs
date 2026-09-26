@@ -367,7 +367,8 @@ public class ElasticsearchContactSourceTests
             {"_id":9,"ShortDisplayName":"Secret","LongDisplayName":"Secret unit","Hidden":true}],
           "Fr_Force_Present":25,"En_Force":5,"Fr_KIA":1,"Fr_WIA":2,"En_KIA":3,"En_WIA":4,
           "Description_of_Incident":"AT LOC STATED.","Archival_Source_Data":"Intel V-dat Base",
-          "Source_Hyperlink":"https://www.awm.gov.au/collection/R1"}}
+          "Source_Hyperlink":"https://www.awm.gov.au/collection/R1",
+          "Incident_Summary":" A platoon made contact at the place stated. "}}
         """;
 
     [Fact]
@@ -385,6 +386,8 @@ public class ElasticsearchContactSourceTests
         Assert.DoesNotContain(d.Units, u => u.Id == 9);
         Assert.Equal((1, 2, 3, 4), (d.FrKia, d.FrWia, d.EnKia, d.EnWia));
         Assert.Equal("https://www.awm.gov.au/collection/R1", d.SourceUrl);
+        Assert.Contains("Incident_Summary", handler.Request.RequestUri.Query);
+        Assert.Equal("A platoon made contact at the place stated.", d.Summary);
     }
 
     [Theory]
