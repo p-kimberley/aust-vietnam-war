@@ -151,12 +151,22 @@ export const timelineResolver: ResolveFn<TimelineContent> = () => loadTimeline()
 
 // ---------------------------------------------------------------- the layout
 
+/** The phases' colours, in order, for their bands, markers and the navigator's lines. */
+const PHASE_COLOURS = ['#566137', '#8a6d2f', '#b5331f', '#2f5f86', '#8f3420', '#6b5b95', '#3f7f6a', '#7a7462'];
+
+/** The colour of the phase at this place in the war's order. */
+export function phaseColour(index: number): string {
+  return PHASE_COLOURS[((index % PHASE_COLOURS.length) + PHASE_COLOURS.length) % PHASE_COLOURS.length];
+}
+
 /** A row under a phase: a month of the Task Force's work, or an operation (placed after the month it began in). */
 export type TimelineEntry =
   | { kind: 'month'; key: string; sort: string; month: MonthFacts; narrative: Narrative | null }
   | { kind: 'operation'; key: string; sort: string; operation: OperationFacts; narrative: Narrative | null };
 
 export interface PhaseView {
+  /** Its place in the war's order (for its colour), whatever is left out around it. */
+  index: number;
   phase: PhaseFacts;
   narrative: Narrative | null;
   entries: TimelineEntry[];
@@ -169,7 +179,7 @@ export interface PhaseView {
  */
 export function layOut(content: TimelineContent): PhaseView[] {
   const { facts } = content;
-  const views = facts.phases.map((phase) => ({ phase, narrative: content.phases[phase.slug] ?? null, entries: [] as TimelineEntry[] }));
+  const views = facts.phases.map((phase, index) => ({ index, phase, narrative: content.phases[phase.slug] ?? null, entries: [] as TimelineEntry[] }));
   const holding = (day: string) => views.filter((v) => v.phase.from <= day && day <= v.phase.to);
   const place = (day: string, lead: string | undefined) => {
     const candidates = holding(day);

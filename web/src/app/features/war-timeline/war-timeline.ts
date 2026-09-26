@@ -2,12 +2,10 @@ import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Injector, afterNextRender, computed, effect, inject, input, untracked } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Seo } from '../../core/seo.service';
-import { TimelineContent, layOut } from './timeline-data';
+import { TimelineContent, layOut, phaseColour } from './timeline-data';
+import { TimelineNavigator } from './timeline-navigator';
 import { TimelinePhase } from './timeline-phase';
 import { TimelineState, ZOOMS, Zoom } from './timeline-state';
-
-/** The phases' colours, in order, for their bands and markers. */
-const PHASE_COLOURS = ['#566137', '#8a6d2f', '#b5331f', '#2f5f86', '#8f3420', '#6b5b95', '#3f7f6a', '#7a7462'];
 
 /**
  * `/features/war-timeline`: what Australian forces did in Vietnam, and why, from 1965 to 1971, as a vertical timeline. Three
@@ -16,7 +14,7 @@ const PHASE_COLOURS = ['#566137', '#8a6d2f', '#b5331f', '#2f5f86', '#8f3420', '#
  */
 @Component({
   selector: 'app-war-timeline',
-  imports: [RouterLink, TimelinePhase],
+  imports: [RouterLink, TimelineNavigator, TimelinePhase],
   providers: [TimelineState],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -61,15 +59,22 @@ const PHASE_COLOURS = ['#566137', '#8a6d2f', '#b5331f', '#2f5f86', '#8f3420', '#
         </nav>
         <ol class="phases">
           @for (v of shown(); track v.phase.slug; let i = $index) {
-            <li [style.--phase]="colour(v.phase.slug)"><app-timeline-phase [view]="v" [maxMonth]="maxMonth()" /></li>
+            <li [style.--phase]="colour(v.index)"><app-timeline-phase [view]="v" [maxMonth]="maxMonth()" /></li>
           }
         </ol>
       </div>
+      <app-timeline-navigator [views]="shown()" />
     </div>
   `,
   styles: `
     .page {
       padding-block: 1.5rem 4rem;
+    }
+    /* Room for the navigator at the right-hand edge, where the page's margin is too narrow to hold it. */
+    @media (min-width: 40.01rem) and (max-width: 82rem) {
+      .page {
+        padding-right: 3.25rem;
+      }
     }
     .crumbs {
       display: flex;
@@ -235,10 +240,7 @@ export class WarTimeline {
     afterNextRender(() => this.openFragment(this.route.snapshot.fragment), { injector: this.injector });
   }
 
-  protected colour(slug: string): string {
-    const i = this.facts().phases.findIndex((p) => p.slug === slug);
-    return PHASE_COLOURS[i % PHASE_COLOURS.length];
-  }
+  protected readonly colour = phaseColour;
 
   protected setZoom(zoom: Zoom): void {
     this.state.setZoom(zoom);

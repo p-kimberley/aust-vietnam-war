@@ -1,7 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   MonthFacts,
   OperationFacts,
@@ -157,6 +157,11 @@ describe('WarTimeline', () => {
     expect(el.querySelector('app-timeline-entry app-contact-list')).toBeNull();
     expect(text(el.querySelector('#establishing app-narrative-text'))).toContain('It arrived in April');
     expect(el.querySelector<HTMLAnchorElement>('#establishing-src-1 a')!.href).toBe('https://anzacportal.dva.gov.au/x');
+    // A source mark leads to its source on this page, not the site's home page (the base address is the root).
+    const mark = el.querySelector<HTMLAnchorElement>('#establishing .cite')!;
+    expect(mark.getAttribute('href')).toBe('/features/war-timeline?zoom=operational#establishing-src-1');
+    await click(mark);
+    expect(el.querySelector('#establishing-src-1')!.classList).toContain('is-shown');
 
     await click(zoom('Tactical'));
     expect(el.querySelectorAll('app-timeline-entry app-contact-list')).toHaveLength(5);
@@ -168,6 +173,56 @@ describe('WarTimeline', () => {
 
     await click(el.querySelector('#with-the-173rd h3 button'));               // a phase closed
     expect(el.querySelectorAll('#with-the-173rd app-timeline-entry')).toHaveLength(0);
+  });
+
+  it('lines the phases and their operations up down the right-hand edge, and one chosen opens its phase and comes into view', async () => {
+    const scrolled: string[] = [];
+    // The test page has no scrolling of its own: record what would be brought into view instead.
+    const had = 'scrollIntoView' in Element.prototype;
+    if (!had) Element.prototype.scrollIntoView = () => undefined;
+    const scroll = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (this: Element) {
+      scrolled.push(this.id);
+    });
+    try {
+      const { el, text, click } = await render();
+      const ticks = [...el.querySelectorAll<HTMLButtonElement>('app-timeline-navigator .tick')];
+
+      expect(ticks.map((t) => [t.classList.contains('tick--phase') ? 'phase' : 'op', text(t.querySelector('strong'))])).toEqual([
+        ['phase', 'Phase with-the-173rd'],
+        ['op', 'Operation Silver-city'],
+        ['phase', 'Phase establishing'],
+        ['op', 'Operation Hardihood'],
+      ]);
+      expect(text(ticks[3].querySelector('.label'))).toBe('Operation Hardihood 1 May – 24 Jun 1966');
+      expect(el.querySelector('#op-hardihood')).toBeNull();                     // its phase is closed at the strategic level
+
+      await click(ticks[3]);
+      expect(el.querySelector('#op-hardihood')).not.toBeNull();
+      expect(scrolled).toEqual([]);                                              // not until its phase has grown open
+      await new Promise((r) => setTimeout(r, 400));
+      expect(scrolled).toEqual(['op-hardihood']);
+    } finally {
+      scroll.mockRestore();
+      if (!had) delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+    }
+  });
+
+  it('picks out the phase and operation being read as the page scrolls', async () => {
+    const { el, harness } = await render('?zoom=operational');
+    const tops: Record<string, number> = { 'with-the-173rd': -2000, 'op-silver-city': -900, establishing: 100, 'op-hardihood': 900 };
+    const rect = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+      return { top: tops[this.id] ?? 5000 } as DOMRect;
+    });
+    try {
+      window.dispatchEvent(new Event('scroll'));
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      harness.detectChanges();
+      const current = () => [...el.querySelectorAll('app-timeline-navigator [aria-current]')].map((t) => t.textContent?.replace(/\s+/g, ' ').trim());
+
+      expect(current()).toEqual(['Phase establishing 1 Mar – 17 Aug 1966']);   // Hardihood is not yet reached
+    } finally {
+      rect.mockRestore();
+    }
   });
 
   it('narrows the timeline to a unit, its Battle Map links with it, and keeps the view in the address', async () => {

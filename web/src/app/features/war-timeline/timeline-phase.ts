@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input } from '@angular/core';
 import { NarrativeText } from './narrative-text';
 import { TimelineEntry } from './timeline-entry';
 import { PhaseView, daySpan, withUnit } from './timeline-data';
 import { TimelineState } from './timeline-state';
+
+/** How long a phase takes to grow open (its .opening animation below), and a little more. */
+export const PHASE_OPENING_MS = 340;
 
 /**
  * A phase of the war: its title and dates, its figures, a chart of its months' contacts (the friendly killed marked in red), and
@@ -19,7 +22,7 @@ import { TimelineState } from './timeline-state';
       <p class="dates data">{{ dates() }}</p>
       <div class="title-row">
         <h3>
-          <button type="button" [attr.aria-expanded]="open()" [attr.aria-controls]="view().phase.slug + '-body'" (click)="state.togglePhase(view().phase.slug)">
+          <button type="button" [attr.aria-expanded]="open()" [attr.aria-controls]="view().phase.slug + '-body'" (click)="toggle()">
             {{ view().phase.title }}<span class="chev" aria-hidden="true"></span>
           </button>
         </h3>
@@ -61,6 +64,8 @@ import { TimelineState } from './timeline-state';
       position: relative;
       display: block;
       margin: 0 0 1.25rem;
+      /* Brought into view (by a link or the navigator), it stops below the page's sticky view controls. */
+      scroll-margin-top: 4.5rem;
     }
     .head {
       position: relative;
@@ -253,6 +258,24 @@ export class TimelinePhase {
   readonly maxMonth = input.required<number>();
 
   protected readonly state = inject(TimelineState);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /**
+   * Opens or shuts the phase; opened, it is brought to the top of the window (below the view controls) to be read from its start,
+   * once it has grown open (a smooth scroll begun while the page is still growing beneath it can stop short). At once for those
+   * who ask for less motion, as nothing then grows.
+   */
+  protected toggle(): void {
+    const opening = !this.open();
+    this.state.togglePhase(this.view().phase.slug);
+    if (!opening) return;
+    const still = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const bring = () => this.host.nativeElement.scrollIntoView?.({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    clearTimeout(this.bringing);
+    this.bringing = setTimeout(bring, still ? 0 : PHASE_OPENING_MS);
+  }
+
+  private bringing?: ReturnType<typeof setTimeout>;
   protected readonly open = computed(() => this.state.phaseOpen(this.view().phase.slug));
   protected readonly dates = computed(() => daySpan(this.view().phase.from, this.view().phase.to));
   protected readonly entries = computed(() => {

@@ -57,6 +57,8 @@ const days = (from: string, to: string) => (Date.parse(to) - Date.parse(from)) /
   styles: `
     :host {
       position: relative;
+      /* Brought into view (by a link or the navigator), it stops below the page's sticky view controls. */
+      scroll-margin-top: 4.5rem;
       display: grid;
       grid-template-columns: 7.5rem minmax(0, 1fr);
       gap: 0 1.5rem;
