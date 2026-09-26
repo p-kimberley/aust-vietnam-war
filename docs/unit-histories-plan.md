@@ -13,8 +13,12 @@ history at the right, as either:
 - a **vertical timeline** of the unit's major incidents, alongside the major events of Australia's war.
 
 The histories are **built once, offline, and committed to the repository** as Markdown with their own images, so they can be
-read, reviewed and refined in later iterations like any other source: nothing is generated when someone visits. Once published,
-editors can go on editing them in the Studio.
+read, reviewed and refined in later iterations like any other source: nothing is generated when someone visits. **The
+repository is the only copy**: a change is made there and goes out with the next deploy. They are not in the database and not
+edited in the Studio.
+
+Unit Histories is the first of the site's **Features**, a new item in the header's navigation beside the Battle Map.
+**Operation Histories** is planned next, built the same way (section 8).
 
 ## 2. What the data gives us (checked against the live data, 2026-09-26)
 
@@ -54,16 +58,20 @@ sections can be reached directly: the list at the left shows them under their un
 
 ## 3. What a reader sees
 
-**Route:** `/units`, `/units/<unit>` for a unit's history, and `/units/<unit>/<sub-unit>` for a sub-unit's section of it (for
-example `/units/5-rar`, `/units/5-rar/b-company`), server-rendered like the stories, so a history can be shared, searched and read
-without the map. The header's nav gains **Units**.
+**Navigation:** the header gains **Features**, beside **Battle Map**, leading to `/features`: a short page introducing each
+feature (Unit Histories now, Operation Histories later), each opening its own page.
+
+**Routes:** `/features/unit-histories` (the list, and an introduction), `/features/unit-histories/<unit>` for a unit's history,
+and `/features/unit-histories/<unit>/<sub-unit>` for a sub-unit's section of it (for example
+`/features/unit-histories/5-rar/b-company`). They are **prerendered at build time** into plain HTML from the committed Markdown,
+so they load at once, are found by search engines, can be shared, and read without the map.
 
 **Layout:** a list at the left (the 16 units, each with its sub-units indented beneath it; a filter box; each with its contact
 count), the history at the right. Choosing a sub-unit opens its unit's history at that sub-unit's section. On a phone the list
 becomes a unit picker at the top.
 
-**The history's head:** name, the parent it belongs to, its dates in Vietnam, and a strip of figures (contacts, operations,
-friendly and enemy casualties), with **View on the Battle Map**: the map filtered to the unit (`/battlemap?units=<id>`).
+**The history's head:** name, its dates in Vietnam, and a strip of figures (contacts, operations, friendly and enemy casualties),
+with **View on the Battle Map**: the map filtered to the unit (`/battlemap?units=<id>`).
 
 **Written account** (the default):
 
@@ -121,13 +129,13 @@ The written account and the timeline's descriptions are **drafted by a language 
 the fact sheet**, once, by a second command (`unit-histories draft`), and **written to the repository** (4.4).
 
 - The model is given the fact sheet, the reports of the unit's notable contacts, and the reference notes from official sources
-  (4.3), and nothing else to write from. It writes to the fixed structure in 3, and marks each incident it links with the
-  contact's id; the build checks every id is one of the unit's contacts and turns it into a Battle Map link. It links **only
+  (4.3), and nothing else to write from. It writes to the fixed structure in 3, and links each incident it names to the
+  Battle Map (`/battlemap?incident=<id>`); the build checks every linked id is one of the unit's contacts. It links **only
   significant or illustrative contacts** (a handful per section), not every incident it draws on.
 - Quotations from the reports must be word for word (checked by the build), and every statement taken from an external source
   carries its citation (checked: a citation must name one of the unit's reference sources).
-- The drafts are reviewed and refined in the repository (by you, or with further passes), then published; published accounts
-  are editable by editors in the Studio (4.4).
+- The drafts are reviewed and refined in the repository (by you, or with further passes), and published by committing them;
+  later corrections are made the same way (4.4).
 - The cost is one run over 16 units, not per visit; the model is chosen, and its cost confirmed, when phase 4 starts.
 
 ### 4.3 Official sources
@@ -142,53 +150,53 @@ Official photographs from the Memorial's collection may be used where its catalo
 and with their accession number; they are committed with the history (4.4). Otherwise photographs come from the site's own
 collection, referenced where they are deployed.
 
-### 4.4 In the repository, and in the site
+### 4.4 In the repository, and how the site shows it
 
-**The repository holds the histories**, under `content/unit-histories/`:
+**The repository holds the histories**, under `content/features/unit-histories/`:
 
 ```
-content/unit-histories/
-  war-events.md                 the curated events of Australia's war, each with its source
-  unit-names.csv                the rolls' unit names mapped to the tree's, and any re-parenting (1 ATF Artillery, Mortars)
-  5-rar/
-    history.md                  the written account: front matter (unit id, title, dates, status) and Markdown, with
-                                sub-unit sections (## B Company {#b-company}), contact links ([…](contact:1234)),
-                                portraits and pictures by reference (portrait:216900, picture:512), citations ([^3])
-    timeline.md                 the timeline's entries (date, kind, words, contact or person or picture), one per line
-    sources.md                  the reference file (4.3)
-    facts.json                  the fact sheet the draft was made from (rebuilt by `unit-histories facts`)
-    images/                     official photographs used, with their credit (never copies of portraits or site pictures)
+content/features/
+  features.md                   the Features page: a short introduction to each feature
+  war-events.md                 the curated events of Australia's war, each with its source (shared with Operation Histories)
+  unit-histories/
+    index.md                    the Unit Histories introduction; the list of units and sub-units, with their counts (front matter)
+    unit-names.csv              the rolls' unit names mapped to the tree's, and any re-parenting (1 ATF Artillery, Mortars)
+    5-rar/
+      history.md                the written account: front matter (unit id, title, dates, figures) and Markdown, with sub-unit
+                                sections (## B Company {#b-company}), citations ([^3]), and links and pictures written as their
+                                site addresses (below)
+      timeline.md               the timeline's entries (date, kind, words, link, picture), one per line
+      sources.md                the reference file (4.3)
+      facts.json                the fact sheet the draft was made from (rebuilt by `unit-histories facts`, kept for review)
+      images/                   official photographs used, with their credit (never copies of portraits or site pictures)
 ```
 
-`contact:`, `portrait:` and `picture:` references are resolved when the history is shown, so portraits and community pictures
-are always the deployed ones.
+**Every reference is a plain site address**, written in when the history is drafted, so showing a history needs no database or
+API call: a contact is `/battlemap?incident=<id>`, the unit on the map is `/battlemap?units=<id>`, a portrait is
+`/media/portraits/<service number>.jpg`, and a community picture is its deployed `/media/…` address. The drafting command checks
+each exists (the contact is the unit's, the portrait and the picture are deployed).
 
-**The site holds the published copy**, so editors can edit it:
-
-- `unit-histories import` loads a unit's files into a `unit_histories` table (account as Markdown, rendered and sanitised for readers, as articles are;
-  timeline and sources as JSON; revisions as articles have them), as a new revision; it will not overwrite an editor's change
-  without being told to.
-- In the Studio, **Unit histories** lists the units; editors edit a published account with the article editor, and its
-  timeline entries, and publish.
-- `unit-histories export` writes the published copies back to `content/unit-histories/`, so editors' changes are committed and
-  the next iteration starts from them.
-- `GET /api/units` (the list for the left-hand side) and `GET /api/units/{slug}` (one history, with its references resolved).
+**The web build** copies `content/features/` into the site's assets (an `angular.json` asset entry) and **prerenders** each
+page from it: the Markdown is rendered (with `marked`, already in the app) when the site is built, and Angular sanitises the
+result as it does any HTML it is given. Nothing is added to the API or the database. A change to a history is a change to its
+Markdown, reviewed and committed like code, and live with the next deploy.
 
 ### 4.5 Keeping it current
 
-The histories are a snapshot. When contacts, the roll or the pictures change a lot, `unit-histories facts` is run again; the
-Studio shows which units' facts have changed since their account was reviewed, and those are redrafted or edited by hand.
+The histories are a snapshot. When contacts, the roll or the pictures change a lot, `unit-histories facts` is run again; its
+report says which units' facts have changed since their account was drafted (the new `facts.json` shows the difference in the
+commit), and those are redrafted or edited by hand. The commands are tools run from a developer's machine (they read the live
+Elasticsearch and the database read-only, and write files); they are never part of the site.
 
 ## 5. Phases and estimates
 
 | Phase | What | Days |
 |---|---|---|
 | 1. Fact sheets | The unit names table, the fact-sheet command (contacts, sub-units, the nominal roll's tours, portraits, pictures) and its tests; `facts.json` for the 16 units committed; a review of a few with you | 3–4 |
-| 2. Page and API | The Markdown format and its references, `import` and the `unit_histories` table, the API, `/units` with the list and a history drawn from the fact sheet alone (figures, activity mix, sub-unit sections, roll of honour, photographs) | 4–5 |
+| 2. Features and the page | **Features** in the header and `/features`; `/features/unit-histories` with the list and a history drawn from the fact sheet alone (figures, activity mix, sub-unit sections, roll of honour, photographs), prerendered from the committed files | 3–4 |
 | 3. Timeline | The vertical timeline, `war-events.md` with its sources, the switch between views | 3 |
 | 4. Accounts | Official reference files for the units, the drafting command with checked links, quotations and citations, the 16 drafts committed | 4–6 |
-| 5. Editing | Studio editing of published histories, `export` back to the repository | 2–3 |
-| 6. Review | Your review of the drafts, refinements, publishing | review time |
+| 5. Review | Your review of the drafts, refinements in the repository | review time |
 
 Phases 1–3 give a working page without any model; phase 4 adds the prose.
 
@@ -200,7 +208,11 @@ Phases 1–3 give a working page without any model; phase 4 adds the prose.
 3. **Drafted with a language model**, and the drafted content **committed to the repository** (Markdown, and static images)
    so it can be referenced and refined in later iterations.
 4. **Official sources only**, cited wherever external material is used.
-5. **Published accounts are editable by editors** (in the Studio, exported back to the repository).
+5. **The repository is the only copy** (changed 2026-09-26): histories are committed Markdown, changed in the repository and
+   live with the next deploy; not in the database, and not edited in the Studio. Feature pages stay out of the database unless
+   one needs it.
+8. **Features**: a new header item beside Battle Map, leading to `/features`; Unit Histories is its first page, Operation
+   Histories the next (section 8).
 6. **Portraits are the deployed ones** (`media/portraits/<service number>.jpg`, 520 of the roll's 522, mapped and checked
    against the nominal roll index); histories reference them and never copy them.
 7. **Only significant or illustrative contacts are linked** to the Battle Map, not every incident.
@@ -216,7 +228,16 @@ Still open: the one portrait that matches no one (`2786017.jpg`), which may be a
 - **Thin units**: some companies have few reports with any detail; their accounts will be short, which is better than padded.
 - **Copyright**: facts from official sources, not their words, and cited; photographs from the site's own collection, or official
   photographs the Memorial marks as out of copyright, each credited.
-- **Two copies**: the repository and the site can drift apart. `import` refuses to overwrite editors' changes, and `export`
-  brings them back to the repository; the Studio shows which histories have changed since they were last exported.
+- **Changes need a deploy**: a correction to a history waits for the next release. That is the trade for keeping it in the
+  repository, reviewed like code; a hotfix deploy is the answer if one is urgent.
 - **Sensitivity**: this is about people who died and their families. The tone is set in the drafting instructions (plain,
   factual, respectful), and the review is the safeguard.
+
+## 8. Operation Histories (next)
+
+The same pattern, for the major operations: a list at the left (by year), each operation's account (why it was mounted, the units
+in it, what happened, what it cost) and its timeline, from a fact sheet of its contacts, units, dead and pictures, drafted from
+official sources and committed under `content/features/operation-histories/`. Most of phase 1 to 3 is shared (the fact-sheet
+machinery, the Markdown and its references, the page, the timeline and `war-events.md`); what the operations add is their own
+selection (which operations are major), their fact sheet and their drafting instructions. Unit and operation histories link to
+each other where a unit took part in an operation. Planned in detail once Unit Histories is built.
