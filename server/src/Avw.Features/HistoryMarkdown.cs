@@ -88,8 +88,6 @@ public static partial class HistoryMarkdown
         if (s.Notable.Count > 0)
         {
             Section("Notable contacts");
-            Line("Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and " +
-                 "soldiers' shorthand; the original is on the Battle Map.");
             foreach (var c in s.Notable)
             {
                 var title = $"{Day(c.Dtg)}: {Esc(c.Task ?? "Contact")}" + (c.Operation is { } op ? $", Operation {Esc(op)}" : "");

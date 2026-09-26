@@ -67,8 +67,6 @@ In the contacts it led, by the task the report records:
 
 ## Notable contacts
 
-Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.
-
 ### 25 June 1966: Security, Operation TAOR
 
 *First* · SASR in contact
