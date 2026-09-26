@@ -70,10 +70,6 @@ In the contacts it led, by the task the report records:
 | [Cung Chung](/battlemap?units=143&ops=Cung%20Chung) | 19 June 1970 | 1 | 0 | 0 |
 | [Briar Patch 1](/battlemap?units=143&ops=Briar%20Patch%201) | 11 April 1971 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Serle (FSB, 12), Herring (FSB, 10), Dampier (FSB, 8), Weir (FSB, 7), Arrow (FSB, 6), Garth (FSB, 4), Panther (FSB, 4), Gabo (FSB, 2).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

@@ -59,10 +59,6 @@ In the contacts it led, by the task the report records:
 | [Cung Chung 2](/battlemap?units=8956&ops=Cung%20Chung%202) | 3 August 1970 – 6 September 1970 | 4 | 0 | 22 |
 | [Cung Chung 3](/battlemap?units=8956&ops=Cung%20Chung%203) | 9 October 1970 | 1 | 0 | 4 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Weir (FSB, 32), Arrow (FSB, 29), Wattle (FSPB, 26), Kate (FSB, 19), Isa (FSPB, 18), Thrust (FSB, 8), Buffalo (FSB, 7), Puma (FSB, 7).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

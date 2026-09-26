@@ -5,46 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/ci.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/ci.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-armoured-regiment/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-armoured-regiment/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-atf/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-atf/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-field-regiment/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-field-regiment/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-field-squadron/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-field-squadron/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/2-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/2-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/3-cavalry-regiment/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/3-cavalry-regiment/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/3-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/3-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/4-field-regiment/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/4-field-regiment/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/4-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/4-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/5-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/5-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/6-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/6-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/7-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/7-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/8-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/8-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/9-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/9-rar/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/sasr/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/sasr/facts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/units.csv" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/units.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/runbook.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/unit-histories-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/unit-histories-plan.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Features/FactSheet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Features/FactSheet.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Features/FactSheetBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Features/FactSheetBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Features/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Features/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/FactSheetBuilderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/FactSheetBuilderTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/web/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-community.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-community.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-history.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap-history.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/battlemap.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/layout/layout.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/layout/layout.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/layout/site-header.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/layout/site-header.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/layout/site-layout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/layout/site-layout.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-armoured-regiment/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-armoured-regiment/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-atf/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-atf/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-field-regiment/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-field-regiment/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-field-squadron/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-field-squadron/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/2-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/2-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/3-cavalry-regiment/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/3-cavalry-regiment/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/3-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/3-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/4-field-regiment/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/4-field-regiment/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/4-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/4-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/5-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/5-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/6-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/6-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/7-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/7-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/8-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/8-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/9-rar/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/9-rar/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/sasr/history.md" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/sasr/history.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Avw.Features/HistoryMarkdown.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Features/HistoryMarkdown.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -225,7 +202,7 @@
       <workItem from="1789826907280" duration="57186000" />
       <workItem from="1790238719146" duration="12841000" />
       <workItem from="1790331544884" duration="11149000" />
-      <workItem from="1790370537759" duration="24422000" />
+      <workItem from="1790370537759" duration="24781000" />
     </task>
     <task id="LOCAL-00001" summary="Add api as submodule">
       <option name="closed" value="true" />

@@ -68,10 +68,6 @@ In the contacts it led, by the task the report records:
 | [Lyre Bird](/battlemap?units=4186&ops=Lyre%20Bird) | 15 August 1969 | 1 | 0 | 0 |
 | [Nepabunna](/battlemap?units=4186&ops=Nepabunna) | 15 August 1969 – 11 September 1969 | 15 | 1 | 13 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Jenny (FSB, 39), Arrow (FSB, 37), Wattle (FSPB, 27), Hawk (FSB, 21), Barbara (FSPB, 17), Syke (FSB, 16), Tanee (FSB, 14), Cedar (FSB, 12).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

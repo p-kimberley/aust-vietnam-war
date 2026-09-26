@@ -78,10 +78,6 @@ In the contacts it led, by the task the report records:
 | [Cung Chung 3](/battlemap?units=1330&ops=Cung%20%20Chung%203) | 10 October 1970 – 23 January 1971 | 30 | 3 | 42 |
 | [Phoi Hop](/battlemap?units=1330&ops=Phoi%20Hop) | 1 February 1971 – 19 February 1971 | 5 | 2 | 3 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Harrison (FSB, 42), Thrust (FSB, 32), Arrow (FSB, 31), Weir (FSB, 23), Baton (FSB, 22), Herring (FSB, 16), Dampier (FSB, 15), Lance (FSB, 14).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

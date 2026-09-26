@@ -79,10 +79,6 @@ In the contacts it led, by the task the report records:
 | [Briar Patch](/battlemap?units=1419&ops=Briar%20Patch) | 31 March 1971 | 1 | 2 | 2 |
 | [U/K](/battlemap?units=1419&ops=U%2FK) | 9 April 1971 – 22 April 1971 | 2 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Andersen (FSB, 33), Weir (FSB, 25), Harrison (FSB, 18), Melissa (FSB, 18), Garth (FSB, 16), Noela (FSB, 16), Buffalo (FSB, 13), Friendship (FSB, 10).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

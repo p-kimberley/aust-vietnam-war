@@ -54,10 +54,6 @@ In the contacts it led, by the task the report records:
 | [Cung Chung](/battlemap?units=1396&ops=Cung%20%20Chung) | 14 June 1970 | 1 | 1 | 1 |
 | [Phoi Hop](/battlemap?units=1396&ops=Phoi%20Hop) | 18 February 1971 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Baton (FSB, 33), Serle (FSB, 26), Weir (FSB, 23), Arrow (FSB, 9), Cook (LZ, 8), Cougar (FSB, 7), Lance (FSB, 7), Chocolate (LZ, 6).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

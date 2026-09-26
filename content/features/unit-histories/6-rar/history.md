@@ -86,10 +86,6 @@ In the contacts it led, by the task the report records:
 | [Townsville](/battlemap?units=172&ops=Townsville) | 27 March 1970 – 19 April 1970 | 12 | 0 | 13 |
 | [Concrete](/battlemap?units=172&ops=Concrete) | 22 April 1970 | 1 | 1 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Lance (FSB, 65), Tiger (FSPB, 43), Weir (FSB, 26), Discovery (FSB, 24), Garth (FSB, 24), Dampier (FSB, 18), Baton (FSB, 15), Thrust (FSB, 15).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

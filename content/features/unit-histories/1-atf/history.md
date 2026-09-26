@@ -118,10 +118,6 @@ In the contacts it led, by the task the report records:
 | [Inverbrackie](/battlemap?units=107&ops=Inverbrackie) | 10 August 1971 | 1 | 0 | 0 |
 | [Cudlee Creek](/battlemap?units=107&ops=Cudlee%20Creek) | 1 September 1971 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Weir (FSB, 82), Lance (FSB, 45), Herring (FSB, 39), Dampier (FSB, 38), Thrust (FSB, 32), Isa (FSPB, 23), Arrow (FSB, 22), Sabre (FSB, 12).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

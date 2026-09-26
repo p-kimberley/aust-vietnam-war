@@ -84,14 +84,6 @@ public static partial class HistoryMarkdown
                 }));
         }
 
-        // Where it worked.
-        if (s.Areas.Count > 0)
-        {
-            Section("Where it worked");
-            Line("Contacts by the nearest base or landing zone: " +
-                 string.Join(", ", s.Areas.Select(a => $"{Esc(a.Place)} ({Esc(a.Type)}, {a.Contacts})")) + ".");
-        }
-
         // Notable contacts, each with the summary of its report.
         if (s.Notable.Count > 0)
         {

@@ -72,10 +72,6 @@ In the contacts it led, by the task the report records:
 | [U/K](/battlemap?units=210&ops=U%2FK) | 4 January 1970 | 1 | 0 | 0 |
 | [Bondi 2](/battlemap?units=210&ops=Bondi%202) | 28 January 1970 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Lance (FSB, 6), Cougar (FSB, 5), Dampier (FSB, 3), Hawk (FSB, 3), Sabre (FSB, 3), Syke (FSB, 3), Weir (FSB, 3), Baton (FSB, 2).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

@@ -75,10 +75,6 @@ In the contacts it led, by the task the report records:
 | [Inverbrackie](/battlemap?units=2160&ops=Inverbrackie) | 10 August 1971 – 18 August 1971 | 3 | 0 | 0 |
 | [Cudlee Creek](/battlemap?units=2160&ops=Cudlee%20Creek) | 25 August 1971 – 1 September 1971 | 3 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Coral (FSPB, 28), Thrust (FSB, 23), Arrow (FSB, 18), Wattle (FSPB, 17), Chocolate (LZ, 14), Discovery (FSB, 14), Flinders (FSB, 14), Balmoral (FSB, 13).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

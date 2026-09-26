@@ -103,10 +103,6 @@ In the contacts it led, by the task the report records:
 | [Bondi](/battlemap?units=1&ops=Bondi) | 31 December 1969 – 14 February 1970 | 36 | 0 | 35 |
 | [Bondi 2](/battlemap?units=1&ops=Bondi%202) | 28 January 1970 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Dampier (FSB, 58), Weir (FSB, 44), Noela (FSB, 42), Arrow (FSB, 25), Puma (FSB, 21), Syke (FSB, 21), Cougar (FSB, 20), Melissa (FSB, 20).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

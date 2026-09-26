@@ -140,10 +140,6 @@ In the contacts it led, by the task the report records:
 | [Ivanhoe](/battlemap?units=49&ops=Ivanhoe) | 20 September 1971 – 25 September 1971 | 3 | 0 | 1 |
 | [South Ward](/battlemap?units=49&ops=South%20Ward) | 12 October 1971 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Thrust (FSB, 28), Herring (FSB, 26), Garth (FSB, 25), Arrow (FSB, 20), Weir (FSB, 20), Nelson (FSB, 16), Elaine (FSB, 15), Julia (FSPB, 14).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

@@ -71,10 +71,6 @@ In the contacts it led, by the task the report records:
 | [Ivanhoe](/battlemap?units=3774&ops=Ivanhoe) | 20 September 1971 – 21 September 1971 | 4 | 5 | 28 |
 | [South Ward](/battlemap?units=3774&ops=South%20Ward) | 18 October 1971 | 2 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Wattle (FSPB, 26), Flinders (FSB, 20), Lindy (FSB, 14), Evans (FSB, 12), Cambrai (FSPB, 8), Kate (FSB, 8), Peggy (FSB, 7), Syke (FSB, 7).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

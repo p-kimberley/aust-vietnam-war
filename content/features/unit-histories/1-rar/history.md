@@ -114,10 +114,6 @@ In the contacts it led, by the task the report records:
 | [Goodwood](/battlemap?units=3233&ops=Goodwood) | 3 December 1968 – 26 January 1969 | 67 | 3 | 41 |
 | [Tiger Balm](/battlemap?units=3233&ops=Tiger%20Balm) | 1 January 1969 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Coral (FSPB, 70), Kerry (FSB, 58), Coogee (FSB, 53), Balmoral (FSB, 43), Harrison (FSB, 35), Cedar (FSB, 18), Tanee (FSB, 17), Polly (FSB, 15).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

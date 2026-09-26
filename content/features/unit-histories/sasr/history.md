@@ -65,10 +65,6 @@ In the contacts it led, by the task the report records:
 | [Massey (Force)](/battlemap?units=236&ops=Massey%20%28Force%29) | 9 September 1970 | 1 | 0 | 2 |
 | [Iron Fox](/battlemap?units=236&ops=Iron%20Fox) | 1 August 1971 | 1 | 0 | 0 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Toby (FSB, 53), Tiger (FSPB, 28), Flinders (FSB, 24), Bruiser (FSB, 17), Noela (FSB, 15), Wattle (FSPB, 14), Cook (LZ, 13), Melissa (FSB, 12).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.

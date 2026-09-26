@@ -94,10 +94,6 @@ In the contacts it led, by the task the report records:
 | [Hermit Park](/battlemap?units=2908&ops=Hermit%20Park) | 25 June 1971 | 1 | 0 | 3 |
 | [Iron Fox](/battlemap?units=2908&ops=Iron%20Fox) | 30 July 1971 | 1 | 1 | 12 |
 
-## Where it worked
-
-Contacts by the nearest base or landing zone: Thrust (FSB, 21), Herring (FSB, 17), Gabo (FSB, 16), Arrow (FSB, 14), Coral (FSPB, 7), Julia (FSPB, 7), Garth (FSB, 6), Leopard (FSB, 6).
-
 ## Notable contacts
 
 Each report is summarised in plain English by an AI model from the original, which is full of abbreviations and soldiers' shorthand; the original is on the Battle Map.
