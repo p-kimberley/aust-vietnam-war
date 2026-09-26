@@ -1,6 +1,8 @@
+/* Centred in the Battle Map's top bar, rather than lined up by its text with the title, so it moves nothing as it arrives. */
 :host {
   display: block;
   flex: 1;
+  align-self: center;
   min-width: 0;
   max-width: 26rem;
 }
