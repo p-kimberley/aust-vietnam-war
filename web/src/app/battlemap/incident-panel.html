@@ -107,15 +107,15 @@
           <h3>Incident summary</h3>
           <app-panel-info subject="the incident summary" [text]="info.summary" />
         </div>
-        <app-read-more class="incident__summary" [lines]="10" [text]="d.summary" />
+        <app-read-more class="incident__summary" [lines]="5" [text]="d.summary" />
       }
 
       <div class="incident__section">
         <h3>Original incident report</h3>
         <app-panel-info subject="the original incident report" [text]="info.report" />
       </div>
-      <!-- The report's first ten lines or so, until the reader asks for the rest. -->
-      <app-read-more class="incident__report" [lines]="10" [text]="d.description || 'No report is recorded.'" />
+      <!-- The report's first five lines, until the reader asks for the rest. -->
+      <app-read-more class="incident__report" [lines]="5" [text]="d.description || 'No report is recorded.'" />
 
       @if (d.archivalSource) {
         <div class="incident__section">
