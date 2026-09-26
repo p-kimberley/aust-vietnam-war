@@ -547,19 +547,33 @@ describe('HonourPanel', () => {
     return mount(HonourPanel, community, auth, { serviceNumber: '5715978' });
   }
 
-  it('shows a poppy laid without words as a poppy, and counts it', async () => {
+  it('lists each poppy with who left it (or Anonymous) and when, then any words, and counts them', async () => {
     const community = fakeCommunity({
       person: vi.fn(() => Promise.resolve(person)),
-      tributes: vi.fn(() => Promise.resolve({ items: [tribute({ message: 'Thank you.' }), tribute({ id: 2, message: '', authorName: 'Member' })], total: 2, page: 1, pageSize: 20 })),
+      tributes: vi.fn(() =>
+        Promise.resolve({
+          items: [tribute({ message: 'Thank you.' }), tribute({ id: 2, message: '', authorName: ' ' }), tribute({ id: 3, message: '', authorName: 'Member' })],
+          total: 3,
+          page: 1,
+          pageSize: 20,
+        }),
+      ),
     });
     const { fixture, el } = panel(community);
     await settle(fixture);
 
-    const cards = [...el.querySelectorAll('article.card')].map((c) => text(c));
-    expect(cards[0]).toContain('Thank you.');
-    expect(cards[1]).toContain('Laid a poppy.');
-    expect(cards[1]).toContain('Member');
-    expect(text(el)).toContain('Poppies (2)');
+    const rows = [...el.querySelectorAll('article.tribute')].map((t) => [
+      text(t.querySelector('.tribute__who')),
+      text(t.querySelector('.tribute__when')),
+      text(t.querySelector('.tribute__words')),
+    ]);
+    expect(rows).toEqual([
+      ['Bo Member', '1 Mar 2026', 'Thank you.'],
+      ['Anonymous', '1 Mar 2026', ''],                              // no name, and a poppy laid without words is just the poppy
+      ['Anonymous', '1 Mar 2026', ''],                              // "Member" is the site's stand-in for a name not known
+    ]);
+    expect(el.querySelectorAll('article.tribute > .poppy')).toHaveLength(3);
+    expect(text(el)).toContain('Poppies (3)');
   });
 
   it('shows who the person was, their service, incidents and poppies', async () => {
@@ -585,7 +599,7 @@ describe('HonourPanel', () => {
     });
     expect(text(el.querySelector('.tours li'))).toContain('5th Battalion, The Royal Australian Regiment (05/02/1969 to 04/04/1969)');
     expect(text(el)).toContain('Poppies (2)');
-    expect(el.querySelectorAll('article.card')).toHaveLength(2);
+    expect(el.querySelectorAll('article.tribute')).toHaveLength(2);
 
     button(el, 'Incident 9').click();
     expect(opened).toEqual([9]);
@@ -606,7 +620,7 @@ describe('HonourPanel', () => {
     await settle(fixture);
 
     expect(community['leaveTribute']).toHaveBeenCalledWith('5715978', 'Lest we forget.');
-    expect(text(el.querySelector('article.card'))).toContain('Lest we forget.');
+    expect(text(el.querySelector('article.tribute'))).toContain('Lest we forget.');
     expect(text(el)).toContain('Poppies (1)');
 
     button(el, 'Remove').click();
@@ -631,13 +645,13 @@ describe('HonourPanel', () => {
     const tributes = vi.fn((_sn: string, page: number) => Promise.resolve({ items: [tribute({ id: page, message: `Page ${page}` })], total: 2, page, pageSize: 1 }));
     const { fixture, el } = panel(fakeCommunity({ person: vi.fn(() => Promise.resolve(person)), tributes }));
     await settle(fixture);
-    expect(el.querySelectorAll('article.card')).toHaveLength(1);
+    expect(el.querySelectorAll('article.tribute')).toHaveLength(1);
 
     scrolling.reachEnd();
     await settle(fixture);
 
     expect(tributes).toHaveBeenLastCalledWith('5715978', 2);
-    expect(el.querySelectorAll('article.card')).toHaveLength(2);
+    expect(el.querySelectorAll('article.tribute')).toHaveLength(2);
     expect(el.querySelector('.loading-more')).toBeNull();
     vi.unstubAllGlobals();
   });

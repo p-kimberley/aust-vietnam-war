@@ -5,6 +5,10 @@ import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, HonourPerson, TributeView } from './community';
 import { Icon } from '../icon';
 import { LoadMore } from '../load-more';
+import { Poppy } from './poppy';
+
+/** The name the site gives someone whose name is not known (the API's CommunityLimits.DefaultAuthorName). */
+const UNKNOWN_AUTHOR = 'Member';
 
 /**
  * The person's entry on the Australian War Memorial's Roll of Honour: its people search, on the Roll of Honour, for their service
@@ -17,7 +21,7 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
 /** A person on the honour roll: who they were, where they served, the incidents they are linked to, and the poppies left for them. */
 @Component({
   selector: 'app-honour-panel',
-  imports: [DatePipe, Icon, LoadMore],
+  imports: [DatePipe, Icon, LoadMore, Poppy],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './community.css',
   styles: `
@@ -108,14 +112,50 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
       margin: 0;
       padding-left: 1.1rem;
     }
+    /* One poppy left: compact, with no box around it. */
+    /* The poppy centred on the words beside it. */
+    .tribute {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0.55rem 0;
+    }
+    .tribute p {
+      margin: 0;
+    }
+    .tribute__text {
+      min-width: 0;
+      white-space: normal;
+    }
+    .tribute__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0 0.5rem;
+    }
+    .tribute__who {
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .tribute__when,
+    .tribute__remove {
+      color: var(--khaki);
+      font-size: 0.8rem;
+    }
+    /* The words as they were written, line breaks and all. */
+    .tribute .tribute__words {
+      margin-top: 0.2rem;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
     .poppy {
-      display: inline-block;
-      width: 0.8rem;
-      height: 0.8rem;
       margin-right: 0.35rem;
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 50%, #1f2314 0 22%, var(--contact-red) 24%);
-      vertical-align: middle;
+    }
+    .poppy.poppy--large {
+      width: 1.75rem;
+      height: 1.75rem;
+      margin: 0;
     }
   `,
   template: `
@@ -179,18 +219,27 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
           @if (auth.isAuthenticated()) {
             <form (submit)="$event.preventDefault(); leave(note)">
               <label>Leave a poppy and a few words <textarea #note rows="3" maxlength="500" required></textarea></label>
-              <div class="actions"><button type="submit" class="primary" [disabled]="busy()"><span class="poppy" aria-hidden="true"></span>Place a poppy</button></div>
+              <div class="actions"><button type="submit" class="primary" [disabled]="busy()"><app-poppy class="poppy" />Place a poppy</button></div>
             </form>
           } @else {
             <p class="hint"><button type="button" class="link" (click)="auth.login()">Sign in</button> to leave a poppy.</p>
           }
           @for (t of items(); track t.id) {
-            <article class="card">
-              <p class="body"><span class="poppy" aria-hidden="true"></span>{{ t.message || 'Laid a poppy.' }}</p>
-              <p class="meta">{{ t.authorName }}, {{ t.createdUtc | date: 'd MMM y' }}</p>
-              @if (t.canDelete) {
-                <button type="button" class="link" (click)="remove(t)" [disabled]="busy()">Remove</button>
-              }
+            <!-- A poppy at the left; beside it who left it (or Anonymous) and when, then any words they left with it. -->
+            <article class="tribute">
+              <app-poppy class="poppy poppy--large" />
+              <div class="tribute__text">
+                <p class="tribute__head">
+                  <span class="tribute__who">{{ who(t) }}</span>
+                  <span class="tribute__when">{{ t.createdUtc | date: 'd MMM y' }}</span>
+                  @if (t.canDelete) {
+                    <button type="button" class="link tribute__remove" (click)="remove(t)" [disabled]="busy()">Remove</button>
+                  }
+                </p>
+                @if (t.message) {
+                  <p class="tribute__words">{{ t.message }}</p>
+                }
+              </div>
             </article>
           } @empty {
             @if (tributes()) {
@@ -243,6 +292,12 @@ export class HonourPanel {
       this.person();
       this.heading()?.nativeElement.focus({ preventScroll: true });
     });
+  }
+
+  /** Who left a poppy: their name, or Anonymous where it is not known (the site's stand-in for an unknown name is "Member"). */
+  protected who(t: TributeView): string {
+    const name = t.authorName.trim();
+    return name && name !== UNKNOWN_AUTHOR ? name : 'Anonymous';
   }
 
   protected birthplace(p: HonourPerson): string {
