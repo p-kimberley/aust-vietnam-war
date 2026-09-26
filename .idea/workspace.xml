@@ -6,9 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/unit-histories-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/unit-histories-plan.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Avw.slnx" beforeDir="false" afterPath="$PROJECT_DIR$/server/Avw.slnx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/Avw.Api.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/Avw.Api.Tests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-atf/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-atf/facts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/1-field-squadron/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/1-field-squadron/facts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/8-rar/facts.json" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/8-rar/facts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/features/unit-histories/units.csv" beforeDir="false" afterPath="$PROJECT_DIR$/content/features/unit-histories/units.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,7 +190,7 @@
       <workItem from="1789826907280" duration="57186000" />
       <workItem from="1790238719146" duration="12841000" />
       <workItem from="1790331544884" duration="11149000" />
-      <workItem from="1790370537759" duration="17009000" />
+      <workItem from="1790370537759" duration="17781000" />
     </task>
     <task id="LOCAL-00001" summary="Add api as submodule">
       <option name="closed" value="true" />

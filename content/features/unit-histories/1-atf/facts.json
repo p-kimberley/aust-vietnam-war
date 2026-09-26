@@ -5,11 +5,11 @@
     "title": "1st Australian Task Force",
     "short": "1 ATF",
     "arm": "headquarters",
-    "record": null,
+    "record": "https://www.awm.gov.au/collection/C1375421",
     "tours": [
       {
         "from": "1966-04",
-        "to": "1972-03"
+        "to": "1971-12"
       }
     ],
     "outsideTours": [],
