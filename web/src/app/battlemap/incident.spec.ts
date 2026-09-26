@@ -100,6 +100,8 @@ describe('IncidentPanel', () => {
       '2 Pl, A Coy, 5 RAR',
     ]);
     expect(el.querySelector('.incident__report')?.textContent).toContain('CONTACTED 5 EN');
+    expect(el.querySelector('.incident__report .rm__text')!.classList).not.toContain('is-cut');   // it all fits, so nothing fades
+    expect(el.querySelector('.incident__report .rm__toggle')).toBeNull();
   });
 
   it('lays the figures out as a table with friendly and enemy columns', async () => {
@@ -195,6 +197,7 @@ describe('IncidentPanel', () => {
       const report = el.querySelector('.incident__report')!;
       const more = el.querySelector<HTMLButtonElement>('.incident__report .rm__toggle')!;
       expect(report.classList).toContain('is-clamped');
+      expect(report.querySelector('.rm__text')!.classList).toContain('is-cut');
       expect([more.textContent?.trim(), more.getAttribute('aria-expanded')]).toEqual(['Read more', 'false']);
 
       more.click();

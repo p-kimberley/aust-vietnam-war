@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Injector, afterNextRender, afterRenderEffect, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, afterNextRender, afterRenderEffect, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
 import { Icon } from './icon';
 
 let nextId = 0;
@@ -14,7 +14,7 @@ let nextId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.is-clamped]': '!expanded()', '[style.--lines]': 'lines()' },
   template: `
-    <div #body class="rm__text" [id]="textId()" [class.is-clamped]="!expanded()">{{ text() }}</div>
+    <div #body class="rm__text" [id]="textId()" [class.is-clamped]="!expanded()" [class.is-cut]="!expanded() && clamped()">{{ text() }}</div>
     @if (clamped() || expanded()) {
       <button type="button" class="rm__toggle" [attr.aria-controls]="textId()" [attr.aria-expanded]="expanded()" (click)="toggle()">
         {{ expanded() ? 'Read less' : 'Read more' }}<app-icon [name]="expanded() ? 'chevron-up' : 'chevron-down'" />
@@ -28,9 +28,11 @@ let nextId = 0;
     .rm__text {
       overflow: hidden;
     }
-    /* The first lines, the last of them fading out. */
+    /* The first lines; where there is more, the last of them fades out. */
     .rm__text.is-clamped {
       max-height: calc(var(--lines) * 1lh);
+    }
+    .rm__text.is-cut {
       mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent);
     }
     /* Across the width of the text, its words and arrow centred; the row shades under the pointer. */
@@ -76,12 +78,23 @@ export class ReadMore {
   private readonly injector = inject(Injector);
 
   constructor() {
-    // Whether there is more is seen once the text is on the page.
+    // Whether there is more is seen once the text is on the page, and again whenever its box changes size: text drawn while its
+    // panel is still hidden or opening has no height yet, so has nothing more to show until it is laid out.
     afterRenderEffect(() => {
-      const el = this.body().nativeElement;
       this.text();
-      if (!this.expanded()) this.clamped.set(el.scrollHeight > el.clientHeight + 1);
+      this.measure();
     });
+    afterNextRender(() => {
+      if (typeof ResizeObserver !== 'function') return;
+      const watch = new ResizeObserver(() => this.measure());
+      watch.observe(this.body().nativeElement);
+      this.injector.get(DestroyRef).onDestroy(() => watch.disconnect());
+    });
+  }
+
+  private measure() {
+    const el = this.body().nativeElement;
+    if (!this.expanded()) this.clamped.set(el.scrollHeight > el.clientHeight + 1);
   }
 
   /** Opens or closes the text, easing its height from where it was to where it lands. */

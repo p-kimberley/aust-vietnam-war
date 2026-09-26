@@ -6,30 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/_map.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/_map.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/accordion-section.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/accordion-section.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/analytics/analytics-panel.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/analytics/timeline.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/analytics/timeline.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/checklist-filter.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/checklist-filter.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/community/honour-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/community/honour-panel.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/filters-panel.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/filters-panel.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/follow-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/follow-panel.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/incident-panel.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/incident-panel.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/incident-panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/incident-panel.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/incident-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/incident-panel.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/incident.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/incident.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/map-legend.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/nominal-roll.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/photos.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/photos.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/picture-viewer.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/picture-viewer.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/picture-viewer.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/picture-viewer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/picture-viewer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/picture-viewer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/pictures-panel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/pictures-panel.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/poi-panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/poi-panel.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/range-filter.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/range-filter.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/search-box.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/search-box.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/search-box.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/search-box.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/unit-tree-view.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/unit-tree-view.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/app/battlemap/read-more.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/app/battlemap/read-more.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -210,7 +188,7 @@
       <workItem from="1789826907280" duration="57186000" />
       <workItem from="1790238719146" duration="12841000" />
       <workItem from="1790331544884" duration="11149000" />
-      <workItem from="1790370537759" duration="34453000" />
+      <workItem from="1790370537759" duration="35548000" />
     </task>
     <task id="LOCAL-00001" summary="Add api as submodule">
       <option name="closed" value="true" />
