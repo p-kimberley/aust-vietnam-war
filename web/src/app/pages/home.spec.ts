@@ -33,4 +33,10 @@ describe('Home', () => {
     expect(link('Open the Battle Map').getAttribute('href')).toBe('/battlemap');
     expect(link('Explore the map').getAttribute('href')).toBe('/battlemap');
   });
+
+  it('leads to the unit histories from a tile beside the Battle Map', () => {
+    const { link } = setup();
+
+    expect(link('Read the unit histories').getAttribute('href')).toBe('/features/unit-histories');
+  });
 });

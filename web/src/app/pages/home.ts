@@ -31,6 +31,11 @@ import { SITE_NAME, Seo } from '../core/seo.service';
         <a routerLink="/battlemap">Explore the map</a>
       </article>
       <article class="tile">
+        <h2>Unit Histories</h2>
+        <p>The war of each of the major Australian units: what each did, where, and at what cost, with its roll of honour.</p>
+        <a routerLink="/features/unit-histories">Read the unit histories</a>
+      </article>
+      <article class="tile">
         <h2>Honour roll</h2>
         <p>The names of those who died, with portraits and biographies where they are known.</p>
         <a routerLink="/battlemap" [queryParams]="{ roll: '1' }">See the honour roll</a>
