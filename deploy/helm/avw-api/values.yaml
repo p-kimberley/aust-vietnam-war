@@ -48,7 +48,7 @@ map:
   overlays:
     - id: 1atf-topo
       name: 1ATF topo
-      tiles: ["https://geoserver.hosting.gradata.com.au/geoserver/vietnam/wms?bbox={bbox-epsg-3857}&service=WMS&version=1.1.1&request=GetMap&transparent=true&layers=vietnam:1atf-topo-classic&width=256&height=256&srs=EPSG:3857&format=image/png8"]
+      tiles: ["https://geoserver.hosting.gradata.com.au/geoserver/vietnam/wms?bbox={bbox-epsg-3857}&service=WMS&version=1.1.1&request=GetMap&transparent=true&layers=vietnam:1atf-topo-classic&width=256&height=256&srs=EPSG:3857&format=image/vnd.jpeg-png"]
   # Elevation for the 3D switch. Unset (null) hides the switch. Either a TileJSON url or explicit tiles, with the
   # encoding of the elevation PNGs (terrarium or mapbox). For example public Terrarium tiles (AWS Open Data):
   #   terrain:
