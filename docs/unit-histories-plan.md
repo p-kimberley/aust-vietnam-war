@@ -53,7 +53,7 @@ section of their own. "1 ATF Artillery" and "1 ATF Mortars" are top-level groupi
 1 ATF** as two of its sub-units (their contacts count towards 1 ATF's figures, and each has its own section). The unit
 names table (4.4) records that re-parenting, so the Battle Map's own unit tree is left as it is.
 
-Each history has **a section for each of its sub-units** with enough to say (companies, squadrons, batteries, troops), and those
+Each history has **a section for each of its sub-units** with enough to say, down to company level (companies, squadrons, batteries; platoons and troops count towards them), and those
 sections can be reached directly: the list at the left shows them under their unit, and each has its own address.
 
 ## 3. What a reader sees

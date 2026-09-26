@@ -1,0 +1,1152 @@
+{
+  "unit": {
+    "id": 210,
+    "slug": "1-field-regiment",
+    "title": "1st Field Regiment",
+    "short": "1 Fd Regt",
+    "arm": "artillery",
+    "record": "https://www.awm.gov.au/collection/U53441",
+    "tours": [
+      {
+        "from": "1965-09",
+        "to": "1967-05"
+      },
+      {
+        "from": "1969-02",
+        "to": "1970-05"
+      }
+    ],
+    "outsideTours": [
+      4103
+    ],
+    "corrected": [],
+    "mapUrl": "/battlemap?units=210"
+  },
+  "figures": {
+    "contacts": 68,
+    "led": 29,
+    "supported": 39,
+    "first": "1965-10-23",
+    "last": "1970-08-21",
+    "operations": 26,
+    "friendlyKilled": 30,
+    "friendlyWounded": 140,
+    "enemyKilled": 447,
+    "enemyWounded": 453,
+    "mineIncidents": 1
+  },
+  "perYear": [
+    {
+      "year": 1965,
+      "contacts": 4
+    },
+    {
+      "year": 1966,
+      "contacts": 14
+    },
+    {
+      "year": 1967,
+      "contacts": 18
+    },
+    {
+      "year": 1969,
+      "contacts": 29
+    },
+    {
+      "year": 1970,
+      "contacts": 3
+    }
+  ],
+  "activity": [
+    {
+      "name": "Artillery engagement",
+      "count": 22,
+      "share": 0.76
+    },
+    {
+      "name": "Enemy attack",
+      "count": 2,
+      "share": 0.07
+    },
+    {
+      "name": "Security",
+      "count": 2,
+      "share": 0.07
+    },
+    {
+      "name": "Artillery and mortar fire",
+      "count": 1,
+      "share": 0.03
+    },
+    {
+      "name": "Mine incident",
+      "count": 1,
+      "share": 0.03
+    },
+    {
+      "name": "Transport",
+      "count": 1,
+      "share": 0.03
+    }
+  ],
+  "support": [
+    {
+      "kind": "Fire support",
+      "contacts": 39,
+      "for": [
+        {
+          "unit": "5 RAR",
+          "contacts": 17
+        },
+        {
+          "unit": "1 RAR",
+          "contacts": 9
+        },
+        {
+          "unit": "6 RAR",
+          "contacts": 8
+        },
+        {
+          "unit": "161 Field Battery, RNZA (New Zealand)",
+          "contacts": 2
+        },
+        {
+          "unit": "US Army",
+          "contacts": 2
+        },
+        {
+          "unit": "US Artillery",
+          "contacts": 1
+        }
+      ]
+    }
+  ],
+  "dataSources": [
+    {
+      "name": "1ATF",
+      "count": 56,
+      "share": 0.82
+    },
+    {
+      "name": "1RAR",
+      "count": 12,
+      "share": 0.18
+    }
+  ],
+  "operations": [
+    {
+      "name": "13/65",
+      "contacts": 1,
+      "first": "1965-10-23",
+      "last": "1965-10-23",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "14/65, Hump",
+      "contacts": 1,
+      "first": "1965-11-05",
+      "last": "1965-11-05",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "14/65",
+      "contacts": 1,
+      "first": "1965-11-08",
+      "last": "1965-11-08",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "17/65, Smash",
+      "contacts": 1,
+      "first": "1965-12-17",
+      "last": "1965-12-17",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "18/65, Marauder",
+      "contacts": 1,
+      "first": "1966-01-01",
+      "last": "1966-01-01",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "1/66, Crimp",
+      "contacts": 1,
+      "first": "1966-01-08",
+      "last": "1966-01-08",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "3/66, Roundhouse",
+      "contacts": 1,
+      "first": "1966-02-04",
+      "last": "1966-02-04",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "4/66, Rolling Stone",
+      "contacts": 1,
+      "first": "1966-02-19",
+      "last": "1966-02-19",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "6/66, Silver City",
+      "contacts": 1,
+      "first": "1966-03-09",
+      "last": "1966-03-09",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Silver City",
+      "contacts": 2,
+      "first": "1966-03-16",
+      "last": "1966-03-17",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "7/66, Abilene",
+      "contacts": 1,
+      "first": "1966-03-30",
+      "last": "1966-03-30",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Hardihood",
+      "contacts": 1,
+      "first": "1966-06-24",
+      "last": "1966-06-24",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "TAOR",
+      "contacts": 2,
+      "first": "1966-08-17",
+      "last": "1967-02-10",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Smithfield (original - Vendetta)",
+      "contacts": 3,
+      "first": "1966-08-18",
+      "last": "1966-08-18",
+      "friendlyKilled": 17,
+      "enemyKilled": 265
+    },
+    {
+      "name": "Bribie",
+      "contacts": 1,
+      "first": "1967-02-17",
+      "last": "1967-02-17",
+      "friendlyKilled": 8,
+      "enemyKilled": 50
+    },
+    {
+      "name": "Hammer",
+      "contacts": 1,
+      "first": "1969-06-06",
+      "last": "1969-06-06",
+      "friendlyKilled": 1,
+      "enemyKilled": 43
+    },
+    {
+      "name": "Hammer/Tong",
+      "contacts": 1,
+      "first": "1969-06-07",
+      "last": "1969-06-07",
+      "friendlyKilled": 0,
+      "enemyKilled": 40
+    },
+    {
+      "name": "TONG",
+      "contacts": 1,
+      "first": "1969-06-07",
+      "last": "1969-06-07",
+      "friendlyKilled": 0,
+      "enemyKilled": 6
+    },
+    {
+      "name": "Lavarack",
+      "contacts": 1,
+      "first": "1969-06-11",
+      "last": "1969-06-11",
+      "friendlyKilled": 0,
+      "enemyKilled": 9
+    },
+    {
+      "name": "Camden",
+      "contacts": 2,
+      "first": "1969-08-08",
+      "last": "1969-08-28",
+      "friendlyKilled": 0,
+      "enemyKilled": 8
+    },
+    {
+      "name": "Camden 2",
+      "contacts": 1,
+      "first": "1969-08-21",
+      "last": "1969-08-21",
+      "friendlyKilled": 1,
+      "enemyKilled": 9
+    },
+    {
+      "name": "Burnham",
+      "contacts": 2,
+      "first": "1969-09-09",
+      "last": "1969-09-13",
+      "friendlyKilled": 0,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Kingston",
+      "contacts": 1,
+      "first": "1969-09-21",
+      "last": "1969-09-21",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Kings Cross",
+      "contacts": 7,
+      "first": "1969-11-02",
+      "last": "1969-12-07",
+      "friendlyKilled": 2,
+      "enemyKilled": 14
+    },
+    {
+      "name": "U/K",
+      "contacts": 1,
+      "first": "1970-01-04",
+      "last": "1970-01-04",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Bondi 2",
+      "contacts": 1,
+      "first": "1970-01-28",
+      "last": "1970-01-28",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    }
+  ],
+  "areas": [
+    {
+      "place": "Lance",
+      "type": "FSB",
+      "contacts": 6,
+      "share": 0.09
+    },
+    {
+      "place": "Cougar",
+      "type": "FSB",
+      "contacts": 5,
+      "share": 0.07
+    },
+    {
+      "place": "Dampier",
+      "type": "FSB",
+      "contacts": 3,
+      "share": 0.04
+    },
+    {
+      "place": "Hawk",
+      "type": "FSB",
+      "contacts": 3,
+      "share": 0.04
+    },
+    {
+      "place": "Sabre",
+      "type": "FSB",
+      "contacts": 3,
+      "share": 0.04
+    },
+    {
+      "place": "Syke",
+      "type": "FSB",
+      "contacts": 3,
+      "share": 0.04
+    },
+    {
+      "place": "Weir",
+      "type": "FSB",
+      "contacts": 3,
+      "share": 0.04
+    },
+    {
+      "place": "Baton",
+      "type": "FSB",
+      "contacts": 2,
+      "share": 0.03
+    }
+  ],
+  "notable": [
+    {
+      "id": 10185,
+      "url": "/battlemap?incident=10185",
+      "dtg": "1965-10-23T08:00:00",
+      "why": [
+        "first"
+      ],
+      "role": "Fire support",
+      "ledBy": "1 RAR",
+      "operation": "13/65",
+      "task": "Deployment",
+      "gridRef": "YT109216",
+      "friendlyForce": 0,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 APC Troop, Prince of Wales Light Horse Regiment",
+        "1 Battalion, Royal Australian Regiment",
+        "105 Field Battery, 1 Field Regiment",
+        "161 Field Battery, 1 Australian Task Force",
+        "3 Field Troop, 1 Field Squadron"
+      ],
+      "subUnits": [
+        "105-field-battery"
+      ],
+      "report": "Operation 13/65 took place from 23 to 26 October 1965. It involved 1 RAR with, under command, 1 APC Tp (PWLH) and 3 Fd Tp (Royal Australian Engineers), with, in direct support 105 Fd Bty (RAA) and 161 Fd Bty (NZ). In support were E/17th Cav (US) and 161 (Indep) Recce Flt. This was a battalion search and destroy operation to extend the 173d Abn Bde area of influence beyond and to the north east of its TAOR based on the Bien Hoa airbase. The operation took place about 18 kilometres northeast of the Bien Hoa base.",
+      "archivalSource": "AWM95, item 7/1/35, 1 Battalion Royal Australian Regiment, Narrative Annexes, 1-31 Oct 65, p. 18-19. McNeill, To Long Tan, p. 441."
+    },
+    {
+      "id": 10188,
+      "url": "/battlemap?incident=10188",
+      "dtg": "1965-11-08T11:37:00",
+      "why": [
+        "typical:Artillery and mortar fire"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "14/65",
+      "task": "Arty/Mor",
+      "gridRef": "YT138257",
+      "friendlyForce": 30,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 2,
+      "enemyWounded": 0,
+      "units": [
+        "105 Field Battery, 1 Field Regiment"
+      ],
+      "subUnits": [
+        "105-field-battery"
+      ],
+      "report": "At LZ Queen, 105 Field Battery fired a battery fire mission in support of US 1/503 Infantry Battalion, 173 Abn Bde (Sep) which had made contact with a main force VC unit to the north west of thee Song Dong Nai. Two VC were confirmed KIA by the airborne fire controller.",
+      "archivalSource": "AWM95, item 7/1/39, 1 Battalion Royal Australian Regiment, Narrative, Annexes, 1-30 Nov 1965, p. 11."
+    },
+    {
+      "id": 10189,
+      "url": "/battlemap?incident=10189",
+      "dtg": "1966-03-16T08:16:00",
+      "why": [
+        "typical:Enemy attack"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Silver City",
+      "task": "Attack by en",
+      "gridRef": "YT140430",
+      "friendlyForce": 0,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "105 Field Battery, 1 Field Regiment",
+        "2 Battalion, 503 Infantry Regiment, US Army"
+      ],
+      "subUnits": [
+        "105-field-battery"
+      ],
+      "report": "At 0816 hours, 2/503 battalion reported that it was in contact on all sides of its perimeter. The attack began with 60mm and 81mm mortars, 75mm Howitzer, and recoilless rifle fire. The enemy assault lasted from 0730 to 1130 hours. 2/503 suffered 7 KIA and 114 WIA. The VC suffered 288 KIA (by body count) and an estimated 300 WIA. Artillery and airstrikes were applied to the enemy and played a large part in the defeat of the VC attack. 105 Field Battery RAA (Australan) fired in support of 2/503 battalion. The enemy unit involved was thought to be 271 Regiment with J10, J15 and J20 battalions all involved in the operation. Later that day, 2/503 battalion was joined by 1/503 battalion. The next day 1/503 found a large cache of weapons including 2 HMG, 4 BAR, and 2 x 60mm mortars.",
+      "archivalSource": "AWM95, item 7/1/61, 1 Battalion, Royal Australian Regiment, Narrative, Annexes, 1-31 Mar 66, p. 20."
+    },
+    {
+      "id": 218,
+      "url": "/battlemap?incident=218",
+      "dtg": "1966-08-17T02:43:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "161 Field Battery, RNZA (New Zealand)",
+      "operation": "TAOR",
+      "task": "Security",
+      "gridRef": "YS4366",
+      "friendlyForce": 400,
+      "enemyForce": 40,
+      "friendlyKilled": 1,
+      "friendlyWounded": 24,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "103 Field Battery, 1 Field Regiment",
+        "161 Field Battery, 1 Australian Task Force"
+      ],
+      "subUnits": [],
+      "report": "Enemy fires mortars into TF arty area killing one Aust and wounding 24. Retaliatory fire was commenced in 7 minutes.\n\nSHELLING COMMENCED ON THE TF BASE LOCATION. FIRE WASDELIVERED BY BOTH 82MM MORTARS AND WHAT IS BELIEVED TO BEA JAPANESE 70MM HOWITZER. POINTS FROM WHICH THE ROUNDSWERE DELIVERED ARE BELIEVED TO BE AS FOLLOWS.YS459671: THIS WAS CONFIRMED BY A PATROL FROM B/6 RAR.THEIR ESTIMATION WAS FOUR MORTAR BASE PLATES PLUS WPNSPITS FOR THIRTY SIX MEN. A REGIMENTAL TARGET WAS FIRED ATYS459674 DURING THE ATTK.MORTAR REPORTS ALSO INDICATED THE POSSIBILITY OF WEAPONSFIRING FROM THE WEST OF THE TF AREA. THESE REPORTS WERERECEIVED FROM A BTY 2/35 ARTY AND AN OP ON NUI DAT(YS4367)AND FLASHES SEEN BY THREE PERSONNEL FROM A BTY AREA. POSSPOSITIONS FROM WHICH THE FIRE MAY HAVE BEEN DELIVEREDWERE BOMBARDED. THEY WERE YS395655, DEDUCED FROM MORTARREPORTS AND YS395660, POINT TO FLASH OBSERVATIONS. THETOTAL NUMBER OF 82MM MORTAR ROUNDS RECEIVED WAS APPROX 66.THEY LANDED GENERALLY IN THE SOUTH EAST CORNER OF YS4366.UNITS RECORDING SOUNDS WERE AS FOLLOWS; ARTY-12, 1FD SQN-19, 3 SAS SQN-10, 1 ARA [ 1 ARU ??  ]-25 ROUNDS.\n\nSitrep 18/8/66(AWM95 1/4/6.pdf p57) records that B Coy 6 RAR discovered the enemy mortar baseplate position and there were clear signs of carts having been used to cart bodies away after Aust counter mort fire. B Coy found the position of the 3x75mm guns with 8 shell cases by each. There were clear signs of a hurried departure with clothing and equipment scattered along the trail and many blood stains. Aust arty had fired at that position as well.",
+      "archivalSource": "Intsum, AWM95 1/4/6.pdf p112-14;"
+    },
+    {
+      "id": 220,
+      "url": "/battlemap?incident=220",
+      "dtg": "1966-08-18T16:07:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "6 RAR",
+      "operation": "Smithfield (original - Vendetta)",
+      "task": "Patrol",
+      "gridRef": "YS478673",
+      "friendlyForce": 108,
+      "enemyForce": 2500,
+      "friendlyKilled": 17,
+      "friendlyWounded": 19,
+      "enemyKilled": 245,
+      "enemyWounded": 350,
+      "units": [
+        "1 Field Regiment",
+        "161 Field Battery, 1 Australian Task Force",
+        "2 Battalion, 35 Field Artillery Regiment, US Army",
+        "3 Troop, 1 APC Squadron, 3 Cavalry Regiment",
+        "A Company, 6 Battalion, Royal Australian Regiment",
+        "B Company, 6 Battalion, Royal Australian Regiment",
+        "D Company, 6 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "D Coy Battle\n\nSee Combined Arms Data Base\n\n1540hrs D Coy 6 RAR contact 6-8 VC dressed in khaki at YS478673. VC withdrew E leaving 1 AK47. 1615hrs D Coy report mortars falling near their position. 1637hrs D coy contacts enemy Coy at YS478673 and receives mortar fire. 1730hrs D coy attacked by enemy coy plus. Between 1730 and 1900hrs D coy came under heavy MG fire and attack. APCs with 1 Coy arrive 1910hrs. Artillery support was extensive. 105mm gave close support and broke up many enemy attacks. 155mm countered enemy mortar fire, and fired on rear areas with harassing fire. Air strikes could not be conducted in support of D Coy because of low cloud. They were directed at likely enemy assembly areas in the rear. Iroquois helos resupplied D Coy with ammo during the battle and later evacuated the wounded. 50% of enemy cas in battle area had been caused by SA and the rest by arty. It was considered that the arty also caused considerable en cas in rear areas to the battle ground. 6RAR cmdr considered that Aust soldiers should carry at least 140rds of SAA as a consequence of Long Tan. Co of D Coy noted that en carried up to 250rds of SAA per man.\n\nCO 0f D Coy states that the M60 failed in the rain and mud. The ammo could not be kept clean, and so clogged the guns. The M60 is not a MMG or a GPMG as originally intended. The GPMG Mag 58 used in Malaysia is needed. SLR performed well, but magazines should be increased from 3 to 8 per man because they are impossible to fill in circumstances like Long Tan. The OSMG was ineffective beyond 25m. M16 performed well. CO wanted a 60mm Mor as part of Coy armament to fill in gaps in arty support when out of Bn mortar range.\n\nEquip Failure: M60\n\n   D Coy with a strength of 108, moved from its base location through B Coy area at 1100 hrs on 18 Aug 66, arriving at YS473673 to RV with B Coy HQ at 1300 hrs. After studying the evidence of enemy tracks, I ordered an advance, one-up, to the NE, commencing at 1500hrs, following the line of a fresh VC track. At YS475675 the track divided into 2 tracks, both heading ESE, roughly parallel, and about 300 yds apart. At this point there was evidence of 82mm mortar ammo being prepared for firing, and signs that the enemy had fled E in a hurry to escape CB. Several grenades, sandals, and pieces of equipment were found over a wide area.\n   At this point I ordered the advance to continue, but now with 2 Platoons up; 10 Pl on the left, 11 Pl on the right - on the high ground, with Coy HQ and 12 Pl in the centre rear. The Coy covered a frontage of 400m and a similar distance in depth.\n   At 1540hrs, 11 PL contacted 6 VC at YS478673. The report was 6-8 local VC, dressed in Khaki, no equipment, fled E. 1 Ak rifle was recovered (a body later recovered). I instructed 11 Pl to continue sweeping E, with the rest of the Coy moving as before.\n   At 1600 hrs, 11 Pl reported movement and Noise in the house at YS481672 and prepared to assault the house. I ordered 10 Pl to continue advancing E and to get into",
+      "archivalSource": "To Long Tan; Sitrep, AWM95 1/4/6.pdf p56-8; AWM 102, 42   6RAR After Action Report, op. Smithfield, 18 -21 August 1966, Nui Dat (Battle of Long Tan)"
+    },
+    {
+      "id": 222,
+      "url": "/battlemap?incident=222",
+      "dtg": "1966-08-18T17:30:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "6 RAR",
+      "operation": "Smithfield (original - Vendetta)",
+      "task": null,
+      "gridRef": "YS476667",
+      "friendlyForce": 100,
+      "enemyForce": 200,
+      "friendlyKilled": 0,
+      "friendlyWounded": 4,
+      "enemyKilled": 20,
+      "enemyWounded": 40,
+      "units": [
+        "1 Field Regiment",
+        "161 Field Battery, 1 Australian Task Force",
+        "2 Battalion, 35 Field Artillery Regiment, US Army",
+        "3 Troop, 1 APC Squadron, 3 Cavalry Regiment",
+        "A Company, 6 Battalion, Royal Australian Regiment",
+        "B Company, 6 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "A Coy Battle with 3 Tp 1 APC Sqn\n\nA Coy at Nui Dat is warned to move out in APCs to assist D Coy at Long Tan 1730hrs. 1745hrs the Coy left. Approaching the battle area, A Coy and APCs contacted the Support Coy of D445 Bn at GR476667, inflicting 15 cas 1810hrs. 4 Aust wded, (3 from A Coy 1 from 3 Tp). As soon as the enemy were fleeing, 2 pl remounted joining the rest of A Coy, and moved towards D Coy. Shortly after at GR478670, 1850hrs, A Coy contacted 2 coys of 275 NVA Regt inflicting 45 cas on enemy. A Coy then joined D Coy 1910hrs. The enemy was retreating.",
+      "archivalSource": "To Long Tan; Sitrep, AWM95 1/4/6.pdf p56-8; AWM 102, 42   6RAR After Action Report, op. Smithfield, 18 -21 August 1966; AWM95 7-6-5.pdf 6 RAR Aug 66;"
+    },
+    {
+      "id": 5485,
+      "url": "/battlemap?incident=5485",
+      "dtg": "1967-02-04T11:21:00",
+      "why": [
+        "typical:Artillery engagement"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": null,
+      "task": null,
+      "gridRef": "YS6180",
+      "friendlyForce": 0,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Regiment"
+      ],
+      "subUnits": [],
+      "report": "Numerous cooking fires were seen around Thua Tich by a VR aircraft. C/S5B fired 25 rds into the area. (AWM95 3/6/7.pdf p165 1 Fd Regt Diary)",
+      "archivalSource": null
+    },
+    {
+      "id": 4717,
+      "url": "/battlemap?incident=4717",
+      "dtg": "1967-02-10T20:00:00",
+      "why": [
+        "typical:Security"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "TAOR",
+      "task": "Security",
+      "gridRef": "YS436660",
+      "friendlyForce": 5,
+      "enemyForce": 4,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "103 Field Battery, 1 Field Regiment"
+      ],
+      "subUnits": [],
+      "report": "A standing patrol reported noise to S of their position that continued for 20 mins. The enemy could not be sighted, so patrol leader decided to change the position because he felt that he had been compromised by movement. He moved 150m N to 103 Bty outer wire. About 30 mins later, a grenade was thrown by enemy into the standing patrol",
+      "archivalSource": "AWM109 R723/1/1/2 Pt1 HQ 1 ATF Reports General, Contact Rept; Intsum, AWM95 1/4/30.pdf p129;"
+    },
+    {
+      "id": 447,
+      "url": "/battlemap?incident=447",
+      "dtg": "1967-02-17T15:55:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "6 RAR",
+      "operation": "Bribie",
+      "task": "Bunker",
+      "gridRef": "YS542572",
+      "friendlyForce": 102,
+      "enemyForce": 135,
+      "friendlyKilled": 8,
+      "friendlyWounded": 21,
+      "enemyKilled": 50,
+      "enemyWounded": 13,
+      "units": [
+        "101 Field Battery, 1 Field Regiment",
+        "2 Troop, A Squadron, 3 Cavalry Regiment",
+        "B Company, 6 Battalion, Royal Australian Regiment",
+        "Mortar Platoon, Support Company, 6 Battalion, Royal Australian Regiment",
+        "Support Section, Squadron Headquarters, A Squadron, 3 Cavalry Regiment"
+      ],
+      "subUnits": [
+        "101-field-battery"
+      ],
+      "report": "6 RAR was being flown by helo to begin a search and destroy mission. The first coy (A Coy) came under sniper fire and in attempting to clear them clashed with what was determined to be a dug in VC coy in a full defensive position with pits and bunkers with overhead cover. A coy sustained 6 wded, while the enemy suffered 3 killed and unknown number of wded. A Coy withdrew 150 metres from contact (See Contact Record for 1355hrs). \n     B coy was ordered to assault the position with support from A coy. After arty support fire on the enemy, at 1555hrs the attack began, and B Coy was tied down by SA fire from all quarters, as well as HMG, Claymore and light mortar fire. This revealed that a heavy weapons Coy was in support of the well concealed VC positions. This unit showed great skill in moving its MGs from shell scrape to prepared position.\n     The difficult situation B coy found itself in with mounting casualties, led to 4 air strikes being made on the enemy position. 2 Tp of A Sqn of 3 Cav were sent in to extricate casualties. One APC was hit by 3 RR shells and disabled killing the driver and wounding the APC commander and the wounded in side. Casualties were all withdrawn and after a 4 hr battle, B coy and A coy withdrew into a night defensive position with the rest of 6 RAR, 200 metres from the enemy. The latter withdrew during the night. En force had been 1 Coy plus Hvy Weapons Coy, of D445 Bn.\n\nSee Combined Arms Data Base\n\nAAReport on Bribie noted that VC fire discipline had been good, but as usual, accuracy had been poor. Most contact had been at 30-70m. CO 6 RAR said that he did not launch a full BN attack because he had been ordered to conclude the operation at last light. 1ATF was expecting a large en attack on Nui Dat. CO said the operation clearly demonstrated a need for tanks which could have attacked the en position with little difficulty, while withstanding the enemy",
+      "archivalSource": "AWM 279, 723/R5/34; Scorpion Stings pg48-54; On the Offensive pg114. AWM95 7-6-11 pdf 6 RAR Op Bribie; AWM95 7-6-14.pdf pg189 Contact Rept;"
+    },
+    {
+      "id": 2496,
+      "url": "/battlemap?incident=2496",
+      "dtg": "1969-06-06T11:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "5 RAR",
+      "operation": "Hammer",
+      "task": null,
+      "gridRef": "YS450740",
+      "friendlyForce": 200,
+      "enemyForce": 240,
+      "friendlyKilled": 1,
+      "friendlyWounded": 10,
+      "enemyKilled": 43,
+      "enemyWounded": 6,
+      "units": [
+        "105 Field Battery, 1 Field Regiment",
+        "3 Troop, B Squadron, 3 Cavalry Regiment",
+        "B Company, 5 Battalion, Royal Australian Regiment",
+        "B Squadron, 1 Armoured Regiment",
+        "Light Fire Team",
+        "Popular Force, Army of the Republic of Vietnam",
+        "Regional Force, Army of the Republic of Vietnam"
+      ],
+      "subUnits": [
+        "105-field-battery"
+      ],
+      "report": "Commencing at approx 1100H and continuing until 1830H B and D Coys 5 RAR; elements of B Sqn 1 Armd Regt; element of B Sqn 3 Cav Regt; DUC THANH District RF/ PF troops were engaged in an action with an estimated 90 enemy in the village of BINH BA YS4474. Results of the action were 27 en KIA (BC), 2 en PW. Friendly losses were 2 Centurion tanks moderately damaged, 1 Aust KIA, 8 Aust WIA (evac).\n\n\n\nB Coy 5 RAR supported by 4 Tp B Sqn 1 Armd Regt formed a block while D coy 6 RAR swept through the area of yesterday",
+      "archivalSource": "Sitrep, AWM95 1/4/156.pdf p16; Analysis of Aust Urban Engagements in Vn; Scorpion Stings pg169-78;"
+    },
+    {
+      "id": 2509,
+      "url": "/battlemap?incident=2509",
+      "dtg": "1969-06-07T13:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "5 RAR",
+      "operation": "Hammer/Tong",
+      "task": null,
+      "gridRef": "YS453745",
+      "friendlyForce": 105,
+      "enemyForce": 85,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 40,
+      "enemyWounded": 0,
+      "units": [
+        "1 Troop, B Squadron, 3 Cavalry Regiment",
+        "105 Field Battery, 1 Field Regiment",
+        "4 Troop, B Squadron, 1 Armoured Regiment",
+        "B Company, 5 Battalion, Royal Australian Regiment",
+        "Light Fire Team"
+      ],
+      "subUnits": [
+        "105-field-battery"
+      ],
+      "report": "A Coy of 1 Bn, 33 Regt NVA attacked Duc Trung and overwhelmed the local defense pl. B coy sent to recover the situation. Initially Arty fire was brought down to within 20m of the houses causing enemy casualties. This was supported by an LFT which attacked on the N and W sides of the village. B coy then attacked the S of the village with 1 tp of tanks. The enemy was routed, and the PF took over the clearance of the rest of the village to avoid civilian casualties.\n\nSee Combined Arms Data Base",
+      "archivalSource": "AWM 279 723/R5/59; AWM95 7-5-25.pdf pg36; Analysis of Australian Urban Engagements in Vietnam, R Hall and A Ross, ADSC, Unsw@ADFA May 2003;"
+    },
+    {
+      "id": 2541,
+      "url": "/battlemap?incident=2541",
+      "dtg": "1969-06-11T14:45:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "6 RAR",
+      "operation": "Lavarack",
+      "task": "Bunker",
+      "gridRef": "YS393818",
+      "friendlyForce": 105,
+      "enemyForce": 25,
+      "friendlyKilled": 0,
+      "friendlyWounded": 10,
+      "enemyKilled": 9,
+      "enemyWounded": 0,
+      "units": [
+        "101 Field Battery, 1 Field Regiment",
+        "B Company, 6 Battalion, Royal Australian Regiment",
+        "Light Fire Team",
+        "Spooky Royal Australian Air Force"
+      ],
+      "subUnits": [
+        "101-field-battery"
+      ],
+      "report": "After detecting a sentry, 6 pl and half of 5 pl were ordered to attack what was thought to be a small enemy camp. Heavy rain disguised B Coy recce and deployment round the camp. The en sentry was sheltering under a plastic cloak. However, after the initial attack in which the Australians surprised the enemy and fired first killing the sentry, the camp was seen to be a large bunker system from which the enemy counter attacked. The rest of the Coy, including 4 pl, was fed in to the battle. Artillery fire was called in and LFTs fired in support. A Spooky aircraft arrived and stayed for over 1 hr. After taking 10 casualties, B coy was ordered to withdraw. Heavy rain and 8-10 enemy tree snipers made this difficult. 2 M60s of 6 pl became inoperative during the battle. 8 RPGs were fired at night, into the area where the Coy had been during the battle (but had evacuated during the night).The camp was re entered the 1400hrs next day but the enemy had evacuated during the night. 6 pl had lost all its packs during the withdrawal from the camp. 3 of the Aust wded remained on duty. Of the 7 seriously wded, 6 had GSW and one shrapnel. B Coy experienced considerable comms difficulties during the battle. The FO was the only link to Bn and relayed sitreps, dustoff requests and opdems and fire directions.\n\nSitrep: At 1655H B coy received sniper fire from an unknown number of enemy, resulting in 4 Aust WIA (evacuated). B Coy withdrew from first contact and were contacted again, resulting in 3 Aust WIA. Enemy casualties are unknown. Spooky and LFTs are still in the area.\n\nA search of the contact area resulted in 9 enemy KIA (BC).\n\nSee Combined Arms Data Base\n\nEquip Failure: M60x2",
+      "archivalSource": "Intsum, AWM95 1/4/156.pdf p110; Sitrep AWM 98 (323); AWM95 7-6-22.pdf pg29 Contact Rept; AWM95 7-6-18.pdf pg102"
+    },
+    {
+      "id": 2833,
+      "url": "/battlemap?incident=2833",
+      "dtg": "1969-08-21T15:01:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Fire support",
+      "ledBy": "5 RAR",
+      "operation": "Camden 2",
+      "task": "Bunker",
+      "gridRef": "YS247826",
+      "friendlyForce": 60,
+      "enemyForce": 300,
+      "friendlyKilled": 1,
+      "friendlyWounded": 37,
+      "enemyKilled": 9,
+      "enemyWounded": 25,
+      "units": [
+        "105 Field Battery, 1 Field Regiment",
+        "3 Platoon, A Company, 5 Battalion, Royal Australian Regiment",
+        "Assault Pioneer Platoon, Support Company, 5 Battalion, Royal Australian Regiment",
+        "Light Fire Team"
+      ],
+      "subUnits": [
+        "105-field-battery"
+      ],
+      "report": "On hearing voices a short distance ahead, Aslt Pnr pl called up 3 pl and they launched a two pl assault on enemy bunker system. Artillery was fired behind bunker system to act as a cutoff. 3 pl opened fire on enemy in open, but was met  by  very heavy RPG and AK47 fire from bunkers and flanks. RPG rounds were also landing in rear of pls causing casualties. Aslt Pnr covered retreat of 3 pl to a base 30m from bunkers. LFTs were now firing in support of pls. As dustoff helos appeared they became targets for enemy who closed up on base and fired 60mm Mortars, SA and RPGs which landed amongst the wounded in the base perimeter creating more wounded. LFTs suppressed this fire and base was moved away to allow safe evacuation of wounded.\n\nSee Combined Arms Data Base\n\nFurther to contact of 211605H at YS245827. Original contact was made by Aslt Pnr pl and 3 Pl. The Aslt Pnr Pl was preparing a harbour position when they heard noises approx 300m away. The area was engaged by 105 Fd Bty with 72 rds of 105mm delay fuze. The 2 pls with Aslt Pnr Pl leading and command by 2IC A Coy moved into the contact area. The Pnr Pl was engaged by enemy SA and RPG fire and received approx 6 casualties. 3 Pl formed a firm fire base and the Aslt Pnr Pl withdrew. The whole group was engaged by SA and RPG fire from flank and 2 flanks. 10 casualties were sustained during this period. The group then withdrew to a clear area for DUSTOFF. Whilst DUSTOFF was in progress a large enemy force counter attack from flank using fire and movement. Most casualties were sustained during this period. At least 10 enemy were seen to fall during the contact. Consolidated figures to date are : 10 VC KIA (POSS), 4 VC KBA, 1 Aust KIA, 31 Aust WIA (evacuated).\n\nCoy OC coments was that the Coy comms net was a shambles with every element supporting the contact having a say. He suggested that a FAC be on the Coy net and that he should control all air on a separate net.\n\nAWM95 7-5-34.pdf pg186 The cas for this were amended to 9 en killed, 4 en killed by Arty/air, 25 en wded.",
+      "archivalSource": "AWM 288, 569/1/112/2 Pt 2 Camden; Intsum, AWM95 1/4/164.pdf p164; Sitrep, AWM95 1/4/164.pdf p74-5; AWM95 7-5-32.pdf pg176 Contact Rept;"
+    },
+    {
+      "id": 4103,
+      "url": "/battlemap?incident=4103",
+      "dtg": "1970-08-21T15:50:00",
+      "why": [
+        "last"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": null,
+      "task": null,
+      "gridRef": "YS435538",
+      "friendlyForce": 1,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Regiment"
+      ],
+      "subUnits": [],
+      "report": "GRADER DET M14 MINE AT YS435538. NIL CAS.\n\nA grader blade detonated an M14 mine. No cas.",
+      "archivalSource": "Intsum, AWM95 1/4/197.pdf p238"
+    }
+  ],
+  "subUnits": [
+    {
+      "id": 1195,
+      "slug": "101-field-battery",
+      "parent": null,
+      "title": "101 Field Battery",
+      "mapUrl": "/battlemap?units=1195",
+      "figures": {
+        "contacts": 24,
+        "led": 15,
+        "supported": 9,
+        "first": "1967-02-17",
+        "last": "1970-01-04",
+        "operations": 4,
+        "friendlyKilled": 8,
+        "friendlyWounded": 34,
+        "enemyKilled": 60,
+        "enemyWounded": 14,
+        "mineIncidents": 0
+      },
+      "activity": [
+        {
+          "name": "Artillery engagement",
+          "count": 15,
+          "share": 1
+        }
+      ],
+      "support": [
+        {
+          "kind": "Fire support",
+          "contacts": 9,
+          "for": [
+            {
+              "unit": "6 RAR",
+              "contacts": 5
+            },
+            {
+              "unit": "US Army",
+              "contacts": 2
+            },
+            {
+              "unit": "161 Field Battery, RNZA (New Zealand)",
+              "contacts": 1
+            },
+            {
+              "unit": "US Artillery",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        447,
+        2541,
+        2903
+      ]
+    },
+    {
+      "id": 211,
+      "slug": "105-field-battery",
+      "parent": null,
+      "title": "105 Field Battery",
+      "mapUrl": "/battlemap?units=211",
+      "figures": {
+        "contacts": 35,
+        "led": 8,
+        "supported": 27,
+        "first": "1965-10-23",
+        "last": "1970-01-28",
+        "operations": 20,
+        "friendlyKilled": 4,
+        "friendlyWounded": 57,
+        "enemyKilled": 122,
+        "enemyWounded": 49,
+        "mineIncidents": 0
+      },
+      "activity": [
+        {
+          "name": "Artillery engagement",
+          "count": 4,
+          "share": 0.5
+        },
+        {
+          "name": "Enemy attack",
+          "count": 2,
+          "share": 0.25
+        },
+        {
+          "name": "Artillery and mortar fire",
+          "count": 1,
+          "share": 0.12
+        },
+        {
+          "name": "Security",
+          "count": 1,
+          "share": 0.12
+        }
+      ],
+      "support": [
+        {
+          "kind": "Fire support",
+          "contacts": 27,
+          "for": [
+            {
+              "unit": "5 RAR",
+              "contacts": 17
+            },
+            {
+              "unit": "1 RAR",
+              "contacts": 9
+            },
+            {
+              "unit": "US Army",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        2496,
+        2509,
+        2833
+      ]
+    }
+  ],
+  "dead": [
+    {
+      "serviceNumber": "36205",
+      "name": "Thomas Simpson",
+      "rank": "Gunner",
+      "died": "1965-12-09",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/36205.jpg"
+    },
+    {
+      "serviceNumber": "17071",
+      "name": "Kenneth Wilfred Bade",
+      "rank": "Captain",
+      "died": "1966-01-08",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/17071.jpg"
+    },
+    {
+      "serviceNumber": "1411047",
+      "name": "Richard William Cliff",
+      "rank": "Gunner",
+      "died": "1967-02-06",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/1411047.jpg"
+    },
+    {
+      "serviceNumber": "235324",
+      "name": "Bernard Anthony Garland",
+      "rank": "Lieutenant",
+      "died": "1970-04-22",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/235324.jpg"
+    }
+  ],
+  "pictures": [
+    {
+      "id": 381,
+      "url": "/media/uploads/2e/2e53d8fb7a1ecd8dd76b0893eb75a4c32f0dd2e2b9144c95b11c774f0db75b3f.jpg",
+      "thumbUrl": "/media/uploads/2e/2e53d8fb7a1ecd8dd76b0893eb75a4c32f0dd2e2b9144c95b11c774f0db75b3f-480.jpg",
+      "caption": "Long Tann Cross 2002",
+      "credit": "Ern Marshall",
+      "dateTaken": null,
+      "contact": 220,
+      "how": "linked",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 382,
+      "url": "/media/uploads/66/66ceda40feb50939086514b9364fdd32cb66309cf9ad7f0bee99e0e53c344225.jpg",
+      "thumbUrl": "/media/uploads/66/66ceda40feb50939086514b9364fdd32cb66309cf9ad7f0bee99e0e53c344225-480.jpg",
+      "caption": "Ern Marshall at The Cross 2002",
+      "credit": "Ern Marshall",
+      "dateTaken": null,
+      "contact": 220,
+      "how": "linked",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 545,
+      "url": "/media/uploads/b3/b33fdc385cd28ffec849f444c2c5dbe0ec0ae00fde503d1ca01074f93253253a.jpg",
+      "thumbUrl": "/media/uploads/b3/b33fdc385cd28ffec849f444c2c5dbe0ec0ae00fde503d1ca01074f93253253a-480.jpg",
+      "caption": "Sketch Map of the Battle of Long Tan - D445 \\\u0022version\\\u0022",
+      "credit": null,
+      "dateTaken": null,
+      "contact": 220,
+      "how": "linked",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 353,
+      "url": "/media/uploads/fd/fd4966283ea626e365b5af31ee777c77cafe8f946115c52c08c047f1f4b1aa6c.jpg",
+      "thumbUrl": "/media/uploads/fd/fd4966283ea626e365b5af31ee777c77cafe8f946115c52c08c047f1f4b1aa6c-480.jpg",
+      "caption": "Nui Dat looking north.",
+      "credit": "TBA",
+      "dateTaken": "1966-08-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 620,
+      "url": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98.jpg",
+      "thumbUrl": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98-480.jpg",
+      "caption": "1 ATF Power plant before fire",
+      "credit": null,
+      "dateTaken": "1970-03-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 621,
+      "url": "/media/uploads/86/8638fe1d78f37a1d61b8a2ebf6493b7c92d6fa3f11423af6ec03784b6b4f3751.jpg",
+      "thumbUrl": "/media/uploads/86/8638fe1d78f37a1d61b8a2ebf6493b7c92d6fa3f11423af6ec03784b6b4f3751-480.jpg",
+      "caption": "1 ATF Diesel Power Plant fir circa 1970. Plant completely destroyed by fire",
+      "credit": null,
+      "dateTaken": "1970-07-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 622,
+      "url": "/media/uploads/70/700ac1e57d31b1298a7440a684159c13e52b5f609c364f9cf1cfab94d63bd45a.jpg",
+      "thumbUrl": "/media/uploads/70/700ac1e57d31b1298a7440a684159c13e52b5f609c364f9cf1cfab94d63bd45a-480.jpg",
+      "caption": "Remains of Power Plant after the fire.",
+      "credit": null,
+      "dateTaken": "1970-06-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 623,
+      "url": "/media/uploads/73/73257c437f695a2be51648a2dd7206ebbd7e4e8386d8f519d40e8eb1fc3c3844.jpg",
+      "thumbUrl": "/media/uploads/73/73257c437f695a2be51648a2dd7206ebbd7e4e8386d8f519d40e8eb1fc3c3844-480.jpg",
+      "caption": "New Power Plant Building after the fire that destroyed the former one.",
+      "credit": null,
+      "dateTaken": "1970-06-30",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 624,
+      "url": "/media/uploads/9e/9eb167386220447a16a4f5e300772e9668888141bfa23508a5dce855547c2c41.jpg",
+      "thumbUrl": "/media/uploads/9e/9eb167386220447a16a4f5e300772e9668888141bfa23508a5dce855547c2c41-480.jpg",
+      "caption": "Engineers laying the new Power lines that burnt down during the fire that destroyed the Power Plant.",
+      "credit": null,
+      "dateTaken": "1970-06-28",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 625,
+      "url": "/media/uploads/19/198c79360f48a0750e02b1fb942778f265f406d1c40076773279229c32028f03.jpg",
+      "thumbUrl": "/media/uploads/19/198c79360f48a0750e02b1fb942778f265f406d1c40076773279229c32028f03-480.jpg",
+      "caption": "1 Australian Psychology Operations Unit (! Psyops Unit) printing room with psyops staff. Playboy centerfolds behind then on the wall.",
+      "credit": null,
+      "dateTaken": "1970-09-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 447,
+      "url": "/media/uploads/de/deb49c89417125790ebbcd70d8128fe61ac3d211075d856b58fc56473de695a5.jpg",
+      "thumbUrl": "/media/uploads/de/deb49c89417125790ebbcd70d8128fe61ac3d211075d856b58fc56473de695a5-480.jpg",
+      "caption": "Tanks of B Squadron on Route 2 in 1969",
+      "credit": "Ern Marshall Barry Hodges",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 4
+    },
+    {
+      "id": 364,
+      "url": "/media/uploads/52/52b8db904d724aedbb1cddc159611c4e66bc144cf7eea9f9c5262e5726450a08.jpg",
+      "thumbUrl": "/media/uploads/52/52b8db904d724aedbb1cddc159611c4e66bc144cf7eea9f9c5262e5726450a08-480.jpg",
+      "caption": "Looking Across 2 RAR lines",
+      "credit": "Allan Burkhill",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 393,
+      "url": "/media/uploads/7e/7e0bd6ea5154147c55f48e339f041cf70871426043c847d8cac119ccc6342922.jpg",
+      "thumbUrl": "/media/uploads/7e/7e0bd6ea5154147c55f48e339f041cf70871426043c847d8cac119ccc6342922-480.jpg",
+      "caption": "Google map with units overlaid as about 2011",
+      "credit": "Ern Marshall unknown",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 403,
+      "url": "/media/uploads/46/46ccc59315f922cfe36ae22224c00dd423e74fe06fb4c5a0448aa85da994d692.jpg",
+      "thumbUrl": "/media/uploads/46/46ccc59315f922cfe36ae22224c00dd423e74fe06fb4c5a0448aa85da994d692-480.jpg",
+      "caption": null,
+      "credit": "Ern Marshall",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 405,
+      "url": "/media/uploads/61/61e366824b5017b5cbaa81aebaab50037729783a54bdeae23b620c3fe7b50fc5.jpg",
+      "thumbUrl": "/media/uploads/61/61e366824b5017b5cbaa81aebaab50037729783a54bdeae23b620c3fe7b50fc5-480.jpg",
+      "caption": "Couple of Diggers at The Horseshoe",
+      "credit": "ErnMarshall",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    }
+  ],
+  "sources": {
+    "contacts": 6157,
+    "units": 590,
+    "rollPeople": 522,
+    "casualtyLinks": 213,
+    "pictures": 350,
+    "places": 113,
+    "portraits": 521
+  }
+}

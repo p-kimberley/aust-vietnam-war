@@ -1,0 +1,1285 @@
+{
+  "unit": {
+    "id": 143,
+    "slug": "1-field-squadron",
+    "title": "1st Field Squadron",
+    "short": "1 Fd Sqn",
+    "arm": "engineers",
+    "record": "https://www.awm.gov.au/collection/U53457",
+    "tours": [
+      {
+        "from": "1965-09",
+        "to": "1972-02"
+      }
+    ],
+    "outsideTours": [],
+    "corrected": [],
+    "mapUrl": "/battlemap?units=143"
+  },
+  "figures": {
+    "contacts": 76,
+    "led": 58,
+    "supported": 18,
+    "first": "1965-10-23",
+    "last": "1971-04-11",
+    "operations": 22,
+    "friendlyKilled": 9,
+    "friendlyWounded": 45,
+    "enemyKilled": 0,
+    "enemyWounded": 2,
+    "mineIncidents": 29
+  },
+  "perYear": [
+    {
+      "year": 1965,
+      "contacts": 5
+    },
+    {
+      "year": 1966,
+      "contacts": 14
+    },
+    {
+      "year": 1967,
+      "contacts": 7
+    },
+    {
+      "year": 1968,
+      "contacts": 5
+    },
+    {
+      "year": 1969,
+      "contacts": 24
+    },
+    {
+      "year": 1970,
+      "contacts": 19
+    },
+    {
+      "year": 1971,
+      "contacts": 2
+    }
+  ],
+  "activity": [
+    {
+      "name": "Security",
+      "count": 24,
+      "share": 0.41
+    },
+    {
+      "name": "Mine incident",
+      "count": 19,
+      "share": 0.33
+    },
+    {
+      "name": "Land clearance",
+      "count": 9,
+      "share": 0.16
+    },
+    {
+      "name": "Transport",
+      "count": 4,
+      "share": 0.07
+    },
+    {
+      "name": "Mine clearance",
+      "count": 1,
+      "share": 0.02
+    },
+    {
+      "name": "Not recorded",
+      "count": 1,
+      "share": 0.02
+    }
+  ],
+  "support": [
+    {
+      "kind": "Engineer support",
+      "contacts": 18,
+      "for": [
+        {
+          "unit": "1 RAR",
+          "contacts": 13
+        },
+        {
+          "unit": "1 Armd Regt",
+          "contacts": 2
+        },
+        {
+          "unit": "1 ATF",
+          "contacts": 1
+        },
+        {
+          "unit": "5 RAR",
+          "contacts": 1
+        },
+        {
+          "unit": "9 RAR",
+          "contacts": 1
+        }
+      ]
+    }
+  ],
+  "dataSources": [
+    {
+      "name": "1ATF",
+      "count": 63,
+      "share": 0.83
+    },
+    {
+      "name": "1RAR",
+      "count": 13,
+      "share": 0.17
+    }
+  ],
+  "operations": [
+    {
+      "name": "13/65",
+      "contacts": 1,
+      "first": "1965-10-23",
+      "last": "1965-10-23",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "14/65, Hump",
+      "contacts": 1,
+      "first": "1965-11-05",
+      "last": "1965-11-05",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "16/65, New Life",
+      "contacts": 2,
+      "first": "1965-11-21",
+      "last": "1965-12-04",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "17/65, Smash",
+      "contacts": 1,
+      "first": "1965-12-17",
+      "last": "1965-12-17",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "18/65, Marauder",
+      "contacts": 1,
+      "first": "1966-01-01",
+      "last": "1966-01-01",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "1/66, Crimp",
+      "contacts": 1,
+      "first": "1966-01-08",
+      "last": "1966-01-08",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "1/66",
+      "contacts": 1,
+      "first": "1966-01-10",
+      "last": "1966-01-10",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "3/66, Roundhouse",
+      "contacts": 1,
+      "first": "1966-02-04",
+      "last": "1966-02-04",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "4/66, Rolling Stone",
+      "contacts": 1,
+      "first": "1966-02-19",
+      "last": "1966-02-19",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "6/66, Silver City",
+      "contacts": 1,
+      "first": "1966-03-09",
+      "last": "1966-03-09",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Silver City",
+      "contacts": 1,
+      "first": "1966-03-17",
+      "last": "1966-03-17",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "7/66, Abilene",
+      "contacts": 1,
+      "first": "1966-03-30",
+      "last": "1966-03-30",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Hardihood",
+      "contacts": 2,
+      "first": "1966-06-12",
+      "last": "1966-06-23",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Casula",
+      "contacts": 4,
+      "first": "1966-09-27",
+      "last": "1966-12-24",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Leeton",
+      "contacts": 3,
+      "first": "1967-05-09",
+      "last": "1967-05-30",
+      "friendlyKilled": 5,
+      "enemyKilled": 0
+    },
+    {
+      "name": "TAOR",
+      "contacts": 3,
+      "first": "1968-03-24",
+      "last": "1969-08-23",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Lyre Bird",
+      "contacts": 2,
+      "first": "1968-08-01",
+      "last": "1968-08-02",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Backbone",
+      "contacts": 1,
+      "first": "1969-10-21",
+      "last": "1969-10-21",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Frangimus 4",
+      "contacts": 1,
+      "first": "1970-04-08",
+      "last": "1970-04-08",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Concrete",
+      "contacts": 2,
+      "first": "1970-04-22",
+      "last": "1970-04-24",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Cung Chung",
+      "contacts": 1,
+      "first": "1970-06-19",
+      "last": "1970-06-19",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Briar Patch 1",
+      "contacts": 1,
+      "first": "1971-04-11",
+      "last": "1971-04-11",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    }
+  ],
+  "areas": [
+    {
+      "place": "Serle",
+      "type": "FSB",
+      "contacts": 12,
+      "share": 0.16
+    },
+    {
+      "place": "Herring",
+      "type": "FSB",
+      "contacts": 10,
+      "share": 0.13
+    },
+    {
+      "place": "Dampier",
+      "type": "FSB",
+      "contacts": 8,
+      "share": 0.11
+    },
+    {
+      "place": "Weir",
+      "type": "FSB",
+      "contacts": 7,
+      "share": 0.09
+    },
+    {
+      "place": "Arrow",
+      "type": "FSB",
+      "contacts": 6,
+      "share": 0.08
+    },
+    {
+      "place": "Garth",
+      "type": "FSB",
+      "contacts": 4,
+      "share": 0.05
+    },
+    {
+      "place": "Panther",
+      "type": "FSB",
+      "contacts": 4,
+      "share": 0.05
+    },
+    {
+      "place": "Gabo",
+      "type": "FSB",
+      "contacts": 2,
+      "share": 0.03
+    }
+  ],
+  "notable": [
+    {
+      "id": 10185,
+      "url": "/battlemap?incident=10185",
+      "dtg": "1965-10-23T08:00:00",
+      "why": [
+        "first"
+      ],
+      "role": "Engineer support",
+      "ledBy": "1 RAR",
+      "operation": "13/65",
+      "task": "Deployment",
+      "gridRef": "YT109216",
+      "friendlyForce": 0,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 APC Troop, Prince of Wales Light Horse Regiment",
+        "1 Battalion, Royal Australian Regiment",
+        "105 Field Battery, 1 Field Regiment",
+        "161 Field Battery, 1 Australian Task Force",
+        "3 Field Troop, 1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "Operation 13/65 took place from 23 to 26 October 1965. It involved 1 RAR with, under command, 1 APC Tp (PWLH) and 3 Fd Tp (Royal Australian Engineers), with, in direct support 105 Fd Bty (RAA) and 161 Fd Bty (NZ). In support were E/17th Cav (US) and 161 (Indep) Recce Flt. This was a battalion search and destroy operation to extend the 173d Abn Bde area of influence beyond and to the north east of its TAOR based on the Bien Hoa airbase. The operation took place about 18 kilometres northeast of the Bien Hoa base.",
+      "archivalSource": "AWM95, item 7/1/35, 1 Battalion Royal Australian Regiment, Narrative Annexes, 1-31 Oct 65, p. 18-19. McNeill, To Long Tan, p. 441."
+    },
+    {
+      "id": 10079,
+      "url": "/battlemap?incident=10079",
+      "dtg": "1966-01-10T00:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Engineer support",
+      "ledBy": "1 RAR",
+      "operation": "1/66",
+      "task": "Installation",
+      "gridRef": "XT653287",
+      "friendlyForce": 100,
+      "enemyForce": 0,
+      "friendlyKilled": 1,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "3 Field Troop, 1 Field Squadron",
+        "B Company, 1 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "Engineers brought forward a Mighty Mite team to blow smoke and CS gas into the tunnels found by B Company and other 1RAR elements on previous days. It was hoped that the smoke forced into the tunnels would reveal where other entrances were located. The CS gas would be used to deny the tunnels to enemy occupation. During an inspection of one of the tunnel entrances, Cpl Bowtell (RAE) was asphixiated by a combination of CS gas and lack of oxygen. He was located in a vertical shaft between the first and second levels of tunnels. In his struggles he had dislodged his respirator and when rescue parties eventually reached him, he was found to be dead. Two other soldiers were badly affected during their attempts to reach Cpl Bowtell and were dusted off. Other important documents were found in the tunnel system including an excellently presented propaganda book of photographs prepared by the Saigon Cholon Gia Dinh Committee. Other caches  were discovered within the B Company perimeter. These included food, documents, and  medical stores. One cache was found in a tunnel entrance with a sophisticated hinged wooden trap door entry. From the trap door, wires led to two booby traps. The booby traps were grenades in plastic bags. Both wires had been pulled but had broken because the grenade pins had been left splayed.",
+      "archivalSource": "Major Ian McFarlane\u0027s Operational Analysis is at AWM95, item 7/1/56, 1 Battalion, Royal Australian Regiment, Annexes, 1-31 Jan 1966, p. 12-19."
+    },
+    {
+      "id": 10144,
+      "url": "/battlemap?incident=10144",
+      "dtg": "1966-03-17T17:10:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Engineer support",
+      "ledBy": "1 RAR",
+      "operation": "Silver City",
+      "task": "Mine/Booby trap",
+      "gridRef": "YT076433",
+      "friendlyForce": 100,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 4,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "3 Field Troop, 1 Field Squadron",
+        "B Company, 1 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "B Company reported that three soldiers (including one US soldier) had been wounded when a claymore mine was detonated in front of a Mule (a light transport vehicle) extracting rice from a captured cache. The 2 Australians wounded were 38151 Sapper M. Livingstone and 42853 Sapper D.J. Peters, both of 3 Field Troop.",
+      "archivalSource": "AWM95, item 7/1/61, 1 Battalion, Royal Australian Regiment, Narrative, Annexes, 1-31 Mar 66, p. 22."
+    },
+    {
+      "id": 66,
+      "url": "/battlemap?incident=66",
+      "dtg": "1966-06-12T13:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "Engineer support",
+      "ledBy": "5 RAR",
+      "operation": "Hardihood",
+      "task": "Patrol",
+      "gridRef": "YS436643",
+      "friendlyForce": 35,
+      "enemyForce": 10,
+      "friendlyKilled": 1,
+      "friendlyWounded": 3,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 APC Squadron, 3 Cavalry Regiment",
+        "1 Field Squadron",
+        "D \u0026 E Platoon, 1 Australian Task Force",
+        "D Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "D Coy of 5 RAR was conducting an sweep of NE section of Hoa Long searching for enemy mortar positions. Elements of its force received light mortar rounds resulting in 2 cas from D and E pl, 1 from 1 APC Sqn, and 1 from 1Fd Sqn. 1 Aust killed 3 wounded.\n\nYS438643: EN MORTAR AT LOC STATED. ENGAGED BY ARTY. RESUNK.\n\nThe en mortars located by AN/KPQ1 Radar at Long Phuoc village. (1ATF Sitrep 12/6/66)",
+      "archivalSource": "Cmdr"
+    },
+    {
+      "id": 4710,
+      "url": "/battlemap?incident=4710",
+      "dtg": "1967-05-09T10:41:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Leeton",
+      "task": "Security",
+      "gridRef": "YS503587",
+      "friendlyForce": 0,
+      "enemyForce": 0,
+      "friendlyKilled": 2,
+      "friendlyWounded": 4,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Troop, 1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "Sapper sets off M16 mine while laying it. 6 soldiers wounded\n\nFriendly Fire\n\nR Deed died 10/5, and D Brooks died 22/5 of wounds received from mine explosion. Wounded were T Evans, J Thompson, A Culkin, E Holst. ( Hist of 1 Fd Sqn p135)",
+      "archivalSource": "AWM95 1-4-39.pdf pg78 Sitrep;"
+    },
+    {
+      "id": 4679,
+      "url": "/battlemap?incident=4679",
+      "dtg": "1967-05-20T15:52:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Leeton",
+      "task": null,
+      "gridRef": "YS500609",
+      "friendlyForce": 0,
+      "enemyForce": 0,
+      "friendlyKilled": 2,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "Two engineers were killed when an anti lift device exploded while they were laying M16 mines in the barrier mine field during op Leeton.\n\nNoted in FF Database",
+      "archivalSource": "AWM95 1-4-39.pdf p95 Sitrep"
+    },
+    {
+      "id": 526,
+      "url": "/battlemap?incident=526",
+      "dtg": "1967-05-30T08:18:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Leeton",
+      "task": "Security",
+      "gridRef": "YS507558",
+      "friendlyForce": 4,
+      "enemyForce": 0,
+      "friendlyKilled": 1,
+      "friendlyWounded": 2,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Troop, 1 Field Squadron",
+        "Assault Pioneer Platoon, Support Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "While laying mines in the barrier mine field, a member of a mine arming party ( from 7 RAR Aslt Pnrs) set off an M16 mine killing one sapper and wounding 2. \n\nFriendly Fire: Noted in FF Database\n\nKilled was T Renshaw, wounded was B Bevan, shocked was L Sempel. (Hist of 1 Fd Sqn p142).",
+      "archivalSource": "On the Offensive pg 171; AWM95 7-7-2.pdf pg155"
+    },
+    {
+      "id": 4694,
+      "url": "/battlemap?incident=4694",
+      "dtg": "1967-12-16T09:45:00",
+      "why": [
+        "typical:Security"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": null,
+      "task": "Security",
+      "gridRef": "YS497580",
+      "friendlyForce": 10,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 2,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "1 Fd Sqn was assisting 4/48 ARVN to repair the mine field between Dat Do and Phuoc Hai. An ARVN soldier stepped on an M16 mine resulting in 2 Aust wded, and 1 ARVN killed and 4 ARVN wded.\n\nFriendly Fire",
+      "archivalSource": "AWM95 1-4-74.pdf p32 SITREP;"
+    },
+    {
+      "id": 1441,
+      "url": "/battlemap?incident=1441",
+      "dtg": "1968-08-01T15:35:00",
+      "why": [
+        "typical:Land clearance"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Lyre Bird",
+      "task": "Land Clearance",
+      "gridRef": "YS317665",
+      "friendlyForce": 1,
+      "enemyForce": 2,
+      "friendlyKilled": 0,
+      "friendlyWounded": 1,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "Bulldozer driver injured by RPG. 2 enemy fired an RPG-2 and SA at bulldozer wounding the driver and setting fire to the dozer. Driver suffered head and chest wds.\n\nThe land clearing team was operating around Nui Thi Vai and the Nui Dinh Mountains. An enemy fired an RPG at the D8 bulldozer setting it on fire and wounding the operator with shrapnel to the head, chest and legs (Sapper W Edwards). The engineers could not put the fire out in the bulldozer, so pushed it into a cutting and buried it with soil. After extinguishing the flames the dozer was withdrawn to Nui Dat the next day.\n(Hist of 1 Fd Sqn p214-15; 4 RAR Diary AWM95, 7/4/30.pdf p15-16.)",
+      "archivalSource": "AWM95 7-4-30.pdf pg15-16; AWM95 7-4-31.pdf pg137 Contact Rept; Intsum, AWM95 1/4/113 pt3.pdf p3;"
+    },
+    {
+      "id": 2424,
+      "url": "/battlemap?incident=2424",
+      "dtg": "1969-05-24T11:33:00",
+      "why": [
+        "typical:Transport"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": null,
+      "task": "Transport",
+      "gridRef": "YS452577",
+      "friendlyForce": 6,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 3,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "YS452577, YS452581: AT LOCS STATED, IN TAM PHOUC,2 X LCT VEHICLES DETONATED 3 X M-16 MINES. RES 3 AUST WIA,2 DOZERS SLIGHTLY DAMAGED.\n\nOne dozer ran over an M16 mine injuring the driver and one soldier walking behind. A second dozer ran over another M16 mine slightly damaging the radiator and the driver. Cas were evac 1 had light shrap to R thigh, another had minor shrap to L thigh, the third had minor shrap wd to scalp.\n\nEdge of village SE of Long Dien",
+      "archivalSource": "Intsum, AWM95 1/4/152.pdf p139; AWM95 7-9-16.pdf 9RAR May 69 pg198-99"
+    },
+    {
+      "id": 3036,
+      "url": "/battlemap?incident=3036",
+      "dtg": "1969-10-21T13:10:00",
+      "why": [
+        "typical:Mine incident"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Backbone",
+      "task": null,
+      "gridRef": "YS495556",
+      "friendlyForce": 25,
+      "enemyForce": 0,
+      "friendlyKilled": 1,
+      "friendlyWounded": 1,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "YS495556: AT LOC STATED, FRI FORCES DETONATED M26 MINERES 1 AUST KIA AND 1 AUST WIA.\n\nMini Team was clearing a road block.\n\nWhile engaged in mine clearing activities, LCp B Hansen was killed by a mine/booby trap, while working with  B Sqn 1 Armd Regt on Route 326. (Hist of 1 Fd Sqn p280)",
+      "archivalSource": "Sitrep, AWM95 1/4/170.pdf p69"
+    },
+    {
+      "id": 3110,
+      "url": "/battlemap?incident=3110",
+      "dtg": "1969-11-09T10:40:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": null,
+      "task": null,
+      "gridRef": "YS501581",
+      "friendlyForce": 25,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 4,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "Mine Clearing Team, 1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "Booby Trap\n\nYS501581: AT THE LOC STATED, A M16 MINE WAS DETONATEDRESULTS: 4 AUST WIA(EVAC). M)\n\n300m N of Phuoc Loi",
+      "archivalSource": "Sitrep, AWM95 1/4/173.pdf p71; AWM95 2-2-10.pdf pg52 (Sitrep)"
+    },
+    {
+      "id": 3768,
+      "url": "/battlemap?incident=3768",
+      "dtg": "1970-04-22T10:40:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Concrete",
+      "task": null,
+      "gridRef": "YS671607",
+      "friendlyForce": 25,
+      "enemyForce": 0,
+      "friendlyKilled": 1,
+      "friendlyWounded": 4,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Squadron",
+        "A Company, 6 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "Coy detonates M16 mine\n\nYS671607, ELMS 1 FD SQN AND A/6RAR/NZ DET M16 MINE. RESULTS:1 AUST KIA, 4 AUST WIA. ) YS671607, ELMS 1 FD SQN AND A/6RAR/NZ DET M16 MINE. RESULTS: 1 AUST KIA, 4 AUST WIA. (M) A. 500M NE OF INCIDENT IS OLD HARBOUR POSN (PROB EX 8RAR) OF PL SIZE. ABOUT 1 KM NE OF THAT POINT IS OLD COY HARBOUR POSN (POSS ALSO 8RAR). B. 5M SW OF INCIDENT IS CLEARING (HELI PAD ETC). MINE WAS LAID ON BULLOCK TRACK LEADING TO CLEARING. C. AT LEAST 4 MEN HAD PASSED OVER THE MINE PRIOR TO ITS DETONATION. 8RAR HAD BEEN THRU THIS AREA PRIOR TO A/6RAR/NZ\u0027S MOV INTO THE AREA. WOULD APPEAR MINE WAS LAID FOL 8RAR\u0027S MOV OUT OF AREA. OC A/6RAR/NZ BELIEVES THAT ALL OTHER TRACKS LEADING INTO THAT CLEARING FROM OTHER DIRECTIONS WOULD ALSO BE MINED. THERE WAS VC MINE MARKER POINTING TWDS THIS MINE. IT WAS BRANCH BROKEN AND LEFT POINTING TWDS MINE. ADDITIONAL INFO. A. MINE WAS PLACED IN SAND PATCH ABOUT 5M IN DIA. THE BULLOCK CART TRACKS PASSED THRU CLEARING. B. MINE MARKER WAS ON BUSH SIDE OF MINE AND ON BULLOCK CART TRACK. C. EN OBVIOUSLY APPRECIATED THAT CLEARING WOULD BE USED BY OUR TPS AS LZ FOR INSERTION/EXTRACTION OR MAINTDEM AND HAS PROB PLACED MINES ON ALL ACCESS TRACKS INTO CLEARING. D. SHOULD ALSO BE EXPECTED THAT OTHER OBVIOUS CLEARINGS USED AS LZ\u0027S, PARTICULARLY ONES WITH MARKED EXIT TRACKS, COULD BE MINED.  \n\nJungle 7 Km s of Xuyen Moc",
+      "archivalSource": "AWM109 Ops 1ATF [C]; Intsum, AWM95 1/4/186.pdf p93"
+    },
+    {
+      "id": 4463,
+      "url": "/battlemap?incident=4463",
+      "dtg": "1971-04-11T11:40:00",
+      "why": [
+        "last"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Briar Patch 1",
+      "task": null,
+      "gridRef": "YS613717",
+      "friendlyForce": 2,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Field Squadron"
+      ],
+      "subUnits": [],
+      "report": "YS613717, 1 FD SQN MINE CLEARING TANK DET A 60-80LB MINE RES INEXTENSIVE DAM TO THE TANK. IT COULD NOT BE DETERMINED WHETHER THE MINEWAS COMD OR PRESSURE DET.\n\nJungle off route328",
+      "archivalSource": "Intsum, AWM95 1/4/219.pdf p132"
+    }
+  ],
+  "subUnits": [],
+  "dead": [
+    {
+      "serviceNumber": "18409",
+      "name": "Leslie Prowse",
+      "rank": "Sapper",
+      "died": "1966-07-25",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/18409.jpg"
+    },
+    {
+      "serviceNumber": "3788300",
+      "name": "Ramon John Peter Deed",
+      "rank": "Sapper",
+      "died": "1967-05-10",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/3788300.jpg"
+    },
+    {
+      "serviceNumber": "2782555",
+      "name": "Glen Trevor Bartholomew",
+      "rank": "Sapper",
+      "died": "1967-05-18",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2782555.jpg"
+    },
+    {
+      "serviceNumber": "2782812",
+      "name": "Gregory Vincent Brady",
+      "rank": "Sapper",
+      "died": "1967-05-20",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2782812.jpg"
+    },
+    {
+      "serviceNumber": "2782779",
+      "name": "John Laurence O\u0027hara",
+      "rank": "Sapper",
+      "died": "1967-05-20",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2782779.jpg"
+    },
+    {
+      "serviceNumber": "3787889",
+      "name": "Dennis Lindsay Brooks",
+      "rank": "Sapper",
+      "died": "1967-05-22",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/3787889.jpg"
+    },
+    {
+      "serviceNumber": "3788172",
+      "name": "Terrence James Renshaw",
+      "rank": "Sapper",
+      "died": "1967-05-30",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        526
+      ],
+      "subUnits": [],
+      "portrait": "/media/portraits/3788172.jpg"
+    },
+    {
+      "serviceNumber": "18665",
+      "name": "Donald Spence Wride",
+      "rank": "Sapper",
+      "died": "1967-07-10",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/18665.jpg"
+    },
+    {
+      "serviceNumber": "242811",
+      "name": "Barry John Moore",
+      "rank": "(Temporary) Warrant-Officer Class 2",
+      "died": "1967-11-16",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/242811.jpg"
+    },
+    {
+      "serviceNumber": "1200455",
+      "name": "Maurice John Hutchison",
+      "rank": "(Temporary) Corporal",
+      "died": "1967-11-16",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/1200455.jpg"
+    },
+    {
+      "serviceNumber": "44042",
+      "name": "Allan Graham Pattison",
+      "rank": "Sapper",
+      "died": "1968-02-18",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/44042.jpg"
+    },
+    {
+      "serviceNumber": "13053",
+      "name": "Colin William Mclachlan",
+      "rank": "Sergeant",
+      "died": "1968-02-18",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/13053.jpg"
+    },
+    {
+      "serviceNumber": "4719232",
+      "name": "David John Steen",
+      "rank": "Sapper",
+      "died": "1968-02-18",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/4719232.jpg"
+    },
+    {
+      "serviceNumber": "1200473",
+      "name": "John Edgar Garrett",
+      "rank": "Lance-Corporal",
+      "died": "1968-02-18",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/1200473.jpg"
+    },
+    {
+      "serviceNumber": "6708750",
+      "name": "Geoffrey John Coombs",
+      "rank": "Sapper",
+      "died": "1968-03-22",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/6708750.jpg"
+    },
+    {
+      "serviceNumber": "55251",
+      "name": "Vincent John Tobin",
+      "rank": "Sapper",
+      "died": "1968-03-22",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/55251.jpg"
+    },
+    {
+      "serviceNumber": "172377",
+      "name": "Peter James Gollagher",
+      "rank": "Staff Sergeant",
+      "died": "1968-04-05",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/172377.jpg"
+    },
+    {
+      "serviceNumber": "2412486",
+      "name": "Kenneth Roy Nicholson",
+      "rank": "Sapper",
+      "died": "1968-04-12",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2412486.jpg"
+    },
+    {
+      "serviceNumber": "18395",
+      "name": "Norman William Le Bherz",
+      "rank": "Sapper",
+      "died": "1968-09-14",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/18395.jpg"
+    },
+    {
+      "serviceNumber": "2789684",
+      "name": "Peter John Bramble",
+      "rank": "Sapper",
+      "died": "1969-05-22",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2789684.jpg"
+    },
+    {
+      "serviceNumber": "38530",
+      "name": "Ronald Edward Davies",
+      "rank": "Sapper",
+      "died": "1969-05-28",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/38530.jpg"
+    },
+    {
+      "serviceNumber": "3794831",
+      "name": "John Smith",
+      "rank": "Sapper",
+      "died": "1969-07-23",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/3794831.jpg"
+    },
+    {
+      "serviceNumber": "39281",
+      "name": "Ronald George Smillie",
+      "rank": "Sapper",
+      "died": "1969-07-23",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/39281.jpg"
+    },
+    {
+      "serviceNumber": "218451",
+      "name": "Bryant Victor Hansen",
+      "rank": "Lance-Corporal",
+      "died": "1969-10-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3036
+      ],
+      "subUnits": [],
+      "portrait": "/media/portraits/218451.jpg"
+    },
+    {
+      "serviceNumber": "5716228",
+      "name": "Alan Leslie Duncuff",
+      "rank": "Sapper",
+      "died": "1969-10-25",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/5716228.jpg"
+    },
+    {
+      "serviceNumber": "2791437",
+      "name": "Anthony Lisle",
+      "rank": "Sapper",
+      "died": "1969-11-12",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2791437.jpg"
+    },
+    {
+      "serviceNumber": "2791447",
+      "name": "John Gerald Greene",
+      "rank": "Sapper",
+      "died": "1969-12-08",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2791447.jpg"
+    },
+    {
+      "serviceNumber": "2786682",
+      "name": "Anthony Edward Hollis",
+      "rank": "Sapper",
+      "died": "1970-01-30",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2786682.jpg"
+    },
+    {
+      "serviceNumber": "18797",
+      "name": "Ronald John Engstrom",
+      "rank": "Corporal",
+      "died": "1970-01-30",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/18797.jpg"
+    },
+    {
+      "serviceNumber": "55566",
+      "name": "Rodney Noel Hubble",
+      "rank": "Sapper",
+      "died": "1970-02-28",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/55566.jpg"
+    },
+    {
+      "serviceNumber": "2791326",
+      "name": "Harold Walter Hurst",
+      "rank": "Sapper",
+      "died": "1970-04-29",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2791326.jpg"
+    },
+    {
+      "serviceNumber": "1735424",
+      "name": "Ian Neil Scott",
+      "rank": "Sapper",
+      "died": "1970-06-14",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/1735424.jpg"
+    },
+    {
+      "serviceNumber": "6709611",
+      "name": "Peter Lawrence Penneyston",
+      "rank": "Sapper",
+      "died": "1970-08-02",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/6709611.jpg"
+    },
+    {
+      "serviceNumber": "1201940",
+      "name": "Robert Barclay Wilson",
+      "rank": "Sapper",
+      "died": "1971-07-16",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/1201940.jpg"
+    }
+  ],
+  "pictures": [
+    {
+      "id": 586,
+      "url": "/media/uploads/5d/5d8e75f8b012455ceac6a0ee4debd55cdf21a3e7e3f58784957f090b706314e6.jpg",
+      "thumbUrl": "/media/uploads/5d/5d8e75f8b012455ceac6a0ee4debd55cdf21a3e7e3f58784957f090b706314e6-480.jpg",
+      "caption": "B Company 5 RAR entering fence, moving south towards Xa Phuoc Loi 29.3.67",
+      "credit": "errol999",
+      "dateTaken": "1967-03-29",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 10
+    },
+    {
+      "id": 625,
+      "url": "/media/uploads/19/198c79360f48a0750e02b1fb942778f265f406d1c40076773279229c32028f03.jpg",
+      "thumbUrl": "/media/uploads/19/198c79360f48a0750e02b1fb942778f265f406d1c40076773279229c32028f03-480.jpg",
+      "caption": "1 Australian Psychology Operations Unit (! Psyops Unit) printing room with psyops staff. Playboy centerfolds behind then on the wall.",
+      "credit": null,
+      "dateTaken": "1970-09-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 9
+    },
+    {
+      "id": 620,
+      "url": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98.jpg",
+      "thumbUrl": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98-480.jpg",
+      "caption": "1 ATF Power plant before fire",
+      "credit": null,
+      "dateTaken": "1970-03-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 8
+    },
+    {
+      "id": 621,
+      "url": "/media/uploads/86/8638fe1d78f37a1d61b8a2ebf6493b7c92d6fa3f11423af6ec03784b6b4f3751.jpg",
+      "thumbUrl": "/media/uploads/86/8638fe1d78f37a1d61b8a2ebf6493b7c92d6fa3f11423af6ec03784b6b4f3751-480.jpg",
+      "caption": "1 ATF Diesel Power Plant fir circa 1970. Plant completely destroyed by fire",
+      "credit": null,
+      "dateTaken": "1970-07-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 8
+    },
+    {
+      "id": 622,
+      "url": "/media/uploads/70/700ac1e57d31b1298a7440a684159c13e52b5f609c364f9cf1cfab94d63bd45a.jpg",
+      "thumbUrl": "/media/uploads/70/700ac1e57d31b1298a7440a684159c13e52b5f609c364f9cf1cfab94d63bd45a-480.jpg",
+      "caption": "Remains of Power Plant after the fire.",
+      "credit": null,
+      "dateTaken": "1970-06-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 8
+    },
+    {
+      "id": 623,
+      "url": "/media/uploads/73/73257c437f695a2be51648a2dd7206ebbd7e4e8386d8f519d40e8eb1fc3c3844.jpg",
+      "thumbUrl": "/media/uploads/73/73257c437f695a2be51648a2dd7206ebbd7e4e8386d8f519d40e8eb1fc3c3844-480.jpg",
+      "caption": "New Power Plant Building after the fire that destroyed the former one.",
+      "credit": null,
+      "dateTaken": "1970-06-30",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 8
+    },
+    {
+      "id": 624,
+      "url": "/media/uploads/9e/9eb167386220447a16a4f5e300772e9668888141bfa23508a5dce855547c2c41.jpg",
+      "thumbUrl": "/media/uploads/9e/9eb167386220447a16a4f5e300772e9668888141bfa23508a5dce855547c2c41-480.jpg",
+      "caption": "Engineers laying the new Power lines that burnt down during the fire that destroyed the Power Plant.",
+      "credit": null,
+      "dateTaken": "1970-06-28",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 8
+    },
+    {
+      "id": 353,
+      "url": "/media/uploads/fd/fd4966283ea626e365b5af31ee777c77cafe8f946115c52c08c047f1f4b1aa6c.jpg",
+      "thumbUrl": "/media/uploads/fd/fd4966283ea626e365b5af31ee777c77cafe8f946115c52c08c047f1f4b1aa6c-480.jpg",
+      "caption": "Nui Dat looking north.",
+      "credit": "TBA",
+      "dateTaken": "1966-08-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 7
+    },
+    {
+      "id": 589,
+      "url": "/media/uploads/69/69cb236985904bf85cb0d48b4512c031cbf89a9357e1c41d63f7405f3addb25b.jpg",
+      "thumbUrl": "/media/uploads/69/69cb236985904bf85cb0d48b4512c031cbf89a9357e1c41d63f7405f3addb25b-480.jpg",
+      "caption": "Australian M113 APCs at Laager, the crews having breakfast inside the area that was fenced immediately east of Xa Phuoc Loi. This area became part of the fenced minefield",
+      "credit": "errol999",
+      "dateTaken": "1967-04-08",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 7
+    },
+    {
+      "id": 608,
+      "url": "/media/uploads/c2/c227a30709662b54512108b851bfd05c2492900640b733bb4a48e64ac441d52c.jpg",
+      "thumbUrl": "/media/uploads/c2/c227a30709662b54512108b851bfd05c2492900640b733bb4a48e64ac441d52c-480.jpg",
+      "caption": "Lt. A.E. (Ted) Pott and Corporal Bobby Harboard walking south out of Xa Phuoc Loi on Route 44. The Australian Engineers had advised us that the barbed wire fence next to Route 44 had been booby trapped by the V.C.. 9.4.1967",
+      "credit": "errol999",
+      "dateTaken": "1967-04-09",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 7
+    },
+    {
+      "id": 639,
+      "url": "/media/uploads/0d/0dc657aa07b8cf9617075711d3fb32cb3d471633165031463f47f3a495691f49.jpg",
+      "thumbUrl": "/media/uploads/0d/0dc657aa07b8cf9617075711d3fb32cb3d471633165031463f47f3a495691f49-480.jpg",
+      "caption": "Outline of Line Alpha. This was the line that patrols could work in so they had artillery and mortar fire to support them. This was completed while Nui Dat defences were being built.",
+      "credit": null,
+      "dateTaken": "1966-08-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 6
+    },
+    {
+      "id": 644,
+      "url": "/media/uploads/84/84ad6491379ed4aa388e808e0617e5903d267bcb03a47ebac0224dc0548d3d86.jpg",
+      "thumbUrl": "/media/uploads/84/84ad6491379ed4aa388e808e0617e5903d267bcb03a47ebac0224dc0548d3d86-480.jpg",
+      "caption": "The Long Hai Hills viewed from immediately south of Xa Phuoc Loi during breakfast in the fenced minefield 6 Pl 5 RAR 8.4.67",
+      "credit": "errol999",
+      "dateTaken": "1967-04-08",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 6
+    }
+  ],
+  "sources": {
+    "contacts": 6157,
+    "units": 590,
+    "rollPeople": 522,
+    "casualtyLinks": 213,
+    "pictures": 350,
+    "places": 113,
+    "portraits": 521
+  }
+}

@@ -1,0 +1,2422 @@
+{
+  "unit": {
+    "id": 1,
+    "slug": "5-rar",
+    "title": "5th Battalion, Royal Australian Regiment",
+    "short": "5 RAR",
+    "arm": "infantry",
+    "record": "https://www.awm.gov.au/collection/U53500",
+    "tours": [
+      {
+        "from": "1966-04",
+        "to": "1967-05"
+      },
+      {
+        "from": "1969-02",
+        "to": "1970-02"
+      }
+    ],
+    "outsideTours": [
+      2,
+      1979
+    ],
+    "corrected": [
+      {
+        "id": 543,
+        "date": "1967-06-12",
+        "recordedAgainst": "5-rar",
+        "countedFor": "2-rar"
+      },
+      {
+        "id": 545,
+        "date": "1967-06-17",
+        "recordedAgainst": "5-rar",
+        "countedFor": "2-rar"
+      },
+      {
+        "id": 881,
+        "date": "1968-01-29",
+        "recordedAgainst": "5-rar",
+        "countedFor": "3-rar"
+      },
+      {
+        "id": 950,
+        "date": "1968-02-05",
+        "recordedAgainst": "5-rar",
+        "countedFor": "2-rar"
+      },
+      {
+        "id": 986,
+        "date": "1968-02-12",
+        "recordedAgainst": "5-rar",
+        "countedFor": "3-rar"
+      },
+      {
+        "id": 1178,
+        "date": "1968-04-25",
+        "recordedAgainst": "5-rar",
+        "countedFor": "1-rar"
+      },
+      {
+        "id": 1186,
+        "date": "1968-04-26",
+        "recordedAgainst": "5-rar",
+        "countedFor": "1-rar"
+      },
+      {
+        "id": 1188,
+        "date": "1968-04-26",
+        "recordedAgainst": "5-rar",
+        "countedFor": "1-rar"
+      },
+      {
+        "id": 1235,
+        "date": "1968-05-13",
+        "recordedAgainst": "5-rar",
+        "countedFor": "1-rar"
+      },
+      {
+        "id": 1351,
+        "date": "1968-06-04",
+        "recordedAgainst": "5-rar",
+        "countedFor": "4-rar"
+      },
+      {
+        "id": 1366,
+        "date": "1968-06-17",
+        "recordedAgainst": "5-rar",
+        "countedFor": "4-rar"
+      },
+      {
+        "id": 1665,
+        "date": "1968-10-26",
+        "recordedAgainst": "5-rar",
+        "countedFor": "4-rar"
+      },
+      {
+        "id": 1762,
+        "date": "1968-12-11",
+        "recordedAgainst": "5-rar",
+        "countedFor": "9-rar"
+      }
+    ],
+    "mapUrl": "/battlemap?units=1"
+  },
+  "figures": {
+    "contacts": 596,
+    "led": 587,
+    "supported": 9,
+    "first": "1966-03-03",
+    "last": "1970-02-14",
+    "operations": 51,
+    "friendlyKilled": 50,
+    "friendlyWounded": 328,
+    "enemyKilled": 466,
+    "enemyWounded": 298,
+    "mineIncidents": 30
+  },
+  "perYear": [
+    {
+      "year": 1966,
+      "contacts": 178
+    },
+    {
+      "year": 1967,
+      "contacts": 35
+    },
+    {
+      "year": 1969,
+      "contacts": 337
+    },
+    {
+      "year": 1970,
+      "contacts": 46
+    }
+  ],
+  "activity": [
+    {
+      "name": "Patrol",
+      "count": 214,
+      "share": 0.36
+    },
+    {
+      "name": "Ambush",
+      "count": 164,
+      "share": 0.28
+    },
+    {
+      "name": "Security",
+      "count": 105,
+      "share": 0.18
+    },
+    {
+      "name": "Bunker",
+      "count": 46,
+      "share": 0.08
+    },
+    {
+      "name": "Artillery and mortar fire",
+      "count": 12,
+      "share": 0.02
+    },
+    {
+      "name": "Artillery engagement",
+      "count": 9,
+      "share": 0.02
+    },
+    {
+      "name": "Mine incident",
+      "count": 6,
+      "share": 0.01
+    },
+    {
+      "name": "Attack",
+      "count": 2,
+      "share": 0
+    },
+    {
+      "name": "Cordon",
+      "count": 2,
+      "share": 0
+    },
+    {
+      "name": "Friendly fire",
+      "count": 2,
+      "share": 0
+    },
+    {
+      "name": "Transport",
+      "count": 2,
+      "share": 0
+    },
+    {
+      "name": "Air support",
+      "count": 1,
+      "share": 0
+    },
+    {
+      "name": "Not recorded",
+      "count": 22,
+      "share": 0.04
+    }
+  ],
+  "support": [
+    {
+      "kind": "In another unit\u0027s contact",
+      "contacts": 9,
+      "for": [
+        {
+          "unit": "3 Cav Regt",
+          "contacts": 8
+        },
+        {
+          "unit": "1 Fd Sqn",
+          "contacts": 1
+        }
+      ]
+    }
+  ],
+  "dataSources": [
+    {
+      "name": "1ATF",
+      "count": 596,
+      "share": 1
+    }
+  ],
+  "operations": [
+    {
+      "name": "Hardihood",
+      "contacts": 73,
+      "first": "1966-05-05",
+      "last": "1966-06-24",
+      "friendlyKilled": 4,
+      "enemyKilled": 16
+    },
+    {
+      "name": "Enoggera",
+      "contacts": 1,
+      "first": "1966-06-25",
+      "last": "1966-06-25",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "TAOR",
+      "contacts": 33,
+      "first": "1966-06-25",
+      "last": "1970-01-29",
+      "friendlyKilled": 2,
+      "enemyKilled": 17
+    },
+    {
+      "name": "Sydney",
+      "contacts": 4,
+      "first": "1966-07-08",
+      "last": "1966-07-13",
+      "friendlyKilled": 0,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Sydney 1",
+      "contacts": 6,
+      "first": "1966-07-08",
+      "last": "1966-07-12",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Sydney 2",
+      "contacts": 16,
+      "first": "1966-07-19",
+      "last": "1966-07-22",
+      "friendlyKilled": 0,
+      "enemyKilled": 7
+    },
+    {
+      "name": "Holsworthy",
+      "contacts": 5,
+      "first": "1966-08-08",
+      "last": "1966-08-16",
+      "friendlyKilled": 1,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Toledo",
+      "contacts": 4,
+      "first": "1966-09-03",
+      "last": "1966-09-07",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Crows Nest",
+      "contacts": 2,
+      "first": "1966-10-01",
+      "last": "1966-10-01",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Canberra",
+      "contacts": 4,
+      "first": "1966-10-08",
+      "last": "1966-10-09",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Robin",
+      "contacts": 5,
+      "first": "1966-10-11",
+      "last": "1966-10-14",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Queanbeyan",
+      "contacts": 10,
+      "first": "1966-10-17",
+      "last": "1966-10-24",
+      "friendlyKilled": 3,
+      "enemyKilled": 11
+    },
+    {
+      "name": "Canberra 2",
+      "contacts": 1,
+      "first": "1966-10-19",
+      "last": "1966-10-19",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Hayman",
+      "contacts": 12,
+      "first": "1966-11-08",
+      "last": "1966-11-12",
+      "friendlyKilled": 1,
+      "enemyKilled": 11
+    },
+    {
+      "name": "Ingham",
+      "contacts": 1,
+      "first": "1966-11-29",
+      "last": "1966-11-29",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Canary",
+      "contacts": 5,
+      "first": "1966-12-08",
+      "last": "1966-12-12",
+      "friendlyKilled": 0,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Caloundra",
+      "contacts": 1,
+      "first": "1967-01-10",
+      "last": "1967-01-10",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Kirribili",
+      "contacts": 6,
+      "first": "1967-01-26",
+      "last": "1967-01-29",
+      "friendlyKilled": 0,
+      "enemyKilled": 5
+    },
+    {
+      "name": "Beaumaris",
+      "contacts": 1,
+      "first": "1967-02-14",
+      "last": "1967-02-14",
+      "friendlyKilled": 3,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Renmark",
+      "contacts": 6,
+      "first": "1967-02-19",
+      "last": "1967-02-21",
+      "friendlyKilled": 9,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Leeton",
+      "contacts": 7,
+      "first": "1967-03-06",
+      "last": "1967-05-30",
+      "friendlyKilled": 3,
+      "enemyKilled": 5
+    },
+    {
+      "name": "Portsea",
+      "contacts": 3,
+      "first": "1967-03-24",
+      "last": "1967-04-06",
+      "friendlyKilled": 1,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Lismore",
+      "contacts": 2,
+      "first": "1967-05-02",
+      "last": "1967-05-03",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Goodwood",
+      "contacts": 2,
+      "first": "1969-01-27",
+      "last": "1969-02-08",
+      "friendlyKilled": 1,
+      "enemyKilled": 4
+    },
+    {
+      "name": "Quintus Thrust",
+      "contacts": 17,
+      "first": "1969-03-02",
+      "last": "1969-03-06",
+      "friendlyKilled": 0,
+      "enemyKilled": 15
+    },
+    {
+      "name": "Federal",
+      "contacts": 24,
+      "first": "1969-03-27",
+      "last": "1969-04-09",
+      "friendlyKilled": 2,
+      "enemyKilled": 19
+    },
+    {
+      "name": "Federal/Overlander",
+      "contacts": 3,
+      "first": "1969-04-03",
+      "last": "1969-04-03",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Overlander",
+      "contacts": 4,
+      "first": "1969-04-03",
+      "last": "1969-04-06",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Deerstalk",
+      "contacts": 1,
+      "first": "1969-04-11",
+      "last": "1969-04-11",
+      "friendlyKilled": 1,
+      "enemyKilled": 3
+    },
+    {
+      "name": "Surfside",
+      "contacts": 17,
+      "first": "1969-04-23",
+      "last": "1969-05-02",
+      "friendlyKilled": 0,
+      "enemyKilled": 4
+    },
+    {
+      "name": "Surfside/Coogee",
+      "contacts": 1,
+      "first": "1969-04-27",
+      "last": "1969-04-27",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Roadside",
+      "contacts": 6,
+      "first": "1969-05-04",
+      "last": "1969-05-20",
+      "friendlyKilled": 0,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Twickenham",
+      "contacts": 24,
+      "first": "1969-05-04",
+      "last": "1969-05-29",
+      "friendlyKilled": 1,
+      "enemyKilled": 16
+    },
+    {
+      "name": "Reynella",
+      "contacts": 1,
+      "first": "1969-05-09",
+      "last": "1969-05-09",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Twickenham/Toan Thang III",
+      "contacts": 5,
+      "first": "1969-05-23",
+      "last": "1969-05-29",
+      "friendlyKilled": 0,
+      "enemyKilled": 6
+    },
+    {
+      "name": "Hammer",
+      "contacts": 6,
+      "first": "1969-06-06",
+      "last": "1969-06-07",
+      "friendlyKilled": 1,
+      "enemyKilled": 46
+    },
+    {
+      "name": "Hammer/Tong",
+      "contacts": 1,
+      "first": "1969-06-07",
+      "last": "1969-06-07",
+      "friendlyKilled": 0,
+      "enemyKilled": 40
+    },
+    {
+      "name": "TONG",
+      "contacts": 1,
+      "first": "1969-06-07",
+      "last": "1969-06-07",
+      "friendlyKilled": 0,
+      "enemyKilled": 6
+    },
+    {
+      "name": "ESSO",
+      "contacts": 38,
+      "first": "1969-06-15",
+      "last": "1969-07-10",
+      "friendlyKilled": 9,
+      "enemyKilled": 38
+    },
+    {
+      "name": "Distant Trumpet",
+      "contacts": 2,
+      "first": "1969-07-21",
+      "last": "1969-07-22",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Camden",
+      "contacts": 48,
+      "first": "1969-07-31",
+      "last": "1969-08-29",
+      "friendlyKilled": 1,
+      "enemyKilled": 54
+    },
+    {
+      "name": "Camden 2",
+      "contacts": 1,
+      "first": "1969-08-21",
+      "last": "1969-08-21",
+      "friendlyKilled": 1,
+      "enemyKilled": 9
+    },
+    {
+      "name": "Nepabunna",
+      "contacts": 2,
+      "first": "1969-09-11",
+      "last": "1969-09-12",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Kingston",
+      "contacts": 23,
+      "first": "1969-09-15",
+      "last": "1969-10-16",
+      "friendlyKilled": 0,
+      "enemyKilled": 15
+    },
+    {
+      "name": "Kings Cross",
+      "contacts": 73,
+      "first": "1969-10-31",
+      "last": "1969-12-09",
+      "friendlyKilled": 4,
+      "enemyKilled": 52
+    },
+    {
+      "name": "Atherton",
+      "contacts": 2,
+      "first": "1969-12-11",
+      "last": "1969-12-18",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Vintage RALLY",
+      "contacts": 5,
+      "first": "1969-12-15",
+      "last": "1969-12-23",
+      "friendlyKilled": 0,
+      "enemyKilled": 6
+    },
+    {
+      "name": "U/K",
+      "contacts": 2,
+      "first": "1969-12-22",
+      "last": "1969-12-31",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Bondi 1",
+      "contacts": 2,
+      "first": "1969-12-28",
+      "last": "1969-12-29",
+      "friendlyKilled": 0,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Bondi",
+      "contacts": 36,
+      "first": "1969-12-31",
+      "last": "1970-02-14",
+      "friendlyKilled": 0,
+      "enemyKilled": 35
+    },
+    {
+      "name": "Bondi 2",
+      "contacts": 1,
+      "first": "1970-01-28",
+      "last": "1970-01-28",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    }
+  ],
+  "areas": [
+    {
+      "place": "Dampier",
+      "type": "FSB",
+      "contacts": 58,
+      "share": 0.1
+    },
+    {
+      "place": "Weir",
+      "type": "FSB",
+      "contacts": 44,
+      "share": 0.07
+    },
+    {
+      "place": "Noela",
+      "type": "FSB",
+      "contacts": 42,
+      "share": 0.07
+    },
+    {
+      "place": "Arrow",
+      "type": "FSB",
+      "contacts": 25,
+      "share": 0.04
+    },
+    {
+      "place": "Puma",
+      "type": "FSB",
+      "contacts": 21,
+      "share": 0.04
+    },
+    {
+      "place": "Syke",
+      "type": "FSB",
+      "contacts": 21,
+      "share": 0.04
+    },
+    {
+      "place": "Cougar",
+      "type": "FSB",
+      "contacts": 20,
+      "share": 0.03
+    },
+    {
+      "place": "Melissa",
+      "type": "FSB",
+      "contacts": 20,
+      "share": 0.03
+    }
+  ],
+  "notable": [
+    {
+      "id": 2,
+      "url": "/battlemap?incident=2",
+      "dtg": "1966-03-03T19:50:00",
+      "why": [
+        "first"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": null,
+      "task": null,
+      "gridRef": "YS374671",
+      "friendlyForce": 25,
+      "enemyForce": 5,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Platoon, A Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "report": "YS374671: AT LOC STATED, 1/A/5 RAR CONTACTED 5 EN MOVING S WITH UNK RES.",
+      "archivalSource": "Intel V-dat Base"
+    },
+    {
+      "id": 452,
+      "url": "/battlemap?incident=452",
+      "dtg": "1967-02-21T14:07:00",
+      "why": [
+        "significant"
+      ],
+      "role": "In another unit\u0027s contact",
+      "ledBy": "3 Cav Regt",
+      "operation": "Renmark",
+      "task": null,
+      "gridRef": "YS482526",
+      "friendlyForce": 122,
+      "enemyForce": 0,
+      "friendlyKilled": 9,
+      "friendlyWounded": 26,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "3 Troop, A Squadron, 3 Cavalry Regiment",
+        "B Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "B coy, 5 RAR was being moved into position as part of a Task Force attack on the VC strong-hold of the Long Hai Hills. While on a dirt track, the leading APC (carrying part of 4 pl) hit a powerful mine resulting in the two cavalrymen being killed, and two infantry. The rest of the troops in the APC were severely wounded. The APC was thrown on its side and the crater was 1m deep and 2m wide. \n\nThe rest of the Tp immediately slewed left and right in a counter ambush procedure. Once it was clear no ambush was occurring, infantry officers and men jumped off their APCs and ran to assist the medics already attending the dead and wounded. They set off more M16 anti-personnel mines. Most of the medics and the Coy HQ were either killed or wounded. Normal mine-contact procedures had been ignored. Engineers ordered everyone to keep still while they cleared the mines. Medical support was sent in by Helo.\n\nOperation Renmark was cancelled. \n\nLocation was the Long Hais.",
+      "archivalSource": "AWM279 569/R4/37; When the Scorpion Stings pg55; On the Offensive pg121; AWM95 7-5-15.pdf 5 RAR Mar 67 pg158;"
+    },
+    {
+      "id": 2038,
+      "url": "/battlemap?incident=2038",
+      "dtg": "1969-02-08T11:58:00",
+      "why": [
+        "typical:Bunker"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Goodwood",
+      "task": "Bunker",
+      "gridRef": "YS261906",
+      "friendlyForce": 70,
+      "enemyForce": 30,
+      "friendlyKilled": 1,
+      "friendlyWounded": 5,
+      "enemyKilled": 4,
+      "enemyWounded": 0,
+      "units": [
+        "11 Platoon, D Company, 5 Battalion, Royal Australian Regiment",
+        "12 Platoon, D Company, 6 Battalion, Royal Australian Regiment",
+        "9 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "report": "6 enemy fired RPG from a bunker system at 11 pl 1250hrs. Enemy was quickly reinforced to squad size. Camp had 21 bunkers in an area of 200x200 metres. While it was withdrawing, 12 pl were fired on by RPGs 1447hrs. D coy withdrew and the camp was attacked with arty and 2 airstrikes and LFT. D coy returned to the undefended camp the next day. 12 pl thought that it had killed 3 en and 11 pl had killed 2.\n\nSee Combined Arms Data Base\n\n\nD Coy, 11 pl,12 pl, were moving W with 11 pl leading. 11 pl leading elements heard movement 20 - 30m to their S and then they were fired upon. They returned the fire. 12 pl were moved S 100m then swept from E to W (1220hrs). When they were due S of 11 pl they contacted enemy in bunkers firing SA. 12 pl engaged and held in that location. 11 pl whilst attempting to clear the ground between themselves and 12 pl were fired on by 6 en with RPGs.(1250hrs) and sustained 1 casualty.  It was realised the system was larger than initially suspected so C/S42 were withdrawn E to evacuate their cas covered by 12 pl. As soon as DUSTOFF hovered 12 pl was fired upon by HMG, RPG and SA. The helicopter were fired upon and forced to depart without the casualty. \n  12 pl suffered 5 cas in the engagement and when 11 pl DUSTOFF was complete 12 pl withdrew E to effect their own cas evac.\n\nThe OC of D Coy observed that no manouvering of subunits should take place when a bunker system is suspected, until careful and thorough examination of the ground has taken place. The enemy has excellent fire discipline and will lie quietly for hours only 20m away awaiting his best opportunity. The enemy will hold fire until a dustoff helo is just hovering and at its most vulnerable moment. Do not be sucked in to a bunker engagement unless heavy arty and air support and tanks are available. Enemy returned to collect bodies although 4 were found 2 days later. The M72 was not able to be used as effectively as the RPG. The enemy had prepared bunkers to take RPG back blast, but foliage was too dense for M72 back blast. The enemy had also cut fire lanes for the RPG, there were none for the M72 because the ground was chosen by the enemy. The RPG was more effective in dense bush because with its system of inertial ignition, it does not ignite on hitting small twigs and undergrowth. The M72 has a graze fuse with bakelite cap, point ignition and base detonation. It is much more sensitive to foliage.",
+      "archivalSource": "Intsum, AWM95 1/4/140.pdf p73; AWM 290 item 9/25 op. Goodwood; AWM95 7-9-11.pdf 9 RAR Feb 69 pg174-179; AWM95 7-9-12.pdf 9 RAR Feb 69 pg196 Contact Rept;"
+    },
+    {
+      "id": 2162,
+      "url": "/battlemap?incident=2162",
+      "dtg": "1969-03-27T10:15:00",
+      "why": [
+        "significant"
+      ],
+      "role": "In another unit\u0027s contact",
+      "ledBy": "3 Cav Regt",
+      "operation": "Federal",
+      "task": "Transport",
+      "gridRef": "YS159939",
+      "friendlyForce": 22,
+      "enemyForce": 0,
+      "friendlyKilled": 0,
+      "friendlyWounded": 20,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "A Company, 5 Battalion, Royal Australian Regiment",
+        "A Squadron, 3 Cavalry Regiment"
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "report": "While escorting a convoy of trucks up Route 15 in Bien Hoa, two US lorries hit mines 50m apart resulting in 10 Australians wounded, and 2 US wounded. In addition, 10 Aust wded stayed on duty.\n\nYS157937: AT THE LOC STATED, A MINE WAS DETONATED,7 AUST WIA, 1 US WIA AND 1 TCV DAMAGED. (Time recorded 1045hrs.)\n\nRoute 15\n\nAWM121, item 16 Armd Incidents Svn 026: 2 TCUs US were being escorted by elements of A Sqn 3 Cav.",
+      "archivalSource": "Intsum, AWM95 1/4/144.pdf p121; Scorpion Stings pg157; AWM95 7-5-20.pdf pg27, 7-5-21.pdf p128;"
+    },
+    {
+      "id": 2208,
+      "url": "/battlemap?incident=2208",
+      "dtg": "1969-04-04T08:10:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Federal",
+      "task": "Bunker",
+      "gridRef": "YS318995",
+      "friendlyForce": 24,
+      "enemyForce": 30,
+      "friendlyKilled": 2,
+      "friendlyWounded": 7,
+      "enemyKilled": 4,
+      "enemyWounded": 0,
+      "units": [
+        "1 ATF Artillery",
+        "11 Platoon, D Company, 5 Battalion, Royal Australian Regiment",
+        "Light Fire Team"
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "report": "11 pl contacts pl of enemy in bunker system. 11 Platoon was spread out along the objective when fire opened and found that all elements of the  platoon were under fire. This meant that the platoon commander had no reserve to use to extract his platoon.  Heavy casualties suffered. Pl hit by claymores and heavy small arms fire and RPGs. RPG fire killed one man and wounded 7 (this contact report). Arty, called in. At 1106hrs 12 pl entered the area as did LTF called in as well as airstrikes.(See 910hrs). 11 pl able to disengage and carry out wounded. In contact for 4 hrs. Arty failed to  contribute effectively to the contact.\n\nSee Combined Arms Data Base\n\nYS311978: AT LOC STATED, A/5 RAR FOUND GRAVES CONTAINING 6 BODIES. TWO WERE VERY OLD BUT 4 APPEARED TO HAVE BEEN KILLEDBY SMALL ARMS RECENTLY, AND ARE BELIEVED TO BE THE RESULTOF THE CONTACT WITH D/5 RAR ON 4TH APR 69 (Intsum AWM95 1/4/148.pdf p103)",
+      "archivalSource": "Intsum AWM95 1/4/148.pdf p94; AWM103, 569/2/155, Operations, 1ATF Particular, Operation Overlander. Contact Rept;"
+    },
+    {
+      "id": 2496,
+      "url": "/battlemap?incident=2496",
+      "dtg": "1969-06-06T11:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammer",
+      "task": null,
+      "gridRef": "YS450740",
+      "friendlyForce": 200,
+      "enemyForce": 240,
+      "friendlyKilled": 1,
+      "friendlyWounded": 10,
+      "enemyKilled": 43,
+      "enemyWounded": 6,
+      "units": [
+        "105 Field Battery, 1 Field Regiment",
+        "3 Troop, B Squadron, 3 Cavalry Regiment",
+        "B Company, 5 Battalion, Royal Australian Regiment",
+        "B Squadron, 1 Armoured Regiment",
+        "Light Fire Team",
+        "Popular Force, Army of the Republic of Vietnam",
+        "Regional Force, Army of the Republic of Vietnam"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "Commencing at approx 1100H and continuing until 1830H B and D Coys 5 RAR; elements of B Sqn 1 Armd Regt; element of B Sqn 3 Cav Regt; DUC THANH District RF/ PF troops were engaged in an action with an estimated 90 enemy in the village of BINH BA YS4474. Results of the action were 27 en KIA (BC), 2 en PW. Friendly losses were 2 Centurion tanks moderately damaged, 1 Aust KIA, 8 Aust WIA (evac).\n\n\n\nB Coy 5 RAR supported by 4 Tp B Sqn 1 Armd Regt formed a block while D coy 6 RAR swept through the area of yesterday",
+      "archivalSource": "Sitrep, AWM95 1/4/156.pdf p16; Analysis of Aust Urban Engagements in Vn; Scorpion Stings pg169-78;"
+    },
+    {
+      "id": 2509,
+      "url": "/battlemap?incident=2509",
+      "dtg": "1969-06-07T13:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammer/Tong",
+      "task": null,
+      "gridRef": "YS453745",
+      "friendlyForce": 105,
+      "enemyForce": 85,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 40,
+      "enemyWounded": 0,
+      "units": [
+        "1 Troop, B Squadron, 3 Cavalry Regiment",
+        "105 Field Battery, 1 Field Regiment",
+        "4 Troop, B Squadron, 1 Armoured Regiment",
+        "B Company, 5 Battalion, Royal Australian Regiment",
+        "Light Fire Team"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "A Coy of 1 Bn, 33 Regt NVA attacked Duc Trung and overwhelmed the local defense pl. B coy sent to recover the situation. Initially Arty fire was brought down to within 20m of the houses causing enemy casualties. This was supported by an LFT which attacked on the N and W sides of the village. B coy then attacked the S of the village with 1 tp of tanks. The enemy was routed, and the PF took over the clearance of the rest of the village to avoid civilian casualties.\n\nSee Combined Arms Data Base",
+      "archivalSource": "AWM 279 723/R5/59; AWM95 7-5-25.pdf pg36; Analysis of Australian Urban Engagements in Vietnam, R Hall and A Ross, ADSC, Unsw@ADFA May 2003;"
+    },
+    {
+      "id": 2547,
+      "url": "/battlemap?incident=2547",
+      "dtg": "1969-06-15T11:06:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "ESSO",
+      "task": null,
+      "gridRef": "YS489584",
+      "friendlyForce": 60,
+      "enemyForce": 0,
+      "friendlyKilled": 3,
+      "friendlyWounded": 24,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "12 Platoon, D Company, 5 Battalion, Royal Australian Regiment",
+        "Company Headquarters, D Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "report": "Soldier stepped on a mine M16. 1 more found within 10m.\n\nYS489584: AT THE LOC STATED, 2 AUST KIA AND 24 AUST WIA, BYAN UNIDENTIFIED MINE. TWO M16 MINES WERE RECOVERED IN THEVICINITY.\n\n2 killed, 1 died of wds and 20 wded from mine blast. The district chief had been advised 3 days earlier that D coy would be operating in the area. M16 jumped 2m and exploded. M16 found nearby had been laid in the last 2-3 days.\n\nS edge of Dat Do",
+      "archivalSource": "Intsum, AWM95 1/4/156.pdf p120; AWM95 7-5-25.pdf pg8,63,65,"
+    },
+    {
+      "id": 2550,
+      "url": "/battlemap?incident=2550",
+      "dtg": "1969-06-16T03:15:00",
+      "why": [
+        "typical:Security"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "ESSO",
+      "task": "Security",
+      "gridRef": "YS480589",
+      "friendlyForce": 21,
+      "enemyForce": 10,
+      "friendlyKilled": 1,
+      "friendlyWounded": 2,
+      "enemyKilled": 2,
+      "enemyWounded": 0,
+      "units": [
+        "10 Platoon, D Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "report": "YS480589: AT THE LOC STATED, 10/D/5 RAR CONTACTEDAND ESTIMATED SQUAD. RESULTS: 4 EN KIA (BC) 1 AK-47,1 SKS, 1 M16 AND 1 M1 CIA. 1 AUST KIA 2 AUST WIA.\n\n10 Pl were engaged with SA and RPG fire by an unknown enemy force. Results: 4 VC KIA (BC), 1 Aust KIA, 2 Aust WIA. 1 SKS, 1 M1 and AK47, and 1 M16 CIA.\n\nContact rept only records 2 en killed, but Sitrep and Intsum might reflect a later  battle summary. It would seem that 10pl had stayed around too long and the LF had them spotted.",
+      "archivalSource": "Intsum, AWM95 1/4/156.pdf p121; Sitrep AWM 98 (323); AWM95 7-5-30.pdf pg169 Contact Rept;"
+    },
+    {
+      "id": 2588,
+      "url": "/battlemap?incident=2588",
+      "dtg": "1969-06-24T16:50:00",
+      "why": [
+        "typical:Patrol"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "ESSO",
+      "task": "Patrol",
+      "gridRef": "YS553588",
+      "friendlyForce": 65,
+      "enemyForce": 40,
+      "friendlyKilled": 0,
+      "friendlyWounded": 7,
+      "enemyKilled": 2,
+      "enemyWounded": 6,
+      "units": [
+        "1 Company, 52 Battalion, Army of the Republic of Vietnam",
+        "2 Company, 52 Battalion, Army of the Republic of Vietnam",
+        "3 Platoon, A Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "report": "Force was 10 Aust and 55 ARVN soldiers.\n\nThe combined force of 10 Aust and 55 ARVN had conducted an ambush (see 1415hrs) and had dusted off their wounded. The patrol was moving to a new ambush site when it was attacked by a platoon of MF VC with heavy fire from AK47s, M79s and RPGs. The Aust led force was receiving fire from all directions but could get no arty support because of poor comms. Finally, a possum aircraft relayed the requests and arty began to land in the area. But the enemy closed up on the Aust force to avoid the arty. However, 2xLFTs arrived and gave fire support to within 25m of the Aust force. The enemy decided to withdraw. The Aust/ARVN force suffered 7 ARVN wded all caused by RPGs. Enemy suffered 2 killed with 6 possible from many blood trails. These were caused by SA, arty and LFTs.",
+      "archivalSource": "AWM288 459/1/2/2 pt3 After Action Reports 5 RAR 66-69; AWM95 7-5-31.pdf pg10 Contact Rept;"
+    },
+    {
+      "id": 2633,
+      "url": "/battlemap?incident=2633",
+      "dtg": "1969-07-04T21:07:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "ESSO",
+      "task": "Patrol",
+      "gridRef": "YS490521",
+      "friendlyForce": 25,
+      "enemyForce": 0,
+      "friendlyKilled": 3,
+      "friendlyWounded": 14,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "7 Platoon, C Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "1529hrs C Coy locates a bunker system which has 5 antivehicle mines, 1 claymore and one command detonated 105mm mine. At 2107hrs 7 pl hits an M16 mine. Another M16 was hit while the wded were being moved (2205hrs). Heavy casualties. 3 Aust killed and 14 wded. A third M16 was found nearby.\n\nSE edge Long Hais\n\nOne of the wded was an engineer (Hist of 1 Fd Sqn p260).",
+      "archivalSource": "Intsum, AWM95 1/4/160.pdf p99; AWM95 7-5-29.pdf pg7,90-1"
+    },
+    {
+      "id": 2747,
+      "url": "/battlemap?incident=2747",
+      "dtg": "1969-08-06T05:45:00",
+      "why": [
+        "typical:Ambush"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Camden",
+      "task": "Ambush",
+      "gridRef": "YS315821",
+      "friendlyForce": 27,
+      "enemyForce": 50,
+      "friendlyKilled": 0,
+      "friendlyWounded": 1,
+      "enemyKilled": 7,
+      "enemyWounded": 9,
+      "units": [
+        "12 Platoon, D Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "report": "Enemy moved along track from South to North. Platoon was in 1/2 Platoon groups 70 metres apart. The enemy moved through the southern group to the northern group. The northern group opened fire when leading elements were in their killing ground. The enemy were still moving through the southern group and the southern group opened fire on them. To this stage 45 enemy had been counted and they were still coming when fire opened. The enemy withdrew hastily east and south east without returning fire. Some elements dragged bodies out and assisted casualties, the movement and noise could be heard and was fired on each time. When it was light enough a sweep was done, preceded by clearing by fire. Gun ships were used 200 metres to the east, south east and south plus artillery and mortars in depth. 5 AK47 captured. 1 Aust wded by shrap to head from en grenade, remained on duty.\n\nIntsum: YS315821, 12/D/5 RAR contacts about 45 enemy moving N. 7 en killed, 5 en killed poss, 9 en wded (BT and drag marks). 5 AK47, 1xpistol, 2xclaymore, 5xrifle grens, 13 AK47 mags, 450 SAA rds, 10xpacks of food and rice, and docs captured.\n\n105 Fd Bty fired 100 rds in support (AWM95 3/6/17.pdf p8 1 Fd Regt Diary)",
+      "archivalSource": "Contact Report AWM288, item R459/1/2/2 Part 1, After action Reports"
+    },
+    {
+      "id": 2833,
+      "url": "/battlemap?incident=2833",
+      "dtg": "1969-08-21T15:01:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Camden 2",
+      "task": "Bunker",
+      "gridRef": "YS247826",
+      "friendlyForce": 60,
+      "enemyForce": 300,
+      "friendlyKilled": 1,
+      "friendlyWounded": 37,
+      "enemyKilled": 9,
+      "enemyWounded": 25,
+      "units": [
+        "105 Field Battery, 1 Field Regiment",
+        "3 Platoon, A Company, 5 Battalion, Royal Australian Regiment",
+        "Assault Pioneer Platoon, Support Company, 5 Battalion, Royal Australian Regiment",
+        "Light Fire Team"
+      ],
+      "subUnits": [
+        "a-company",
+        "support-company"
+      ],
+      "report": "On hearing voices a short distance ahead, Aslt Pnr pl called up 3 pl and they launched a two pl assault on enemy bunker system. Artillery was fired behind bunker system to act as a cutoff. 3 pl opened fire on enemy in open, but was met  by  very heavy RPG and AK47 fire from bunkers and flanks. RPG rounds were also landing in rear of pls causing casualties. Aslt Pnr covered retreat of 3 pl to a base 30m from bunkers. LFTs were now firing in support of pls. As dustoff helos appeared they became targets for enemy who closed up on base and fired 60mm Mortars, SA and RPGs which landed amongst the wounded in the base perimeter creating more wounded. LFTs suppressed this fire and base was moved away to allow safe evacuation of wounded.\n\nSee Combined Arms Data Base\n\nFurther to contact of 211605H at YS245827. Original contact was made by Aslt Pnr pl and 3 Pl. The Aslt Pnr Pl was preparing a harbour position when they heard noises approx 300m away. The area was engaged by 105 Fd Bty with 72 rds of 105mm delay fuze. The 2 pls with Aslt Pnr Pl leading and command by 2IC A Coy moved into the contact area. The Pnr Pl was engaged by enemy SA and RPG fire and received approx 6 casualties. 3 Pl formed a firm fire base and the Aslt Pnr Pl withdrew. The whole group was engaged by SA and RPG fire from flank and 2 flanks. 10 casualties were sustained during this period. The group then withdrew to a clear area for DUSTOFF. Whilst DUSTOFF was in progress a large enemy force counter attack from flank using fire and movement. Most casualties were sustained during this period. At least 10 enemy were seen to fall during the contact. Consolidated figures to date are : 10 VC KIA (POSS), 4 VC KBA, 1 Aust KIA, 31 Aust WIA (evacuated).\n\nCoy OC coments was that the Coy comms net was a shambles with every element supporting the contact having a say. He suggested that a FAC be on the Coy net and that he should control all air on a separate net.\n\nAWM95 7-5-34.pdf pg186 The cas for this were amended to 9 en killed, 4 en killed by Arty/air, 25 en wded.",
+      "archivalSource": "AWM 288, 569/1/112/2 Pt 2 Camden; Intsum, AWM95 1/4/164.pdf p164; Sitrep, AWM95 1/4/164.pdf p74-5; AWM95 7-5-32.pdf pg176 Contact Rept;"
+    },
+    {
+      "id": 3511,
+      "url": "/battlemap?incident=3511",
+      "dtg": "1970-02-14T09:45:00",
+      "why": [
+        "last"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Bondi",
+      "task": "Ambush",
+      "gridRef": "YS568650",
+      "friendlyForce": 31,
+      "enemyForce": 3,
+      "friendlyKilled": 0,
+      "friendlyWounded": 1,
+      "enemyKilled": 1,
+      "enemyWounded": 0,
+      "units": [
+        "Platoon Headquarters, 8 Platoon, C Company, 5 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "YS568650. HQ COY AND 8/C/5RAR CON 1, POSS 3, EN. RES: 1 AUSTWIA, 1 EN KIA (BC), 1XM1, 2 PACKS, QTY DOCUS, FOOD, CLOTHING, WEBBINGAND QTY AK47 RDS CIA.\n\nPl and CHQ were ambushing a main track with a small footpad in the rear. The rear gunner saw enemy coming along the rear footpad and  engaged the en with MG and SA. Enemy returned fire. 1 en was killed and the others got away. 1 Aust wded by shrap from claymores shorting out and exploding. Noted in FF Database.",
+      "archivalSource": "Sitrep, AWM95 1/4/181.pdf Pt2 p45; AWM95 7-5-38.pdf pg177 Contact Rept;"
+    }
+  ],
+  "subUnits": [
+    {
+      "id": 2,
+      "slug": "a-company",
+      "parent": null,
+      "title": "A Company",
+      "mapUrl": "/battlemap?units=2",
+      "figures": {
+        "contacts": 133,
+        "led": 128,
+        "supported": 5,
+        "first": "1966-03-03",
+        "last": "1970-02-08",
+        "operations": 32,
+        "friendlyKilled": 5,
+        "friendlyWounded": 101,
+        "enemyKilled": 109,
+        "enemyWounded": 92,
+        "mineIncidents": 4
+      },
+      "activity": [
+        {
+          "name": "Ambush",
+          "count": 48,
+          "share": 0.38
+        },
+        {
+          "name": "Patrol",
+          "count": 44,
+          "share": 0.34
+        },
+        {
+          "name": "Security",
+          "count": 17,
+          "share": 0.13
+        },
+        {
+          "name": "Bunker",
+          "count": 8,
+          "share": 0.06
+        },
+        {
+          "name": "Artillery and mortar fire",
+          "count": 6,
+          "share": 0.05
+        },
+        {
+          "name": "Artillery engagement",
+          "count": 2,
+          "share": 0.02
+        },
+        {
+          "name": "Mine incident",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Not recorded",
+          "count": 2,
+          "share": 0.02
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 5,
+          "for": [
+            {
+              "unit": "3 Cav Regt",
+              "contacts": 3
+            },
+            {
+              "unit": "5 RAR",
+              "contacts": 2
+            }
+          ]
+        }
+      ],
+      "notable": [
+        2162,
+        2588,
+        2833
+      ]
+    },
+    {
+      "id": 11,
+      "slug": "b-company",
+      "parent": null,
+      "title": "B Company",
+      "mapUrl": "/battlemap?units=11",
+      "figures": {
+        "contacts": 132,
+        "led": 128,
+        "supported": 4,
+        "first": "1966-05-24",
+        "last": "1970-02-08",
+        "operations": 28,
+        "friendlyKilled": 21,
+        "friendlyWounded": 71,
+        "enemyKilled": 161,
+        "enemyWounded": 85,
+        "mineIncidents": 5
+      },
+      "activity": [
+        {
+          "name": "Patrol",
+          "count": 50,
+          "share": 0.39
+        },
+        {
+          "name": "Ambush",
+          "count": 29,
+          "share": 0.23
+        },
+        {
+          "name": "Security",
+          "count": 24,
+          "share": 0.19
+        },
+        {
+          "name": "Bunker",
+          "count": 9,
+          "share": 0.07
+        },
+        {
+          "name": "Artillery engagement",
+          "count": 3,
+          "share": 0.02
+        },
+        {
+          "name": "Cordon",
+          "count": 2,
+          "share": 0.02
+        },
+        {
+          "name": "Air support",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Friendly fire",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Mine incident",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Transport",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Not recorded",
+          "count": 7,
+          "share": 0.05
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 4,
+          "for": [
+            {
+              "unit": "3 Cav Regt",
+              "contacts": 3
+            },
+            {
+              "unit": "5 RAR",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        452,
+        2496,
+        2509
+      ]
+    },
+    {
+      "id": 6,
+      "slug": "c-company",
+      "parent": null,
+      "title": "C Company",
+      "mapUrl": "/battlemap?units=6",
+      "figures": {
+        "contacts": 123,
+        "led": 122,
+        "supported": 1,
+        "first": "1966-05-24",
+        "last": "1970-02-14",
+        "operations": 22,
+        "friendlyKilled": 8,
+        "friendlyWounded": 63,
+        "enemyKilled": 76,
+        "enemyWounded": 43,
+        "mineIncidents": 8
+      },
+      "activity": [
+        {
+          "name": "Patrol",
+          "count": 45,
+          "share": 0.37
+        },
+        {
+          "name": "Ambush",
+          "count": 32,
+          "share": 0.26
+        },
+        {
+          "name": "Security",
+          "count": 18,
+          "share": 0.15
+        },
+        {
+          "name": "Bunker",
+          "count": 16,
+          "share": 0.13
+        },
+        {
+          "name": "Artillery and mortar fire",
+          "count": 3,
+          "share": 0.02
+        },
+        {
+          "name": "Artillery engagement",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Friendly fire",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Not recorded",
+          "count": 6,
+          "share": 0.05
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 1,
+          "for": [
+            {
+              "unit": "5 RAR",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        441,
+        2633,
+        3076
+      ]
+    },
+    {
+      "id": 53,
+      "slug": "d-company",
+      "parent": null,
+      "title": "D Company",
+      "mapUrl": "/battlemap?units=53",
+      "figures": {
+        "contacts": 133,
+        "led": 133,
+        "supported": 0,
+        "first": "1966-05-29",
+        "last": "1970-02-10",
+        "operations": 26,
+        "friendlyKilled": 12,
+        "friendlyWounded": 71,
+        "enemyKilled": 99,
+        "enemyWounded": 58,
+        "mineIncidents": 9
+      },
+      "activity": [
+        {
+          "name": "Ambush",
+          "count": 42,
+          "share": 0.32
+        },
+        {
+          "name": "Patrol",
+          "count": 40,
+          "share": 0.3
+        },
+        {
+          "name": "Security",
+          "count": 32,
+          "share": 0.24
+        },
+        {
+          "name": "Bunker",
+          "count": 10,
+          "share": 0.08
+        },
+        {
+          "name": "Mine incident",
+          "count": 3,
+          "share": 0.02
+        },
+        {
+          "name": "Attack",
+          "count": 2,
+          "share": 0.02
+        },
+        {
+          "name": "Artillery and mortar fire",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Artillery engagement",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Not recorded",
+          "count": 2,
+          "share": 0.02
+        }
+      ],
+      "support": [],
+      "notable": [
+        2208,
+        2547,
+        2747
+      ]
+    },
+    {
+      "id": -3,
+      "slug": "support-company",
+      "parent": null,
+      "title": "Support Company",
+      "mapUrl": "/battlemap?units=-3",
+      "figures": {
+        "contacts": 52,
+        "led": 47,
+        "supported": 5,
+        "first": "1966-08-15",
+        "last": "1970-02-10",
+        "operations": 21,
+        "friendlyKilled": 6,
+        "friendlyWounded": 55,
+        "enemyKilled": 34,
+        "enemyWounded": 50,
+        "mineIncidents": 3
+      },
+      "activity": [
+        {
+          "name": "Patrol",
+          "count": 25,
+          "share": 0.53
+        },
+        {
+          "name": "Ambush",
+          "count": 10,
+          "share": 0.21
+        },
+        {
+          "name": "Security",
+          "count": 7,
+          "share": 0.15
+        },
+        {
+          "name": "Bunker",
+          "count": 3,
+          "share": 0.06
+        },
+        {
+          "name": "Artillery engagement",
+          "count": 1,
+          "share": 0.02
+        },
+        {
+          "name": "Mine incident",
+          "count": 1,
+          "share": 0.02
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 5,
+          "for": [
+            {
+              "unit": "5 RAR",
+              "contacts": 4
+            },
+            {
+              "unit": "1 Fd Sqn",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        290,
+        2517,
+        2833
+      ]
+    }
+  ],
+  "dead": [
+    {
+      "serviceNumber": "4717546",
+      "name": "Errol Wayne Noack",
+      "rank": "Private",
+      "died": "1966-05-24",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/4717546.jpg"
+    },
+    {
+      "serviceNumber": "215958",
+      "name": "John Robert Sweetnam",
+      "rank": "Private",
+      "died": "1966-06-09",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/215958.jpg"
+    },
+    {
+      "serviceNumber": "15358",
+      "name": "Brendan Francis Coupe",
+      "rank": "Corporal",
+      "died": "1966-06-10",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        64
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/15358.jpg"
+    },
+    {
+      "serviceNumber": "3786921",
+      "name": "Leslie Thomas Farren",
+      "rank": "Private",
+      "died": "1966-06-10",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        64
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/3786921.jpg"
+    },
+    {
+      "serviceNumber": "42720",
+      "name": "Robert John Lubcke",
+      "rank": "Private",
+      "died": "1966-07-02",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/42720.jpg"
+    },
+    {
+      "serviceNumber": "5713739",
+      "name": "Marian Tomas",
+      "rank": "Lance-Corporal",
+      "died": "1966-07-08",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/5713739.jpg"
+    },
+    {
+      "serviceNumber": "16196",
+      "name": "Raymond John Kennedy",
+      "rank": "Private",
+      "died": "1966-08-14",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        212
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/16196.jpg"
+    },
+    {
+      "serviceNumber": "3786978",
+      "name": "Graham Francis Anthony Warburton",
+      "rank": "Private",
+      "died": "1966-10-01",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        259
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/3786978.jpg"
+    },
+    {
+      "serviceNumber": "15170",
+      "name": "Norman James Womal",
+      "rank": "Corporal",
+      "died": "1966-10-17",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        289
+      ],
+      "subUnits": [
+        "support-company"
+      ],
+      "portrait": "/media/portraits/15170.jpg"
+    },
+    {
+      "serviceNumber": "54865",
+      "name": "Gordon Henry D\u0027antoine",
+      "rank": "Private",
+      "died": "1966-10-18",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        290
+      ],
+      "subUnits": [
+        "support-company"
+      ],
+      "portrait": "/media/portraits/54865.jpg"
+    },
+    {
+      "serviceNumber": "5713748",
+      "name": "Bryan Phillip Watson",
+      "rank": "Lance-Corporal",
+      "died": "1966-11-10",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        317
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/5713748.jpg"
+    },
+    {
+      "serviceNumber": "1200083",
+      "name": "Erald Herman Nilsen",
+      "rank": "Private",
+      "died": "1966-11-14",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/1200083.jpg"
+    },
+    {
+      "serviceNumber": "216044",
+      "name": "Noel Arthur Pracy",
+      "rank": "Private",
+      "died": "1966-11-18",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/216044.jpg"
+    },
+    {
+      "serviceNumber": "3786696",
+      "name": "Paul Charles Sullivan",
+      "rank": "Private",
+      "died": "1966-12-27",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        393
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/3786696.jpg"
+    },
+    {
+      "serviceNumber": "23916",
+      "name": "Donald Mackenzie Bourne",
+      "rank": "Major",
+      "died": "1967-02-14",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        441
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "portrait": "/media/portraits/23916.jpg"
+    },
+    {
+      "serviceNumber": "29635",
+      "name": "Robert Bruce Milligan",
+      "rank": "(Temporary) Captain",
+      "died": "1967-02-14",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        441
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "portrait": "/media/portraits/29635.jpg"
+    },
+    {
+      "serviceNumber": "5713804",
+      "name": "Donald Murray Clark",
+      "rank": "Private",
+      "died": "1967-02-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        452
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/5713804.jpg"
+    },
+    {
+      "serviceNumber": "2782127",
+      "name": "George Bruce Green",
+      "rank": "Lance-Corporal",
+      "died": "1967-02-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        452
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/2782127.jpg"
+    },
+    {
+      "serviceNumber": "5713751",
+      "name": "James Clifton Webster",
+      "rank": "Private",
+      "died": "1967-02-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        452
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/5713751.jpg"
+    },
+    {
+      "serviceNumber": "342916",
+      "name": "Michael Damien Poole",
+      "rank": "Private",
+      "died": "1967-02-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        452
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/342916.jpg"
+    },
+    {
+      "serviceNumber": "43496",
+      "name": "Richard Wayne Sandow",
+      "rank": "Private",
+      "died": "1967-02-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        452
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/43496.jpg"
+    },
+    {
+      "serviceNumber": "36911",
+      "name": "John Carruthers",
+      "rank": "Lieutenant",
+      "died": "1967-02-24",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/36911.jpg"
+    },
+    {
+      "serviceNumber": "235136",
+      "name": "Malcolm Bruce Mcqualter",
+      "rank": "Major",
+      "died": "1967-03-05",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/235136.jpg"
+    },
+    {
+      "serviceNumber": "2784015",
+      "name": "Richard Edward Lloyd",
+      "rank": "Private",
+      "died": "1967-04-06",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        479
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/2784015.jpg"
+    },
+    {
+      "serviceNumber": "217479",
+      "name": "Kerry Patrick Rinkin",
+      "rank": "2nd Lieutenant",
+      "died": "1967-04-07",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/217479.jpg"
+    },
+    {
+      "serviceNumber": "41400",
+      "name": "Peter John Badcoe",
+      "rank": "Major",
+      "died": "1967-04-07",
+      "via": [
+        "contact"
+      ],
+      "contacts": [
+        481
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/41400.jpg"
+    },
+    {
+      "serviceNumber": "42252",
+      "name": "Bernard Lyle Smith",
+      "rank": "(Acting) Sergeant",
+      "died": "1969-03-09",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/42252.jpg"
+    },
+    {
+      "serviceNumber": "5411605",
+      "name": "Brian Geoffrey Walker",
+      "rank": "2nd Lieutenant",
+      "died": "1969-03-09",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/5411605.jpg"
+    },
+    {
+      "serviceNumber": "14900",
+      "name": "George Geoffrey Gilbert",
+      "rank": "Corporal",
+      "died": "1969-03-09",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/14900.jpg"
+    },
+    {
+      "serviceNumber": "218421",
+      "name": "Geoffrey Anthony Pike",
+      "rank": "Private",
+      "died": "1969-04-04",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2208
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/218421.jpg"
+    },
+    {
+      "serviceNumber": "5715978",
+      "name": "James Mungo White",
+      "rank": "Private",
+      "died": "1969-04-04",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2208
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/5715978.jpg"
+    },
+    {
+      "serviceNumber": "4719818",
+      "name": "Alexander Remeljej",
+      "rank": "Private",
+      "died": "1969-04-11",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2249
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/4719818.jpg"
+    },
+    {
+      "serviceNumber": "235328",
+      "name": "Errol John Lee",
+      "rank": "Lieutenant",
+      "died": "1969-05-11",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/235328.jpg"
+    },
+    {
+      "serviceNumber": "55537",
+      "name": "Andrew Drummond",
+      "rank": "Private",
+      "died": "1969-05-30",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/55537.jpg"
+    },
+    {
+      "serviceNumber": "2790880",
+      "name": "Wayne Edward Teeling",
+      "rank": "Private",
+      "died": "1969-06-06",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2790880.jpg"
+    },
+    {
+      "serviceNumber": "216304",
+      "name": "John Joseph Kennedy",
+      "rank": "Corporal",
+      "died": "1969-06-15",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2547
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/216304.jpg"
+    },
+    {
+      "serviceNumber": "2789790",
+      "name": "Peter Joseph Jackson",
+      "rank": "Private",
+      "died": "1969-06-15",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2547
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/2789790.jpg"
+    },
+    {
+      "serviceNumber": "4720253",
+      "name": "Timothy Charles Turner",
+      "rank": "Private",
+      "died": "1969-06-15",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/4720253.jpg"
+    },
+    {
+      "serviceNumber": "5716163",
+      "name": "Anthony Edward Loughran Waring",
+      "rank": "Private",
+      "died": "1969-06-16",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2550
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/5716163.jpg"
+    },
+    {
+      "serviceNumber": "217961",
+      "name": "Leslie James Pettit",
+      "rank": "Private",
+      "died": "1969-07-04",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2633
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "portrait": "/media/portraits/217961.jpg"
+    },
+    {
+      "serviceNumber": "2788085",
+      "name": "Hans Leonhard Muller",
+      "rank": "Private",
+      "died": "1969-07-05",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2788085.jpg"
+    },
+    {
+      "serviceNumber": "135494",
+      "name": "Paul Leslie Smith",
+      "rank": "Lance-Corporal",
+      "died": "1969-07-05",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/135494.jpg"
+    },
+    {
+      "serviceNumber": "3794377",
+      "name": "James Clyde Mcmillan",
+      "rank": "Private",
+      "died": "1969-07-31",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2729
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "portrait": "/media/portraits/3794377.jpg"
+    },
+    {
+      "serviceNumber": "3793566",
+      "name": "Baron Frederick Smith",
+      "rank": "Private",
+      "died": "1969-08-11",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/3793566.jpg"
+    },
+    {
+      "serviceNumber": "6709107",
+      "name": "David John Banfield",
+      "rank": "Private",
+      "died": "1969-08-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2833
+      ],
+      "subUnits": [
+        "a-company",
+        "support-company"
+      ],
+      "portrait": "/media/portraits/6709107.jpg"
+    },
+    {
+      "serviceNumber": "218554",
+      "name": "Ronald Francis Connors",
+      "rank": "Private",
+      "died": "1969-10-25",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/218554.jpg"
+    },
+    {
+      "serviceNumber": "1734491",
+      "name": "Matthew Philip Linton",
+      "rank": "Private",
+      "died": "1969-11-04",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3082
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/1734491.jpg"
+    },
+    {
+      "serviceNumber": "218006",
+      "name": "Henry Edward Suttor",
+      "rank": "(Temporary) Corporal",
+      "died": "1969-11-16",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3139
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "portrait": "/media/portraits/218006.jpg"
+    },
+    {
+      "serviceNumber": "217191",
+      "name": "Michael Paul White",
+      "rank": "Lance-Corporal",
+      "died": "1969-11-25",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/217191.jpg"
+    },
+    {
+      "serviceNumber": "5716427",
+      "name": "Nick John Cassano",
+      "rank": "Private",
+      "died": "1969-12-07",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3205
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/5716427.jpg"
+    },
+    {
+      "serviceNumber": "313122",
+      "name": "John George Stevens",
+      "rank": "Private",
+      "died": "1970-01-23",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/313122.jpg"
+    },
+    {
+      "serviceNumber": "2789920",
+      "name": "Barry John Thompson",
+      "rank": "Private",
+      "died": "1970-02-01",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/2789920.jpg"
+    }
+  ],
+  "pictures": [
+    {
+      "id": 410,
+      "url": "/media/uploads/da/da25c29d729c2221fb8deb38dec8eeb16f70ded3086754b0f572e8b7734e5e36.jpg",
+      "thumbUrl": "/media/uploads/da/da25c29d729c2221fb8deb38dec8eeb16f70ded3086754b0f572e8b7734e5e36-480.jpg",
+      "caption": "Having been ambushed at Thua Tich, D440 moves to attack Binh Ba; 33rd NVA Regiment moves south-west from Long Khanh to Binh Ba and becomes the principal attacking force. On 7 June 1969, C41 District Company attacks Hoa Long.",
+      "credit": "Ernie Chamberlain",
+      "dateTaken": "1969-06-06",
+      "contact": 2510,
+      "how": "linked",
+      "nearbyContacts": 20
+    },
+    {
+      "id": 383,
+      "url": "/media/uploads/2e/2e835174f0c9431d6de8d5f3cc8e992d5e1297486dce5d28b1c5002e5ef05784.jpg",
+      "thumbUrl": "/media/uploads/2e/2e835174f0c9431d6de8d5f3cc8e992d5e1297486dce5d28b1c5002e5ef05784-480.jpg",
+      "caption": "Company Sign",
+      "credit": "Ern arshall",
+      "dateTaken": "1967-07-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 30
+    },
+    {
+      "id": 443,
+      "url": "/media/uploads/f7/f722e85346ca2ea2e01a87b1ed2ce590c6dba68ff92532f7168089ff05743efb.jpg",
+      "thumbUrl": "/media/uploads/f7/f722e85346ca2ea2e01a87b1ed2ce590c6dba68ff92532f7168089ff05743efb-480.jpg",
+      "caption": "Nui Dat looking from North West to south east over Luscombe Field",
+      "credit": null,
+      "dateTaken": "1968-02-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 25
+    },
+    {
+      "id": 639,
+      "url": "/media/uploads/0d/0dc657aa07b8cf9617075711d3fb32cb3d471633165031463f47f3a495691f49.jpg",
+      "thumbUrl": "/media/uploads/0d/0dc657aa07b8cf9617075711d3fb32cb3d471633165031463f47f3a495691f49-480.jpg",
+      "caption": "Outline of Line Alpha. This was the line that patrols could work in so they had artillery and mortar fire to support them. This was completed while Nui Dat defences were being built.",
+      "credit": null,
+      "dateTaken": "1966-08-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 25
+    },
+    {
+      "id": 620,
+      "url": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98.jpg",
+      "thumbUrl": "/media/uploads/8d/8d3bdadd9dd6fd04a65eb64ef0da66e576c870dbb69c9cd94869e366c3ed7c98-480.jpg",
+      "caption": "1 ATF Power plant before fire",
+      "credit": null,
+      "dateTaken": "1970-03-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 18
+    },
+    {
+      "id": 583,
+      "url": "/media/uploads/69/6908bf6499cac07af16c5be699494f63a56c0728a1a1511cef987426938e8448.jpg",
+      "thumbUrl": "/media/uploads/69/6908bf6499cac07af16c5be699494f63a56c0728a1a1511cef987426938e8448-480.jpg",
+      "caption": "Pre-Long Tan shelling of the 1 ATF Nui Dat base by VC 70mm Japanese howitzer.",
+      "credit": "VCAT",
+      "dateTaken": "1966-08-17",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 12
+    },
+    {
+      "id": 435,
+      "url": "/media/uploads/78/788855b85d22137ed8c4165a43207bf98f8baab0fd9b2c6a03f623bbbd162637.jpg",
+      "thumbUrl": "/media/uploads/78/788855b85d22137ed8c4165a43207bf98f8baab0fd9b2c6a03f623bbbd162637-480.jpg",
+      "caption": "Centurion Tank ARN 169076 32Alpha at FSB Julia Dec 1968 Left to Right Tpr Don Webber, Tpr Ross Prior and Sgt Mick Rainey.",
+      "credit": "Barry J Diwell",
+      "dateTaken": "1968-11-30",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 10
+    },
+    {
+      "id": 647,
+      "url": "/media/uploads/2c/2cee04d21c816294c5bc25da1cc18d87d1c50ffb5d96dd645cd13740cb3f5b14.jpg",
+      "thumbUrl": "/media/uploads/2c/2cee04d21c816294c5bc25da1cc18d87d1c50ffb5d96dd645cd13740cb3f5b14-480.jpg",
+      "caption": "B Coy 5 R.A.R. water resupply by R.A.A.F. UH-1B Iroquois south-east Dat Do early morning 5.4.67",
+      "credit": "errol999",
+      "dateTaken": "1967-04-05",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 9
+    },
+    {
+      "id": 648,
+      "url": "/media/uploads/2c/2cee04d21c816294c5bc25da1cc18d87d1c50ffb5d96dd645cd13740cb3f5b14.jpg",
+      "thumbUrl": "/media/uploads/2c/2cee04d21c816294c5bc25da1cc18d87d1c50ffb5d96dd645cd13740cb3f5b14-480.jpg",
+      "caption": "B Coy 5 R.A.R. water resupply by R.A.A.F. UH-1B Iroquois south-east Dat Do early morning 5.4.67",
+      "credit": "errol999",
+      "dateTaken": "1967-04-05",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 9
+    },
+    {
+      "id": 436,
+      "url": "/media/uploads/6f/6f750235b140c928cd50c611bc50b6c76f8c0a3ee2d35d64b426f4d9466b1960.jpg",
+      "thumbUrl": "/media/uploads/6f/6f750235b140c928cd50c611bc50b6c76f8c0a3ee2d35d64b426f4d9466b1960-480.jpg",
+      "caption": "32 Charlie after having been escorted back to FSB Dyke. Temporary repairs had been made to the damaged suspension station. Rus Kiellerup is inspecting the damage.",
+      "credit": "Duncan McIntosh",
+      "dateTaken": "1968-12-10",
+      "contact": 1754,
+      "how": "near",
+      "nearbyContacts": 7
+    },
+    {
+      "id": 586,
+      "url": "/media/uploads/5d/5d8e75f8b012455ceac6a0ee4debd55cdf21a3e7e3f58784957f090b706314e6.jpg",
+      "thumbUrl": "/media/uploads/5d/5d8e75f8b012455ceac6a0ee4debd55cdf21a3e7e3f58784957f090b706314e6-480.jpg",
+      "caption": "B Company 5 RAR entering fence, moving south towards Xa Phuoc Loi 29.3.67",
+      "credit": "errol999",
+      "dateTaken": "1967-03-29",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 7
+    },
+    {
+      "id": 589,
+      "url": "/media/uploads/69/69cb236985904bf85cb0d48b4512c031cbf89a9357e1c41d63f7405f3addb25b.jpg",
+      "thumbUrl": "/media/uploads/69/69cb236985904bf85cb0d48b4512c031cbf89a9357e1c41d63f7405f3addb25b-480.jpg",
+      "caption": "Australian M113 APCs at Laager, the crews having breakfast inside the area that was fenced immediately east of Xa Phuoc Loi. This area became part of the fenced minefield",
+      "credit": "errol999",
+      "dateTaken": "1967-04-08",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 7
+    },
+    {
+      "id": 353,
+      "url": "/media/uploads/fd/fd4966283ea626e365b5af31ee777c77cafe8f946115c52c08c047f1f4b1aa6c.jpg",
+      "thumbUrl": "/media/uploads/fd/fd4966283ea626e365b5af31ee777c77cafe8f946115c52c08c047f1f4b1aa6c-480.jpg",
+      "caption": "Nui Dat looking north.",
+      "credit": "TBA",
+      "dateTaken": "1966-08-01",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 6
+    }
+  ],
+  "sources": {
+    "contacts": 6157,
+    "units": 590,
+    "rollPeople": 522,
+    "casualtyLinks": 213,
+    "pictures": 350,
+    "places": 113,
+    "portraits": 521
+  }
+}

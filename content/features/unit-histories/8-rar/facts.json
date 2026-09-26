@@ -1,0 +1,1394 @@
+{
+  "unit": {
+    "id": 8956,
+    "slug": "8-rar",
+    "title": "8th Battalion, Royal Australian Regiment",
+    "short": "8 RAR",
+    "arm": "infantry",
+    "record": null,
+    "tours": [
+      {
+        "from": "1969-11",
+        "to": "1970-11"
+      }
+    ],
+    "outsideTours": [],
+    "corrected": [],
+    "mapUrl": "/battlemap?units=8956"
+  },
+  "figures": {
+    "contacts": 211,
+    "led": 204,
+    "supported": 7,
+    "first": "1969-11-11",
+    "last": "1970-10-09",
+    "operations": 15,
+    "friendlyKilled": 19,
+    "friendlyWounded": 118,
+    "enemyKilled": 185,
+    "enemyWounded": 129,
+    "mineIncidents": 14
+  },
+  "perYear": [
+    {
+      "year": 1969,
+      "contacts": 43
+    },
+    {
+      "year": 1970,
+      "contacts": 168
+    }
+  ],
+  "activity": [
+    {
+      "name": "Ambush",
+      "count": 93,
+      "share": 0.46
+    },
+    {
+      "name": "Patrol",
+      "count": 54,
+      "share": 0.26
+    },
+    {
+      "name": "Security",
+      "count": 33,
+      "share": 0.16
+    },
+    {
+      "name": "Bunker",
+      "count": 7,
+      "share": 0.03
+    },
+    {
+      "name": "Mine incident",
+      "count": 4,
+      "share": 0.02
+    },
+    {
+      "name": "Artillery and mortar fire",
+      "count": 3,
+      "share": 0.01
+    },
+    {
+      "name": "Not recorded",
+      "count": 10,
+      "share": 0.05
+    }
+  ],
+  "support": [
+    {
+      "kind": "In another unit\u0027s contact",
+      "contacts": 7,
+      "for": [
+        {
+          "unit": "3 Cav Regt",
+          "contacts": 6
+        },
+        {
+          "unit": "1 Fd Sqn",
+          "contacts": 1
+        }
+      ]
+    }
+  ],
+  "dataSources": [
+    {
+      "name": "1ATF",
+      "count": 211,
+      "share": 1
+    }
+  ],
+  "operations": [
+    {
+      "name": "Atherton",
+      "contacts": 47,
+      "first": "1969-12-12",
+      "last": "1970-01-10",
+      "friendlyKilled": 1,
+      "enemyKilled": 26
+    },
+    {
+      "name": "U/K",
+      "contacts": 8,
+      "first": "1969-12-13",
+      "last": "1970-09-08",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "TAOR",
+      "contacts": 2,
+      "first": "1970-01-13",
+      "last": "1970-01-27",
+      "friendlyKilled": 0,
+      "enemyKilled": 8
+    },
+    {
+      "name": "Keperra",
+      "contacts": 11,
+      "first": "1970-01-27",
+      "last": "1970-02-11",
+      "friendlyKilled": 1,
+      "enemyKilled": 6
+    },
+    {
+      "name": "Bondi",
+      "contacts": 1,
+      "first": "1970-02-10",
+      "last": "1970-02-10",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Hammersley",
+      "contacts": 30,
+      "first": "1970-02-10",
+      "last": "1970-03-01",
+      "friendlyKilled": 11,
+      "enemyKilled": 42
+    },
+    {
+      "name": "Hamilton",
+      "contacts": 7,
+      "first": "1970-03-06",
+      "last": "1970-03-23",
+      "friendlyKilled": 2,
+      "enemyKilled": 3
+    },
+    {
+      "name": "Phoi Hop",
+      "contacts": 14,
+      "first": "1970-04-08",
+      "last": "1970-04-18",
+      "friendlyKilled": 0,
+      "enemyKilled": 14
+    },
+    {
+      "name": "Concrete",
+      "contacts": 5,
+      "first": "1970-04-20",
+      "last": "1970-04-24",
+      "friendlyKilled": 1,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Nudgee",
+      "contacts": 31,
+      "first": "1970-04-26",
+      "last": "1970-06-05",
+      "friendlyKilled": 1,
+      "enemyKilled": 31
+    },
+    {
+      "name": "Cung  Chung",
+      "contacts": 4,
+      "first": "1970-06-14",
+      "last": "1970-06-27",
+      "friendlyKilled": 1,
+      "enemyKilled": 7
+    },
+    {
+      "name": "Petrie",
+      "contacts": 9,
+      "first": "1970-06-29",
+      "last": "1970-07-12",
+      "friendlyKilled": 0,
+      "enemyKilled": 8
+    },
+    {
+      "name": "Decade",
+      "contacts": 3,
+      "first": "1970-07-27",
+      "last": "1970-07-29",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Cung Chung 2",
+      "contacts": 4,
+      "first": "1970-08-03",
+      "last": "1970-09-06",
+      "friendlyKilled": 0,
+      "enemyKilled": 22
+    },
+    {
+      "name": "Cung Chung 3",
+      "contacts": 1,
+      "first": "1970-10-09",
+      "last": "1970-10-09",
+      "friendlyKilled": 0,
+      "enemyKilled": 4
+    }
+  ],
+  "areas": [
+    {
+      "place": "Weir",
+      "type": "FSB",
+      "contacts": 32,
+      "share": 0.15
+    },
+    {
+      "place": "Arrow",
+      "type": "FSB",
+      "contacts": 29,
+      "share": 0.14
+    },
+    {
+      "place": "Wattle",
+      "type": "FSPB",
+      "contacts": 26,
+      "share": 0.12
+    },
+    {
+      "place": "Kate",
+      "type": "FSB",
+      "contacts": 19,
+      "share": 0.09
+    },
+    {
+      "place": "Isa",
+      "type": "FSPB",
+      "contacts": 18,
+      "share": 0.09
+    },
+    {
+      "place": "Thrust",
+      "type": "FSB",
+      "contacts": 8,
+      "share": 0.04
+    },
+    {
+      "place": "Buffalo",
+      "type": "FSB",
+      "contacts": 7,
+      "share": 0.03
+    },
+    {
+      "place": "Puma",
+      "type": "FSB",
+      "contacts": 7,
+      "share": 0.03
+    }
+  ],
+  "notable": [
+    {
+      "id": 3121,
+      "url": "/battlemap?incident=3121",
+      "dtg": "1969-11-11T08:50:00",
+      "why": [
+        "first"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": null,
+      "task": "Patrol",
+      "gridRef": "YS403649",
+      "friendlyForce": 25,
+      "enemyForce": 1,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [],
+      "report": "YS 403649:AT LOC STATED, A PATROL FROM 8 RAR LOCATEDCON / ENGAGED WITH ONE ROUND OF SA FIRE FROM ONE EN DRESSED INGREENS AND MOVING EAST. THE EN WITHDREW IN THE DIRECTION OF HOA LONG/ RES/ EN CAS UNKNOWN/ NIL FRIENDLY CASUALTIES.",
+      "archivalSource": "Intel V-dat Base"
+    },
+    {
+      "id": 3278,
+      "url": "/battlemap?incident=3278",
+      "dtg": "1969-12-21T15:45:00",
+      "why": [
+        "typical:Bunker"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Atherton",
+      "task": "Bunker",
+      "gridRef": "YS390906",
+      "friendlyForce": 63,
+      "enemyForce": 35,
+      "friendlyKilled": 1,
+      "friendlyWounded": 2,
+      "enemyKilled": 1,
+      "enemyWounded": 3,
+      "units": [
+        "1 Troop, B Squadron, 1 Armoured Regiment",
+        "10 Platoon, D Company, 8 Battalion, Royal Australian Regiment",
+        "11 Platoon, D Company, 8 Battalion, Royal Australian Regiment",
+        "Light Fire Team"
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "report": "YS390906:AT LOC STATED, D COY 8 RAR CONTACTED A PL TP COYSIZE EN  FORCE WHO FIRED SA/AW AND RPG 2. 10 PL D COY8 RAR WERE FIRST CON BY 2 EN IN A WELL CONSTRUCTED TRENCH RESULTINGIN ONE AUST WIA. THE REMAINDER OF THE PL WITHDREW AND WHILE ATTEMpTINGTO RECOVER WIA, PL CAME UNDER HEAVY SA FIRE FROM A BUNKER SYSTEM RESULTING ON ONE AUST KIA. AT H THIS TIME ANOTHER PL WASDEPLOYED TO ASSIST IN THE CONTACT RESULTING IN A FURTHER AUST WIA. BUSHRANGERS (LFT) AND ARTY WERE USED IN SUPPORT OF THECONTACT. THE KIA AND WEAPON WERE RECOVERED AND D COY WITHDREW EAST.RES: ONE AUST KIA. 2 AUST WIA NIL EN CASUaLTIES. \n\nIntsum 22/12/69: D Coy 8 RAR enters the bunker system and finds 1 dead enemy and an AK47.\n\n\n30-40 well trained enemy were occupying 6 bunkers when they were discovered by D coy. The enemy opened fire wounding an engineer (GSW to right thigh and buttock). Supported by 11 pl , 10 pl assaulted the bunkers and after 2hrs 40 minutes, had rendered 1 bunker ineffective and repulsed an enemy counter attack. 2 further Aust cas. 1 soldier shot in chest and killed, 1 soldier with graze to head. Dusk forced a break in action but D coy returned the next day with tanks. The enemy withdrew before the arrival of the tanks. Enemy losses were 1 killed and 1 wounded for certain, but probably his losses were higher.\n\n161 Fd Bty fired in support. (AWM95 3/6/21.pdf p17 1 Fd Regt Diary)",
+      "archivalSource": "Sitrep, AWM95 1/4/176.pdf p77; AWM109 Ops 1ATF [A]; AWM95 7-8-3.pdf 8 RAR Dec 69 pg130-134; AWM95 7-8-4.pdf 8 RAR Dec 69 pg150 Contact Rept;"
+    },
+    {
+      "id": 3363,
+      "url": "/battlemap?incident=3363",
+      "dtg": "1970-01-13T20:55:00",
+      "why": [
+        "typical:Ambush"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "TAOR",
+      "task": "Ambush",
+      "gridRef": "YS386652",
+      "friendlyForce": 14,
+      "enemyForce": 11,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 8,
+      "enemyWounded": 2,
+      "units": [
+        "10 Platoon, D Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "report": "The patrol contacted 11 enemy and killed 8 and captured 2 wded. M60 and claymores used initially. The ambush was covering a track junction near the Suoi Hoa Nuoc next to paddi fields. At approx 2055hrs the sentry on the M60 heard a radio playing and waited until it was in the killing area. The Claymores were fired and M60 and M79 were fired into the arc of the killing ground. After 5 mins firing ceased and moaning was heard. 2xM79 flares were fired and M26 and M79 HE was fired in a systematic neutralising pattern for 10 mins. Arty was called in (161 Fd Bty) and registered 600m W of ambush position. Capt 1 RPG2, 2xM1 Carbines, 1xAK47, 1xSKS, 2xpistols, 4 grenades.\n\nThe patrol OC observed that fire must be directed low to the ground with the arcs of fire interlocking. All of the killing group must give maximum fire to the killing area once ambush is sprung.\n\nIntsum 14/1/70 reports that a patrol from D Coy contacted 11 enemy. 8 enemy were killed including 1 female, and 2 wded VC were captured. 1 RPG-2, 1xM1 Garrand, 2xM1, 1xSKS, 2xpistol, 1xAK47, 4 grenades were captured.",
+      "archivalSource": "Sitrep, AWM95 1/4/179.pdf p41; AWM95 7-8-5.pdf 8 RAR Jan 70 pg118 Contact Rept;"
+    },
+    {
+      "id": 3516,
+      "url": "/battlemap?incident=3516",
+      "dtg": "1970-02-15T18:55:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammersley",
+      "task": "Ambush",
+      "gridRef": "YS458564",
+      "friendlyForce": 28,
+      "enemyForce": 60,
+      "friendlyKilled": 0,
+      "friendlyWounded": 3,
+      "enemyKilled": 10,
+      "enemyWounded": 22,
+      "units": [
+        "2 Troop, 1 Armoured Regiment",
+        "9 Platoon, C Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "YS458564, 9/C/8RAR CON AN EST COY MOVING N RESULTING IN 7 ENKIA (BC). A SWEEP ON THE MORNING OF 16/02/70 RESULTED IN 2 SMALLCONTACTS RESULTING IN 2 EN KIA (BC)(see 16/02/70 1200hrs). A FURTHER BODY WAS ALSO LOC.RES: 10 EN KIA (BC), 22 DRAG MARKS (22 EN KIA/WIA POSS), 1 AK47,1 M16, 1 M2, 1 PISTOL (NFI), QTY OF DOCUS AND MANY ASSTD GRENS CIA.\n\nDuring the action the enemy counter attacked. With the 9 pl running low on ammo, 2 Tp 1 Armd Regt was scrambled from FSPB Isa, joined up with 8 pl at 455568  and rescued the infantry, staying with them all night. While in contact with the 100\u002B enemy.  9 pl received 155mm arty and 2xHFT support. A heavy exchange of fire continued until1957 and sporadic fire until 2047hrs.\n\nArty support was: B/2/13 US Arty fired on grid YS469569, later 161 Fd Bty fired on YS443563, the Dat Do 155s engaged YS460546, A/7/8 US Arty engaged YS455560 and YS421542  (AWM95 3/6/23.pdf p10 1 Fd Regt Diary)\n\nThe area of the ambush was chosen because it was thought possible to ambush a large enemy force. Everything was planned carefully. The pl was inserted by tanks, 1000m from the ambush site. The tanks moved off and created a diversion by firing, while the pl quietly moved in undetected with engineers checking for mines in the site, and with FO and MFC for close arty and mor support. The tanks returned to FSPB ISA where they would come and support the pl if needed. 15 claymores were sighted for maximum effect along a track.\nThe pl was occupying its ambush positions when the 1st of 4 enemy groups (28 men ) were allowed to pass through. The second and third groups were hit by different banks of claymores and appear to have been wiped out for no further reaction came from these areas. The 1st and 4th enemy groups tried to sort out where the pl was and to counter attack. They were met by heavy SA fire including M72 and M79 fire. 3 Aust were wounded and were dusted off during the firefight. After 10 mins mortar fire began to support the pl and to cut-off enemy retreat routes. Arty support followed soon after. The pl was resupplied twice with first line ammo. Within 40 mins the tanks arrived and cleared the killing ground by fire. The tanks remained and provided illumination and interdictory fire throughout the night.\n\nNot possible to accurately assign enemy cas to particular weapons. It has been estimated. Bob has detailed Contact report of this action.",
+      "archivalSource": "Scorpion Stings pg205; Intsum, AWM95 1/4/181.pdf Pt2 p172; AWM95 7-8-7.pdf 8 RAR Feb 70 pg87 Contact Rept; Sitrep, AWM95 1/4/181.pdf Pt2 p51"
+    },
+    {
+      "id": 3537,
+      "url": "/battlemap?incident=3537",
+      "dtg": "1970-02-18T10:45:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammersley",
+      "task": "Bunker",
+      "gridRef": "YS475523",
+      "friendlyForce": 135,
+      "enemyForce": 35,
+      "friendlyKilled": 2,
+      "friendlyWounded": 13,
+      "enemyKilled": 12,
+      "enemyWounded": 10,
+      "units": [
+        "161 Field Battery, 1 Australian Task Force",
+        "2 Troop, A Squadron, 1 Armoured Regiment",
+        "3 Troop, B Squadron, 3 Cavalry Regiment",
+        "9 Platoon, C Company, 8 Battalion, Royal Australian Regiment",
+        "Light Fire Team"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "YS475523, C/8RAR AND ELMS B/3 CAV REGT AND A/1 ARMD REGT CON EST 40 EN WHO FIRED RPG2\u0027S. RES: 1 APC DES, 2 AUST KIA [Hugh Carlyle of 3 Cav], 7 AUST WIA,1 VC KIA (BC), AND 1 PW CAPTURED. \n\nInitial contact was made 1045hrs YS475522 with 3 VC and HQ C Coy. 1 VC was captured and revealed that 40 enemy were a short distance away in a bunker system and that there were many anti personnel mines in the area.\n Full company attack was launched on located bunker system, with APC and tank support resulting in 1 APC being destroyed by 2 RPGs, 2 men killed and over 7 wounded. The Coy withdrew and arty and air strikes were launched. At 1300hrs C coy attacked again with tank troop leading. This assault fought through the bunker system against little significant opposition but on reaching the far side of the bunker system found that further progress was impeded by a deep creek (YS475532). \n\nAt this point the assaulting force was advised that  as well as anti-personnel mines and booby traps, the bunker system also was protected by an anti-tank minefield. While the OC considered whether to dismount the infantry, orders were received to break contact and withdraw. \n\nWhile withdrawing (1430hrs)  the assault force again came under heavy fire from RPGs and SA from enemy who had re-occupied the bunkers. 1 Aust wounded. At 1500hrs (YS475543) 5 more Aust were wounded by shrapnel. The assault force withdrew and contact was broken at approx 1520 hrs. Air and artillery fire was then brought to bear on the bunker system until 1830 hrs. At this time a further assault was made by tanks and the HQ APC Tp to recover the APC casualty. This was successfully done by 1900 hrs when the final break with the enemy was made and the contact ended. 8RAR did not return to the bunker system till the morning of 20 February after a B52 strike had been brought down upon the position. During the contact 12 enemy were killed and many blood trails indicating many wounded were found. The system was extensive and was defended by 30-40 enemy (also described as 1 Bn of enemy). 1 tank was hit 8 times by RPGs but remained in action. Another APC was also hit by RPGs.  Most of the enemy cas were caused by tank cannister and HE rds.\n\nA/7/8 US Arty, B/2/13 US Arty and the 155mm of Dat Do fired in support of C Coy 8 RAR (AWM95 3/6/23.pdf p11 1 Fd Regt Diary)",
+      "archivalSource": ";"
+    },
+    {
+      "id": 3538,
+      "url": "/battlemap?incident=3538",
+      "dtg": "1970-02-18T13:15:00",
+      "why": [
+        "typical:Patrol"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammersley",
+      "task": "Patrol",
+      "gridRef": "YS455546",
+      "friendlyForce": 32,
+      "enemyForce": 8,
+      "friendlyKilled": 0,
+      "friendlyWounded": 2,
+      "enemyKilled": 3,
+      "enemyWounded": 0,
+      "units": [
+        "2 Section, 2 Troop, B Squadron, 3 Cavalry Regiment",
+        "5 Platoon, B Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "YS455546, 6/B/8RAR AND ELMS B/3 CAV CON 1 VC WHO ENG APC WITHRPG2. RES: 1 APC DAM, 3 AUST WIA.\n\nWhile travelling down jungle trail to an ambush position, 2 section was ambushed by an RPG2 team which hit twice, the leading APC penetrating the hull and wounding the two crew. The damaged APC was driven to a more secure area, and the enemy dispersed by APC counter fire (0.30). Enemy also fired AK47s. 5 pl who were nearby 200m, having been concentrating for the APCs to pick them up for a move), put in a quick sweep, finding nothing, They then secured the LZ for cas evac. The enemy came from a nearby bunker system not known about at the time.\n\nYS447536 10/D/8RAR LOC CACHE CONTAINING 3 BODIES APPROX 1 WK OLD.CREDITED TO B/8RAR CON ON 18/2/70.",
+      "archivalSource": "Scorpion Stings pg209; Sitrep, AWM95 1/4/181.pdf Pt2 p57; AWM95 7-8-7.pdf 8 RAR Feb 70 pg103 Contact Rept;"
+    },
+    {
+      "id": 3544,
+      "url": "/battlemap?incident=3544",
+      "dtg": "1970-02-18T16:15:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammersley",
+      "task": "Bunker",
+      "gridRef": "YS484522",
+      "friendlyForce": 33,
+      "enemyForce": 12,
+      "friendlyKilled": 0,
+      "friendlyWounded": 8,
+      "enemyKilled": 6,
+      "enemyWounded": 0,
+      "units": [
+        "3 Section, 2 Troop, B Squadron, 3 Cavalry Regiment",
+        "4 Platoon, B Company, 8 Battalion, Royal Australian Regiment",
+        "A Squadron, 1 Armoured Regiment"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "4 pl contacts a bunker and suffers 7 casualties, kills 6 enemy. 1 tank hit by RPG and 1 APC was holed.\n\nNoted in Combined Arms Data Base\n\nFollowing the C Coy 8 RAR heavy contact, B Coy was being hurried into blocking positions by APC. 4 pl had just dismounted and were moving forward with the APCs in support when 3 section was fired on by the enemy. Receiving heavy SA fire, RPGs were fired at the APCs, one hitting an APC on the left side. The two crew were injured and the hull was punctured. Heavy fire was poured into the area. A sweep was organised when enemy fire subsided, but 10m into the jungle claymore type wires were noticed, and the pl was pulled back. The 8 Aust cas were caused by RPGs.\n\nSitrep 25/2/70 3 bodies found from above action.",
+      "archivalSource": "AWM98, item R723-1-219; Headquarters, Australian Forces Vietnam, Reports General Investigation into Accidental Shooting 8RAR [Royal Australian Regiment], Long hais - 18 Feb 70. Sitrep, AWM95 1/4/181.pdf Pt 2 p58; Scorpion Stings pg209; AWM95 7-8-7.pdf 8 RAR Feb 70 pg110 Contact Rept;"
+    },
+    {
+      "id": 3576,
+      "url": "/battlemap?incident=3576",
+      "dtg": "1970-02-25T10:25:00",
+      "why": [
+        "typical:Security"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammersley",
+      "task": "Security",
+      "gridRef": "YS492509",
+      "friendlyForce": 25,
+      "enemyForce": 0,
+      "friendlyKilled": 1,
+      "friendlyWounded": 2,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "A Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "report": "Mine incident. Chicom grenade explodes killing 1 Aust and wounding 2.\n\nSitrep says it was probably an M16 mine. This is confirmed by the unit diary.\n\nSE Long Hais",
+      "archivalSource": "Sitrep, AWM95 1/4/181 Pt2.pdf p80; AWM95 7-8-7.pdf 8 RAR Feb 70 pg52"
+    },
+    {
+      "id": 3584,
+      "url": "/battlemap?incident=3584",
+      "dtg": "1970-02-28T11:03:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hammersley",
+      "task": "Patrol",
+      "gridRef": "YS486505",
+      "friendlyForce": 25,
+      "enemyForce": 0,
+      "friendlyKilled": 7,
+      "friendlyWounded": 13,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "1 Platoon, A Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "report": "YS486505 - DET M16 MINE. 7 AUST KIA, 13 AUST WIA. The area was known to be infested with mines, and the pl was moving carefully, with engineers clearing the way, to an ambush site. The site had been reached, but one of the engineer team set off an M16 jumping jack mine, while the pl was concentrated around pl HQ.\n\nYS486505 - DET M16 MINE. 8 AUST KIA, 13 AUST WIA. See 1140hrs.\n\nSE Long Hais",
+      "archivalSource": "Sitrep, AWM95 1/4/181 Pt2.pdf p90; Combat Battalion p154; AWM95 7-8-7.pdf pg70;"
+    },
+    {
+      "id": 3609,
+      "url": "/battlemap?incident=3609",
+      "dtg": "1970-03-06T12:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Hamilton",
+      "task": null,
+      "gridRef": "YS667615",
+      "friendlyForce": 25,
+      "enemyForce": 0,
+      "friendlyKilled": 2,
+      "friendlyWounded": 6,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "5 Platoon, B Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "Pressure mine detonated.\n\nYS667615, B/8RAR LOC AN OLD M16 MINE. AT 061210H B COY DET AN M16MINE RESULTING IN 2 AUST KIA AND 6 AUST WIA.\n\nAs the rusty M16 was being destroyed the pl began to investigate some old bunkers. It deployed into all round defence, and someone detonated another M16.\n\nJungle 6Km S of Xuyen Moc",
+      "archivalSource": "AWM Records Ops 1ATF [E]; Sitrep, AWM95 1/4/183 Pt2.pdf p20; AWM95 2-1-6.pdf pg57 Sitrep 6/3/70; AWM95 7-8-7.pdf pg132"
+    },
+    {
+      "id": 3763,
+      "url": "/battlemap?incident=3763",
+      "dtg": "1970-04-20T09:02:00",
+      "why": [
+        "significant"
+      ],
+      "role": "In another unit\u0027s contact",
+      "ledBy": "3 Cav Regt",
+      "operation": "Concrete",
+      "task": "Transport",
+      "gridRef": "YS638627",
+      "friendlyForce": 30,
+      "enemyForce": 0,
+      "friendlyKilled": 1,
+      "friendlyWounded": 10,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "3 Troop, B Squadron, 3 Cavalry Regiment",
+        "5 Platoon, B Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "report": "3 Tp was transporting troops of 8 RAR when one APC hit a 40lbs anti tank mine.  APC was heavily damaged but 1 crew killed, and 10 others wounded who were riding in the APC.\n\nYS637628, ELMS B/3 CAV REGT AND 5/B/8RAR DET MINE CONSISTINGOF APPROX 40 LBS CHICOM EXPL. RES: 11 AUST WIA, 1 APC WITH  HVY DAM.\n\nTrack offRoute 23\n\nOne of the wounded was an engineer (Hist of 1 Fd Sqn p297)",
+      "archivalSource": "AWM109 Ops 1ATF [C]; Intsum, AWM95 1/4/186.pdf p87; AWM95 7-8-9.pdf 8 RAR Apr 70 pg 23;"
+    },
+    {
+      "id": 3815,
+      "url": "/battlemap?incident=3815",
+      "dtg": "1970-05-03T19:55:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Nudgee",
+      "task": "Ambush",
+      "gridRef": "YS473585",
+      "friendlyForce": 24,
+      "enemyForce": 70,
+      "friendlyKilled": 0,
+      "friendlyWounded": 6,
+      "enemyKilled": 2,
+      "enemyWounded": 5,
+      "units": [
+        "1 ATF Artillery",
+        "1 ATF Mortars",
+        "3 Platoon, A Company, 8 Battalion, Royal Australian Regiment",
+        "3 Troop, B Squadron, 3 Cavalry Regiment"
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "report": "YS475585, 3/A/8RAR CON 40-50 VC CARRYING AK47\u0027S RPG\u0027S MGS ANDM79\u0027S. EN WERE MOV N-S. AFTER INITIAL CON EN WDR AND REORG ANDRECOVERED THEIR KIA BY FIRE AND MOVT. EN WDR S. SWEEP OF AREAREVEALED 3 BT AND DRAG MARKS LEADING S. RES: 2 VC KIA, 1 M16 AND1 M26 RECOVERED, 6 AUST WIA.\n\nSee Combat Battalion pg131-7\n\nAfter the initial ambush the enemy counter attacked. After one hours fighting 3 Tp was summoned to assist the infantry. It arrived at about 2120hrs and at 2130hrs the enemy broke contact.\n\nIntel later claimed over 50 enemy killed.\n\nPl was moving to AP when contact was started when the lead sect saw and fired on the enemy. The pl closed into a fire base. En returned fire with AK47s, RPG-7, M79, RPD, M16, and M26. Other en parties moved to other flank and engaged pl position. En withdrew reorged and using fire and movement, moved to within 10m of pl position to recover their wounded and some of their dead. The 6 friendly cas were caused by RPG and M26.\n\n161 Fd Bty fired at YS459560 in support (AWM95 3/7/12.pdf p7 4 Fd Regt Diary)",
+      "archivalSource": "Intsum, AWM95 1/4/189.pdf p105; Scorpion Stings pg222; AWM 723/R5/103; Combat Bn pg134; AWM95 7/8 Jun 70; AWM95 7-8-9.pdf 8 RAR Apr 70 pg138 Contact Rept;"
+    },
+    {
+      "id": 4092,
+      "url": "/battlemap?incident=4092",
+      "dtg": "1970-08-12T03:15:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Cung Chung 2",
+      "task": "Ambush",
+      "gridRef": "YS402633",
+      "friendlyForce": 25,
+      "enemyForce": 55,
+      "friendlyKilled": 0,
+      "friendlyWounded": 1,
+      "enemyKilled": 19,
+      "enemyWounded": 6,
+      "units": [
+        "1 Troop, B Squadron, 3 Cavalry Regiment",
+        "8 Platoon, C Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "AT YS402633 8/C/8RAR AND 1/B/3 CAV REGT AMBUSHED 50-60 VCLEAVING HOA LONG IN 2 GPS 50M APART. RES: 19 VC KIA (BC), 6 VC PW,1 HOI CHANH. CIA: 2 AK47, 3 M1 CARBINES, 1 M79, 2 7.62 SMG,1 M26 GREN, AMMO FOR ALL WPNS, QTY DOCUS, 50 TORCH BATTERIES, LGEQTY CLOTHING, 72LB SUGAR, LGE QTY TOBACCO, 10LB SALT, 65LB OTHERFRESH FOOD, 220 TINS FOOD, 100LB RICE CAKES, 550LB RICE. SURVIVORSWDR SE. (PART SERIAL A286 ONLY).\n\n8pl was ambushing and observed the enemy entering the village at 2100hrs 11 Aug. It decided to wait and ambush the enemy as they retired later in the night. 1 Tp was put on alert to assist as soon as the ambush was sprung. This happened at 315hrs 12 Aug. The enemy immediately counter attacked the platoon but retreated as soon as the APCs arrived. The APCs pursued the enemy killing one and capturing 5. The Tp stayed with the pl until dawn.\n\nThe original task of the pl was to ambush Route 2 because this was thought to be a supply route into Hoa Long. At 2050hrs, the W gps of the ambush observed 50-60 en moving along the paddi bunds. The en moved carefully with 20m separating each man and they crouched low to avoid silhouette. Since the en were not going to go into the AP killing ground, the decision was made to let them pass and shift the ambush to meet the en on their return later that night.\n\nThe en returned at 315hrs moving in 2 gps of 25 with spacing of only 2-3m and the distance between the 2 gps was 20-30m. They were carrying packs and were not nearly so alert as for the move in. The en came straight towards gp 3 so the ambush had to be initiated before the main body was in the killing ground. Claymores were fired, and although the en were not in the killing ground, a good crossfire was achieved from all 4 MGs. The majority of en cas were inflicted by SA, but M72s were also used to good effect from gp 4. All of the first en gp were killed or wounded. The second en gp withdrew to the SE, taking the wounded of the 1 st with them. Very little return fire was received. Arty and mors fired for illum and to block escape routes.\n\nA quick response from 1 Tp 3 CAV allowed the ambush to be exploited gaining 2 en killed and 5 POW who had hidden in the scrub about 800m from the ambush.\n\n106 Fd Bty, 161 Fd Bty and A Bty 2/35 US Arty all engaged areas to W of Hoa Long as blocking fire in support of C Coy 8 RAR. (AWM95 3/7/15.pdf p10 4 Fd Regt Diary)",
+      "archivalSource": "Intsum, AWM95 1/4/197.pdf p203; Scorpion Stings pg235;"
+    },
+    {
+      "id": 4169,
+      "url": "/battlemap?incident=4169",
+      "dtg": "1970-10-09T01:20:00",
+      "why": [
+        "last"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Cung Chung 3",
+      "task": "Ambush",
+      "gridRef": "YS402632",
+      "friendlyForce": 17,
+      "enemyForce": 6,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 4,
+      "enemyWounded": 1,
+      "units": [
+        "9 Platoon, C Company, 8 Battalion, Royal Australian Regiment"
+      ],
+      "subUnits": [
+        "c-company"
+      ],
+      "report": "YS402632, 9/C/8RAR AMBUSHED 6 VC MOV SW ALONG RTE 2 ARMED WITH 1RPG2, 1 AK47 AND 1 BLAST GREN. RES: 4 VC KIA (BC), 1 NVA PW (WIA),REMAINING VC WDR IN AN UNK DIRECTION.\n\nAn ambush was set on Route 2. Enemy silhouettes were seen, and the ambush was initiated with claymores (3 failed to detonate) followed by M60 fire. Suppressive fire was employed by M60, M72 and M79 until possum illum and APC support arrived. 4 enemy killed and 1 wded and captured.\n\nEquip Failure- Claymore\n\n106 Fd Bty fires illum at YS398628 (AWM95 3/7/17.pdf p6 4 Fd Regt Diary)",
+      "archivalSource": "Intsum, AWM95 1/4/201.pdf p190"
+    }
+  ],
+  "subUnits": [
+    {
+      "id": 9159,
+      "slug": "a-company",
+      "parent": null,
+      "title": "A Company",
+      "mapUrl": "/battlemap?units=9159",
+      "figures": {
+        "contacts": 42,
+        "led": 42,
+        "supported": 0,
+        "first": "1969-12-03",
+        "last": "1970-08-03",
+        "operations": 11,
+        "friendlyKilled": 10,
+        "friendlyWounded": 36,
+        "enemyKilled": 32,
+        "enemyWounded": 31,
+        "mineIncidents": 5
+      },
+      "activity": [
+        {
+          "name": "Ambush",
+          "count": 24,
+          "share": 0.57
+        },
+        {
+          "name": "Patrol",
+          "count": 10,
+          "share": 0.24
+        },
+        {
+          "name": "Security",
+          "count": 5,
+          "share": 0.12
+        },
+        {
+          "name": "Bunker",
+          "count": 2,
+          "share": 0.05
+        },
+        {
+          "name": "Mine incident",
+          "count": 1,
+          "share": 0.02
+        }
+      ],
+      "support": [],
+      "notable": [
+        3584,
+        3815,
+        3849
+      ]
+    },
+    {
+      "id": 9302,
+      "slug": "b-company",
+      "parent": null,
+      "title": "B Company",
+      "mapUrl": "/battlemap?units=9302",
+      "figures": {
+        "contacts": 48,
+        "led": 47,
+        "supported": 1,
+        "first": "1969-12-15",
+        "last": "1970-09-08",
+        "operations": 10,
+        "friendlyKilled": 4,
+        "friendlyWounded": 33,
+        "enemyKilled": 49,
+        "enemyWounded": 22,
+        "mineIncidents": 3
+      },
+      "activity": [
+        {
+          "name": "Ambush",
+          "count": 20,
+          "share": 0.43
+        },
+        {
+          "name": "Patrol",
+          "count": 18,
+          "share": 0.38
+        },
+        {
+          "name": "Security",
+          "count": 3,
+          "share": 0.06
+        },
+        {
+          "name": "Mine incident",
+          "count": 2,
+          "share": 0.04
+        },
+        {
+          "name": "Bunker",
+          "count": 1,
+          "share": 0.02
+        },
+        {
+          "name": "Not recorded",
+          "count": 3,
+          "share": 0.06
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 1,
+          "for": [
+            {
+              "unit": "3 Cav Regt",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        3544,
+        3609,
+        3763
+      ]
+    },
+    {
+      "id": 9288,
+      "slug": "c-company",
+      "parent": null,
+      "title": "C Company",
+      "mapUrl": "/battlemap?units=9288",
+      "figures": {
+        "contacts": 57,
+        "led": 53,
+        "supported": 4,
+        "first": "1969-12-14",
+        "last": "1970-10-09",
+        "operations": 12,
+        "friendlyKilled": 4,
+        "friendlyWounded": 35,
+        "enemyKilled": 71,
+        "enemyWounded": 51,
+        "mineIncidents": 3
+      },
+      "activity": [
+        {
+          "name": "Ambush",
+          "count": 21,
+          "share": 0.4
+        },
+        {
+          "name": "Security",
+          "count": 13,
+          "share": 0.25
+        },
+        {
+          "name": "Patrol",
+          "count": 11,
+          "share": 0.21
+        },
+        {
+          "name": "Bunker",
+          "count": 3,
+          "share": 0.06
+        },
+        {
+          "name": "Artillery and mortar fire",
+          "count": 1,
+          "share": 0.02
+        },
+        {
+          "name": "Not recorded",
+          "count": 4,
+          "share": 0.08
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 4,
+          "for": [
+            {
+              "unit": "3 Cav Regt",
+              "contacts": 3
+            },
+            {
+              "unit": "1 Fd Sqn",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        3516,
+        3537,
+        4092
+      ]
+    },
+    {
+      "id": 9253,
+      "slug": "d-company",
+      "parent": null,
+      "title": "D Company",
+      "mapUrl": "/battlemap?units=9253",
+      "figures": {
+        "contacts": 40,
+        "led": 39,
+        "supported": 1,
+        "first": "1969-12-13",
+        "last": "1970-08-18",
+        "operations": 9,
+        "friendlyKilled": 1,
+        "friendlyWounded": 14,
+        "enemyKilled": 26,
+        "enemyWounded": 14,
+        "mineIncidents": 2
+      },
+      "activity": [
+        {
+          "name": "Ambush",
+          "count": 20,
+          "share": 0.51
+        },
+        {
+          "name": "Patrol",
+          "count": 9,
+          "share": 0.23
+        },
+        {
+          "name": "Security",
+          "count": 5,
+          "share": 0.13
+        },
+        {
+          "name": "Bunker",
+          "count": 1,
+          "share": 0.03
+        },
+        {
+          "name": "Mine incident",
+          "count": 1,
+          "share": 0.03
+        },
+        {
+          "name": "Not recorded",
+          "count": 3,
+          "share": 0.08
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 1,
+          "for": [
+            {
+              "unit": "3 Cav Regt",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        3278,
+        3363,
+        3541
+      ]
+    }
+  ],
+  "dead": [
+    {
+      "serviceNumber": "55890",
+      "name": "Eric George Gould",
+      "rank": "Private",
+      "died": "1969-12-21",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3278
+      ],
+      "subUnits": [
+        "d-company"
+      ],
+      "portrait": "/media/portraits/55890.jpg"
+    },
+    {
+      "serviceNumber": "312756",
+      "name": "Victor Neil Wagstaff",
+      "rank": "Private",
+      "died": "1970-01-29",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/312756.jpg"
+    },
+    {
+      "serviceNumber": "43555",
+      "name": "Douglas Alfred Baker",
+      "rank": "Sergeant",
+      "died": "1970-02-25",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3576
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/43555.jpg"
+    },
+    {
+      "serviceNumber": "3795712",
+      "name": "Barry John Munday",
+      "rank": "Private",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3584
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/3795712.jpg"
+    },
+    {
+      "serviceNumber": "61912",
+      "name": "Garry Maxwell West",
+      "rank": "Private",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3584
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/61912.jpg"
+    },
+    {
+      "serviceNumber": "1200097",
+      "name": "James Joseph Barrett",
+      "rank": "(Temporary) Corporal",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3586
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/1200097.jpg"
+    },
+    {
+      "serviceNumber": "3795935",
+      "name": "Larry James Maclennan",
+      "rank": "Private",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3584
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/3795935.jpg"
+    },
+    {
+      "serviceNumber": "3796110",
+      "name": "Philip Mackay Richter",
+      "rank": "Private",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3584
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/3796110.jpg"
+    },
+    {
+      "serviceNumber": "2783512",
+      "name": "Robert James Jackson",
+      "rank": "Corporal",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3584
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/2783512.jpg"
+    },
+    {
+      "serviceNumber": "7154",
+      "name": "Timo Esko Pesonen",
+      "rank": "Private",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3584
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/7154.jpg"
+    },
+    {
+      "serviceNumber": "15400",
+      "name": "William Joseph Hoban",
+      "rank": "Sergeant",
+      "died": "1970-02-28",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3584
+      ],
+      "subUnits": [
+        "a-company"
+      ],
+      "portrait": "/media/portraits/15400.jpg"
+    },
+    {
+      "serviceNumber": "218583",
+      "name": "John Bressington",
+      "rank": "Lance-Corporal",
+      "died": "1970-03-06",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        3609
+      ],
+      "subUnits": [
+        "b-company"
+      ],
+      "portrait": "/media/portraits/218583.jpg"
+    },
+    {
+      "serviceNumber": "39016",
+      "name": "Stephen James O\u0027dal",
+      "rank": "Private",
+      "died": "1970-03-06",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/39016.jpg"
+    },
+    {
+      "serviceNumber": "3795605",
+      "name": "Daryl Poulson",
+      "rank": "Private",
+      "died": "1970-04-03",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/3795605.jpg"
+    },
+    {
+      "serviceNumber": "5716533",
+      "name": "John Leonard Mcquat",
+      "rank": "Private",
+      "died": "1970-04-30",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/5716533.jpg"
+    },
+    {
+      "serviceNumber": "45104",
+      "name": "Philip Earle",
+      "rank": "Private",
+      "died": "1970-05-01",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/45104.jpg"
+    },
+    {
+      "serviceNumber": "1734847",
+      "name": "Phillip Raymond Goody",
+      "rank": "Lance-Corporal",
+      "died": "1970-05-01",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/1734847.jpg"
+    },
+    {
+      "serviceNumber": "214287",
+      "name": "Alan William Ahearn",
+      "rank": "Sergeant",
+      "died": "1970-05-14",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/214287.jpg"
+    }
+  ],
+  "pictures": [
+    {
+      "id": 356,
+      "url": "/media/uploads/c2/c2e563c1c41cb06aaefaf17d2619f36b56f18396bb2ea2ffeef07779d4c1e7e5.jpg",
+      "thumbUrl": "/media/uploads/c2/c2e563c1c41cb06aaefaf17d2619f36b56f18396bb2ea2ffeef07779d4c1e7e5-480.jpg",
+      "caption": "C Company 8 RAR assaulting into an enemy bunker system in the foothills of the Long Hais (Minh Dam Secret Zone) shortly after a B52 strike had hit the system.",
+      "credit": "Rod Simpson",
+      "dateTaken": "1970-02-22",
+      "contact": 3537,
+      "how": "linked",
+      "nearbyContacts": 5
+    },
+    {
+      "id": 357,
+      "url": "/media/uploads/2f/2f783b17935e498f68f8ea3a0983d15418eb6bc82c9db9e84386cdbaa5cc254b.jpg",
+      "thumbUrl": "/media/uploads/2f/2f783b17935e498f68f8ea3a0983d15418eb6bc82c9db9e84386cdbaa5cc254b-480.jpg",
+      "caption": "8 RAR troops and Centurion tanks of 1 Armd Regt at Night Defensive Position Isa in February 1970. The tanks are firing into the hills.",
+      "credit": "Rod Simpson",
+      "dateTaken": null,
+      "contact": 3497,
+      "how": "linked",
+      "nearbyContacts": 7
+    },
+    {
+      "id": 467,
+      "url": "/media/uploads/9c/9c4730fab0b8b6179d8182f160d55a9a25a86aeb75d8d21833286b6aef75a61e.jpg",
+      "thumbUrl": "/media/uploads/9c/9c4730fab0b8b6179d8182f160d55a9a25a86aeb75d8d21833286b6aef75a61e-480.jpg",
+      "caption": "RPG Damage to 22A and Crew being Casvaced",
+      "credit": "Paul Davison",
+      "dateTaken": "1970-02-18",
+      "contact": 3538,
+      "how": "linked",
+      "nearbyContacts": 20
+    },
+    {
+      "id": 468,
+      "url": "/media/uploads/df/df13935ba2966728845e8a3f12c0d1962f8eb26e49075b7c943ff9b89ff42c05.jpg",
+      "thumbUrl": "/media/uploads/df/df13935ba2966728845e8a3f12c0d1962f8eb26e49075b7c943ff9b89ff42c05-480.jpg",
+      "caption": "RPG Damage to 22A and Crew being Casvaced",
+      "credit": "Paul Davison",
+      "dateTaken": "1970-02-18",
+      "contact": 3538,
+      "how": "linked",
+      "nearbyContacts": 20
+    },
+    {
+      "id": 634,
+      "url": "/media/uploads/3f/3fbee7ee796470d8b33e57190cfb777cb2412be9328134600f3fc6d6c2ce0027.jpg",
+      "thumbUrl": "/media/uploads/3f/3fbee7ee796470d8b33e57190cfb777cb2412be9328134600f3fc6d6c2ce0027-480.jpg",
+      "caption": "Looking west from Hoa Long road to Baria over half grown rice paddies",
+      "credit": null,
+      "dateTaken": "1970-05-06",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 16
+    },
+    {
+      "id": 629,
+      "url": "/media/uploads/08/080f7cc8479b4e4f9af285589b2b959b51421f9e6ef3550e7f9804fcb9aa620c.jpg",
+      "thumbUrl": "/media/uploads/08/080f7cc8479b4e4f9af285589b2b959b51421f9e6ef3550e7f9804fcb9aa620c-480.jpg",
+      "caption": "Child carrying salt from salt pans and boats on the road from Long Hai village to Baria (Provincial Capital).",
+      "credit": null,
+      "dateTaken": "1970-06-10",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 633,
+      "url": "/media/uploads/b5/b511b7f9c294a19ef38a5aad1f8673896cbb85275d4cd6e544ba60a814ed5b24.jpg",
+      "thumbUrl": "/media/uploads/b5/b511b7f9c294a19ef38a5aad1f8673896cbb85275d4cd6e544ba60a814ed5b24-480.jpg",
+      "caption": "Repairing road east of Hoa Long village",
+      "credit": null,
+      "dateTaken": "1970-05-06",
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 525,
+      "url": "/media/uploads/e2/e29bbf04dc987d29c8d965b6bfa826c5898331e6155ad29d96bea65161acb113.jpg",
+      "thumbUrl": "/media/uploads/e2/e29bbf04dc987d29c8d965b6bfa826c5898331e6155ad29d96bea65161acb113-480.jpg",
+      "caption": "Hoa Long Map",
+      "credit": "Ern Marshall rasurvey",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 16
+    },
+    {
+      "id": 428,
+      "url": "/media/uploads/79/7964b91afafb5f0d2700b6d9192ed7cba5c969758d74c46a4ea69df1e59e45ba.jpg",
+      "thumbUrl": "/media/uploads/79/7964b91afafb5f0d2700b6d9192ed7cba5c969758d74c46a4ea69df1e59e45ba-480.jpg",
+      "caption": "Vietnamese communist graves in the Baria cemetery. There is no commemoration for Vietnamese who died fighting for America and her allies.",
+      "credit": "Ern Marshall Bernie Weisz",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 13
+    },
+    {
+      "id": 441,
+      "url": "/media/uploads/b9/b97c83f3c587d343f1654a7f299f935aabfeb762a267cedede5e58064f3dec4a.jpg",
+      "thumbUrl": "/media/uploads/b9/b97c83f3c587d343f1654a7f299f935aabfeb762a267cedede5e58064f3dec4a-480.jpg",
+      "caption": "Hoa Long Village well",
+      "credit": "Ern Marshall Tony Templeton",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 6
+    },
+    {
+      "id": 463,
+      "url": "/media/uploads/5c/5c6eea4d4cbabf69800f033d17315fb09bbadfeae7f567a2b748b277795562a0.jpg",
+      "thumbUrl": "/media/uploads/5c/5c6eea4d4cbabf69800f033d17315fb09bbadfeae7f567a2b748b277795562a0-480.jpg",
+      "caption": "One of two very rare 3D maps of the Long Hai\\\u0027s",
+      "credit": "Ern Marshall Oziexplorer",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 6
+    },
+    {
+      "id": 464,
+      "url": "/media/uploads/b9/b9c7e38720f244bdf8101e8cb8f7492d29e10838e23a8a2df28e9dfa3a14f380.jpg",
+      "thumbUrl": "/media/uploads/b9/b9c7e38720f244bdf8101e8cb8f7492d29e10838e23a8a2df28e9dfa3a14f380-480.jpg",
+      "caption": "Number two of the Long Hai\\\u0027s in 3D",
+      "credit": "Ern Marshall Oziexplorer",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 5
+    },
+    {
+      "id": 447,
+      "url": "/media/uploads/de/deb49c89417125790ebbcd70d8128fe61ac3d211075d856b58fc56473de695a5.jpg",
+      "thumbUrl": "/media/uploads/de/deb49c89417125790ebbcd70d8128fe61ac3d211075d856b58fc56473de695a5-480.jpg",
+      "caption": "Tanks of B Squadron on Route 2 in 1969",
+      "credit": "Ern Marshall Barry Hodges",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 478,
+      "url": "/media/uploads/c9/c9f292185e33acc4216f8a627b95570f97ed6dd064f2145150e8c7933fb563d3.jpg",
+      "thumbUrl": "/media/uploads/c9/c9f292185e33acc4216f8a627b95570f97ed6dd064f2145150e8c7933fb563d3-480.jpg",
+      "caption": "B Sqn on the road",
+      "credit": "Ern Marshall Bob Ferrari",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 614,
+      "url": "/media/uploads/0b/0b9c71b4b71983e09fd9842a5a99d4a2ab932a1e6df7d186c0991cd6b5992a52.jpg",
+      "thumbUrl": "/media/uploads/0b/0b9c71b4b71983e09fd9842a5a99d4a2ab932a1e6df7d186c0991cd6b5992a52-480.jpg",
+      "caption": "U.S. Army M 107 175mm SP Gun Battery A 1st Battalion 83rd Artillery Regiment at Camp Everett 1 ATF 4.67",
+      "credit": "errol999",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    },
+    {
+      "id": 615,
+      "url": "/media/uploads/41/41fcc76da22967e7a7b0de712ab9b6c7d99e54703f19cf113480b85276a273cf.jpg",
+      "thumbUrl": "/media/uploads/41/41fcc76da22967e7a7b0de712ab9b6c7d99e54703f19cf113480b85276a273cf-480.jpg",
+      "caption": "U.S. Army M 107 175mm SP Gun Battery A 1st Battalion 83rd Artillery Regt Camp Everett 1 ATF Nui Dat 4.67",
+      "credit": "errol999",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    }
+  ],
+  "sources": {
+    "contacts": 6157,
+    "units": 590,
+    "rollPeople": 522,
+    "casualtyLinks": 213,
+    "pictures": 350,
+    "places": 113,
+    "portraits": 521
+  }
+}

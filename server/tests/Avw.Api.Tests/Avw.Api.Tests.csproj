@@ -13,6 +13,8 @@
     <PackageReference Include="xunit.runner.visualstudio" />
     <ProjectReference Include="..\..\src\Avw.Api\Avw.Api.csproj" />
     <ProjectReference Include="..\..\src\Avw.Migration\Avw.Migration.csproj" />
+    <!-- Aliased: the tool, like the API, has a top-level Program class. -->
+    <ProjectReference Include="..\..\src\Avw.Features\Avw.Features.csproj" Aliases="features" />
   </ItemGroup>
 
   <ItemGroup>

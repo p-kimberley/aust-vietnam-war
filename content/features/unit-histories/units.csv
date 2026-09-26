@@ -1,0 +1,24 @@
+role,unit_id,slug,parent,arm,awm,tours,title,short,roll_names
+history,3233,1-rar,,infantry,https://www.awm.gov.au/collection/U53496,1965-05..1966-06;1968-04..1969-02,"1st Battalion, Royal Australian Regiment",1 RAR,"1st Battalion, The Royal Australian Regiment"
+history,1419,2-rar,,infantry,https://www.awm.gov.au/collection/U53497,1967-04..1968-06;1970-05..1971-05,"2nd Battalion, Royal Australian Regiment",2 RAR,"2nd Battalion, The Royal Australian Regiment"
+history,2160,3-rar,,infantry,https://www.awm.gov.au/collection/U53498,1967-12..1968-11;1971-02..1971-10,"3rd Battalion, Royal Australian Regiment",3 RAR,"3rd Battalion, The Royal Australian Regiment"
+history,3774,4-rar,,infantry,https://www.awm.gov.au/collection/U53499,1968-06..1969-05;1971-05..1971-12,"4th Battalion, Royal Australian Regiment",4 RAR,"4th Battalion, The Royal Australian Regiment"
+history,1,5-rar,,infantry,https://www.awm.gov.au/collection/U53500,1966-04..1967-05;1969-02..1970-02,"5th Battalion, Royal Australian Regiment",5 RAR,"5th Battalion, The Royal Australian Regiment"
+history,172,6-rar,,infantry,https://www.awm.gov.au/collection/U53501,1966-05..1967-06;1969-05..1970-05,"6th Battalion, Royal Australian Regiment",6 RAR,"6th Battalion, The Royal Australian Regiment"
+history,1330,7-rar,,infantry,https://www.awm.gov.au/collection/U53502,1967-04..1968-04;1970-02..1971-02,"7th Battalion, Royal Australian Regiment",7 RAR,"7th Battalion, The Royal Australian Regiment"
+history,8956,8-rar,,infantry,,1969-11..1970-11,"8th Battalion, Royal Australian Regiment",8 RAR,"8th Battalion, The Royal Australian Regiment"
+history,4186,9-rar,,infantry,https://www.awm.gov.au/collection/U53504,1968-11..1969-12,"9th Battalion, Royal Australian Regiment",9 RAR,"9th Battalion, The Royal Australian Regiment"
+history,49,3-cavalry-regiment,,cavalry,https://www.awm.gov.au/collection/U60601,1965-05..1972-03,3rd Cavalry Regiment,3 Cav Regt,"A Squadron, 3rd Cavalry Regiment;B Squadron, 3rd Cavalry Regiment;A Squadron, 3rd Cavalry Regiment Light Aid Detachment;Detachment, A Squadron, 3rd Cavalry Regiment Light Aid Detachment;1st Armoured Personnel Carrier Squadron"
+history,2908,1-armoured-regiment,,armour,https://www.awm.gov.au/collection/U60600,1968-02..1971-09,1st Armoured Regiment,1 Armd Regt,"A Squadron, 1st Armoured Regiment;B Squadron, 1st Armoured Regiment;C Squadron, 1st Armoured Regiment"
+history,236,sasr,,special-air-service,,1966-06..1971-10,Special Air Service Regiment,SASR,1st Special Air Service Squadron;2nd Special Air Service Squadron;3rd Special Air Service Squadron
+history,107,1-atf,,headquarters,,1966-04..1972-03,1st Australian Task Force,1 ATF,"Headquarters, 1st Australian Task Force"
+history,1396,4-field-regiment,,artillery,https://www.awm.gov.au/collection/U53442,1967-04..1968-05;1970-02..1971-03,4th Field Regiment,4 Fd Regt,4th Field Regiment
+history,210,1-field-regiment,,artillery,https://www.awm.gov.au/collection/U53441,1965-09..1967-05;1969-02..1970-05,1st Field Regiment,1 Fd Regt,1st Field Regiment;105th Field Battery
+history,143,1-field-squadron,,engineers,https://www.awm.gov.au/collection/U53457,1965-09..1972-02,1st Field Squadron,1 Fd Sqn,1st Field Squadron
+nest,113,1-atf-artillery,1-atf,artillery,,,1 ATF Artillery,1 ATF Arty,
+nest,475,1-atf-mortars,1-atf,artillery,,,1 ATF Mortars,1 ATF Mortars,
+exclude,1420,,,,,,"V Company, 2 RAR (New Zealand)",,
+exclude,6866,,,,,,"V Company, 6 RAR (New Zealand)",,
+exclude,3775,,,,,,"V Company, 4 RAR (New Zealand)",,
+exclude,6625,,,,,,"W Company, 6 RAR (New Zealand)",,
+exclude,308,,,,,,"161 Field Battery, RNZA (New Zealand)",,

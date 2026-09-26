@@ -1,0 +1,975 @@
+{
+  "unit": {
+    "id": 236,
+    "slug": "sasr",
+    "title": "Special Air Service Regiment",
+    "short": "SASR",
+    "arm": "special-air-service",
+    "record": null,
+    "tours": [
+      {
+        "from": "1966-06",
+        "to": "1971-10"
+      }
+    ],
+    "outsideTours": [],
+    "corrected": [],
+    "mapUrl": "/battlemap?units=236"
+  },
+  "figures": {
+    "contacts": 380,
+    "led": 375,
+    "supported": 5,
+    "first": "1966-06-25",
+    "last": "1971-08-26",
+    "operations": 16,
+    "friendlyKilled": 2,
+    "friendlyWounded": 31,
+    "enemyKilled": 565,
+    "enemyWounded": 150,
+    "mineIncidents": 2
+  },
+  "perYear": [
+    {
+      "year": 1966,
+      "contacts": 40
+    },
+    {
+      "year": 1967,
+      "contacts": 71
+    },
+    {
+      "year": 1968,
+      "contacts": 91
+    },
+    {
+      "year": 1969,
+      "contacts": 82
+    },
+    {
+      "year": 1970,
+      "contacts": 76
+    },
+    {
+      "year": 1971,
+      "contacts": 20
+    }
+  ],
+  "activity": [
+    {
+      "name": "Patrol",
+      "count": 243,
+      "share": 0.65
+    },
+    {
+      "name": "Ambush",
+      "count": 100,
+      "share": 0.27
+    },
+    {
+      "name": "Security",
+      "count": 17,
+      "share": 0.05
+    },
+    {
+      "name": "Bunker",
+      "count": 6,
+      "share": 0.02
+    },
+    {
+      "name": "Air support",
+      "count": 2,
+      "share": 0.01
+    },
+    {
+      "name": "Artillery and mortar fire",
+      "count": 1,
+      "share": 0
+    },
+    {
+      "name": "Mine incident",
+      "count": 1,
+      "share": 0
+    },
+    {
+      "name": "Not recorded",
+      "count": 5,
+      "share": 0.01
+    }
+  ],
+  "support": [
+    {
+      "kind": "In another unit\u0027s contact",
+      "contacts": 5,
+      "for": [
+        {
+          "unit": "US Army",
+          "contacts": 3
+        },
+        {
+          "unit": "3 Cav Regt",
+          "contacts": 1
+        },
+        {
+          "unit": "LFT",
+          "contacts": 1
+        }
+      ]
+    }
+  ],
+  "dataSources": [
+    {
+      "name": "1ATF",
+      "count": 380,
+      "share": 1
+    }
+  ],
+  "operations": [
+    {
+      "name": "TAOR",
+      "contacts": 1,
+      "first": "1966-06-25",
+      "last": "1966-06-25",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "LRRP",
+      "contacts": 344,
+      "first": "1966-07-01",
+      "last": "1971-08-26",
+      "friendlyKilled": 2,
+      "enemyKilled": 527
+    },
+    {
+      "name": "Toledo",
+      "contacts": 3,
+      "first": "1966-08-25",
+      "last": "1966-08-29",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Hayman",
+      "contacts": 2,
+      "first": "1966-11-10",
+      "last": "1966-11-10",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "Duck",
+      "contacts": 2,
+      "first": "1966-12-18",
+      "last": "1966-12-22",
+      "friendlyKilled": 0,
+      "enemyKilled": 6
+    },
+    {
+      "name": "Paddington",
+      "contacts": 1,
+      "first": "1967-07-24",
+      "last": "1967-07-24",
+      "friendlyKilled": 0,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Ainslie",
+      "contacts": 1,
+      "first": "1967-08-31",
+      "last": "1967-08-31",
+      "friendlyKilled": 0,
+      "enemyKilled": 3
+    },
+    {
+      "name": "Santa Fe",
+      "contacts": 2,
+      "first": "1967-11-06",
+      "last": "1967-11-08",
+      "friendlyKilled": 0,
+      "enemyKilled": 1
+    },
+    {
+      "name": "Forrest",
+      "contacts": 2,
+      "first": "1967-12-11",
+      "last": "1967-12-12",
+      "friendlyKilled": 0,
+      "enemyKilled": 8
+    },
+    {
+      "name": "Albany",
+      "contacts": 2,
+      "first": "1968-07-13",
+      "last": "1968-07-14",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    },
+    {
+      "name": "VNKEP",
+      "contacts": 1,
+      "first": "1968-11-25",
+      "last": "1968-11-25",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "STELLAR Bright",
+      "contacts": 2,
+      "first": "1968-12-11",
+      "last": "1968-12-18",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Silk Cord",
+      "contacts": 3,
+      "first": "1969-01-01",
+      "last": "1969-01-01",
+      "friendlyKilled": 0,
+      "enemyKilled": 7
+    },
+    {
+      "name": "Goodwood",
+      "contacts": 2,
+      "first": "1969-01-19",
+      "last": "1969-01-30",
+      "friendlyKilled": 0,
+      "enemyKilled": 3
+    },
+    {
+      "name": "Massey (Force)",
+      "contacts": 1,
+      "first": "1970-09-09",
+      "last": "1970-09-09",
+      "friendlyKilled": 0,
+      "enemyKilled": 2
+    },
+    {
+      "name": "Iron Fox",
+      "contacts": 1,
+      "first": "1971-08-01",
+      "last": "1971-08-01",
+      "friendlyKilled": 0,
+      "enemyKilled": 0
+    }
+  ],
+  "areas": [
+    {
+      "place": "Toby",
+      "type": "FSB",
+      "contacts": 53,
+      "share": 0.14
+    },
+    {
+      "place": "Tiger",
+      "type": "FSPB",
+      "contacts": 28,
+      "share": 0.07
+    },
+    {
+      "place": "Flinders",
+      "type": "FSB",
+      "contacts": 24,
+      "share": 0.06
+    },
+    {
+      "place": "Bruiser",
+      "type": "FSB",
+      "contacts": 17,
+      "share": 0.04
+    },
+    {
+      "place": "Noela",
+      "type": "FSB",
+      "contacts": 15,
+      "share": 0.04
+    },
+    {
+      "place": "Wattle",
+      "type": "FSPB",
+      "contacts": 14,
+      "share": 0.04
+    },
+    {
+      "place": "Cook",
+      "type": "LZ",
+      "contacts": 13,
+      "share": 0.03
+    },
+    {
+      "place": "Melissa",
+      "type": "FSB",
+      "contacts": 12,
+      "share": 0.03
+    }
+  ],
+  "notable": [
+    {
+      "id": 105,
+      "url": "/battlemap?incident=105",
+      "dtg": "1966-06-25T21:29:00",
+      "why": [
+        "first"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "TAOR",
+      "task": "Security",
+      "gridRef": "YS443668",
+      "friendlyForce": 5,
+      "enemyForce": 5,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 0,
+      "enemyWounded": 0,
+      "units": [
+        "3 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "3-sas-squadron"
+      ],
+      "report": "During the night, the SAS Sqn received MG and SA fire on its left flank. It then shifted in the direction of the engineers. SAS standing patrol then saw 4-5 enemy in paddy field at 120m range, but they disappeared before fire could be directed at them.",
+      "archivalSource": "Horner, SAS pg180; AWM95 7-12-1.pdf 3 SAS Jun 66 pg10; 20"
+    },
+    {
+      "id": 774,
+      "url": "/battlemap?incident=774",
+      "dtg": "1967-12-12T15:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "Forrest",
+      "task": "Ambush",
+      "gridRef": "YS546787",
+      "friendlyForce": 10,
+      "enemyForce": 8,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 7,
+      "enemyWounded": 1,
+      "units": [
+        "12 Patrol, 1 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "1-sas-squadron"
+      ],
+      "report": "YS546787: A LRRP FROM 1 ATF CONTACTED 7 VC AT LOCSTATED. RES 7 VC KIA (BC), AND THREE WPNS CAPTURED. THEVC WERE DRESSED IN MIXED DRESS AND CARRYING A LARGE AMOUNT OFFOOD. THERE WERE FIVE MALES AND TWO FEMALES. THE WPNSCAPTURED WERE 1 X CHICOM 7.62 RIFLE, 1 X MI944 CARBINE, 1 USM1 .30 RIFLE, THERE WERE NO DOCS.\n\nGlover",
+      "archivalSource": "Intsum, AWM95 1/4/74.pdf p116; AWM 569/R4/77; Horner SAS pg230; AWM95 7-10-12.pdf 1 SAS pg124"
+    },
+    {
+      "id": 1090,
+      "url": "/battlemap?incident=1090",
+      "dtg": "1968-03-18T23:10:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Ambush",
+      "gridRef": "YS355864",
+      "friendlyForce": 5,
+      "enemyForce": 30,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 21,
+      "enemyWounded": 0,
+      "units": [
+        "13 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YS358864: AT THE LOC STATED A BEEHIVE AND CLAYMORE MINESYSTEM PLACED BY A 1ATF LRRP DETONATED UNDER A TRACTOR ANDTRAILER CARRYING AMMUNITION, WEAPONS AND PERSONAL EQUIPMENT.RESULTS; 15 VC KIA (BC), 1X75MM RR AND ONE 75MM RR ROUND WERECAPTURED. THE TRACTOR AND TRAILER WERE DESTROYED. THERE WERESIX OR EIGHT MORE RR ROUNDS IN THE AREA AS WELL AS AN UNDETERMINEDAMOUNT OF SA AMMUNITION AND PERSONAL EQUIPMENT. LFT ENGAGED THEAREA CAUSING TWO SECONDARY EXPLOSIONS. VR AIRCRAFT RECEIVEDGROUND FIRE TWICE FROM THE AREA. THE PATROL WAS EXTRACTED AFTERTHE INCIDENT. AN A-S WAS ALSO CONDUCTED ON THE AREA WITH NO BDA.\n\nCashmores SAS patrol used explosives and claymores. Enemy defector from same unit which ran tractor said that 21 enemy died in explosions.",
+      "archivalSource": "Horner SAS, pg8-15; AWM95 7-11-1.pdf 2 SAS pg156; Intsum AWM95 1/4/91.pdf p119;"
+    },
+    {
+      "id": 1164,
+      "url": "/battlemap?incident=1164",
+      "dtg": "1968-04-17T08:45:00",
+      "why": [
+        "typical:Ambush"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Ambush",
+      "gridRef": "YS349716",
+      "friendlyForce": 10,
+      "enemyForce": 8,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 7,
+      "enemyWounded": 0,
+      "units": [
+        "35 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YS349716: AT THE LOC STATED, A 1 ATF LRRP CON 8 VC WHO WALKED INTO A AMBUSH SET BY THE LRRP. RES; 6 VC KIA (BC) AND 1 VC KIA(POSS). THERE WERE ALSO 12 VC IN THE AREA WHO DID NOT ENTER THE AMBUSH ZONE. THE AREA WAS ENGAGED BY ARTY WITH UNKNOWN RES.\n\nThe ptl was waiting in ambush when a party of 8 enemy entered in two groups of 4. The 2ic initiated the ambush from the centre with 3 claymores. He wiped out the second enemy group of 4. The left flank fired another claymore at members of the first enemy group, killing 1 and possibly killing another. The first enemy went to ground and opened fire with an LMG. The 4th enemy was engaged by SA and fell dead. The first enemy was engaged with SA and 1 M26 and fell silent. As the ptl withdrew they were fired on from the left flank by 4 enemy with SA and an LMG. The patrol was extracted.",
+      "archivalSource": "Intsum, AWM95 1/4/94 pt3.pdf p104; AWM95 7-11-2.pdf 2 SAS pg130"
+    },
+    {
+      "id": 1183,
+      "url": "/battlemap?incident=1183",
+      "dtg": "1968-04-26T10:00:00",
+      "why": [
+        "typical:Patrol"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Patrol",
+      "gridRef": "YS279807",
+      "friendlyForce": 14,
+      "enemyForce": 4,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 4,
+      "enemyWounded": 0,
+      "units": [
+        "11 Patrol, 2 SAS Squadron, Special Air Service Regiment",
+        "25 Patrol, 2 SAS Squadron, Special Air Service Regiment",
+        "31 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YT278805: AT LOC STATED, A 1 ATF LRRP CONTACTED7 VC. RESULTS 4 VC KIA (BC) \n\nScutts SAS patrol of 19 men was sent to ambush the recently abandoned FSB Dyke. 3 enemy were seen on 26/4 but were not in a good position for the patrol to ambush. Scutts sent a 5 man patrol to come at the enemy from another direction. Meanwhile he moved the rest of his ptl in another direction. After 120m they saw another group of 4 enemy at 7m range. The OC  fired on the first 2 with his M16 and with M79, killing both. The 3rd enemy was hit by 2 burst of 30rds from a FN and killed. The 4th was hit by 20rds of M16 fire and an M79 gren and dropped dead. The area of the contact was then engaged with further SA and M79. The other enemy party was then attacked (see next contact for same patrol same time).",
+      "archivalSource": "Horner SAS, pg254-5; AWM95 7-11-2.pdf 2 SAS pg160;"
+    },
+    {
+      "id": 1357,
+      "url": "/battlemap?incident=1357",
+      "dtg": "1968-06-10T13:15:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Bunker",
+      "gridRef": "YS335659",
+      "friendlyForce": 6,
+      "enemyForce": 15,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 8,
+      "enemyWounded": 0,
+      "units": [
+        "14 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "Simpson",
+      "archivalSource": "Horner SAS pg259; Intsum, AWM95 1/4/103.pdf p190; AWM95 7-11-4.pdf 2 SAS pg91"
+    },
+    {
+      "id": 1360,
+      "url": "/battlemap?incident=1360",
+      "dtg": "1968-06-15T17:20:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Security",
+      "gridRef": "YS558611",
+      "friendlyForce": 6,
+      "enemyForce": 15,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 6,
+      "enemyWounded": 2,
+      "units": [
+        "14 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YS558611: AT THE LOC STATED, A 1 ATF LRRP CON AN EST 15 EN.RES; 6 EN KIA (BC) AND 2 EN KIA (POSS). THERE WERE NO FRIENDLYCAS AND THE PATROL WAS EXTRACTED.\n\nSimpson",
+      "archivalSource": "Intsum, AWM95 1/4/103.pdf p195; Horner SAS pg 260; AWM95 7-11-4.pdf 2 SAS pg106;"
+    },
+    {
+      "id": 1385,
+      "url": "/battlemap?incident=1385",
+      "dtg": "1968-07-05T18:05:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Ambush",
+      "gridRef": "YS612732",
+      "friendlyForce": 6,
+      "enemyForce": 30,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 13,
+      "enemyWounded": 0,
+      "units": [
+        "14 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YS612732: AT THE LOC STATED, A 1 ATF 6 MAN LRRP CONTACTED 25 PLUS EN MOVING SOUTH TO NORTH, DRESSED IN KHAKI GREENS. THEY WERE ARMED WITH 1 RPD, SKS, AKS ANDM1S. RESULT: 13 EN KIA (BC), UNK NO OF EN KIA (POSS). THERE WERE NEG FRIENDLY CAS BUT 1 M 79 WAS DAMAGED.\n\nSimpson",
+      "archivalSource": "Intsum, AWM95 1/4/109.pdf p70; AWM95 7-11-5.pdf 2 SAS pg141;  Horner SAS pg262;"
+    },
+    {
+      "id": 1605,
+      "url": "/battlemap?incident=1605",
+      "dtg": "1968-10-05T17:40:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Ambush",
+      "gridRef": "YS288735",
+      "friendlyForce": 7,
+      "enemyForce": 15,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 8,
+      "enemyWounded": 0,
+      "units": [
+        "24 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YS288732: AT LOC STATED, A 1 ATF LRRP AMBUSHED 3 OXCARTSAND 8 EN MOVING WEST TO EAST ALONG A TRK. RES 8 EN KIA(BC). PAROL RECEIVED FIRE FROM 6-8 EN FROM THE WEST AND A LFT ENGAGED THE AREA. A FURTHER SIX OXCARTS WERE SEEN ON THE TRK.THE PAROL WAS EXTRACTED.\n\nMurray",
+      "archivalSource": "Intsum, AWM95 1/4/121.pdf p82; Horner SAS pg274; AWM95 7-11-8.pdf 2 SAS pg93"
+    },
+    {
+      "id": 1657,
+      "url": "/battlemap?incident=1657",
+      "dtg": "1968-10-23T14:00:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Ambush",
+      "gridRef": "YS755785",
+      "friendlyForce": 10,
+      "enemyForce": 7,
+      "friendlyKilled": 0,
+      "friendlyWounded": 1,
+      "enemyKilled": 7,
+      "enemyWounded": 0,
+      "units": [
+        "15 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YS755785: AT THE LOC STATED, A 1 ATF LRRP CONTACTED 7 EN. RESULTS: 1 AUST WIA. 7 EN KIA (BC); 3 AK-47S AND 1SKS CAPTURED.\n\nSheehan",
+      "archivalSource": "Intsum, AWM95 1/4/121.pdf p125; AWM95 7-11-8.pdf 2 SAS pg122; Horner SAS pg275; AWM103 447A 2 SAS Contact Repts"
+    },
+    {
+      "id": 3357,
+      "url": "/battlemap?incident=3357",
+      "dtg": "1970-01-11T12:15:00",
+      "why": [
+        "significant"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Ambush",
+      "gridRef": "YS738890",
+      "friendlyForce": 6,
+      "enemyForce": 10,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 7,
+      "enemyWounded": 2,
+      "units": [
+        "44 Patrol, 3 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "3-sas-squadron"
+      ],
+      "report": "Dwyer",
+      "archivalSource": "Horner SAS pg344;  AWM95  -7-12-21.pdf  p.171 3SAS  Jan 70;"
+    },
+    {
+      "id": 3822,
+      "url": "/battlemap?incident=3822",
+      "dtg": "1970-05-05T14:30:00",
+      "why": [
+        "typical:Bunker"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Bunker",
+      "gridRef": "YS783739",
+      "friendlyForce": 11,
+      "enemyForce": 5,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 2,
+      "enemyWounded": 0,
+      "units": [
+        "1 Patrol, 3 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "3-sas-squadron"
+      ],
+      "report": "Ptl sighted a bunker and brush hut. The ptl advanced into the camp and saw 5 enemy seated round a cooking fire. The enemy saw the ptl and tried to withdraw. The ptl fired SA and M79 and M26 grenades. A sweep located two bodies and 1 springfield rifle. Ptl leader commented that moving through the jungle with 11 men was hard to accomplish, especially with Viet troops.",
+      "archivalSource": "AWM103 R723/1/1/3 SAS Contact Repts"
+    },
+    {
+      "id": 3926,
+      "url": "/battlemap?incident=3926",
+      "dtg": "1970-06-06T17:45:00",
+      "why": [
+        "typical:Security"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Security",
+      "gridRef": "YS630928",
+      "friendlyForce": 5,
+      "enemyForce": 3,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 3,
+      "enemyWounded": 0,
+      "units": [
+        "25 Patrol, 1 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "1-sas-squadron"
+      ],
+      "report": "YS629920 SAS PTL ENGAGED 3 EN FOL PTL. RES: 2 EN KIA (BC)1 EN KIA (POSS) MOVT OF MORE EN HEARD. OLD CAMP LOC AT YS625925AND YS627929.\n\nO",
+      "archivalSource": "Horner SAS pg354; AWM95 7-10-19.pdf 1 SAS pg128; AWM103 R723/1/1/3 SAS Contact Repts"
+    },
+    {
+      "id": 4635,
+      "url": "/battlemap?incident=4635",
+      "dtg": "1971-08-26T16:40:00",
+      "why": [
+        "last"
+      ],
+      "role": "led",
+      "ledBy": null,
+      "operation": "LRRP",
+      "task": "Patrol",
+      "gridRef": "YS356906",
+      "friendlyForce": 9,
+      "enemyForce": 5,
+      "friendlyKilled": 0,
+      "friendlyWounded": 0,
+      "enemyKilled": 1,
+      "enemyWounded": 0,
+      "units": [
+        "21 Patrol, 2 SAS Squadron, Special Air Service Regiment"
+      ],
+      "subUnits": [
+        "2-sas-squadron"
+      ],
+      "report": "YS356906: A SAS PTL ENG 3 EN MOV N. RES WERE 1 VC KIA (BC). CIAWAS 1 PACK, 1 AK47, 2 AK47 MAGS, APPROX 60 7.62MM SHORT RDS, 1 M26 GREN,QTY MISC EATING AND MILITARY EQPT AND A QTY OF DOCS. EN KIA WAS PROBNGUYEN PHOI, A PL LDR, C6, REAR SVCS STAFF, SR4.\n\nWhile the ptl had stopped to establish communications, the ptl 2IC heard movement coming from the creek line and spotted 3 VC following the ptl backtrail. He engaged the first enemy at 5-7m and sprayed the others in the same burst. 3 enemy were contacted and 1 killed. Enemy returned fire with AK47. At the same time the ptl heard movement on the left flank and suppressed the whole area and threw an M26. The ptl then moved forward using fire and movement. 1 AK47 captured.",
+      "archivalSource": "AWM95 7-11-19.pdf 2 SAS pg142; AWM103 R723/1/1/3 SAS Contact Rept; Intsum, AWM95 1/4/232.pdf p211"
+    }
+  ],
+  "subUnits": [
+    {
+      "id": 1244,
+      "slug": "1-sas-squadron",
+      "parent": null,
+      "title": "1 SAS Squadron",
+      "mapUrl": "/battlemap?units=1244",
+      "figures": {
+        "contacts": 139,
+        "led": 137,
+        "supported": 2,
+        "first": "1967-03-20",
+        "last": "1971-02-04",
+        "operations": 6,
+        "friendlyKilled": 0,
+        "friendlyWounded": 5,
+        "enemyKilled": 159,
+        "enemyWounded": 53,
+        "mineIncidents": 0
+      },
+      "activity": [
+        {
+          "name": "Patrol",
+          "count": 99,
+          "share": 0.72
+        },
+        {
+          "name": "Ambush",
+          "count": 28,
+          "share": 0.2
+        },
+        {
+          "name": "Security",
+          "count": 7,
+          "share": 0.05
+        },
+        {
+          "name": "Bunker",
+          "count": 2,
+          "share": 0.01
+        },
+        {
+          "name": "Not recorded",
+          "count": 1,
+          "share": 0.01
+        }
+      ],
+      "support": [
+        {
+          "kind": "In another unit\u0027s contact",
+          "contacts": 2,
+          "for": [
+            {
+              "unit": "3 Cav Regt",
+              "contacts": 1
+            },
+            {
+              "unit": "US Army",
+              "contacts": 1
+            }
+          ]
+        }
+      ],
+      "notable": [
+        489,
+        597,
+        774
+      ]
+    },
+    {
+      "id": 3026,
+      "slug": "2-sas-squadron",
+      "parent": null,
+      "title": "2 SAS Squadron",
+      "mapUrl": "/battlemap?units=3026",
+      "figures": {
+        "contacts": 100,
+        "led": 100,
+        "supported": 0,
+        "first": "1968-03-16",
+        "last": "1971-08-26",
+        "operations": 7,
+        "friendlyKilled": 0,
+        "friendlyWounded": 18,
+        "enemyKilled": 195,
+        "enemyWounded": 36,
+        "mineIncidents": 1
+      },
+      "activity": [
+        {
+          "name": "Patrol",
+          "count": 46,
+          "share": 0.46
+        },
+        {
+          "name": "Ambush",
+          "count": 43,
+          "share": 0.43
+        },
+        {
+          "name": "Security",
+          "count": 5,
+          "share": 0.05
+        },
+        {
+          "name": "Bunker",
+          "count": 3,
+          "share": 0.03
+        },
+        {
+          "name": "Air support",
+          "count": 2,
+          "share": 0.02
+        },
+        {
+          "name": "Artillery and mortar fire",
+          "count": 1,
+          "share": 0.01
+        }
+      ],
+      "support": [],
+      "notable": [
+        1090,
+        1385,
+        1605
+      ]
+    },
+    {
+      "id": 237,
+      "slug": "3-sas-squadron",
+      "parent": null,
+      "title": "3 SAS Squadron",
+      "mapUrl": "/battlemap?units=237",
+      "figures": {
+        "contacts": 130,
+        "led": 130,
+        "supported": 0,
+        "first": "1966-06-25",
+        "last": "1970-12-20",
+        "operations": 5,
+        "friendlyKilled": 2,
+        "friendlyWounded": 7,
+        "enemyKilled": 210,
+        "enemyWounded": 60,
+        "mineIncidents": 1
+      },
+      "activity": [
+        {
+          "name": "Patrol",
+          "count": 93,
+          "share": 0.72
+        },
+        {
+          "name": "Ambush",
+          "count": 29,
+          "share": 0.22
+        },
+        {
+          "name": "Security",
+          "count": 5,
+          "share": 0.04
+        },
+        {
+          "name": "Bunker",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Mine incident",
+          "count": 1,
+          "share": 0.01
+        },
+        {
+          "name": "Not recorded",
+          "count": 1,
+          "share": 0.01
+        }
+      ],
+      "support": [],
+      "notable": [
+        191,
+        206,
+        3357
+      ]
+    }
+  ],
+  "dead": [
+    {
+      "serviceNumber": "18490",
+      "name": "Geoffrey O\u0027shea",
+      "rank": "Signalman",
+      "died": "1967-10-01",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/18490.jpg"
+    },
+    {
+      "serviceNumber": "214230",
+      "name": "George Terence Baines",
+      "rank": "Sergeant",
+      "died": "1968-02-13",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/214230.jpg"
+    },
+    {
+      "serviceNumber": "5410968",
+      "name": "Ronald Arthur Harris",
+      "rank": "(Temporary) Corporal",
+      "died": "1969-01-17",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/5410968.jpg"
+    },
+    {
+      "serviceNumber": "2787344",
+      "name": "David John Fisher",
+      "rank": "Trooper",
+      "died": "1969-09-27",
+      "via": [
+        "tour",
+        "contact"
+      ],
+      "contacts": [
+        2966
+      ],
+      "subUnits": [
+        "3-sas-squadron"
+      ],
+      "portrait": "/media/portraits/2787344.jpg"
+    },
+    {
+      "serviceNumber": "55780",
+      "name": "Brian Richard Alan Jones",
+      "rank": "2nd Lieutenant",
+      "died": "1971-04-10",
+      "via": [
+        "tour"
+      ],
+      "contacts": [],
+      "subUnits": [],
+      "portrait": "/media/portraits/55780.jpg"
+    }
+  ],
+  "pictures": [
+    {
+      "id": 420,
+      "url": "/media/uploads/ef/efbe8bdee5153a578d9cfd6696e44e0463a02d2b691187fccb8ad85153061bad.jpg",
+      "thumbUrl": "/media/uploads/ef/efbe8bdee5153a578d9cfd6696e44e0463a02d2b691187fccb8ad85153061bad-480.jpg",
+      "caption": "Map of this area",
+      "credit": "Ern Marshall",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 4
+    },
+    {
+      "id": 426,
+      "url": "/media/uploads/8d/8d4d78b7ef920c3d398413161b5e7865588a2caee30466749097bb1d67fedd0c.jpg",
+      "thumbUrl": "/media/uploads/8d/8d4d78b7ef920c3d398413161b5e7865588a2caee30466749097bb1d67fedd0c-480.jpg",
+      "caption": "Sapper Ken Lowdon of Vic climbs onto his bulldozer to begin a shift during the land clearing team\\\u0027s Operation Lyrebird in Phuoc Tuy Province. Members of the 1st Field Squadron and the 17th Construction Squadron, Royal Australian Engineers (RAE), were involved in the operation to clear trails through 30 kilometres of thickly jungled foothills of the Nui Dinh, Nui Thi and Nui Thi Vai hills, a few kilometres west of the 1st Australian Task Force Base at Nui Dat, 1968.",
+      "credit": "Ern Marshall Bernie Weisz",
+      "dateTaken": null,
+      "contact": null,
+      "how": "near",
+      "nearbyContacts": 3
+    }
+  ],
+  "sources": {
+    "contacts": 6157,
+    "units": 590,
+    "rollPeople": 522,
+    "casualtyLinks": 213,
+    "pictures": 350,
+    "places": 113,
+    "portraits": 521
+  }
+}
