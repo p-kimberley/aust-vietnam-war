@@ -316,3 +316,26 @@ describe('Battle Map operation timeline', () => {
     expect(plotted(r.basemaps)).toEqual([1, 2, 3, 4]);
   });
 });
+
+describe('filtering by a value in the incident panel', () => {
+  type WithFilterBy = { filterByIncident(choice: { kind: 'operation' | 'task'; value: string } | { kind: 'unit'; value: number }): void };
+
+  it('replaces what was chosen of that kind, and keeps the other kinds of filter', async () => {
+    const r = await render({ contacts: CONTACTS, queryParams: { ops: 'Coburg', tasks: 'Patrol' } });
+    const battlemap = r.fixture.componentInstance as unknown as WithFilterBy;
+    expect(plotted(r.basemaps)).toEqual([]);                                     // Coburg's one incident was an ambush
+
+    battlemap.filterByIncident({ kind: 'operation', value: 'Hardihood, Phase 2' });
+    await settle(r.fixture);
+    expect(plotted(r.basemaps)).toEqual([1, 4]);                                 // Hardihood in place of Coburg, still patrols
+
+    battlemap.filterByIncident({ kind: 'unit', value: 3310 });
+    await settle(r.fixture);
+    expect(plotted(r.basemaps)).toEqual([1]);
+
+    battlemap.filterByIncident({ kind: 'task', value: 'Ambush' });
+    await settle(r.fixture);
+    expect(plotted(r.basemaps)).toEqual([]);                                     // unit 3310's incident was a patrol
+    expect(r.basemaps.fitTo).toHaveBeenCalled();                                 // the map zooms to what is left
+  });
+});

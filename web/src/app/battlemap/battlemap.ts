@@ -24,7 +24,7 @@ import { LeftTab, LeftTabs } from './left-tabs';
 import { MapLegend } from './map-legend';
 import { NominalRoll } from './nominal-roll';
 import { BasemapService, parseOverlayOpacities } from './basemap.service';
-import { IncidentPanel } from './incident-panel';
+import { IncidentFilter, IncidentPanel } from './incident-panel';
 import { Poi, PoiService } from './poi';
 import { POI_POINTS, addPoiLayers, setPoiVisibility } from './poi-layers';
 import { CommunityService, IncidentMediaView, PictureRef } from './community/community';
@@ -659,6 +659,21 @@ export class Battlemap {
     if (next) {
       this.openContact(next.id);
     }
+  }
+
+  /**
+   * A value in the incident panel was chosen (its operation, unit task or a friendly unit): the map shows only the incidents with
+   * it, in place of whatever was chosen of that kind; the other kinds of filter stay as they are. The map zooms to what is left.
+   */
+  protected filterByIncident(choice: IncidentFilter): void {
+    const current = this.contactFilter.filters();
+    const next: FilterState =
+      choice.kind === 'operation'
+        ? { ...current, operations: new Set([choice.value]) }
+        : choice.kind === 'task'
+          ? { ...current, tasks: new Set([choice.value]) }
+          : { ...current, units: new Set([choice.value]) };
+    this.setFilters(next);
   }
 
   /** Applies a change from the filter panel: redraws the map, starts a report search if the text changed, updates the URL. */

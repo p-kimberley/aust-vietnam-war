@@ -78,7 +78,7 @@
 
   @if (status() === 'ready' && selection.selectedId(); as id) {
     <div class="bm__incident">
-      <app-incident-panel [contactId]="id" [startTab]="selection.incidentTab()" [following]="followUnits.followed()" [trackInfo]="followInfo()" [followFull]="followUnits.full()" (follow)="toggleFollow($event)" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
+      <app-incident-panel [contactId]="id" [startTab]="selection.incidentTab()" [following]="followUnits.followed()" [trackInfo]="followInfo()" [followFull]="followUnits.full()" (follow)="toggleFollow($event)" (filterBy)="filterByIncident($event)" (closed)="select(null)" (openPerson)="openPerson($event)" (openPicture)="openPictureAt($event)" />
     </div>
   } @else if (status() === 'ready' && selection.selectedPerson(); as serviceNumber) {
     <div class="bm__incident">

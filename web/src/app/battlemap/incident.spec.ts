@@ -95,13 +95,34 @@ describe('IncidentPanel', () => {
     expect(el.textContent).toContain('Hardihood');
     expect(el.textContent).toContain('Patrol');
     expect(el.textContent).toContain('YS374671');
-    expect([...el.querySelectorAll('.incident__units li')].map((li) => li.textContent)).toEqual([
+    expect([...el.querySelectorAll('.incident__units .unit__name')].map((u) => u.textContent?.trim())).toEqual([
       '1 Pl, A Coy, 5 RAR',
       '2 Pl, A Coy, 5 RAR',
     ]);
     expect(el.querySelector('.incident__report')?.textContent).toContain('CONTACTED 5 EN');
     expect(el.querySelector('.incident__report .rm__text')!.classList).not.toContain('is-cut');   // it all fits, so nothing fades
     expect(el.querySelector('.incident__report .rm__toggle')).toBeNull();
+  });
+
+  it('filters the map by its operation, unit task or a friendly unit when one is chosen', async () => {
+    const { fixture, ctl, el } = render();
+    const chosen: unknown[] = [];
+    fixture.componentInstance.filterBy.subscribe((f) => chosen.push(f));
+    await tick(fixture);
+    ctl.expectOne('/api/contacts/2').flush(detail);
+    await settle(fixture);
+
+    const filters = [...el.querySelectorAll<HTMLButtonElement>('.incident__filter')];
+    expect(filters.map((b) => b.textContent?.trim())).toEqual(['Hardihood', 'Patrol', '1 Pl, A Coy, 5 RAR', '2 Pl, A Coy, 5 RAR']);
+    expect(filters.map((b) => b.title)).toEqual(['Filter by operation Hardihood', 'Filter by unit task Patrol', 'Filter by unit 1 Platoon, A Company, 5 Battalion, Royal Australian Regiment', 'Filter by unit 2 Platoon']);
+    filters.forEach((b) => b.click());
+
+    expect(chosen).toEqual([
+      { kind: 'operation', value: 'Hardihood' },
+      { kind: 'task', value: 'Patrol' },
+      { kind: 'unit', value: 3 },
+      { kind: 'unit', value: 4 },
+    ]);
   });
 
   it('lays the figures out as a table with friendly and enemy columns', async () => {

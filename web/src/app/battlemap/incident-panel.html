@@ -27,10 +27,16 @@
     } @else if (incident.value(); as d) {
       <h3 class="incident__when data">{{ formatDtg(d.dtg) }}</h3>
       @if (d.operation) {
-        <p class="incident__line"><strong>Operation</strong> {{ d.operation }}</p>
+        <p class="incident__line">
+          <strong>Operation</strong>
+          <button type="button" class="incident__filter" [attr.title]="'Filter by operation ' + d.operation" (click)="filterBy.emit({ kind: 'operation', value: d.operation })">{{ d.operation }}<app-icon name="filter" /></button>
+        </p>
       }
       @if (d.unitTask) {
-        <p class="incident__line"><strong>Unit task</strong> {{ d.unitTask }}</p>
+        <p class="incident__line">
+          <strong>Unit task</strong>
+          <button type="button" class="incident__filter" [attr.title]="'Filter by unit task ' + d.unitTask" (click)="filterBy.emit({ kind: 'task', value: d.unitTask })">{{ d.unitTask }}<app-icon name="filter" /></button>
+        </p>
       }
       @if (d.gridRef) {
         <p class="incident__line"><strong>Grid reference</strong> <span>{{ d.gridRef }}</span></p>
@@ -44,7 +50,7 @@
         <ul class="incident__units">
           @for (u of d.units; track u.id) {
             <li [attr.title]="u.longName">
-              <span class="unit__name">{{ u.shortName }}</span>
+              <button type="button" class="incident__filter unit__name" [attr.title]="'Filter by unit ' + u.longName" (click)="filterBy.emit({ kind: 'unit', value: u.id })">{{ u.shortName }}<app-icon name="filter" /></button>
               <button
                 type="button"
                 class="unit__follow"

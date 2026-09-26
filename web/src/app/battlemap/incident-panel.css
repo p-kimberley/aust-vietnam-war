@@ -91,6 +91,44 @@ h3.incident__when {
   margin: 0.15rem 0;
 }
 
+/*
+ * A value that filters the map by itself: it reads as the value, in the panel's own colour with a faint dotted underline, and a
+ * small yellow funnel after it; under the pointer the underline and the funnel come up.
+ */
+.incident__filter {
+  display: inline;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  text-decoration: underline dotted color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 0.2em;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.incident__filter app-icon {
+  width: 0.85em;
+  height: 0.85em;
+  margin-inline: 0.5em 0;
+  color: var(--smoke-yellow);
+  opacity: 0.7;
+}
+
+.incident__filter:hover {
+  text-decoration-color: currentColor;
+}
+
+.incident__filter:hover app-icon {
+  opacity: 1;
+}
+
+.incident__filter:focus-visible {
+  outline: 2px solid var(--smoke-yellow);
+  outline-offset: 2px;
+}
+
 .incident__line strong {
   display: inline-block;
   min-width: 7.5rem;

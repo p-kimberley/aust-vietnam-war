@@ -10,6 +10,9 @@ import { Icon } from './icon';
 import { PanelInfo } from './panel-info';
 import { ReadMore } from './read-more';
 
+/** A value in the incident's details to filter the map by: its operation or unit task (by name), or one of its units (by id). */
+export type IncidentFilter = { kind: 'operation'; value: string } | { kind: 'task'; value: string } | { kind: 'unit'; value: number };
+
 /** What each section of an incident's details is, for its info button. */
 export const INCIDENT_SECTION_INFO = {
   units: 'The Australian and allied units recorded as taking part. Follow a unit to draw its path from incident to incident on the map.',
@@ -50,6 +53,8 @@ export class IncidentPanel {
   readonly followFull = input(false);
   /** Follows a unit, or stops following it. */
   readonly follow = output<number>();
+  /** One of the incident's operation, unit task or friendly units was chosen: show only incidents with it, in place of whatever else is chosen of that kind. */
+  readonly filterBy = output<IncidentFilter>();
 
   private readonly contacts = inject(ContactsService);
   private readonly heading = viewChild<ElementRef<HTMLElement>>('heading');
