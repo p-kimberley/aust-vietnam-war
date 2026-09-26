@@ -1130,6 +1130,16 @@ public class HonourRollRowsTests
     [InlineData("(Acting) Lance-Corporal", "Lance-Corporal")]
     [InlineData("Temporary", "Temporary")]
     public void Sorts_a_rank_without_its_temporary_or_acting(string rank, string expected) => Assert.Equal(expected, HonourRollRows.RankSortKey(rank));
+
+    [Theory]
+    [InlineData(" COLLIE ", "COLLIE")]
+    [InlineData("NULL", null)]
+    [InlineData("null", null)]
+    [InlineData("Not Specified", null)]
+    [InlineData("UNKNOWN", null)]
+    [InlineData("  ", null)]
+    [InlineData(null, null)]
+    public void Reads_a_stand_in_for_no_birthplace_as_none(string? value, string? expected) => Assert.Equal(expected, HonourRollRows.Place(value));
 }
 
 public class EmailNotifierTests

@@ -127,9 +127,9 @@ public static class HonourRollRows
             Service = ServiceOf(rank, corps),
             BirthDate = TryParseDate(s.Birth?.Date),
             DeathDate = death,
-            BirthPlace = Cap(Clean(s.Birth?.Place), 150),
-            BirthState = Cap(Clean(s.Birth?.State), 100),
-            BirthCountry = Cap(Clean(s.Birth?.Country), 100),
+            BirthPlace = Cap(Place(s.Birth?.Place), 150),
+            BirthState = Cap(Place(s.Birth?.State), 100),
+            BirthCountry = Cap(Place(s.Birth?.Country), 100),
             NationalService = s.NationalService,
             Tours = JsonSerializer.Serialize(tours),
             SearchText = Cap(" " + string.Join(' ', Words($"{given} {family} {number}")) + " ", 500)!,
@@ -154,6 +154,16 @@ public static class HonourRollRows
     private static string Tidy(string name) => name.Any(char.IsLower) ? name : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(name.ToLowerInvariant());
 
     private static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    /// <summary>
+    /// A part of a birthplace, or null where the legacy roll has none: it is blank, or holds a stand-in for nothing (<c>NULL</c>,
+    /// <c>Not Specified</c>, <c>Unknown</c>) that would otherwise be shown as if it were a place.
+    /// </summary>
+    public static string? Place(string? value) =>
+        Clean(value) is { } v && !v.Equals("NULL", StringComparison.OrdinalIgnoreCase) && !v.Equals("Not Specified", StringComparison.OrdinalIgnoreCase)
+        && !v.Equals("Unknown", StringComparison.OrdinalIgnoreCase)
+            ? v
+            : null;
 
     private static string? Cap(string? value, int length) => value is { } v && v.Length > length ? v[..length] : value;
 }

@@ -113,7 +113,7 @@ public sealed class HonourRollStore(AvwDbContext db, IOptions<MediaOptions> medi
         var summary = ToSummary(row);
         return new HonourPerson(
             summary.ServiceNumber, summary.Name, summary.Rank, summary.Branch, summary.Birth, summary.Death, summary.AgeAtDeath, summary.PortraitUrl,
-            row.BirthPlace, row.BirthState, row.BirthCountry, row.NationalService, Tours(row.Tours), [], 0);
+            HonourRollRows.Place(row.BirthPlace), HonourRollRows.Place(row.BirthState), HonourRollRows.Place(row.BirthCountry), row.NationalService, Tours(row.Tours), [], 0);
     }
 
     public async Task<IReadOnlyList<HonourSummary>> GetManyAsync(IReadOnlyCollection<string> serviceNumbers, CancellationToken ct)

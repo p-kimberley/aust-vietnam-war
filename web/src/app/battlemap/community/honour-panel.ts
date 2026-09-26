@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, 
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, HonourPerson, TributeView } from './community';
+import { Icon } from '../icon';
 import { LoadMore } from '../load-more';
 
 /**
@@ -16,7 +17,7 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
 /** A person on the honour roll: who they were, where they served, the incidents they are linked to, and the poppies left for them. */
 @Component({
   selector: 'app-honour-panel',
-  imports: [DatePipe, LoadMore],
+  imports: [DatePipe, Icon, LoadMore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './community.css',
   styles: `
@@ -73,20 +74,34 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
       border: 1px solid var(--olive-500);
       border-radius: var(--radius);
     }
+    /* The arrow out of the box after the words says the link leaves the site. */
+    .awm app-icon {
+      width: 0.9em;
+      height: 0.9em;
+      margin-inline: 0.3em 0;
+      vertical-align: -0.1em;
+    }
     .awm {
       margin: 0.6rem 0 0;
     }
+    /* Each field's name above its value, so a value has the panel's width (less the portrait's) and is not squeezed into a column. */
     dl {
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      gap: 0.15rem 0.75rem;
       margin: 0.5rem 0;
     }
+    /* A small heading, a step below the sections' headings. */
     dt {
+      margin-top: 0.55rem;
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       color: var(--khaki);
     }
+    dt:first-child {
+      margin-top: 0;
+    }
     dd {
-      margin: 0;
+      margin: 0.05rem 0 0;
     }
     ul.tours,
     ul.incidents {
@@ -136,7 +151,7 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
             }
           </dl>
           <p class="awm">
-            <a [href]="awmUrl(p.serviceNumber)" target="_blank" rel="noopener">Australian War Memorial Roll of Honour</a>
+            <a [href]="awmUrl(p.serviceNumber)" target="_blank" rel="noopener">Australian War Memorial Roll of Honour<app-icon name="external" /><span class="visually-hidden"> (opens in a new tab)</span></a>
           </p>
 
           @if (p.tours.length) {
