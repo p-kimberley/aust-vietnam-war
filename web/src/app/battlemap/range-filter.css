@@ -32,7 +32,7 @@ input {
   box-sizing: border-box;
   padding: 0.25rem;
   font: inherit;
-  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--rule);

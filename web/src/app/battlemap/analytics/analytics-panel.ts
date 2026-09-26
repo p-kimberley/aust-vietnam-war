@@ -61,7 +61,7 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
 
       @if (info(); as i) {
         <p class="ap__about">{{ i.description }}</p>
-        <p class="ap__scope data">
+        <p class="ap__scope">
           @if (!i.usesFilter) {
             {{ result()?.rows | number }} people on the nominal roll, with the dates this chart needs. The map's filters do not change it.
           } @else if (filtered()) {
@@ -82,10 +82,10 @@ const GROUPS: ChartGroup[] = ['Casualties', 'Frequency', 'Weapons', 'Personnel']
             <app-echart [option]="option()!" [selectable]="canPickDates()" (selected)="pickDates($event)" />
           }
         } @else {
-          <p class="data">Loading…</p>
+          <p>Loading…</p>
         }
         @if (loading() && result()) {
-          <span class="ap__busy data">Updating…</span>
+          <span class="ap__busy">Updating…</span>
         }
       </div>
 

@@ -219,7 +219,7 @@ describe('PictureViewer', () => {
   it('shows the first lines of a long description, with Read more for the rest, and no button for a short one', async () => {
     const { fixture, el } = viewer();
     await settle(fixture);
-    expect(el.querySelector('button.more')).toBeNull();                              // it all fits
+    expect(el.querySelector('.description .rm__toggle')).toBeNull();                              // it all fits
 
     // As a browser lays out a description longer than five lines.
     const height = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(400);
@@ -228,7 +228,7 @@ describe('PictureViewer', () => {
       fixture.componentRef.setInput('pictureId', 2);
       await settle(fixture);
       const description = el.querySelector('.description')!;
-      const more = el.querySelector<HTMLButtonElement>('button.more')!;
+      const more = el.querySelector<HTMLButtonElement>('.description .rm__toggle')!;
       expect(description.classList).toContain('is-clamped');
       expect([text(more), more.getAttribute('aria-expanded')]).toEqual(['Read more', 'false']);
 

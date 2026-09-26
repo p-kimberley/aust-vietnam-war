@@ -12,7 +12,7 @@
 
 .summary__count {
   margin: 0;
-  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
   font-size: 0.85rem;
 }
 

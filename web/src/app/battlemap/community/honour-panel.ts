@@ -120,7 +120,7 @@ export function awmRollOfHonourUrl(serviceNumber: string): string {
             <img class="portrait" [src]="p.portraitUrl" [alt]="'Portrait of ' + p.name" />
           }
           <dl>
-            <dt>Service number</dt><dd class="data">{{ p.serviceNumber }}</dd>
+            <dt>Service number</dt><dd>{{ p.serviceNumber }}</dd>
             @if (p.rank) { <dt>Rank</dt><dd>{{ p.rank }}</dd> }
             @if (p.branch) { <dt>Corps</dt><dd>{{ p.branch }}</dd> }
             @if (p.birth) {

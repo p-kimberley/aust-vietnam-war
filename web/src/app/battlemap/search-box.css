@@ -220,7 +220,7 @@
 }
 
 .search__snippet {
-  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
   font-size: 0.78rem;
   line-height: 1.35;
 }

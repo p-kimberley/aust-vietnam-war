@@ -14,7 +14,7 @@
       <h3 class="poi__name">{{ p.name }}</h3>
       <p class="poi__line"><strong>Type</strong> {{ typeName(p.type) }}</p>
       @if (p.established) {
-        <p class="poi__line"><strong>Established</strong> <span class="data">{{ p.established }}</span></p>
+        <p class="poi__line"><strong>Established</strong> <span>{{ p.established }}</span></p>
       }
       <h3>History</h3>
       <p class="poi__history">{{ p.details || 'No history is recorded.' }}</p>

@@ -63,7 +63,7 @@ type Mode = 'browse' | 'add';
           <button type="button" class="button primary add-button" (click)="setMode('add')"><app-icon name="upload" />Upload</button>
         </div>
         <div class="bar">
-          <p class="count data" role="status" aria-live="polite">{{ summary() }}</p>
+          <p class="count" role="status" aria-live="polite">{{ summary() }}</p>
           <label class="sort">
             <span class="sort__label">Sort</span>
             <select (change)="setSort($any($event.target).value)">
@@ -136,7 +136,7 @@ type Mode = 'browse' | 'add';
                   </button>
                   <p class="hint">
                     @if (placement.place(); as at) {
-                      Placed at <span class="data">{{ at.lat.toFixed(5) }}, {{ at.lon.toFixed(5) }}</span>. Drag the pin on the map to move it.
+                      Placed at <span>{{ at.lat.toFixed(5) }}, {{ at.lon.toFixed(5) }}</span>. Drag the pin on the map to move it.
                     } @else {
                       Drag the pin onto the map where the image was taken, or press it to put it in the middle of the map.
                     }
@@ -176,11 +176,11 @@ type Mode = 'browse' | 'add';
           }
           @if (t.hit.dateTaken) {
             <dt>Taken</dt>
-            <dd class="data">{{ t.hit.dateTaken | date: 'd MMM y' }}</dd>
+            <dd>{{ t.hit.dateTaken | date: 'd MMM y' }}</dd>
           }
           @if (t.hit.contactId !== null) {
             <dt>Incident</dt>
-            <dd class="data">{{ t.hit.contactId }}</dd>
+            <dd>{{ t.hit.contactId }}</dd>
           }
         </dl>
       </div>

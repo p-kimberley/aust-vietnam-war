@@ -22,7 +22,7 @@
         <button type="button" #nextButton class="stage__step stage__step--next" aria-label="Next photo" title="Next (Right arrow)" [disabled]="!next()" (click)="step(next())">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 4 8 8-8 8" /></svg>
         </button>
-        <p class="stage__count data" aria-live="polite">{{ position() + 1 }} of {{ siblings().length }}</p>
+        <p class="stage__count" aria-live="polite">{{ position() + 1 }} of {{ siblings().length }}</p>
       }
       @if (fullscreen()) {
         <button type="button" class="stage__button stage__exit" aria-label="Exit full screen" (click)="closeFullscreen()">
@@ -30,7 +30,7 @@
         </button>
         @if (onStage(); as p) {
           @if (p.caption || p.credit) {
-            <p class="stage__caption">{{ p.caption }}@if (p.credit) { <span class="data"> · {{ p.credit }}</span> }</p>
+            <p class="stage__caption">{{ p.caption }}@if (p.credit) { <span> · {{ p.credit }}</span> }</p>
           }
         }
       } @else {
@@ -58,12 +58,7 @@
           }
           <!-- The description as it was written (not in capitals), its first five lines until the reader asks for the rest. -->
           @if (p.caption) {
-            <p #description id="viewer-description" class="description" [class.is-clamped]="!expanded()">{{ p.caption }}</p>
-            @if (clamped() || expanded()) {
-              <button type="button" class="more" aria-controls="viewer-description" [attr.aria-expanded]="expanded()" (click)="expanded.set(!expanded())">
-                {{ expanded() ? 'Read less' : 'Read more' }}
-              </button>
-            }
+            <app-read-more class="description" textId="viewer-description" [lines]="5" [text]="p.caption" />
           }
           <dl class="meta">
             @if (p.credit) {
@@ -72,26 +67,26 @@
             }
             @if (p.dateTaken) {
               <dt>Taken</dt>
-              <dd class="data">{{ p.dateTaken | date: 'd MMM y' }}</dd>
+              <dd>{{ p.dateTaken | date: 'd MMM y' }}</dd>
             }
             @if (p.addedBy) {
               <dt>Added by</dt>
               <dd>{{ p.addedBy }}</dd>
             }
             <dt>Added</dt>
-            <dd class="data">{{ p.addedUtc | date: 'd MMM y' }}</dd>
+            <dd>{{ p.addedUtc | date: 'd MMM y' }}</dd>
             @if (p.lat !== null && p.lon !== null) {
               <dt>Location</dt>
-              <dd class="data">{{ p.lat.toFixed(5) }}, {{ p.lon.toFixed(5) }}</dd>
+              <dd>{{ p.lat.toFixed(5) }}, {{ p.lon.toFixed(5) }}</dd>
             }
             <dt>Image</dt>
-            <dd class="data">{{ p.width }} × {{ p.height }} px · {{ formatBytes(p.byteSize) }} · {{ formatType(p.contentType) }}</dd>
+            <dd>{{ p.width }} × {{ p.height }} px · {{ formatBytes(p.byteSize) }} · {{ formatType(p.contentType) }}</dd>
             @if (p.contactId !== null) {
               <dt>Incident</dt>
-              <dd class="data">{{ p.contactId }}</dd>
+              <dd>{{ p.contactId }}</dd>
             }
             <dt>Likes</dt>
-            <dd class="data">{{ likes(p) }}</dd>
+            <dd>{{ likes(p) }}</dd>
           </dl>
 
           @if (message()) {

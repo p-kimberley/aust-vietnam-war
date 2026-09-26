@@ -23,6 +23,8 @@ import { Icon } from '../icon';
 
 const HOUR = 3600 * 1000;
 const DAY = 24 * HOUR;
+/** The site's data font (--font-data), for the chart's tooltip, which does not read the page's styles. */
+const DATA_FONT = "'Courier Prime', 'Courier New', monospace";
 
 /** The margins round the bars inside the chart's box, in pixels. A drag across the bars is measured against them. */
 export const CHART_GRID = { left: 8, right: 12, top: 6, bottom: 62 } as const;
@@ -238,7 +240,7 @@ export function timelineOption(buckets: readonly MonthBucket[], range: DateRange
       axisPointer: { type: 'shadow' },
       backgroundColor: 'rgba(31, 35, 20, 0.95)',
       borderColor: theme.grid,
-      textStyle: { color: theme.text },
+      textStyle: { color: theme.text, fontFamily: DATA_FONT },
     },
     xAxis: {
       type: 'time',
@@ -565,7 +567,7 @@ let nextTimelineId = 0;
               </div>
             }
           </div>
-          <span class="tl__range data" aria-live="polite">{{ label() }}</span>
+          <span class="tl__range" aria-live="polite">@if (ends(); as e) {<span class="tl__date">{{ e.from }}</span> to <span class="tl__date">{{ e.to }}</span>} @else {The whole war}</span>
           @if (range().from || range().to) {
             <button type="button" class="tl__reset" (click)="reset()"><app-icon name="zoom-out" />Reset zoom</button>
           } @else {
@@ -582,7 +584,7 @@ let nextTimelineId = 0;
           <app-echart [option]="option()" (zoomed)="zoomed($event)" />
           <!-- The dates at the slider's handles, following them as they move. -->
           @for (h of handles(); track h.side) {
-            <span class="tl__handle data" [class.tl__handle--start]="h.side === 'start'" [class.tl__handle--end]="h.side === 'end'" [class.is-inside]="h.inside" [style.left]="h.left" aria-hidden="true">{{ h.text }}</span>
+            <span class="tl__handle" [class.tl__handle--start]="h.side === 'start'" [class.tl__handle--end]="h.side === 'end'" [class.is-inside]="h.inside" [style.left]="h.left" aria-hidden="true">{{ h.text }}</span>
           }
           @if (dragBox(); as box) {
             <div class="tl__drag" [style.left.px]="box.left" [style.width.px]="box.width"></div>
@@ -678,7 +680,7 @@ let nextTimelineId = 0;
       height: 1.5rem;
       padding: 0 0.75rem;
       color: var(--khaki);
-      font-family: var(--font-data);
+      font-variant-numeric: tabular-nums;
       font-size: 0.75rem;
       background: rgb(31 35 20);
       border-bottom: 1px solid var(--olive-700);
@@ -701,6 +703,7 @@ let nextTimelineId = 0;
     /* The date of the incident that is open, flagged on the axis; the line itself runs the full height of the timeline (see .tl__marker). */
     .axis__marker {
       position: absolute;
+      font-family: var(--font-data);
       z-index: 1;
       top: 0;
       bottom: 0;
@@ -895,11 +898,15 @@ let nextTimelineId = 0;
     .tl__tick.is-on {
       visibility: visible;
     }
-    /* Two dates of ten characters and " to " fit the column on one line, so a date is never broken in the middle. */
+    /* Centred under Play. Two dates and " to " fit the column on one line; should they not, the second goes under the first, never broken. */
     .tl__range {
-      font-size: 0.74rem;
-      white-space: nowrap;
+      font-family: var(--font-data);
+      font-size: 0.75rem;
+      text-align: center;
       color: var(--khaki);
+    }
+    .tl__date {
+      white-space: nowrap;
     }
     .tl__hint {
       color: var(--khaki);
@@ -919,6 +926,7 @@ let nextTimelineId = 0;
       height: 36px;
       line-height: 36px;
       padding-inline: 6px;
+      font-family: var(--font-data);
       font-size: 0.75rem;
       color: var(--paper);
       white-space: nowrap;
@@ -1085,9 +1093,10 @@ export class Timeline implements OnDestroy {
     const axis = this.axis();
     return moving && axis ? zoomToRange(moving, axis.min, axis.max) : { from: this.from(), to: this.to() };
   });
-  protected readonly label = computed(() => {
+  /** The ends of the dates shown, or null for the whole war. */
+  protected readonly ends = computed(() => {
     const { from, to } = this.range();
-    return from || to ? `${from ?? 'the start'} to ${to ?? 'the end'}` : 'The whole war';
+    return from || to ? { from: from ?? 'the start', to: to ?? 'the end' } : null;
   });
   /** The dates beside the slider's handles, where a side is set (an open side sits at the end of the timeline, and needs none). */
   protected readonly handles = computed(() => {

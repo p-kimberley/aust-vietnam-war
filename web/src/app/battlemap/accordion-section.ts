@@ -82,7 +82,7 @@ let nextId = 0;
       min-width: 1.2rem;
       padding: 0 0.3rem;
       color: var(--ink);
-      font-family: var(--font-data);
+      font-variant-numeric: tabular-nums;
       font-size: 0.72rem;
       text-align: center;
       background: var(--brass);

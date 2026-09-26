@@ -181,17 +181,19 @@ describe('IncidentPanel', () => {
     expect(el.querySelector('.incident__section [role=note]')?.textContent).toContain('written by an AI model');
   });
 
-  it('shows the first lines of a long report, with Read more for the rest', async () => {
+  it('shows the first lines of a long summary and report, each with Read more for the rest', async () => {
     const height = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(600);
     const shown = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(200);
     try {
       const { fixture, ctl, el } = render();
       await tick(fixture);
-      ctl.expectOne('/api/contacts/2').flush(detail);
+      ctl.expectOne('/api/contacts/2').flush({ ...detail, summary: 'A long summary.' });
       await settle(fixture);
 
+      const toggles = [...el.querySelectorAll('.rm__toggle')].map((b) => b.closest('app-read-more')!.className);
+      expect(toggles).toEqual([expect.stringContaining('incident__summary'), expect.stringContaining('incident__report')]);
       const report = el.querySelector('.incident__report')!;
-      const more = el.querySelector<HTMLButtonElement>('.incident__more')!;
+      const more = el.querySelector<HTMLButtonElement>('.incident__report .rm__toggle')!;
       expect(report.classList).toContain('is-clamped');
       expect([more.textContent?.trim(), more.getAttribute('aria-expanded')]).toEqual(['Read more', 'false']);
 

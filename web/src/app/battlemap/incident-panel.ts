@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, afterRenderEffect, effect, inject, input, output, resource, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, output, resource, signal, viewChild } from '@angular/core';
 import { NotesTab } from './community/notes-tab';
 import { PeopleTab } from './community/people-tab';
 import { PictureRef } from './community/community';
@@ -8,6 +8,7 @@ import { formatDtg } from './contacts';
 import { FollowInfo } from './track';
 import { Icon } from './icon';
 import { PanelInfo } from './panel-info';
+import { ReadMore } from './read-more';
 
 /** What each section of an incident's details is, for its info button. */
 export const INCIDENT_SECTION_INFO = {
@@ -27,7 +28,7 @@ export const INCIDENT_SECTION_INFO = {
  */
 @Component({
   selector: 'app-incident-panel',
-  imports: [NotesTab, PicturesTab, PeopleTab, Icon, PanelInfo],
+  imports: [NotesTab, PicturesTab, PeopleTab, Icon, PanelInfo, ReadMore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './incident-panel.html',
   styleUrl: './incident-panel.css',
@@ -63,19 +64,8 @@ export class IncidentPanel {
   protected readonly picturesCount = signal<number | null>(null);
   protected readonly peopleCount = signal<number | null>(null);
   protected readonly info = INCIDENT_SECTION_INFO;
-  /** The whole report is showing, not only its first lines. */
-  protected readonly reportExpanded = signal(false);
-  /** The report is longer than its first lines, so there is more to read. */
-  protected readonly reportClamped = signal(false);
-  private readonly report = viewChild<ElementRef<HTMLElement>>('report');
 
   constructor() {
-    // Whether the report runs past its first lines is seen once it is on the page.
-    afterRenderEffect(() => {
-      const el = this.report()?.nativeElement;
-      this.incident.value();
-      if (el && !this.reportExpanded()) this.reportClamped.set(el.scrollHeight > el.clientHeight + 1);
-    });
     // Move focus into the panel when an incident opens, so keyboard and screen-reader users land on it.
     effect(() => {
       this.contactId();
@@ -85,7 +75,6 @@ export class IncidentPanel {
       this.notesCount.set(null);
       this.picturesCount.set(null);
       this.peopleCount.set(null);
-      this.reportExpanded.set(false);
     });
   }
 }

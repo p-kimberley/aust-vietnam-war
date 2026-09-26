@@ -33,7 +33,7 @@
         <p class="incident__line"><strong>Unit task</strong> {{ d.unitTask }}</p>
       }
       @if (d.gridRef) {
-        <p class="incident__line"><strong>Grid reference</strong> <span class="data">{{ d.gridRef }}</span></p>
+        <p class="incident__line"><strong>Grid reference</strong> <span>{{ d.gridRef }}</span></p>
       }
 
       <div class="incident__section">
@@ -107,7 +107,7 @@
           <h3>Incident summary</h3>
           <app-panel-info subject="the incident summary" [text]="info.summary" />
         </div>
-        <p class="incident__summary">{{ d.summary }}</p>
+        <app-read-more class="incident__summary" [lines]="10" [text]="d.summary" />
       }
 
       <div class="incident__section">
@@ -115,12 +115,7 @@
         <app-panel-info subject="the original incident report" [text]="info.report" />
       </div>
       <!-- The report's first ten lines or so, until the reader asks for the rest. -->
-      <p #report id="incident-report" class="incident__report" [class.is-clamped]="!reportExpanded()">{{ d.description || 'No report is recorded.' }}</p>
-      @if (reportClamped() || reportExpanded()) {
-        <button type="button" class="incident__more" aria-controls="incident-report" [attr.aria-expanded]="reportExpanded()" (click)="reportExpanded.set(!reportExpanded())">
-          {{ reportExpanded() ? 'Read less' : 'Read more' }}<app-icon [name]="reportExpanded() ? 'chevron-up' : 'chevron-down'" />
-        </button>
-      }
+      <app-read-more class="incident__report" [lines]="10" [text]="d.description || 'No report is recorded.'" />
 
       @if (d.archivalSource) {
         <div class="incident__section">

@@ -24,7 +24,7 @@
 }
 
 .bm .marker-tip__when {
-  font-family: var(--font-data);
+  font-family: var(--font-body);
   color: var(--smoke-yellow);
 }
 
@@ -94,7 +94,7 @@
   /* The library sizes the box to the distance it stands for, so the words keep its own small size and padding to fit. */
   padding: 0 5px;
   color: var(--khaki);
-  font-family: var(--font-data);
+  font-family: var(--font-body);
   font-size: 10px;
   background: color-mix(in srgb, var(--olive-900) 88%, transparent);
   border: 1px solid var(--khaki);

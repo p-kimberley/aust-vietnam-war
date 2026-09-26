@@ -78,7 +78,7 @@ ul {
 .node__count {
   flex: none;
   color: var(--khaki);
-  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
 }
 

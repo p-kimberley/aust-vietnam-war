@@ -24,7 +24,7 @@ import { FollowRow } from './track';
               <li>
                 <span class="follow__swatch" [style.background]="row.colour" aria-hidden="true"></span>
                 <span class="follow__label" [attr.title]="row.fullName">{{ row.label }}</span>
-                <span class="follow__pager data" role="group" [attr.aria-label]="'Step through the incidents of ' + row.label">
+                <span class="follow__pager" role="group" [attr.aria-label]="'Step through the incidents of ' + row.label">
                   <button type="button" aria-label="Previous incident" title="Previous incident" (click)="step.emit({ unit: row.unit, direction: -1 })">‹</button>
                   <span>{{ row.at ?? '–' }}/{{ row.total }}</span>
                   <button type="button" aria-label="Next incident" title="Next incident" (click)="step.emit({ unit: row.unit, direction: 1 })">›</button>

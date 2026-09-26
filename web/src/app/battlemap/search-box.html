@@ -104,7 +104,7 @@
                   }
                 </span>
               } @else {
-                <span class="search__kind data">{{ formatDtg(option.hit.dtg) }}</span>
+                <span class="search__kind">{{ formatDtg(option.hit.dtg) }}</span>
                 <span class="search__snippet">
                   @for (part of option.hit.snippet; track $index) {
                     @if (part.match) {

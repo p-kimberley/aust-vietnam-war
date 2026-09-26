@@ -81,7 +81,7 @@ interface FilterList {
           }
         </div>
 
-        <p class="count data" role="status" aria-live="polite">
+        <p class="count" role="status" aria-live="polite">
           {{ summary() }}
           @if (restricted()) {
             <button type="button" class="clear" (click)="clearFilters()"><app-icon name="x" />Clear filters</button>
@@ -107,14 +107,14 @@ interface FilterList {
                 }
                 <span class="person__text">
                   <span class="person__name">{{ person.sortName || person.name }}</span>
-                  <span class="person__meta data">{{ meta(person) }}</span>
+                  <span class="person__meta">{{ meta(person) }}</span>
                 </span>
               </button>
             </li>
           }
           <!-- Inside the list, because the list is what scrolls: it comes into view only as the reader nears the end. -->
           @if (people().length < total() && status() !== 'error') {
-            <li class="loading-more data" role="presentation" appLoadMore [busy]="status() === 'loading'" (appLoadMore)="showMore()">
+            <li class="loading-more" role="presentation" appLoadMore [busy]="status() === 'loading'" (appLoadMore)="showMore()">
               <span role="status">{{ status() === 'loading' ? 'Loading more…' : '' }}</span>
             </li>
           }

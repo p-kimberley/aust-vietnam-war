@@ -270,7 +270,7 @@ const POI_ORDER = ['FSB', 'FSPB', 'LZ', 'Base'];
       flex: 0 0 100%;
       justify-content: space-between;
       color: var(--khaki);
-      font-family: var(--font-data);
+      font-variant-numeric: tabular-nums;
       font-size: 0.7rem;
     }
     @media (prefers-reduced-motion: reduce) {

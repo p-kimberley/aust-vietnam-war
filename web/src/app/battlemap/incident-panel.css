@@ -212,32 +212,6 @@ h3.incident__when {
   line-height: 1.45;
 }
 
-/* The report's first ten lines. */
-.incident__report.is-clamped {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 10;
-  overflow: hidden;
-}
-
-/* Centred under the report, its arrow after the words. */
-.incident__more {
-  display: flex;
-  align-items: center;
-  margin: 0.35rem auto 0;
-  padding: 0;
-  font: inherit;
-  color: var(--smoke-yellow);
-  text-decoration: underline;
-  background: none;
-  border: 0;
-  cursor: pointer;
-}
-
-.incident__more app-icon {
-  margin-inline: 0.25em 0;
-}
-
 a {
   color: var(--smoke-yellow);
 }
