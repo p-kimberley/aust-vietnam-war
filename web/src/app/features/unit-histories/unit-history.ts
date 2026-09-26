@@ -28,7 +28,7 @@ import { UnitToc } from './unit-toc';
         <div><dt>Enemy killed</dt><dd class="data">{{ h.enemyKilled }}</dd></div>
       </dl>
       <p class="uh-actions">
-        <a class="btn" [routerLink]="'/battlemap'" [queryParams]="{ units: h.id }">View on the Battle Map</a>
+        <a class="btn" [routerLink]="'/battlemap'" [queryParams]="{ units: h.id, photos: '0' }">View on the Battle Map</a>
         @if (h.record) {
           <a class="btn btn--quiet" [href]="h.record" rel="noopener" target="_blank">Australian War Memorial record</a>
         }

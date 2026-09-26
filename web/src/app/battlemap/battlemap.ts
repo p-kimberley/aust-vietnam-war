@@ -61,6 +61,7 @@ import {
   setMarkerColours,
   setMarkerSizing,
   pulseSelection,
+  raiseSelection,
   setSelectionColour,
 } from './contact-layers';
 import { SELECTION_YELLOW, selectionColour } from './selection-colour';
@@ -857,6 +858,8 @@ export class Battlemap {
             this.spider ??= new PhotoSpider(map);
             this.spider.addLayers();
             this.spider.setSelected(this.selection.selectedPictureId());
+            // The open incident's ring over all of them.
+            raiseSelection(map);
             if (firstStyle) {
               firstStyle = false;
               // Registered in this order so that, where a contact sits on a base, the contact (drawn on top) wins. A picture is drawn

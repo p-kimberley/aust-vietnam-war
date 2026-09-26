@@ -1,4 +1,5 @@
 import { ResolveFn } from '@angular/router';
+import { featureMapLink } from '../map-link';
 
 // The War Timeline's content (content/features/war-timeline/: facts.json from `Avw.Features war-timeline facts`, and the
 // narratives in narratives/, written to STYLE.md there), and how the page lays it out. See docs/war-timeline-plan.md.
@@ -238,10 +239,13 @@ export function daySpan(from: string, to: string): string {
   return `${dayName(from, false)} – ${dayName(to)}`;
 }
 
-/** A Battle Map link narrowed to a unit too, where one is chosen (its exact filter), keeping the link's own filters. */
+/**
+ * A Battle Map link narrowed to a unit too, where one is chosen (its exact filter), keeping the link's own filters, and opening
+ * without the community photos (see featureMapLink).
+ */
 export function withUnit(url: string, unit: TimelineUnit | null): string {
-  if (!unit) return url;
-  return `${url}${url.includes('?') ? '&' : '?'}units=${encodeURIComponent(unit.mapUnits)}`;
+  const narrowed = unit ? `${url}${url.includes('?') ? '&' : '?'}units=${encodeURIComponent(unit.mapUnits)}` : url;
+  return featureMapLink(narrowed);
 }
 
 // ---------------------------------------------------------------- an operation, characterised

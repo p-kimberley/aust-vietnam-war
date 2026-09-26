@@ -129,7 +129,7 @@ describe('UnitHistories', () => {
     expect(el.querySelector('h1')?.textContent).toBe('5th Battalion, Royal Australian Regiment');
     expect(el.querySelector('#b-company')?.classList).toContain('is-current');
     expect(el.querySelector('.list a[aria-current=page]')?.textContent).toContain('B Company');
-    expect(el.querySelector('a.btn')?.getAttribute('href')).toBe('/battlemap?units=1');
+    expect(el.querySelector('a.btn')?.getAttribute('href')).toBe('/battlemap?units=1&photos=0');   // without the community photos
     const toc = [...el.querySelectorAll<HTMLAnchorElement>('app-unit-toc a')];
     expect(toc.map((a) => a.textContent)).toContain('Roll of honour');
     expect(toc.find((a) => a.textContent === 'Roll of honour')?.getAttribute('href')).toBe('/features/unit-histories/5-rar#roll-of-honour');

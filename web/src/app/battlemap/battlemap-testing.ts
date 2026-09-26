@@ -85,6 +85,7 @@ export function fakeMap() {
     getLayer: (id: string) => (layers.has(id) ? {} : undefined),
     addSource: vi.fn((id: string, _spec?: unknown) => void sources.add(id)),
     addLayer: vi.fn((l: { id: string }) => void layers.add(l.id)),
+    moveLayer: vi.fn(),
     setFilter: vi.fn(),
     setPaintProperty: vi.fn(),
     hasImage: vi.fn(() => false),

@@ -37,7 +37,7 @@ export function casualtyWords(c: Casualties): string {
               }
             </p>
             <p class="summary">{{ c.summary || 'The record gives no summary of this contact.' }}</p>
-            <a class="map" [routerLink]="'/battlemap'" [queryParams]="{ incident: c.id }">On the Battle Map</a>
+            <a class="map" [routerLink]="'/battlemap'" [queryParams]="{ incident: c.id, photos: '0' }">On the Battle Map</a>
           </li>
         }
       </ol>

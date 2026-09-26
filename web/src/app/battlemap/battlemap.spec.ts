@@ -488,6 +488,15 @@ describe('Battlemap', () => {
     expect(map.container.querySelector('.home-in')).toBeNull();
   });
 
+  it('draws the ring round the open incident, and its ripple, over every other layer, photos included', async () => {
+    const { basemaps } = await render({ inputs: { incident: '9' } });
+    const moved = basemaps.map.moveLayer.mock.calls.map(([id, before]) => [id, before]);
+
+    expect(moved.slice(-2)).toEqual([[SELECTED_HALO, undefined], [SELECTED_LAYER, undefined]]);   // to the top: the ring over its ripple
+    const lastAdded = Math.max(...basemaps.map.addLayer.mock.invocationCallOrder);
+    expect(basemaps.map.moveLayer.mock.invocationCallOrder.at(-1)!).toBeGreaterThan(lastAdded);  // after every layer is added
+  });
+
   it('points out nothing when the link opens no incident', async () => {
     const { basemaps } = await render();
     expect(basemaps.map.once).not.toHaveBeenCalled();

@@ -1,4 +1,5 @@
 import { Marked, Renderer, Tokens } from 'marked';
+import { featureMapLink } from '../map-link';
 
 /** A table longer than this shows its first rows, and a button for the rest. */
 export const TABLE_ROWS_SHOWN = 10;
@@ -88,7 +89,7 @@ export function renderHistory(text: string, current: string | null = null): Rend
   renderer.html = (token: Tokens.HTML | Tokens.Tag) => escapeHtml(token.text);
   renderer.link = function (this: Renderer, token: Tokens.Link) {
     const inner = this.parser.parseInline(token.tokens);
-    return safeUrl(token.href) ? `<a href="${escapeHtml(token.href)}">${inner}</a>` : inner;
+    return safeUrl(token.href) ? `<a href="${escapeHtml(featureMapLink(token.href))}">${inner}</a>` : inner;
   };
   renderer.image = (token: Tokens.Image) =>
     safeUrl(token.href) ? `<img src="${escapeHtml(token.href)}" alt="${escapeHtml(token.text)}" loading="lazy">` : '';

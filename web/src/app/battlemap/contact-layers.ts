@@ -221,6 +221,18 @@ export function setSelectedContact(map: Map, id: number | null): void {
   }
 }
 
+/**
+ * Puts the ring round the open incident, and its ripple, over every other layer (the pictures, their stacks and spread-out
+ * pictures are added after the contacts), so the incident being read is never hidden. After every style load, once all are added.
+ */
+export function raiseSelection(map: Map): void {
+  for (const layer of [SELECTED_HALO, SELECTED_LAYER]) {
+    if (map.getLayer(layer)) {
+      map.moveLayer(layer);
+    }
+  }
+}
+
 /** Colours the ring round the open incident, and its ripple, to stand out on the basemap (see `selectionColour`). */
 export function setSelectionColour(map: Map, colour: string): void {
   if (map.getLayer(SELECTED_LAYER)) {

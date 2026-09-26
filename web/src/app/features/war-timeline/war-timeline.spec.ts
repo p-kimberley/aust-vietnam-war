@@ -81,8 +81,8 @@ describe('laying out the timeline', () => {
   });
 
   it('narrows a Battle Map link to a unit with its exact filter, keeping the link\'s own', () => {
-    expect(withUnit('/battlemap?ops=Coburg', unit('2-rar', '2 RAR'))).toBe('/battlemap?ops=Coburg&units=1419!%2C1483');
-    expect(withUnit('/battlemap?ops=Coburg', null)).toBe('/battlemap?ops=Coburg');
+    expect(withUnit('/battlemap?ops=Coburg', unit('2-rar', '2 RAR'))).toBe('/battlemap?ops=Coburg&units=1419!%2C1483&photos=0');
+    expect(withUnit('/battlemap?ops=Coburg', null)).toBe('/battlemap?ops=Coburg&photos=0');                   // without the community photos
   });
 });
 
@@ -236,10 +236,10 @@ describe('WarTimeline', () => {
 
     expect([...el.querySelectorAll('app-timeline-phase h3')].map(text)).toEqual(['Phase establishing']);
     expect([...el.querySelectorAll('app-timeline-entry .title')].map(text)).toEqual(['May 1966', 'Operation Hardihood']);
-    expect(el.querySelector<HTMLAnchorElement>('#establishing .map a')!.getAttribute('href')).toBe('/battlemap?from=1966-03-01&to=1966-08-17&units=1');
+    expect(el.querySelector<HTMLAnchorElement>('#establishing .map a')!.getAttribute('href')).toBe('/battlemap?from=1966-03-01&to=1966-08-17&units=1&photos=0');
     expect(TestBed.inject((await import('@angular/router')).Router).url).toContain('zoom=operational&unit=5-rar');
 
     await click(el.querySelector('#op-hardihood .head'));
-    expect(el.querySelector<HTMLAnchorElement>('#op-hardihood .map')!.getAttribute('href')).toBe('/battlemap?ops=hardihood&units=1');
+    expect(el.querySelector<HTMLAnchorElement>('#op-hardihood .map')!.getAttribute('href')).toBe('/battlemap?ops=hardihood&units=1&photos=0');
   });
 });
