@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { cmsPageMatcher } from './content/cms-page';
 import { roleGuard } from './core/role.guard';
 import { historyResolver } from './features/unit-histories/histories';
+import { timelineResolver } from './features/war-timeline/timeline-data';
 import { SiteLayout } from './layout/site-layout';
 
 const site = "Australia's Vietnam War";
@@ -45,6 +46,12 @@ export const routes: Routes = [
         resolve: { history: historyResolver },
         loadComponent: () => import('./features/unit-histories/unit-histories').then((m) => m.UnitHistories),
       })),
+      {
+        path: 'features/war-timeline',
+        pathMatch: 'full',
+        resolve: { content: timelineResolver },
+        loadComponent: () => import('./features/war-timeline/war-timeline').then((m) => m.WarTimeline),
+      },
       { path: 'forbidden', title: `Not permitted · ${site}`, loadComponent: () => import('./pages/forbidden').then((m) => m.Forbidden) },
       // Anything else is looked up as an authored page; the page shows Not found (and a 404 status) if there is none.
       { matcher: cmsPageMatcher, loadComponent: () => import('./content/cms-page').then((m) => m.CmsPage) },

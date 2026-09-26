@@ -21,6 +21,14 @@ import { UNITS } from './unit-histories/unit-facts';
           </p>
           <a routerLink="/features/unit-histories">Read the unit histories</a>
         </li>
+        <li>
+          <h2><a routerLink="/features/war-timeline">The War, Phase by Phase</a></h2>
+          <p>
+            What Australian forces did from 1965 to 1971, and why: a timeline from the war's phases down to its operations, its months
+            and single actions, each with the way to it on the Battle Map.
+          </p>
+          <a routerLink="/features/war-timeline">Explore the timeline</a>
+        </li>
         <li class="soon">
           <h2>Operation Histories</h2>
           <p>The major operations, why they were mounted, the units in them, what happened and what they cost. Coming later.</p>
