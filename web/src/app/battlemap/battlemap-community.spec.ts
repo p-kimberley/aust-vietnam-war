@@ -76,6 +76,10 @@ describe('Battle Map honour roll', () => {
     expect(r.el.querySelector('app-incident-panel')).toBeNull();
     expect(text(r.el.querySelector('app-honour-panel h2'))).toBe('James Mungo White');
     expect(r.community['person']).toHaveBeenCalledWith('5715978');
+    // Their entry on the Australian War Memorial's Roll of Honour, found by service number, in a tab of its own.
+    const awm = r.el.querySelector<HTMLAnchorElement>('app-honour-panel .awm a')!;
+    expect(awm.getAttribute('href')).toBe('https://www.awm.gov.au/advanced-search/people?roll=Roll%20of%20Honour&people_service_number=5715978');
+    expect([awm.target, awm.rel]).toEqual(['_blank', 'noopener']);
 
     [...r.el.querySelectorAll<HTMLButtonElement>('app-honour-panel button')].find((b) => text(b) === 'Incident 2')!.click();
     await settle(r.fixture);

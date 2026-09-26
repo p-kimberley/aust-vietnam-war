@@ -5,6 +5,14 @@ import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, HonourPerson, TributeView } from './community';
 import { LoadMore } from '../load-more';
 
+/**
+ * The person's entry on the Australian War Memorial's Roll of Honour: its people search, on the Roll of Honour, for their service
+ * number, which finds just them (the Memorial's own record numbers are not on the nominal roll).
+ */
+export function awmRollOfHonourUrl(serviceNumber: string): string {
+  return `https://www.awm.gov.au/advanced-search/people?roll=Roll%20of%20Honour&people_service_number=${encodeURIComponent(serviceNumber)}`;
+}
+
 /** A person on the honour roll: who they were, where they served, the incidents they are linked to, and the poppies left for them. */
 @Component({
   selector: 'app-honour-panel',
@@ -65,6 +73,9 @@ import { LoadMore } from '../load-more';
       border: 1px solid var(--olive-500);
       border-radius: var(--radius);
     }
+    .awm {
+      margin: 0.6rem 0 0;
+    }
     dl {
       display: grid;
       grid-template-columns: max-content 1fr;
@@ -122,6 +133,9 @@ import { LoadMore } from '../load-more';
               <dt>Service</dt><dd>{{ p.nationalService ? 'National Service' : 'Regular Army' }}</dd>
             }
           </dl>
+          <p class="awm">
+            <a [href]="awmUrl(p.serviceNumber)" target="_blank" rel="noopener">Australian War Memorial Roll of Honour</a>
+          </p>
 
           @if (p.tours.length) {
             <h3>Service in Vietnam</h3>
@@ -177,6 +191,7 @@ import { LoadMore } from '../load-more';
   `,
 })
 export class HonourPanel {
+  protected readonly awmUrl = awmRollOfHonourUrl;
   readonly serviceNumber = input.required<string>();
   readonly closed = output<void>();
   /** Opens one of this person's incidents on the map. */
