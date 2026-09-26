@@ -3,6 +3,7 @@
  * brass, contact red. The site is a light "paper" theme; the map and studio use the dark olive surfaces.
  */
 @use 'controls';
+@use 'map';
 
 /* Registered as a length so that a change of the timeline's height can be animated, and everything sized from it follows. */
 @property --timeline-h {

@@ -276,104 +276,10 @@
   }
 }
 
-/* The tooltip over an incident marker (see marker-tip.ts). */
-:host ::ng-deep .map-tip .maplibregl-popup-content {
-  padding: 0.4rem 0.6rem;
-  color: var(--paper);
-  background: color-mix(in srgb, var(--olive-900) 96%, transparent);
-  border: 1px solid var(--olive-500);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-  font-size: 0.8rem;
-  pointer-events: none;
-}
-
-:host ::ng-deep .map-tip .maplibregl-popup-tip {
-  display: none;
-}
-
-:host ::ng-deep .marker-tip p {
-  margin: 0;
-}
-
-:host ::ng-deep .marker-tip__when {
-  font-family: var(--font-data);
-  color: var(--smoke-yellow);
-}
-
-:host ::ng-deep .marker-tip__label {
-  color: var(--khaki);
-}
-
-/* MapLibre's own controls and credit line would otherwise sit under the timeline. */
-:host ::ng-deep .maplibregl-ctrl-bottom-left,
-:host ::ng-deep .maplibregl-ctrl-bottom-right {
-  margin-bottom: calc(var(--timeline-h) + var(--safe-bottom));
-}
-
 /*
- * MapLibre stacks a corner's controls one above another by default; this turns bottom-left into a single row instead,
- * bottom-aligned, so the scale sits level with (and to the right of) the tilt control at the foot of the navigation
- * group, rather than stacked beneath the whole thing.
+ * MapLibre's controls, its popups and the marker tooltip are styled in _map.scss (global, under .bm): they are the library's own
+ * elements, outside this component's view, and would otherwise take this stylesheet over its size budget.
  */
-:host ::ng-deep .maplibregl-ctrl-bottom-left {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-  /* The per-control margin that used to hold these off the corner is zeroed out below, so the offset moves here. */
-  /* Their foot is level with the legend's, and the left-hand panels'. */
-  padding: 0 0 var(--legend-gap) calc(5px + var(--safe-left));
-}
-
-:host ::ng-deep .maplibregl-ctrl-bottom-left .maplibregl-ctrl {
-  margin: 0;
-  float: none;
-  clear: none;
-}
-
-/*
- * MapLibre's zoom and tilt buttons and its scale bar, in the site's colours: dark olive boxes with khaki marks, as the panels
- * and the rails' tabs are. The library draws its icons as dark pictures, so a filter turns them khaki (smoke yellow on hover).
- */
-:host ::ng-deep .maplibregl-ctrl-group {
-  background: color-mix(in srgb, var(--olive-900) 94%, transparent);
-  border: 1px solid var(--olive-500);
-  border-radius: var(--radius);
-  box-shadow: none;
-  overflow: hidden;
-}
-
-:host ::ng-deep .maplibregl-ctrl-group button + button {
-  border-top: 1px solid var(--olive-700);
-}
-
-:host ::ng-deep .maplibregl-ctrl-group button:not(:disabled):hover {
-  background-color: var(--olive-700);
-}
-
-:host ::ng-deep .maplibregl-ctrl-group button:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--smoke-yellow);
-}
-
-:host ::ng-deep .maplibregl-ctrl-group .maplibregl-ctrl-icon {
-  filter: invert(92%) sepia(14%) saturate(420%) hue-rotate(8deg) brightness(98%);
-}
-
-:host ::ng-deep .maplibregl-ctrl-group button:not(:disabled):hover .maplibregl-ctrl-icon {
-  filter: invert(76%) sepia(62%) saturate(640%) hue-rotate(2deg) brightness(96%);
-}
-
-:host ::ng-deep .maplibregl-ctrl-scale {
-  /* The library sizes the box to the distance it stands for, so the words keep its own small size and padding to fit. */
-  padding: 0 5px;
-  color: var(--khaki);
-  font-family: var(--font-data);
-  font-size: 10px;
-  background: color-mix(in srgb, var(--olive-900) 88%, transparent);
-  border: 1px solid var(--khaki);
-  border-top: 0;
-  border-radius: 0 0 2px 2px;
-}
 
 .bm__incident {
   position: absolute;

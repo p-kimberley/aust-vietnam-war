@@ -4,24 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Directory.Packages.props" beforeDir="false" afterPath="$PROJECT_DIR$/server/Directory.Packages.props" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Avw.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Avw.Api.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/ArticleService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Cms/ArticleService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsModels.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Api/Cms/CmsModels.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Api/Cms/ContentSanitizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Core/Content/ContentSanitizer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Core/Avw.Core.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Core/Avw.Core.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Data/AvwDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Data/AvwDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Data/Entities/Article.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Data/Entities/Article.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Data/Migrations/AvwDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Data/Migrations/AvwDbContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/Avw.Migrator/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Avw.Migrator/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ArticleServiceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ArticleServiceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ContentSanitizerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/tests/Avw.Api.Tests/ContentSanitizerTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package.json" afterDir="false" />
-    </list>
+    <list default="true" id="45d1c3a2-e076-4299-bad1-1daea76b1856" name="Changes" comment="Add api as submodule" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -201,7 +184,7 @@
       <workItem from="1789826907280" duration="57186000" />
       <workItem from="1790238719146" duration="12841000" />
       <workItem from="1790331544884" duration="11149000" />
-      <workItem from="1790370537759" duration="12193000" />
+      <workItem from="1790370537759" duration="12524000" />
     </task>
     <task id="LOCAL-00001" summary="Add api as submodule">
       <option name="closed" value="true" />

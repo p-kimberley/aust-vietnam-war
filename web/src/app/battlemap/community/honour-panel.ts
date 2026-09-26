@@ -3,13 +3,12 @@ import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, 
 import { AuthService } from '../../core/auth.service';
 import { problemMessage } from '../../studio/studio-api';
 import { CommunityService, HonourPerson, TributeView } from './community';
-import { Icon } from '../icon';
 import { LoadMore } from '../load-more';
 
 /** A person on the honour roll: who they were, where they served, the incidents they are linked to, and the poppies left for them. */
 @Component({
   selector: 'app-honour-panel',
-  imports: [DatePipe, Icon, LoadMore],
+  imports: [DatePipe, LoadMore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './community.css',
   styles: `
