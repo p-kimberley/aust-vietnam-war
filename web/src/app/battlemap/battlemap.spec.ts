@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { describe, expect, it, vi } from 'vitest';
 import { config, contacts, render, settle } from './battlemap-testing';
-import { HEAT_LAYER, POINT_LAYER, SELECTED_LAYER, heatWeight, pointRadius, selectedRadius } from './contact-layers';
+import { HEAT_LAYER, POINT_LAYER, PULSE_MS, SELECTED_HALO, SELECTED_LAYER, heatWeight, pointRadius, pulseSelection, selectedRadius } from './contact-layers';
 import { fieldRange, formatDtg, sizeCap, toGeoJson } from './contacts';
 import { parseOverlayOpacities } from './basemap.service';
 import { MapConfig, basemapStyle, pickBasemap } from './map-config';
@@ -118,6 +118,38 @@ describe('map config helpers', () => {
     const style = basemapStyle(satellite) as { sources: Record<string, unknown>; layers: { source: string }[] };
     expect(style['sources']['basemap']).toEqual({ type: 'raster', tiles: satellite.tiles, tileSize: satellite.tileSize, attribution: satellite.attribution });
     expect(style['layers']).toEqual([{ id: 'basemap', type: 'raster', source: 'basemap' }]);
+  });
+});
+
+describe('the pulse of the ring round the open incident', () => {
+  const halo = (paint: ReturnType<typeof vi.fn>, property: string) =>
+    paint.mock.calls.filter(([layer, p]) => layer === SELECTED_HALO && p === property).map(([, , value]) => value as number);
+
+  it('sends a second ring out from it, fading as it travels, over and over, until stopped', () => {
+    vi.useFakeTimers();
+    try {
+      const setPaintProperty = vi.fn();
+      const map = { getLayer: (id: string) => (id === SELECTED_HALO ? {} : undefined), setPaintProperty };
+      const stop = pulseSelection(map as never, () => ({ field: null, cap: 0 }));
+
+      vi.advanceTimersByTime(PULSE_MS / 2);
+      // Its radius at zoom 14, the last stop of the ring's: it starts at the ring's own and travels out.
+      const radii = halo(setPaintProperty, 'circle-radius').map((r) => (r as unknown as number[]).at(-1)!);
+      const opacities = halo(setPaintProperty, 'circle-stroke-opacity');
+      expect(radii[0]).toBeCloseTo(14, 0);
+      expect(radii.at(-1)!).toBeGreaterThan(radii[0] + 10);                      // travelling out
+      expect(opacities.at(-1)!).toBeLessThan(opacities[0]);                      // and fading
+      vi.advanceTimersByTime(PULSE_MS);
+      expect(halo(setPaintProperty, 'circle-radius').length).toBeGreaterThan(radii.length);   // and again
+
+      stop();
+      const drawn = setPaintProperty.mock.calls.length;
+      expect(halo(setPaintProperty, 'circle-stroke-opacity').at(-1)).toBe(0);   // gone when stopped
+      vi.advanceTimersByTime(PULSE_MS);
+      expect(setPaintProperty.mock.calls.length).toBe(drawn);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

@@ -7,6 +7,17 @@ export const CONTACT_SOURCE = 'avw-contacts';
 export const HEAT_LAYER = 'avw-contacts-heat';
 export const POINT_LAYER = 'avw-contacts-points';
 export const SELECTED_LAYER = 'avw-contacts-selected';
+/** A second ring, under the first, that ripples out from it and fades while an incident is open (see `pulseSelection`). */
+export const SELECTED_HALO = 'avw-contacts-selected-halo';
+
+/** How far the ripple travels out from the ring, in pixels, before it has faded away. */
+const HALO_TRAVEL = 26;
+/** How strong the ripple is as it leaves the ring, fading to nothing as it spreads. */
+const HALO_OPACITY = 0.9;
+/** How strongly the ripple shades what it passes over: faintly, so the marker inside still shows. */
+const HALO_FILL = 0.22;
+/** How long one ripple takes: slow, so the ring breathes rather than flashes. */
+export const PULSE_MS = 2400;
 
 // Colours match the style guide tokens in styles.scss; map paint properties cannot read CSS variables.
 const CONTACT_RED = '#c23a26';
@@ -76,13 +87,16 @@ export function pointRadius(sizing: MarkerSizing): ExpressionSpecification {
   return ['interpolate', ['linear'], ['zoom'], ...stops] as ExpressionSpecification;
 }
 
-/** The ring round the open incident: as before for equal markers, otherwise always clear of the scaled marker inside it. */
-export function selectedRadius(sizing: MarkerSizing): ExpressionSpecification {
+/**
+ * The ring round the open incident: as before for equal markers, otherwise always clear of the scaled marker inside it. `grow`
+ * pixels further out is where the ripple from it has got to (see `pulseSelection`).
+ */
+export function selectedRadius(sizing: MarkerSizing, grow = 0): ExpressionSpecification {
   const scale = sizeScale(sizing);
   if (!scale) {
-    return ['interpolate', ['linear'], ['zoom'], 6, 6, 14, 14];
+    return ['interpolate', ['linear'], ['zoom'], 6, 6 + grow, 14, 14 + grow];
   }
-  const stops = RING_ZOOMS.flatMap((zoom) => [zoom, ['max', zoom, ['+', ['*', scale, baseRadius(zoom)], 4]]]);
+  const stops = RING_ZOOMS.flatMap((zoom) => [zoom, ['max', zoom + grow, ['+', ['*', scale, baseRadius(zoom)], 4 + grow]]]);
   return ['interpolate', ['linear'], ['zoom'], ...stops] as ExpressionSpecification;
 }
 
@@ -161,6 +175,27 @@ export function addContactLayers(
     });
   }
 
+  if (!map.getLayer(SELECTED_HALO)) {
+    map.addLayer({
+      id: SELECTED_HALO,
+      type: 'circle',
+      source: CONTACT_SOURCE,
+      filter: selectedFilter(state.selectedId),
+      paint: {
+        'circle-radius': selectedRadius(state.sizing),
+        'circle-color': SMOKE_YELLOW,
+        'circle-opacity': 0,
+        'circle-stroke-color': SMOKE_YELLOW,
+        'circle-stroke-width': 3,
+        'circle-stroke-opacity': 0,
+        // Set afresh every frame, so the map is not to ease between the values as well (as it does by default).
+        'circle-radius-transition': { duration: 0 },
+        'circle-opacity-transition': { duration: 0 },
+        'circle-stroke-opacity-transition': { duration: 0 },
+      },
+    });
+  }
+
   if (!map.getLayer(SELECTED_LAYER)) {
     map.addLayer({
       id: SELECTED_LAYER,
@@ -179,9 +214,56 @@ export function addContactLayers(
 
 /** Rings the incident open in the panel, or clears the ring. */
 export function setSelectedContact(map: Map, id: number | null): void {
-  if (map.getLayer(SELECTED_LAYER)) {
-    map.setFilter(SELECTED_LAYER, selectedFilter(id));
+  for (const layer of [SELECTED_HALO, SELECTED_LAYER]) {
+    if (map.getLayer(layer)) {
+      map.setFilter(layer, selectedFilter(id));
+    }
   }
+}
+
+/** Colours the ring round the open incident, and its ripple, to stand out on the basemap (see `selectionColour`). */
+export function setSelectionColour(map: Map, colour: string): void {
+  if (map.getLayer(SELECTED_LAYER)) {
+    map.setPaintProperty(SELECTED_LAYER, 'circle-stroke-color', colour);
+  }
+  if (map.getLayer(SELECTED_HALO)) {
+    map.setPaintProperty(SELECTED_HALO, 'circle-stroke-color', colour);
+    map.setPaintProperty(SELECTED_HALO, 'circle-color', colour);
+  }
+}
+
+/**
+ * Keeps the ring round the open incident pulsing, slowly, until the returned function is called: a second ring, faintly shading
+ * what it passes over, leaves it and travels outward, fading as it goes, again and again. `sizing` is how the markers are sized, which the ring's size follows.
+ * Nothing moves for those who ask for less motion.
+ */
+export function pulseSelection(map: Map, sizing: () => MarkerSizing): () => void {
+  // Guarded rather than called plainly: jsdom has no matchMedia.
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return () => {};
+  }
+  // Drawn every frame the screen shows: at any lower rate the ripple, slowing as it spreads, visibly steps.
+  let frame = 0;
+  let started: number | null = null;
+  const step = (now: number) => {
+    started ??= now;
+    if (map.getLayer(SELECTED_HALO)) {
+      const t = ((now - started) % PULSE_MS) / PULSE_MS;
+      const eased = 1 - (1 - t) * (1 - t);                                // out quickly, then slowing as it fades
+      map.setPaintProperty(SELECTED_HALO, 'circle-radius', selectedRadius(sizing(), eased * HALO_TRAVEL));
+      map.setPaintProperty(SELECTED_HALO, 'circle-stroke-opacity', HALO_OPACITY * (1 - t * t));   // strong most of the way, then gone
+      map.setPaintProperty(SELECTED_HALO, 'circle-opacity', HALO_FILL * (1 - t));
+    }
+    frame = requestAnimationFrame(step);
+  };
+  frame = requestAnimationFrame(step);
+  return () => {
+    cancelAnimationFrame(frame);
+    if (map.getLayer(SELECTED_HALO)) {
+      map.setPaintProperty(SELECTED_HALO, 'circle-stroke-opacity', 0);
+      map.setPaintProperty(SELECTED_HALO, 'circle-opacity', 0);
+    }
+  };
 }
 
 /** Re-weights the heatmap when the chosen data field changes. */
@@ -209,8 +291,10 @@ export function setMarkerSizing(map: Map, sizing: MarkerSizing): void {
     map.setPaintProperty(POINT_LAYER, 'circle-radius', pointRadius(sizing));
     map.setLayoutProperty(POINT_LAYER, 'circle-sort-key', pointSortKey(sizing));
   }
-  if (map.getLayer(SELECTED_LAYER)) {
-    map.setPaintProperty(SELECTED_LAYER, 'circle-radius', selectedRadius(sizing));
+  for (const layer of [SELECTED_HALO, SELECTED_LAYER]) {
+    if (map.getLayer(layer)) {
+      map.setPaintProperty(layer, 'circle-radius', selectedRadius(sizing));
+    }
   }
 }
 

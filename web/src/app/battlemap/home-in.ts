@@ -15,10 +15,10 @@ const RETICULE = `
 
 /**
  * Draws attention to the incident a link opened onto: a reticule, wide across the map at first, closes in on the incident's
- * marker and fades into its ring. It keeps to the incident as the map moves, lets clicks through, and takes itself away when done
- * (or at once, with the function returned). Nothing is drawn for those who ask for less motion.
+ * marker and fades into its ring, in the ring's `colour`. It keeps to the incident as the map moves, lets clicks through, and
+ * takes itself away when done (or at once, with the function returned). Nothing is drawn for those who ask for less motion.
  */
-export function homeIn(map: Map, lon: number, lat: number): () => void {
+export function homeIn(map: Map, lon: number, lat: number, colour: string): () => void {
   if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) {
     return () => undefined;
   }
@@ -26,6 +26,7 @@ export function homeIn(map: Map, lon: number, lat: number): () => void {
   el.className = 'home-in';
   el.setAttribute('aria-hidden', 'true');
   el.innerHTML = RETICULE;
+  el.style.color = colour;                                              // the ring's colour on this basemap
   const place = () => {
     const at = map.project([lon, lat]);
     el.style.transform = `translate(${at.x}px, ${at.y}px)`;

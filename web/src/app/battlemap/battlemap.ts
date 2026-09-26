@@ -60,7 +60,10 @@ import {
   setHeatField,
   setMarkerColours,
   setMarkerSizing,
+  pulseSelection,
+  setSelectionColour,
 } from './contact-layers';
+import { SELECTION_YELLOW, selectionColour } from './selection-colour';
 import { NO_OPERATION_COLOUR, operationColours } from './operation-colours';
 import { markerTip } from './marker-tip';
 import {
@@ -583,6 +586,9 @@ export class Battlemap {
   }
 
   /** Marker sizes are absolute: the cap comes from every contact, not just the filtered ones, so a marker does not change size as filters change. */
+  /** The colour of the ring round the open incident on the basemap in use (see `selectionColour`). */
+  private selectionColour = SELECTION_YELLOW;
+
   private markerSizing(): MarkerSizing {
     const field = this.sizeField();
     return { field, cap: field ? sizeCap(this.contactFilter.allContacts(), field) : 0 };
@@ -807,6 +813,9 @@ export class Battlemap {
               sizing: this.markerSizing(),
               colours: this.operationColourMap(),
             });
+            // The ring round the open incident, in a colour that stands out on this basemap.
+            this.selectionColour = selectionColour(map.getStyle?.());
+            setSelectionColour(map, this.selectionColour);
             addTrackLayers(map, this.tracks(), this.followUnits.followed().size > 0);
             // Pictures last, so they draw over the contacts.
             addPhotoLayers(map, this.mapPictures(), { visible: this.showPhotos(), selectedId: this.selection.selectedPictureId() });
@@ -876,14 +885,26 @@ export class Battlemap {
         },
         { injector: this.injector },
       );
+      // The ring round the open incident pulses slowly for as long as one is open, and not at all otherwise.
+      effect(
+        (onCleanup) => {
+          if (this.selection.selectedId() !== null) {
+            onCleanup(pulseSelection(map, () => this.markerSizing()));
+          }
+        },
+        { injector: this.injector },
+      );
 
-      // An incident the link opened onto is pointed out, once the map has come to it: a reticule closes in on its marker.
+      // An incident the link opened onto is pointed out, once the map has come to it: a reticule, in the ring's colour for this
+      // basemap, closes in on its marker. The basemap's colour is only known once its style has loaded (the map is handed back
+      // before that), so it waits for that too: a link with its own view has no flight to wait for, and would go in yellow.
       if (opened) {
-        const pointOut = () => homeIn(map, opened.lon, opened.lat);
+        const pointOut = () => homeIn(map, opened.lon, opened.lat, this.selectionColour);
+        const onceStyled = () => (this.status() === 'ready' ? pointOut() : map.once('style.load', pointOut));
         if (target && !hasOwnView) {
-          map.once('moveend', pointOut);
+          map.once('moveend', onceStyled);
         } else {
-          afterNextRender(pointOut, { injector: this.injector });
+          afterNextRender(onceStyled, { injector: this.injector });
         }
       }
 
