@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, model, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, OnDestroy, afterNextRender, computed, effect, inject, model, output, signal } from '@angular/core';
 import { CommunityService, HonourFacets, HonourFacetOption, HonourFilters, HonourSummary } from './community/community';
 import { HonourPanel } from './community/honour-panel';
 import { Icon } from './icon';
@@ -9,6 +9,8 @@ import { PanelInfo } from './panel-info';
 export const ROLL_PAGE_SIZE = 20;
 /** How long typing must pause before the roll is searched. */
 export const ROLL_DELAY_MS = 300;
+/** How long after switching between the list and a person the panel's height eases to where it comes to (a person's details load after it). */
+const SWITCH_EASE_MS = 1500;
 
 type Status = 'loading' | 'ready' | 'error';
 type FilterKey = keyof HonourFilters;
@@ -43,7 +45,7 @@ interface FilterList {
           <button type="button" class="close" aria-label="Close the nominal roll" (click)="closed.emit()">×</button>
         </div>
         <div class="detail__panel">
-          <app-honour-panel [serviceNumber]="serviceNumber" [closable]="false" (openIncident)="openIncident.emit($event)" />
+          <app-honour-panel [serviceNumber]="serviceNumber" [closable]="false" (openIncident)="openIncident.emit($event)" (loaded)="release()" />
         </div>
       </div>
     } @else {
@@ -323,6 +325,8 @@ export class NominalRoll implements OnDestroy {
   readonly openIncident = output<number>();
 
   private readonly api = inject(CommunityService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
   private timer?: ReturnType<typeof setTimeout>;
   private seq = 0;
   private page = 0;
@@ -369,6 +373,63 @@ export class NominalRoll implements OnDestroy {
 
   constructor() {
     void this.load(true);
+    this.easeHeightBetweenListAndPerson();
+  }
+
+  /** Until a person's details come, the panel keeps the height it had; see {@link easeHeightBetweenListAndPerson}. */
+  private held?: ReturnType<typeof setTimeout>;
+  /** The panel's height as last drawn. */
+  private lastHeight = 0;
+  /** Until when a change in the panel's height is eased: the switch's, not the list's own as it loads or is searched. */
+  private easeUntil = 0;
+
+  /**
+   * The list fills the panel's height; a person's details may need less. Switching, the panel eases from one height to the other.
+   * A person's details come a moment after the switch, so until they do the panel holds the list's height, rather than drop to
+   * the height of "Loading" and rise again.
+   */
+  private easeHeightBetweenListAndPerson(): void {
+    let first = true;
+    effect(() => {
+      const person = this.person();
+      if (first) {
+        first = false;
+        return;
+      }
+      this.easeUntil = performance.now() + SWITCH_EASE_MS;
+      if (person && this.lastHeight) {
+        this.host.nativeElement.style.minHeight = `${this.lastHeight}px`;
+        clearTimeout(this.held);
+        this.held = setTimeout(() => this.release(), SWITCH_EASE_MS);
+      } else {
+        this.release();
+      }
+    });
+    afterNextRender(() => {
+      const el = this.host.nativeElement;
+      if (typeof ResizeObserver !== 'function' || typeof el.animate !== 'function') return;
+      this.lastHeight = el.getBoundingClientRect().height;
+      let easing = false;
+      const watch = new ResizeObserver(() => {
+        if (easing) return;                                           // the easing's own frames
+        const from = this.lastHeight;
+        const to = (this.lastHeight = el.getBoundingClientRect().height);
+        const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (performance.now() > this.easeUntil || Math.abs(to - from) < 2 || still) return;
+        easing = true;
+        const ease = el.animate([{ height: `${from}px` }, { height: `${to}px` }], { duration: 250, easing: 'ease' });
+        ease.onfinish = ease.oncancel = () => (easing = false);
+      });
+      watch.observe(el);
+      this.destroyRef.onDestroy(() => watch.disconnect());
+    });
+  }
+
+  /** Lets go of the height held while a person's details come, so the panel eases to theirs. */
+  protected release(): void {
+    clearTimeout(this.held);
+    this.easeUntil = performance.now() + SWITCH_EASE_MS;
+    this.host.nativeElement.style.minHeight = '';
   }
 
   /** What is known of each person at a glance: rank, corps and the year of death. */
@@ -433,5 +494,6 @@ export class NominalRoll implements OnDestroy {
 
   ngOnDestroy(): void {
     clearTimeout(this.timer);
+    clearTimeout(this.held);
   }
 }

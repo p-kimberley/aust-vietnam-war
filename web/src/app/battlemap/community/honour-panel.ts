@@ -215,6 +215,8 @@ export class HonourPanel {
   readonly closable = input(true);
   /** Opens one of this person's incidents on the map. */
   readonly openIncident = output<number>();
+  /** The person's details (or word that they could not be loaded) are on show. */
+  readonly loaded = output<void>();
 
   protected readonly auth = inject(AuthService);
   private readonly api = inject(CommunityService);
@@ -266,10 +268,12 @@ export class HonourPanel {
         this.items.set(tributes.items);
         this.tributes.set({ total: tributes.total });
         this.more.set(tributes.items.length < tributes.total);
+        this.loaded.emit();
       }
     } catch (e) {
       if (ticket === this.latest) {
         this.error.set(problemMessage(e, 'This person could not be loaded.'));
+        this.loaded.emit();
       }
     }
   }
