@@ -101,7 +101,7 @@
 
 /* With an incident open the column sits beside it; on narrow screens the incident takes the space. */
 .bm__right.bm__right--shifted {
-  right: calc(var(--rail) + min(22rem, 100vw - 3.9rem) + 1.5rem);
+  right: calc(var(--rail) + min(22rem, 100vw - 3.9rem) + 0.75rem);
 }
 
 /* The followed-units panel (when there is one) and the legend stay together at the bottom of the column. */
@@ -281,12 +281,16 @@
  * elements, outside this component's view, and would otherwise take this stylesheet over its size budget.
  */
 
+/*
+ * Where the Layers and Filters panel flies out: against the rail at the right, its top level with the side panels' (and the
+ * rails'), its foot with theirs just above the timeline.
+ */
 .bm__incident {
   position: absolute;
   z-index: 3;
-  top: calc(3rem + var(--safe-top));
-  right: calc(var(--rail) + 0.75rem + var(--safe-right));
-  bottom: calc(var(--timeline-h) + var(--safe-bottom) + 0.75rem);
+  top: calc(3rem + 12px + var(--safe-top));
+  right: calc(var(--rail) + var(--safe-right));
+  bottom: calc(var(--timeline-h) + var(--safe-bottom) + var(--legend-gap));
   width: min(22rem, calc(100vw - 3.9rem));
 }
 
@@ -389,12 +393,11 @@
     top: calc(3rem + 16px + var(--safe-top));
   }
 
+  /* The whole view below the top bar, over the rails (and under the search box, which drops in over everything). */
   .bm__incident {
-    top: auto;
-    left: 0.75rem;
+    z-index: 6;
+    inset: calc(3rem + 16px + var(--safe-top)) var(--safe-right) var(--safe-bottom) var(--safe-left);
     width: auto;
-    height: 55dvh;
-    bottom: calc(var(--timeline-h) + var(--safe-bottom) + 0.75rem);
   }
 
   .bm__flyout,

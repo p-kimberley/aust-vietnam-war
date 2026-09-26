@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, model, output, signal } from '@angular/core';
 import { CommunityService, HonourFacets, HonourFacetOption, HonourFilters, HonourSummary } from './community/community';
 import { HonourPanel } from './community/honour-panel';
 import { Icon } from './icon';
@@ -35,11 +35,11 @@ interface FilterList {
   imports: [HonourPanel, Icon, LoadMore, PanelInfo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (selected(); as serviceNumber) {
+    @if (person(); as serviceNumber) {
       <div class="detail">
-        <button type="button" class="back" (click)="selected.set(null)"><app-icon name="arrow-left" />Back</button>
+        <button type="button" class="back" (click)="person.set(null)"><app-icon name="arrow-left" />Back</button>
         <div class="detail__panel">
-          <app-honour-panel [serviceNumber]="serviceNumber" (closed)="selected.set(null)" (openIncident)="openIncident.emit($event)" />
+          <app-honour-panel [serviceNumber]="serviceNumber" (closed)="person.set(null)" (openIncident)="openIncident.emit($event)" />
         </div>
       </div>
     } @else {
@@ -92,7 +92,7 @@ interface FilterList {
         <ul class="list" aria-label="People on the roll">
           @for (person of people(); track person.serviceNumber) {
             <li>
-              <button type="button" class="person" (click)="selected.set(person.serviceNumber)">
+              <button type="button" class="person" (click)="show(person.serviceNumber)">
                 @if (person.portraitUrl) {
                   <img class="person__portrait" [src]="person.portraitUrl" alt="" width="36" height="44" loading="lazy" />
                 } @else {
@@ -327,8 +327,13 @@ export class NominalRoll implements OnDestroy {
   protected readonly chosen = signal<Chosen>({ ...NOTHING_CHOSEN });
   /** What each drop-down offers, as the last search counted it. */
   protected readonly facets = signal<HonourFacets | null>(null);
-  /** The service number of the person on show, or `null` for the list. */
-  protected readonly selected = signal<string | null>(null);
+  /** The service number of the person on show, or `null` for the list: set by a link to a person, and by choosing one here. */
+  readonly person = model<string | null>(null);
+
+  /** Shows a person from the list. */
+  protected show(serviceNumber: string): void {
+    this.person.set(serviceNumber);
+  }
 
   protected readonly restricted = computed(() => Object.values(this.chosen()).some(Boolean));
 

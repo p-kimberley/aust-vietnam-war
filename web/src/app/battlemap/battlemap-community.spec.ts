@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { describe, expect, it } from 'vitest';
 import { HonourPerson, HonourSummary } from './community/community';
@@ -91,6 +92,38 @@ describe('Battle Map honour roll', () => {
     expect(onlyPerson.el.querySelector('app-incident-panel')).toBeNull();
   });
 
+  it('keeps Layers and Filters shut on a visit a link opened onto a person or an incident, remembering the choice', async () => {
+    for (const inputs of [{ person: '5715978' }, { incident: '2' }] as Record<string, string>[]) {
+      TestBed.resetTestingModule();
+      const r = await render({ inputs, community: community(), stored: { 'avw.battlemap.panelOpen': 'true' } });
+      await settle(r.fixture);
+      expect(r.el.querySelector('#right-flyout')!.classList.contains('is-open')).toBe(false);
+      expect(localStorage.getItem('avw.battlemap.panelOpen')).toBe('true');
+
+      // Choosing a tool opens it as usual.
+      r.el.querySelector<HTMLButtonElement>('#right-tab-layers')!.click();
+      await settle(r.fixture);
+      expect(r.el.querySelector('#right-flyout')!.classList.contains('is-open')).toBe(true);
+    }
+  });
+
+  it('puts Layers and Filters away when an incident is opened at the right, remembering the choice', async () => {
+    const r = await render({ community: community(), stored: { 'avw.battlemap.panelOpen': 'true' } });
+    await settle(r.fixture);
+    const flyout = () => r.el.querySelector('#right-flyout')!.classList.contains('is-open');
+    expect(flyout()).toBe(true);
+
+    r.basemaps.clickHandler?.({ id: 2 });
+    await settle(r.fixture);
+    expect(r.el.querySelector('app-incident-panel')).not.toBeNull();
+    expect(flyout()).toBe(false);
+    expect(localStorage.getItem('avw.battlemap.panelOpen')).toBe('true');
+
+    r.el.querySelector<HTMLButtonElement>('#right-tab-filters')!.click();
+    await settle(r.fixture);
+    expect(flyout()).toBe(true);
+  });
+
   it('closes the person panel from its close button', async () => {
     const r = await render({ inputs: { person: '5715978' }, community: community() });
     await settle(r.fixture);
@@ -101,13 +134,16 @@ describe('Battle Map honour roll', () => {
     expect(r.el.querySelector('app-honour-panel')).toBeNull();
   });
 
-  it('closes the person panel when an incident or a base is chosen instead', async () => {
+  it("shows a linked person in the Nominal Roll, which stays open beside an incident chosen after", async () => {
     const r = await render({ inputs: { person: '5715978' }, community: community() });
     await settle(r.fixture);
+    expect(r.el.querySelector('#left-flyout app-nominal-roll app-honour-panel')).not.toBeNull();
+    expect(r.el.querySelector('#left-flyout')!.classList.contains('is-open')).toBe(true);
 
     r.basemaps.clickHandler?.({ id: 1 });
     await settle(r.fixture);
 
-    expect(r.el.querySelector('app-honour-panel')).toBeNull();
+    expect(r.el.querySelector('app-incident-panel')).not.toBeNull();
+    expect(r.el.querySelector('#left-flyout app-nominal-roll app-honour-panel')).not.toBeNull();
   });
 });

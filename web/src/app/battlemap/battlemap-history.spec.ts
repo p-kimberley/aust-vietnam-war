@@ -52,9 +52,11 @@ describe('Back and Forward on the Battle Map', () => {
     expect(r.el.querySelector('app-picture-viewer')).not.toBeNull();
     expect(r.el.querySelector('#left-flyout app-nominal-roll')).not.toBeNull();
 
-    await r.goTo({ person: '5715978' });
-    expect(r.el.querySelector('app-honour-panel')).not.toBeNull();
+    await r.goTo({ person: '5715978' });                                         // a person is shown in the Nominal Roll
+    expect(r.el.querySelector('#left-flyout app-nominal-roll app-honour-panel')).not.toBeNull();
     expect(r.el.querySelector('app-picture-viewer')).toBeNull();
+
+    await r.goTo({});
     await new Promise((resolve) => setTimeout(resolve, 350));                    // the fly-out slides away
     await settle(r.fixture);
     expect(r.el.querySelector('#left-flyout app-nominal-roll')).toBeNull();

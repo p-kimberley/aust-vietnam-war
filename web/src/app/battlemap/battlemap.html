@@ -67,7 +67,7 @@
           <app-analytics-panel [ids]="contactFilter.visibleIds()" [filtered]="contactFilter.activeCount() > 0" (closed)="setFlyout(null)" (rangeSelected)="setDateRange($event)" />
         }
         @case ('roll') {
-          <app-nominal-roll (closed)="setFlyout(null)" (openIncident)="openContact($event)" />
+          <app-nominal-roll [person]="rollPerson()" (personChange)="rollPersonChanged($event)" (closed)="setFlyout(null)" (openIncident)="openContact($event)" />
         }
         @case ('images') {
           <app-pictures-panel (closed)="setFlyout(null)" (openPicture)="selectPicture($event.id)" (added)="pictureAdded($event)" />

@@ -9,6 +9,7 @@ import {
   inject,
   input,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -251,7 +252,13 @@ export class Battlemap {
     { id: 'filters', label: 'Filters', icon: 'filter', badge: this.contactFilter.activeCount() || null },
   ]);
   /** The tool flown out at the right, or `null`: the panel's open state and its tab, both kept by the browser (see above). */
-  protected readonly rightTool = computed<Tab | null>(() => (this.panelOpen() ? this.tab() : null));
+  protected readonly rightTool = computed<Tab | null>(() => (this.panelOpen() && !this.rightHeldBack() ? this.tab() : null));
+  /**
+   * The panel is put away while a record is open at the right (an incident, a base or a person, however it was opened, or a picture a
+   * link opened), so it does not cover the record; the choice the browser remembers is left alone, and choosing a tool opens it as
+   * usual.
+   */
+  private readonly rightHeldBack = signal(false);
   /** What the right-hand fly-out holds; like the left one's, it stays through the slide out. */
   protected readonly rightShown = signal<Tab | null>(this.rightTool());
   /** One right-hand tool is being swapped for the other while open, so the width may glide. */
@@ -280,6 +287,8 @@ export class Battlemap {
   protected readonly flyout = signal<string | null>(null);
   /** What the fly-out holds. It stays through the slide out, so the panel does not vanish before it has gone. */
   protected readonly flyoutShown = signal<string | null>(null);
+  /** The person the Nominal Roll shows (a link's `person`, or one chosen there), or `null` for its list. */
+  protected readonly rollPerson = signal<string | null>(null);
   /** One tool is being swapped for another while the fly-out is open, so its width may glide; opening or shutting it takes its width at once. */
   protected readonly flyoutSwitching = signal(false);
   private flyoutTimer?: ReturnType<typeof setTimeout>;
@@ -324,6 +333,21 @@ export class Battlemap {
     // Told once here, rather than threaded through every call, since it only ever means one thing: bring the map up to date.
     this.contactFilter.onSearched = () => this.refreshContacts(true);
     afterNextRender(() => void this.start());
+
+    // Opening a record at the right puts Layers and Filters away, sliding out as usual.
+    effect(() => {
+      const opened = this.selection.selectedId() ?? this.selection.selectedPoiId() ?? this.selection.selectedPerson();
+      if (opened !== null) untracked(() => this.putRightAway());
+    });
+  }
+
+  /** Puts Layers and Filters away for a record opened at the right, without changing what the browser remembers. */
+  private putRightAway(): void {
+    if (this.rightTool() === null) return;
+    clearTimeout(this.rightTimer);
+    this.rightSwitching.set(false);
+    this.rightHeldBack.set(true);
+    this.rightTimer = setTimeout(() => this.rightShown.set(null), FLYOUT_SLIDE_MS);
   }
 
   /** Opens the incident panel for a contact (or closes it), ringing the marker and keeping the URL in step. */
@@ -450,6 +474,12 @@ export class Battlemap {
     }
   }
 
+  /** The Nominal Roll showed a person, or went back to its list. */
+  protected rollPersonChanged(serviceNumber: string | null): void {
+    this.rollPerson.set(serviceNumber);
+    this.syncUrl();
+  }
+
   /** Opens a person's page on the honour roll (or closes it), in place of whatever else is open. */
   protected openPerson(serviceNumber: string | null): void {
     this.selection.openPerson(serviceNumber);
@@ -498,6 +528,7 @@ export class Battlemap {
   /** Opens Layers or Filters at the right, swaps one for the other, or (with `null`) shuts the panel. */
   protected setRightTool(tool: Tab | null): void {
     clearTimeout(this.rightTimer);
+    this.rightHeldBack.set(false);
     this.rightSwitching.set(tool !== null && this.rightTool() !== null);
     if (tool !== null) {
       this.tab.set(tool);
@@ -581,6 +612,7 @@ export class Battlemap {
   /** Flies a tool out from the left, or puts it away. */
   protected setFlyout(id: string | null): void {
     clearTimeout(this.flyoutTimer);
+    if (id !== 'roll') this.rollPerson.set(null);
     this.flyoutSwitching.set(id !== null && this.flyout() !== null);
     this.flyout.set(id);
     if (id !== null) {
@@ -693,12 +725,11 @@ export class Battlemap {
         }
       }
 
-      // A link may open onto a person on the honour roll, unless it already names an incident or a base.
-      if (this.person() && !this.incident() && !this.poi()) {
-        this.selection.selectedPerson.set(this.person()!);
-      }
+      // A link may open onto a person on the honour roll, shown in the Nominal Roll, unless it already names an incident or a base.
+      const linkedPerson = this.person() && !this.incident() && !this.poi() ? this.person()! : null;
+      this.rollPerson.set(linkedPerson);
 
-      const tool = this.charts() === '1' ? 'charts' : this.roll() === '1' ? 'roll' : this.images() === '1' ? 'images' : null;
+      const tool = linkedPerson || this.roll() === '1' ? 'roll' : this.charts() === '1' ? 'charts' : this.images() === '1' ? 'images' : null;
       this.flyout.set(tool);
       this.flyoutShown.set(tool);
       this.followUnits.followed.set(followedFromLink(this.follow(), this.track(), this.contactFilter.filters().units));
@@ -738,6 +769,11 @@ export class Battlemap {
         this.selection.selectedPictureId.set(requestedPicture);
       }
       const openedPicture = this.mapPictures().find((p) => p.id === requestedPicture);
+
+      if (opened || openedPoi || openedPicture || linkedPerson) {
+        this.rightHeldBack.set(true);
+        this.rightShown.set(null);
+      }
 
       const target = opened ?? openedPoi ?? openedPicture;
       const hasOwnView = !!parseAt(this.at());
@@ -906,7 +942,7 @@ export class Battlemap {
         incident: this.selection.selectedId(),
         poi: this.selection.selectedPoiId(),
         picture: this.selection.selectedPictureId(),
-        person: this.selection.selectedPerson(),
+        person: this.flyout() === 'roll' && this.rollPerson() ? this.rollPerson() : this.selection.selectedPerson(),
         charts: this.flyout() === 'charts' ? '1' : null,
         roll: this.flyout() === 'roll' ? '1' : null,
         images: this.flyout() === 'images' ? '1' : null,
@@ -979,8 +1015,11 @@ export class Battlemap {
     this.refreshContacts();
     setTrackVisibility(map, this.followUnits.followed().size > 0);
 
-    // The tool at the left.
-    const tool = one('charts') === '1' ? 'charts' : one('roll') === '1' ? 'roll' : one('images') === '1' ? 'images' : null;
+    // The tool at the left, and the person the Nominal Roll shows (a person in the link is shown there).
+    const person = one('person') ?? null;
+    const rollPerson = person && !one('incident') && !one('poi') ? person : null;
+    const tool = rollPerson || one('roll') === '1' ? 'roll' : one('charts') === '1' ? 'charts' : one('images') === '1' ? 'images' : null;
+    this.rollPerson.set(rollPerson);
     if (tool !== this.flyout()) this.setFlyout(tool);
 
     // What was open: an incident, a base or a person at the right, and a picture in the viewer over them.
@@ -990,13 +1029,10 @@ export class Battlemap {
     };
     const incident = id('incident');
     const poi = id('poi');
-    const person = one('person') ?? null;
     if (incident !== null && this.contactFilter.allContacts().some((c) => c.id === incident)) {
       this.selection.select(incident);
     } else if (poi !== null && this.pois().some((p) => p.id === poi)) {
       this.selection.selectPoi(poi);
-    } else if (person) {
-      this.selection.openPerson(person);
     } else {
       this.selection.clear();
       this.selection.openPerson(null);
