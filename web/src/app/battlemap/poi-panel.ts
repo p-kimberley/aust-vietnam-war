@@ -28,7 +28,7 @@ export class PoiPanel {
     // Move focus into the panel when a point opens, so keyboard and screen-reader users land on it.
     effect(() => {
       this.poiId();
-      this.heading()?.nativeElement.focus();
+      this.heading()?.nativeElement.focus({ preventScroll: true });
     });
   }
 }

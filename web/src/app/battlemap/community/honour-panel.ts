@@ -239,7 +239,7 @@ export class HonourPanel {
     // Move focus into the panel when a person opens, as the incident panel does.
     effect(() => {
       this.person();
-      this.heading()?.nativeElement.focus();
+      this.heading()?.nativeElement.focus({ preventScroll: true });
     });
   }
 

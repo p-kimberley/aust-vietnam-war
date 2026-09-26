@@ -69,7 +69,7 @@ export class IncidentPanel {
     // Move focus into the panel when an incident opens, so keyboard and screen-reader users land on it.
     effect(() => {
       this.contactId();
-      this.heading()?.nativeElement.focus();
+      this.heading()?.nativeElement.focus({ preventScroll: true });
       // Another incident starts on its own details (or where search sent it), with counts to be found again.
       this.tab.set(this.startTab());
       this.notesCount.set(null);

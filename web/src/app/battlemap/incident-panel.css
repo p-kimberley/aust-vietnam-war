@@ -255,3 +255,21 @@ a {
 [hidden] {
   display: none !important;
 }
+
+/* Slides in from the right as it opens (not again as another takes its place), past the rail at the screen's edge. */
+:host {
+  animation: detail-in 0.3s ease-out;
+}
+
+@keyframes detail-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(100% + var(--rail, 0px)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}
